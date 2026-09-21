@@ -586,7 +586,7 @@ void main(){
 let GL_OK = true, LINE = false, CALMO = false;
 /* ---------- resolución de la FORMA: más baja mientras se mueve, en pantallas chicas ----------
    La foto queda siempre a resolución completa; lo que baja es la capa de la forma. */
-const SHAPE_MOTION = () => window.LAB_SHAPESCALE || (innerWidth < 1024 ? 0.125 : 1);
+const SHAPE_MOTION = () => window.LAB_SHAPESCALE || (innerWidth < 1024 ? 0.125 : 0.25);
 const STILL_MS = 250;
 function sigOf(s,m){ return [s.cx,s.cy,s.bw,s.bh,s.radius||0, s.morph||0,s.rectMix||0,s.zoom||1,s.mix||0, m.mouse[0],m.mouse[1],m.hover]; }
 function isMoving(m,s){
