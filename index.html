@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bong Lab</title>
+<meta name="description" content="Experimentos generativos de Bong Studio.">
+<script>
+  // Para sumar un experimento, agregá un objeto acá.
+  // url: carpeta relativa a la raíz del repo, con barra final.
+  const EXPERIMENTOS = [
+    {
+      titulo: "Laboratorio generativo del Sistema de Formas",
+      cliente: "Profertil",
+      descripcion: "Las 17 formas del sistema en partículas, flujo, grilla y mosaico.",
+      url: "profertil/formas/",
+    },
+    {
+      titulo: "Laboratorio de refracción",
+      cliente: "Profertil",
+      descripcion: "Cristal tipo liquid glass sobre el Sistema de Formas.",
+      url: "profertil/refraccion/",
+    },
+  ];
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --fondo: #003DA5;
+    --texto: #FFFEEF;
+    --linea: rgba(255, 254, 239, 0.28);
+    --tenue: rgba(255, 254, 239, 0.72);
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    background: var(--fondo);
+    color: var(--texto);
+    font-family: "Archivo", system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 32px 16px 48px;
+    -webkit-font-smoothing: antialiased;
+  }
+  header, main, footer { max-width: 1120px; margin: 0 auto; }
+  header { margin-bottom: 40px; }
+  .eyebrow {
+    font-size: 12px; font-weight: 500; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--tenue);
+  }
+  h1 {
+    font-size: clamp(40px, 12vw, 96px);
+    font-weight: 700; line-height: 0.95; letter-spacing: -0.03em;
+    margin-top: 12px;
+  }
+  .grilla {
+    list-style: none; padding: 0;
+    display: grid; gap: 16px;
+    grid-template-columns: 1fr;
+  }
+  .tarjeta {
+    display: flex; flex-direction: column; gap: 12px;
+    height: 100%; min-height: 200px;
+    padding: 20px;
+    border: 1px solid var(--linea);
+    border-radius: 4px;
+    color: inherit; text-decoration: none;
+    transition: background-color .2s, border-color .2s;
+  }
+  .tarjeta:hover, .tarjeta:focus-visible {
+    background: rgba(255, 254, 239, 0.08);
+    border-color: var(--texto);
+    outline: none;
+  }
+  .tarjeta h2 {
+    font-size: 24px; font-weight: 700; line-height: 1.1; letter-spacing: -0.01em;
+  }
+  .tarjeta p { font-size: 16px; line-height: 1.4; color: var(--tenue); }
+  .tarjeta .pie {
+    margin-top: auto; padding-top: 16px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .tarjeta .flecha { font-size: 20px; transition: transform .2s; }
+  .tarjeta:hover .flecha { transform: translateX(4px); }
+  footer { margin-top: 56px; font-size: 13px; color: var(--tenue); }
+  footer a { color: inherit; }
+
+  @media (min-width: 640px) {
+    body { padding: 56px 32px 64px; }
+    .grilla { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .tarjeta { padding: 28px; min-height: 240px; }
+  }
+  @media (min-width: 1024px) {
+    .grilla { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <p class="eyebrow">Bong Studio · Experimentos generativos</p>
+    <h1>Bong Lab</h1>
+  </header>
+  <main>
+    <ul class="grilla" id="grilla"></ul>
+  </main>
+  <footer>
+    <a href="https://bongstudio.ar">bongstudio.ar</a>
+  </footer>
+<script>
+  const grilla = document.getElementById("grilla");
+  for (const e of EXPERIMENTOS) {
+    const li = document.createElement("li");
+    const a = document.createElement("a");
+    a.className = "tarjeta";
+    a.href = e.url;
+    const h2 = document.createElement("h2");
+    h2.textContent = e.titulo;
+    const p = document.createElement("p");
+    p.textContent = e.descripcion;
+    const pie = document.createElement("div");
+    pie.className = "pie";
+    const cliente = document.createElement("span");
+    cliente.className = "eyebrow";
+    cliente.textContent = e.cliente;
+    const flecha = document.createElement("span");
+    flecha.className = "flecha";
+    flecha.setAttribute("aria-hidden", "true");
+    flecha.textContent = "→";
+    pie.append(cliente, flecha);
+    a.append(h2, p, pie);
+    li.append(a);
+    grilla.append(li);
+  }
+</script>
+</body>
+</html>

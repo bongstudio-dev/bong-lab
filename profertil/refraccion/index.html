@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Laboratorio de refracción para Profertil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#003DA5;--fg:#FFFEEF;--ac:#EABA2C;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#003DA5;--fg:#FFFEEF;--ac:#EABA2C}}
+:root[data-theme="dark"]{--bg:#003DA5;--fg:#FFFEEF;--ac:#EABA2C}
+*{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--fg);font-family:'Archivo',system-ui,-apple-system,'Segoe UI',sans-serif;-webkit-tap-highlight-color:transparent}
+#stage{position:fixed;inset:0}
+#stage canvas{display:block;touch-action:none}
+.top{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:12px;right:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;pointer-events:none}
+.top span{font-size:13px;font-weight:500;opacity:.8;text-shadow:0 1px 8px rgba(0,0,0,.25)}
+.top div{display:flex;gap:6px;pointer-events:auto}
+.bar{position:fixed;left:0;right:0;bottom:0;padding:10px 12px calc(12px + env(safe-area-inset-bottom,0px));display:grid;gap:8px;background:color-mix(in srgb,var(--bg) 80%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.lbl{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.6;margin:2px 4px -2px}
+button{font:inherit;font-size:14px;font-weight:700;padding:10px 4px;border-radius:999px;border:1.5px solid var(--fg);background:transparent;color:var(--fg);cursor:pointer;white-space:nowrap}
+.top button{padding:8px 14px;background:color-mix(in srgb,var(--bg) 70%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<div class="top"><span>Arrastrá el cristal</span><div><button id="bgb">Fondo</button><button id="pal">Color</button></div></div>
+<div class="bar" id="bar">
+  <div class="lbl">Forma</div>
+  <div class="row" id="shapeRow">
+    <button data-v="pill" aria-pressed="true">Píldora</button>
+    <button data-v="circle" aria-pressed="false">Círculo</button>
+    <button data-v="card" aria-pressed="false">Tarjeta</button>
+    <button data-v="drops" aria-pressed="false">Gotas</button>
+  </div>
+  <div class="lbl">Material</div>
+  <div class="row" id="matRow">
+    <button data-v="0" aria-pressed="true">Cristal</button>
+    <button data-v="1" aria-pressed="false">Líquido</button>
+    <button data-v="2" aria-pressed="false">Esmerilado</button>
+    <button data-v="3" aria-pressed="false">Prisma</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+<script>
+const SHAPES={
+Trigo:{vb:[262,292],d:["M0.114626 152.086C102.159 158.137 125.943 222.856 130.938 261.95C135.94 222.853 159.735 158.16 261.758 152.11C262.707 181.969 260.78 287.272 131.687 291.473C131.685 291.486 131.685 291.493 131.685 291.493C131.573 291.49 131.462 291.486 131.35 291.482C130.964 291.494 130.576 291.507 130.188 291.518C130.188 291.518 130.185 291.494 130.18 291.448C1.09258 287.245 -0.834293 181.945 0.114626 152.086Z","M141.611 10.6143C188.474 57.4771 188.474 133.457 141.611 180.32L130.995 190.935L120.381 180.32C73.5183 133.457 73.5183 57.4772 120.381 10.6143L130.995 0L141.611 10.6143Z"]},
+Sol:{vb:[262,265],d:["M130.956 204.045C112.011 204.045 93.8427 196.458 80.4469 182.952C67.051 169.447 59.5254 151.129 59.5254 132.029C59.5254 112.929 67.051 94.6118 80.4469 81.1062C93.8427 67.6006 112.011 60.0133 130.956 60.0133C149.9 60.0133 168.069 67.6006 181.465 81.1062C194.861 94.6118 202.386 112.929 202.386 132.029C202.386 151.129 194.861 169.447 181.465 182.952C168.069 196.458 149.9 204.045 130.956 204.045ZM119.051 0H142.861V36.008H119.051V0ZM119.051 228.05H142.861V264.058H119.051V228.05ZM29.9413 47.1584L46.775 30.1867L72.0257 55.6443L55.1919 72.6161L29.9413 47.1584ZM189.886 208.414L206.72 191.442L231.97 216.9L215.137 233.872L189.886 208.414ZM215.137 30.1747L231.97 47.1584L206.72 72.6161L189.886 55.6443L215.137 30.1747ZM55.1919 191.442L72.0257 208.414L46.775 233.872L29.9413 216.9L55.1919 191.442ZM261.912 120.027V144.032H226.196V120.027H261.912ZM35.7152 120.027V144.032H0V120.027H35.7152Z"]},
+Hoja:{vb:[255,249],d:["M100.334 77.4792C149.992 -10.0442 254.604 0.386416 254.604 0.386416C253.868 111.726 195.419 153.259 143.571 168.579C146.911 202.676 139.814 233.224 135.742 248.317C-50.2676 192.679 8.95125 30.5134 8.99943 30.3815C50.5229 41.3304 79.8546 58.0139 100.334 77.4792Z"]},
+Urea:{vb:[235,273],d:["M177.988 0C209.042 0 234.217 25.174 234.217 56.2275C234.217 79.3312 220.281 99.1793 200.358 107.828C210.345 124.2 216.101 143.436 216.101 164.017C216.101 223.691 167.724 272.067 108.05 272.067C48.3754 272.067 0 223.691 0 164.017C0.000154623 104.342 48.3755 55.967 108.05 55.9668C112.696 55.9668 117.273 56.2602 121.765 56.8291C121.763 56.6289 121.761 56.4282 121.761 56.2275C121.761 25.1742 146.935 0.000239177 177.988 0Z"]},
+Suelo:{vb:[256,140],d:["M36.8051 108.912V139.543H0V108.912H36.8051ZM255.471 108.912V139.543H61.5481V108.912H255.471ZM112.58 54.4557V85.0871H0.308558V54.4557H112.58ZM255.47 54.4559V85.0871H142.271V54.4557L255.47 54.4559ZM193.923 0V30.6315H0V0H193.923ZM255.471 0V30.6315H218.666V0H255.471Z"]},
+Ondas:{vb:[288,142],d:["M287.673 70.8449C239.728 23.615 191.782 23.615 143.837 70.8449C95.8911 23.615 47.9456 23.615 0 70.8449V35.4225C47.9456 -11.8075 95.8911 -11.8075 143.837 35.4225C191.782 -11.8075 239.728 -11.8075 287.673 35.4225M287.673 141.69C239.728 94.4599 191.782 94.4599 143.837 141.69C95.8911 94.4599 47.9456 94.4599 0 141.69V106.267C47.9456 59.0374 95.8911 59.0374 143.837 106.267C191.782 59.0374 239.728 59.0374 287.673 106.267"]},
+Estrella:{vb:[285,285],d:["M142.164 0C143.399 0 144.399 1.00066 144.399 2.23535C144.399 51.4455 154.9 85.7075 177.049 107.713C199.201 129.721 233.467 139.929 282.094 139.929C283.328 139.929 284.329 140.93 284.329 142.164C284.329 143.399 283.328 144.399 282.094 144.399C233.482 144.399 199.211 154.896 177.054 177.054C154.896 199.211 144.399 233.482 144.399 282.094C144.399 283.328 143.399 284.329 142.164 284.329C140.93 284.329 139.929 283.328 139.929 282.094C139.929 233.486 129.36 199.215 107.165 177.056C84.9695 154.896 50.6977 144.399 2.23535 144.399C1.00066 144.399 0 143.399 0 142.164C0.000112018 140.929 1.00073 139.929 2.23535 139.929C50.7125 139.929 84.9798 129.721 107.17 107.711C129.356 85.7042 139.929 51.4418 139.929 2.23535C139.929 1.00072 140.929 0.000103465 142.164 0Z"]},
+Capas:{vb:[223,285],d:["M111.131 0C125.725 -6.37922e-07 140.176 2.8751 153.659 8.45996C167.142 14.0448 179.393 22.2304 189.713 32.5498C200.032 42.8693 208.219 55.1204 213.804 68.6035C219.389 82.0866 222.263 96.5378 222.263 111.132H178.911C182.704 114.047 186.314 117.209 189.713 120.604C200.032 130.91 208.219 143.145 213.804 156.61C219.389 170.076 222.263 184.508 222.263 199.083H182.663C185.101 201.133 187.453 203.291 189.713 205.551C200.032 215.87 208.219 228.121 213.804 241.604C219.389 255.088 222.263 269.539 222.263 284.133H0C-1.27584e-06 269.539 2.87415 255.088 8.45898 241.604C14.0439 228.121 22.2303 215.87 32.5498 205.551C34.8096 203.291 37.1619 201.133 39.5996 199.083H0C1.43212e-05 184.508 2.87412 170.076 8.45898 156.61C14.0439 143.145 22.2303 130.91 32.5498 120.604C35.9488 117.209 39.5585 114.047 43.3516 111.132H0C6.2847e-06 96.5379 2.87411 82.0866 8.45898 68.6035C14.0439 55.1205 22.2303 42.8693 32.5498 32.5498C42.8691 22.2306 55.1198 14.0448 68.6025 8.45996C82.0855 2.87512 96.537 4.18031e-05 111.131 0Z"]},
+Flor:{vb:[269,279],d:["M0.122525 0C104.518 6.16695 129.089 71.9464 134.315 111.945C139.551 71.9428 164.14 6.20302 268.503 0.0380859C269.392 27.8878 267.823 119.947 166.907 139.112C267.841 158.27 269.41 250.339 268.522 278.19C164.051 272.019 139.519 206.15 134.318 166.159C129.107 206.153 104.56 271.988 0.117642 278.158C-0.770961 250.306 0.797104 158.234 101.737 139.078C0.802177 119.92 -0.766054 27.8514 0.122525 0Z"]},
+Plantas:{vb:[269,291],d:["M3.26108e-08 225.696C29.4699 255.337 138.816 354.778 268.196 225.696C268.196 225.696 150.704 84.9006 3.26108e-08 225.696Z","M0 144.123C29.4699 174.107 138.816 274.698 268.196 144.123C268.196 144.123 150.704 1.70041 0 144.123Z","M3.26108e-08 62.5756C29.4699 92.2166 138.816 191.658 268.196 62.5757C268.196 62.5757 150.704 -78.2195 3.26108e-08 62.5756Z"]},
+Circulos:{vb:[275,184],d:["M45.8311 91.9197C20.5198 91.9197 0 71.3422 0 45.9599C0 20.5775 20.5198 0 45.8311 0C71.1424 0 91.6623 20.5775 91.6623 45.9599C91.6623 71.3422 71.1424 91.9197 45.8311 91.9197ZM137.493 91.9197C162.805 91.9197 183.325 71.3422 183.325 45.9599C183.325 20.5775 162.805 0 137.493 0C112.182 0 91.6623 20.5775 91.6623 45.9599C91.6623 71.3422 112.182 91.9197 137.493 91.9197ZM45.8311 91.9197C20.5198 91.9197 0 112.497 0 137.88C0 163.262 20.5198 183.839 45.8311 183.839C71.1424 183.839 91.6623 163.262 91.6623 137.88C91.6623 112.497 71.1424 91.9197 45.8311 91.9197ZM137.493 91.9197C112.182 91.9197 91.6623 112.497 91.6623 137.88C91.6623 163.262 112.182 183.839 137.493 183.839C162.805 183.839 183.325 163.262 183.325 137.88C183.325 112.497 162.805 91.9197 137.493 91.9197Z","M137.493 91.9197C112.182 91.9197 91.6623 71.3422 91.6623 45.9599C91.6623 20.5775 112.182 0 137.493 0C162.805 0 183.325 20.5775 183.325 45.9599C183.325 71.3422 162.805 91.9197 137.493 91.9197ZM229.156 91.9197C254.467 91.9197 274.987 71.3422 274.987 45.9599C274.987 20.5775 254.467 0 229.156 0C203.844 0 183.325 20.5775 183.325 45.9599C183.325 71.3422 203.844 91.9197 229.156 91.9197ZM137.493 91.9197C112.182 91.9197 91.6623 112.497 91.6623 137.88C91.6623 163.262 112.182 183.839 137.493 183.839C162.805 183.839 183.325 163.262 183.325 137.88C183.325 112.497 162.805 91.9197 137.493 91.9197ZM229.156 91.9197C203.844 91.9197 183.325 112.497 183.325 137.88C183.325 163.262 203.844 183.839 229.156 183.839C254.467 183.839 274.987 163.262 274.987 137.88C274.987 112.497 254.467 91.9197 229.156 91.9197Z"]},
+Industria:{vb:[252,239],d:["M176.673 48.244C217.821 48.2445 251.177 81.6257 251.177 122.803V238.297H42.366C18.9681 238.297 0.000369796 219.315 0 195.9V77.4833H126.026V48.244H176.673Z","M23.3744 0C45.1589 0 62.8187 17.6724 62.8187 39.4724V77.4833H23.3744L23.3744 0Z"]},
+Grafico:{vb:[228,229],d:["M115.314 0.00433095L114.32 114.32L114.318 114.325L227.094 114.722C227.018 136.314 220.828 157.443 209.242 175.664C197.656 193.884 181.147 208.45 161.625 217.677L114.29 117.53L113.325 228.637C83.0067 228.373 54.0353 216.075 32.7834 194.45C11.5316 172.825 -0.259414 143.644 0.00433126 113.325C0.268304 83.007 12.5645 54.0351 34.1892 32.7834C55.8141 11.5315 84.9958 -0.259404 115.314 0.00433095Z"]},
+C:{vb:[252,204],d:["M97.1621 203.028C96.2867 202.99 95.4104 202.943 94.535 202.882C77.8732 201.726 61.7537 196.478 47.6041 187.604C33.4543 178.73 21.7097 166.504 13.4137 152.008C5.1181 137.512 0.52565 121.194 0.0424727 104.499C-0.440492 87.8041 3.20178 71.2456 10.6458 56.2941C18.0898 41.3431 29.1065 28.4587 42.7192 18.7819C56.3324 9.105 72.1229 2.93359 88.6903 0.816508C93.8441 0.157956 99.0237 -0.0991858 104.184 0.0340506L251.821 0.0340377C251.821 56.2035 206.286 101.739 150.117 101.739H150.031C206.122 101.739 251.593 147.209 251.593 203.301L97.1621 203.301V203.028Z"]},
+Barras:{vb:[217,235],d:["M0 102.901C0 78.1579 20.0582 58.0997 44.8012 58.0997H64.3985V234.82H0V102.901Z","M75.3335 0H139.732V234.82H75.3335V0Z","M151.883 125.883H216.282V193.108C216.282 216.145 197.607 234.82 174.57 234.82H151.883V125.883Z"]},
+Escudo:{vb:[246,285],eo:true,d:["M245.423 42.9531C245.493 42.953 245.564 42.9531 245.634 42.9531V175.186H245.305C245.259 176.168 245.2 177.151 245.127 178.133C243.731 196.838 237.39 214.934 226.669 230.818C215.948 246.703 201.174 259.886 183.66 269.199C166.146 278.511 146.43 283.669 126.26 284.212C106.089 284.754 86.0812 280.665 68.0167 272.308C49.9525 263.951 34.3842 251.582 22.6925 236.301C11.0012 221.019 3.54538 203.293 0.987451 184.695C0.254784 179.368 -0.0604958 174.015 0.0188685 168.678H0V0H245.423V42.9531ZM25.2125 28.1141V108.448C25.2131 140.016 50.8056 165.606 82.3736 165.607H121.029V251.458H145.916C186.017 251.458 218.524 218.95 218.524 178.85V95.2733H175.1C145.238 95.2737 121.029 119.482 121.029 149.344V69.826C121.029 46.7894 102.354 28.1141 79.3169 28.1141H25.2125Z"]},
+Lupa:{vb:[260,227],d:["M106.108 0C164.71 0 212.217 47.5063 212.217 106.108C212.217 123.332 208.111 139.595 200.828 153.978L259.268 212.417C239.93 231.755 208.578 231.755 189.24 212.417L168.654 191.831C151.116 204.65 129.496 212.217 106.108 212.217C47.5063 212.217 0 164.711 0 106.108C9.43891e-05 47.5063 47.5063 1.07058e-05 106.108 0Z"]},
+Casco:{vb:[267,234],d:["M1.82251e-05 131.956C1.82251e-05 81.3434 37.6371 40.3138 84.0648 40.3138V136.371C84.0648 159.022 67.2211 177.384 46.4434 177.384H1.82251e-05V131.956Z","M265.103 131.956C265.103 81.3434 227.465 40.3138 181.038 40.3138V136.371C181.038 159.022 197.881 177.384 218.659 177.384H265.103V131.956Z","M97.5252 34.1771C97.5252 15.3016 111.562 0 128.876 0H136.228C153.543 0 167.579 15.3016 167.579 34.1771V177.385H97.5252V34.1771Z","M266.205 196.642C266.205 217.276 250.861 234.003 231.934 234.003L34.2716 234.003C15.3439 234.003 -1.56727e-06 217.276 0 196.642L2.24369e-07 193.688L266.205 193.688V196.642Z"]}
+};
+
+const NAMES=Object.keys(SHAPES);
+NAMES.forEach(n=>{const s=SHAPES[n];s.p=s.d.map(x=>new Path2D(x));s.m=Math.max(s.vb[0],s.vb[1])});
+
+/* Fondos con los colores del sistema */
+const PALS=[
+  {bg:'#003DA5',c:['#EABA2C','#4086FF','#FFFEEF','#2D8035']},
+  {bg:'#2D8035',c:['#EABA2C','#5EB53A','#FFFEEF','#003DA5']},
+  {bg:'#FFFEEF',c:['#003DA5','#E57F19','#2D8035','#4086FF']},
+  {bg:'#8A4818',c:['#EABA2C','#E57F19','#FFFEEF','#5EB53A']}
+];
+const MATS=[
+  {str:1.0,disp:0.0, frost:0, bevel:28,wob:0,tint:.04},
+  {str:1.5,disp:.05, frost:0, bevel:46,wob:1,tint:.02},
+  {str:.7, disp:0.0, frost:7, bevel:24,wob:0,tint:.16},
+  {str:1.7,disp:.28, frost:0, bevel:52,wob:0,tint:0}
+];
+let pi=0,bgMode=0,shapeMode='pill',mat=MATS[0],matT={...MATS[0]};
+let bgG,sh,t=0,D=1,cv;
+let lens={x:0,y:0,vx:0,vy:0},tgt={x:0,y:0},drop={x:0,y:0},ptr={down:false};
+
+const VERT=`
+precision highp float;
+attribute vec3 aPosition;
+void main(){vec4 p=vec4(aPosition,1.0);p.xy=p.xy*2.0-1.0;gl_Position=p;}`;
+const FRAG=`
+precision highp float;
+uniform sampler2D tex;
+uniform vec2 res,p1,p2,s1,s2;
+uniform float r1,r2,kMerge,str,disp,frost,bevel,wob,tint,time,dens;
+float sdRB(vec2 p,vec2 b,float r){vec2 q=abs(p)-b+r;return length(max(q,0.))+min(max(q.x,q.y),0.)-r;}
+float smin(float a,float b,float k){float h=clamp(.5+.5*(b-a)/k,0.,1.);return mix(b,a,h)-k*h*(1.-h);}
+float map(vec2 p){
+  float d=smin(sdRB(p-p1,s1,r1),sdRB(p-p2,s2,r2),kMerge);
+  d+=wob*sin(p.x*.018/dens+time*2.6)*sin(p.y*.021/dens+time*2.1)*5.*dens;
+  return d;
+}
+vec3 T(vec2 p){return texture2D(tex,clamp(p/res,0.001,.999)).rgb;}
+void main(){
+  vec2 p=vec2(gl_FragCoord.x,res.y-gl_FragCoord.y);
+  float d=map(p);
+  vec3 outside=T(p);
+  float sh=(1.-smoothstep(0.,28.*dens,d))*.22*step(0.,d);
+  outside*=1.-sh;
+  vec2 e=vec2(1.,0.);
+  vec2 g=vec2(map(p+e.xy)-map(p-e.xy),map(p+e.yx)-map(p-e.yx));
+  g=g/(length(g)+1e-5);
+  float bv=bevel*dens;
+  float tt=clamp(-d/bv,0.,1.);
+  float edge=1.-tt;
+  float h=sqrt(max(1.-edge*edge,.0025));
+  float slope=min(edge/h,6.);
+  vec2 off=-g*slope*str*bv*.35;
+  vec3 col;
+  if(frost>0.){
+    vec3 acc=vec3(0.);float fr=frost*dens*2.5;
+    for(int i=0;i<8;i++){float a=float(i)*.785398+time*0.;acc+=T(p+off+vec2(cos(a),sin(a))*fr*(1.+.5*mod(float(i),2.)));}
+    col=acc/8.;
+  }else{
+    col=vec3(T(p+off*(1.+disp)).r,T(p+off).g,T(p+off*(1.-disp)).b);
+  }
+  col=mix(col,vec3(1.),tint);
+  vec2 L=normalize(vec2(-.55,-.85));
+  float rim=smoothstep(.55,1.,edge);
+  float spec=pow(max(dot(g,L),0.),2.)*rim*.85+pow(max(dot(g,-L),0.),3.)*rim*.35;
+  float line=smoothstep(.9,1.,edge)*.25;
+  col+=spec+line;
+  float a=smoothstep(.75,-.75,d);
+  gl_FragColor=vec4(mix(outside,col,a),1.);
+}`;
+
+function setup(){
+  D=Math.min(1.5,window.devicePixelRatio||1);
+  pixelDensity(D);
+  cv=createCanvas(windowWidth,windowHeight,WEBGL);cv.parent('stage');
+  sh=createShader(VERT,FRAG);
+  makeBg();
+  const u=usable();
+  lens.x=tgt.x=u.cx;lens.y=tgt.y=u.cy;drop.x=u.cx;drop.y=u.cy;
+  const el=cv.elt;
+  const setP=e=>{const r=el.getBoundingClientRect();tgt.x=e.clientX-r.left;tgt.y=e.clientY-r.top};
+  el.addEventListener('pointerdown',e=>{ptr.down=true;setP(e);try{el.setPointerCapture(e.pointerId)}catch(_){}});
+  el.addEventListener('pointermove',e=>{if(ptr.down)setP(e)});
+  ['pointerup','pointercancel'].forEach(n=>el.addEventListener(n,()=>{ptr.down=false}));
+  applyCss();
+}
+function makeBg(){if(bgG)bgG.remove();bgG=createGraphics(width,height);bgG.pixelDensity(D)}
+function usable(){const b=document.getElementById('bar').getBoundingClientRect().height;return{cx:width/2,cy:(height-b)/2+20}}
+function applyCss(){const P=PALS[pi],r=document.documentElement.style;
+  const light=P.bg==='#FFFEEF';r.setProperty('--bg',P.bg);r.setProperty('--fg',light?'#003DA5':'#FFFEEF');r.setProperty('--ac',P.c[0])}
+
+/* Fondo animado: mosaico de formas o rayas */
+function drawBg(){
+  const P=PALS[pi],c=bgG.drawingContext;
+  c.setTransform(D,0,0,D,0,0);
+  c.fillStyle=P.bg;c.fillRect(0,0,width,height);
+  if(bgMode===0){
+    const cell=Math.max(64,Math.round(Math.min(width,height)/5.2)),off=(t*18)%cell;
+    let k=0;
+    for(let y=-cell;y<height+cell;y+=cell){
+      const row=Math.floor((y+t*18)/cell);
+      for(let x=cell/2;x<width+cell/2;x+=cell){
+        const i=((Math.floor(x/cell)*5+row*3)%NAMES.length+NAMES.length)%NAMES.length,s=SHAPES[NAMES[i]];
+        const sc=cell*.62/s.m;
+        c.save();c.translate(x,y-off+cell/2);c.scale(sc,sc);c.translate(-s.vb[0]/2,-s.vb[1]/2);
+        c.fillStyle=P.c[((Math.floor(x/cell)+row)%4+4)%4];
+        s.p.forEach(pp=>c.fill(pp,s.eo?'evenodd':'nonzero'));c.restore();k++;
+      }
+    }
+  }else{
+    const w=Math.max(18,Math.round(width/16)),off=(t*14)%(w*4);
+    for(let x=-w*4;x<width+w*4;x+=w){
+      const i=Math.round((x+w*4)/w)%4;
+      if(i%2===0){c.fillStyle=P.c[i];c.fillRect(x+off,0,w*.55,height)}
+    }
+    c.fillStyle=P.c[2];c.font='700 '+Math.round(width/5.5)+'px Archivo, system-ui, sans-serif';
+    c.textAlign='center';c.textBaseline='middle';
+    c.fillText('Profertil',width/2,height*.3);
+  }
+}
+
+function draw(){
+  const dt=Math.min(deltaTime,50)*.001;t+=dt;
+  for(const k in mat)matT[k]+=(mat[k]-matT[k])*.12;
+  drawBg();
+  /* resorte: el cristal persigue el dedo */
+  const ax=(tgt.x-lens.x)*.09,ay=(tgt.y-lens.y)*.09;
+  lens.vx=(lens.vx+ax)*.74;lens.vy=(lens.vy+ay)*.74;lens.x+=lens.vx;lens.y+=lens.vy;
+  const S=Math.min(width,height)/390,u=usable();
+  const st=Math.min(Math.hypot(lens.vx,lens.vy)*.9,40);
+  const sx=Math.abs(lens.vx)/(Math.abs(lens.vx)+Math.abs(lens.vy)+.01);
+  let s1=[0,0],r1=0,s2=[1,1],r2=1,p2=[-9999,-9999],k=1;
+  if(shapeMode==='pill'){s1=[125*S,52*S];r1=52*S}
+  else if(shapeMode==='circle'){s1=[82*S,82*S];r1=82*S}
+  else if(shapeMode==='card'){s1=[135*S,88*S];r1=34*S}
+  else{
+    s1=[62*S,62*S];r1=62*S;s2=[48*S,48*S];r2=48*S;k=55*S;
+    drop.x=u.cx+Math.cos(t*.7)*width*.22;drop.y=u.cy+Math.sin(t*1.1)*height*.16;
+    p2=[drop.x*D,drop.y*D];
+  }
+  s1=[s1[0]+st*sx*S,s1[1]+st*(1-sx)*S];
+  shader(sh);
+  sh.setUniform('tex',bgG);
+  sh.setUniform('res',[width*D,height*D]);
+  sh.setUniform('dens',D);
+  sh.setUniform('p1',[lens.x*D,lens.y*D]);
+  sh.setUniform('s1',[s1[0]*D,s1[1]*D]);sh.setUniform('r1',Math.min(r1*D,Math.min(s1[0],s1[1])*D));
+  sh.setUniform('p2',p2);sh.setUniform('s2',[s2[0]*D,s2[1]*D]);sh.setUniform('r2',r2*D);
+  sh.setUniform('kMerge',k*D);
+  sh.setUniform('str',matT.str);sh.setUniform('disp',matT.disp);sh.setUniform('frost',matT.frost);
+  sh.setUniform('bevel',matT.bevel*S);sh.setUniform('wob',matT.wob);sh.setUniform('tint',matT.tint);
+  sh.setUniform('time',t);
+  noStroke();rect(0,0,width,height);
+}
+
+function windowResized(){resizeCanvas(windowWidth,windowHeight);makeBg()}
+
+function group(id,fn){const row=document.getElementById(id);row.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+  row.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));fn(b.dataset.v)}))}
+group('shapeRow',v=>{shapeMode=v});
+group('matRow',v=>{mat=MATS[+v]});
+document.getElementById('pal').addEventListener('click',()=>{pi=(pi+1)%PALS.length;applyCss()});
+document.getElementById('bgb').addEventListener('click',()=>{bgMode=1-bgMode});
+</script>
+</body>
+</html>
