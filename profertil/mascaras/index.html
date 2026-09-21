@@ -586,7 +586,7 @@ void main(){
 let GL_OK = true, LINE = false, CALMO = false;
 /* ---------- resolución de la FORMA: más baja mientras se mueve, en pantallas chicas ----------
    La foto queda siempre a resolución completa; lo que baja es la capa de la forma. */
-const SHAPE_MOTION = () => window.LAB_SHAPESCALE || (innerWidth < 1024 ? 0.25 : 1);
+const SHAPE_MOTION = () => window.LAB_SHAPESCALE || (innerWidth < 1024 ? 0.125 : 1);
 const STILL_MS = 250;
 function sigOf(s,m){ return [s.cx,s.cy,s.bw,s.bh,s.radius||0, s.morph||0,s.rectMix||0,s.zoom||1,s.mix||0, m.mouse[0],m.mouse[1],m.hover]; }
 function isMoving(m,s){
@@ -721,7 +721,7 @@ class Mask{
     this.hover=lerp(this.hover,this.ht,km);
     isMoving(this,s);
     const k=this.k=shapeScale(this), wob=(reduce||CALMO||window.LAB_NOWOB)?0:(s.wob||0);
-    const range=6*d, W=this.c.width, H=this.c.height;
+    const range=Math.max(6*d, 1.5/k), W=this.c.width, H=this.c.height;
 
     /* --- pasada 1: la forma, en su capa --- */
     const [LW,LH]=this.shapeLayer(k);
@@ -1056,7 +1056,7 @@ function loadImg(src){return new Promise((res,rej)=>{const i=new Image();i.onloa
     <div class="r">Temblor <button data-t="wob" aria-pressed="true">Sí</button></div>
     <div class="r">Sombras de texto <button data-t="shadow" aria-pressed="true">Sí</button></div>
     <div class="r">Fotos livianas <button data-t="light" aria-pressed="false">No</button></div>
-    <div class="r">Forma al moverse <span><button data-ss="1">1x</button><button data-ss="0.5">½</button><button data-ss="0.25">¼</button><button data-ss="0.125">⅛</button></span></div>
+    <div class="r">Forma al moverse <span><button data-ss="0.125">⅛</button><button data-ss="0.0625">1/16</button><button data-ss="0.03125">1/32</button></span></div>
   </div>
   <button class="go" id="dGo">Medir: bajar toda la página (12 s)</button>
   <div class="res" id="dRes"></div>
@@ -1122,7 +1122,7 @@ function loadImg(src){return new Promise((res,rej)=>{const i=new Image();i.onloa
         const sorted=f.slice().sort((a,b)=>a-b), med=sorted[Math.floor(sorted.length/2)];
         const avg=f.reduce((a,b)=>a+b,0)/f.length, slow=f.filter(x=>x>med*1.6).length;
         const on=[`res ${state.dpr}x`, state.cut?'cortes':'sin cortes', state.wob?'temblor':'sin temblor',
-                  state.shadow?'sombras':'sin sombras', state.light?'fotos livianas':'fotos originales', 'forma al moverse '+({1:'1x',0.5:'½',0.25:'¼',0.125:'⅛'}[state.ss]||state.ss)].join(' · ');
+                  state.shadow?'sombras':'sin sombras', state.light?'fotos livianas':'fotos originales', 'forma al moverse '+({0.125:'⅛',0.0625:'1/16',0.03125:'1/32'}[state.ss]||state.ss)].join(' · ');
         const line=`${$('#dEng').textContent}: ${Math.round(1000/avg)} fps prom · ${(100*slow/f.length).toFixed(0)}% cuadros lentos · peor ${Math.round(sorted[sorted.length-1])} ms\n${on}`;
         $('#dRes').textContent = line + ($('#dRes').textContent ? '\n\n'+$('#dRes').textContent : '');
         go.disabled=false; go.textContent='Medir: bajar toda la página (12 s)';
