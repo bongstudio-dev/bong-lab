@@ -551,10 +551,15 @@ uniform vec2 uRes,uC,uB,uSA,uSB,uM;
 uniform sampler2D uTA,uTB,uShape;
 uniform float uMix,uZoom,uWob,uDpr,uLine,uHover,uRange;
 out vec4 outColor;
-vec2 cover(vec2 uv, vec2 box, vec2 img){
+vec2 coverScale(vec2 box, vec2 img){
   float ba=box.x/box.y, ia=img.x/img.y;
-  vec2 s = ba>ia ? vec2(1., ia/ba) : vec2(ba/ia, 1.);
-  return (uv-.5)*s+.5;
+  return ba>ia ? vec2(1., ia/ba) : vec2(ba/ia, 1.);
+}
+vec2 cover(vec2 uv, vec2 box, vec2 img){ return (uv-.5)*coverScale(box,img)+.5; }
+/* cuántos píxeles de la foto caen en un píxel de pantalla -> nivel de mipmap */
+float lodFor(vec2 box, vec2 img, float z){
+  vec2 t = img*coverScale(box,img)/(2.*box*z);
+  return max(0., log2(max(t.x,t.y)));
 }
 void main(){
   vec4 sh = textureLod(uShape, gl_FragCoord.xy/uRes, 0.0);
@@ -573,7 +578,7 @@ void main(){
   float t = smoothstep(0., 1., uMix);
   vec2 ua = (cover(uv,uB,uSA)-.5)/z + .5 - par + disp*.10*t*uWob;
   vec2 ub = (cover(uv,uB,uSB)-.5)/z + .5 - par - disp*.10*(1.-t)*uWob;
-  vec3 col = mix(textureLod(uTA,ua,0.0).rgb, textureLod(uTB,ub,0.0).rgb, t);
+  vec3 col = mix(textureLod(uTA,ua,lodFor(uB,uSA,z)).rgb, textureLod(uTB,ub,lodFor(uB,uSB,z)).rgb, t);
   vec4 o = vec4(col*m, m);
   outColor = mix(o, vec4(.918,.729,.173,1.), line);
 }`;
@@ -581,7 +586,7 @@ void main(){
 let GL_OK = true, LINE = false, CALMO = false;
 /* ---------- resolución de la FORMA: más baja mientras se mueve, en pantallas chicas ----------
    La foto queda siempre a resolución completa; lo que baja es la capa de la forma. */
-const SHAPE_MOTION = () => window.LAB_SHAPESCALE || (innerWidth < 1024 ? 0.5 : 1);
+const SHAPE_MOTION = () => window.LAB_SHAPESCALE || (innerWidth < 1024 ? 0.25 : 1);
 const STILL_MS = 250;
 function sigOf(s,m){ return [s.cx,s.cy,s.bw,s.bh,s.radius||0, s.morph||0,s.rectMix||0,s.zoom||1,s.mix||0, m.mouse[0],m.mouse[1],m.hover]; }
 function isMoving(m,s){
@@ -675,7 +680,9 @@ class Mask{
     const t=gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D,t);
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);
     gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,im);
-    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+    /* mipmaps: copias reducidas de la foto para cuando se ve más chica que su tamaño real */
+    gl.generateMipmap(gl.TEXTURE_2D);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_LINEAR);
     gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
@@ -1049,7 +1056,7 @@ function loadImg(src){return new Promise((res,rej)=>{const i=new Image();i.onloa
     <div class="r">Temblor <button data-t="wob" aria-pressed="true">Sí</button></div>
     <div class="r">Sombras de texto <button data-t="shadow" aria-pressed="true">Sí</button></div>
     <div class="r">Fotos livianas <button data-t="light" aria-pressed="false">No</button></div>
-    <div class="r">Forma al moverse <span><button data-ss="1">1x</button><button data-ss="0.5">½</button><button data-ss="0.33">⅓</button></span></div>
+    <div class="r">Forma al moverse <span><button data-ss="1">1x</button><button data-ss="0.5">½</button><button data-ss="0.25">¼</button><button data-ss="0.125">⅛</button></span></div>
   </div>
   <button class="go" id="dGo">Medir: bajar toda la página (12 s)</button>
   <div class="res" id="dRes"></div>
@@ -1115,7 +1122,7 @@ function loadImg(src){return new Promise((res,rej)=>{const i=new Image();i.onloa
         const sorted=f.slice().sort((a,b)=>a-b), med=sorted[Math.floor(sorted.length/2)];
         const avg=f.reduce((a,b)=>a+b,0)/f.length, slow=f.filter(x=>x>med*1.6).length;
         const on=[`res ${state.dpr}x`, state.cut?'cortes':'sin cortes', state.wob?'temblor':'sin temblor',
-                  state.shadow?'sombras':'sin sombras', state.light?'fotos livianas':'fotos originales', 'forma al moverse '+(state.ss===1?'1x':state.ss===0.5?'½':'⅓')].join(' · ');
+                  state.shadow?'sombras':'sin sombras', state.light?'fotos livianas':'fotos originales', 'forma al moverse '+({1:'1x',0.5:'½',0.25:'¼',0.125:'⅛'}[state.ss]||state.ss)].join(' · ');
         const line=`${$('#dEng').textContent}: ${Math.round(1000/avg)} fps prom · ${(100*slow/f.length).toFixed(0)}% cuadros lentos · peor ${Math.round(sorted[sorted.length-1])} ms\n${on}`;
         $('#dRes').textContent = line + ($('#dRes').textContent ? '\n\n'+$('#dRes').textContent : '');
         go.disabled=false; go.textContent='Medir: bajar toda la página (12 s)';
