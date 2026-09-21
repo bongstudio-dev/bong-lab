@@ -485,14 +485,18 @@ function buildCornerLUT(){
    Shader
    ======================================================================= */
 const VS = `#version 300 es
-in vec2 aP; void main(){ gl_Position = vec4(aP,0.,1.); }`;
+layout(location=0) in vec2 aP; void main(){ gl_Position = vec4(aP,0.,1.); }`;
 
-const FS = `#version 300 es
+/* ---------- pasada 1 · la FORMA ----------
+   Corre en una capa que puede ir a menos resolución que el canvas.
+   No guarda "adentro/afuera" sino la DISTANCIA al borde (y el desplazamiento
+   de la foto): así el suavizado del contorno se resuelve después a resolución
+   completa y el borde no se vuelve serrucho. */
+const FS_SHAPE = `#version 300 es
 precision highp float;
-uniform vec2 uRes,uC,uB,uSA,uSB,uM,uFA,uFB;
-uniform sampler2D uSdfA,uSdfB,uCorner,uTA,uTB;
-uniform float uMorph,uRectMix,uRadius,uHasShape;
-uniform float uMix,uZoom,uTime,uWob,uDpr,uLine,uHover;
+uniform vec2 uRes,uLow,uC,uB,uFA,uFB;
+uniform sampler2D uSdfA,uSdfB,uCorner;
+uniform float uMorph,uRectMix,uRadius,uHasShape,uTime,uWob,uDpr,uRange;
 out vec4 outColor;
 
 float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
@@ -505,7 +509,6 @@ float sdfSample(sampler2D t, vec2 p, float field){
   float v = textureLod(t, clamp(uv, 0.002, 0.998), 0.0).r;
   return (v - 0.5) * 2.0 * field;
 }
-/* rectángulo con corner smoothing real de Figma vía LUT de esquina */
 float sdSquircle(vec2 p, vec2 b, float r){
   vec2 e = abs(p) - b;
   float dr = min(max(e.x,e.y),0.0) + length(max(e,0.0));
@@ -515,13 +518,9 @@ float sdSquircle(vec2 p, vec2 b, float r){
   vec2 t = (clamp(q, -1.0, 1.5) + 1.0)/2.5;
   return r * ((textureLod(uCorner, t, 0.0).r - 0.5) * 5.0);
 }
-vec2 cover(vec2 uv, vec2 box, vec2 img){
-  float ba=box.x/box.y, ia=img.x/img.y;
-  vec2 s = ba>ia ? vec2(1., ia/ba) : vec2(ba/ia, 1.);
-  return (uv-.5)*s+.5;
-}
 void main(){
-  vec2 px = vec2(gl_FragCoord.x, uRes.y-gl_FragCoord.y);
+  /* coordenadas en píxeles del canvas COMPLETO, aunque esta capa sea más chica */
+  vec2 px = vec2(gl_FragCoord.x, uLow.y - gl_FragCoord.y) * (uRes/uLow);
   vec2 p  = px - uC;
 
   float dShape = 0.0;
@@ -537,16 +536,39 @@ void main(){
     float ang = atan(p.y, p.x);
     d += (fbm(vec2(ang*1.6 + uTime*.15, uTime*.5) + p*.003) - .5) * uWob * 30. * uDpr;
   }
+  vec2 disp = vec2(0.);
+  if(uWob > 0.0 && d < uRange){
+    vec2 uv = p/(2.*uB) + .5;
+    disp = vec2(fbm(uv*3.+uTime*.2), fbm(uv*3.+7.3-uTime*.2)) - .5;
+  }
+  outColor = vec4(.5 + clamp(d/(2.*uRange), -.5, .5), disp + .5, 1.);
+}`;
 
+/* ---------- pasada 2 · la FOTO, siempre a resolución completa ---------- */
+const FS_PHOTO = `#version 300 es
+precision highp float;
+uniform vec2 uRes,uC,uB,uSA,uSB,uM;
+uniform sampler2D uTA,uTB,uShape;
+uniform float uMix,uZoom,uWob,uDpr,uLine,uHover,uRange;
+out vec4 outColor;
+vec2 cover(vec2 uv, vec2 box, vec2 img){
+  float ba=box.x/box.y, ia=img.x/img.y;
+  vec2 s = ba>ia ? vec2(1., ia/ba) : vec2(ba/ia, 1.);
+  return (uv-.5)*s+.5;
+}
+void main(){
+  vec4 sh = textureLod(uShape, gl_FragCoord.xy/uRes, 0.0);
+  float d = (sh.r - .5) * 2. * uRange;
   float aa = 1.25*uDpr;
   float m  = clamp(.5 - d/aa, 0., 1.);
   float line = (1.0 - smoothstep(0., 1.6*uDpr, abs(d))) * uLine;
   if(m <= 0.0 && line <= 0.0){ outColor = vec4(0.); return; }
 
+  vec2 px = vec2(gl_FragCoord.x, uRes.y-gl_FragCoord.y);
+  vec2 p  = px - uC;
   vec2 uv = p/(2.*uB) + .5;
   vec2 par = uM*.014;
-  vec2 disp = vec2(0.);
-  if(uWob > 0.0) disp = vec2(fbm(uv*3.+uTime*.2), fbm(uv*3.+7.3-uTime*.2)) - .5;
+  vec2 disp = sh.gb - .5;
   float z = uZoom*(1.+.03*uHover);
   float t = smoothstep(0., 1., uMix);
   vec2 ua = (cover(uv,uB,uSA)-.5)/z + .5 - par + disp*.10*t*uWob;
@@ -557,8 +579,9 @@ void main(){
 }`;
 
 let GL_OK = true, LINE = false, CALMO = false;
-/* ---------- resolución adaptativa: más baja mientras la máscara se mueve ---------- */
-const MOTION_DPR = () => window.LAB_MOTIONDPR || (innerWidth < 1024 ? 0.75 : 1.5);
+/* ---------- resolución de la FORMA: más baja mientras se mueve, en pantallas chicas ----------
+   La foto queda siempre a resolución completa; lo que baja es la capa de la forma. */
+const SHAPE_MOTION = () => window.LAB_SHAPESCALE || (innerWidth < 1024 ? 0.5 : 1);
 const STILL_MS = 250;
 function sigOf(s,m){ return [s.cx,s.cy,s.bw,s.bh,s.radius||0, s.morph||0,s.rectMix||0,s.zoom||1,s.mix||0, m.mouse[0],m.mouse[1],m.hover]; }
 function isMoving(m,s){
@@ -569,7 +592,7 @@ function isMoving(m,s){
   m.moving = now-(m._lastMove||0) < STILL_MS;
   return m.moving;
 }
-function targetDpr(m){ return (m.moving && !window.LAB_NOADAPT) ? Math.min(DPR(), MOTION_DPR()) : DPR(); }
+function shapeScale(m){ return (m.moving && !window.LAB_NOADAPT) ? SHAPE_MOTION() : 1; }
 
 const ALL = [];
 
@@ -580,25 +603,39 @@ class Mask{
     if(!gl){ GL_OK=false; return; }
     const sh=(type,src)=>{const o=gl.createShader(type);gl.shaderSource(o,src);gl.compileShader(o);
       if(!gl.getShaderParameter(o,gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(o)); return o;};
-    const pr = this.pr = gl.createProgram();
-    gl.attachShader(pr, sh(gl.VERTEX_SHADER, VS));
-    gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, FS));
-    gl.linkProgram(pr);
-    if(!gl.getProgramParameter(pr,gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(pr));
-    gl.useProgram(pr);
+    const prog=(fs,names)=>{
+      const pr=gl.createProgram();
+      gl.attachShader(pr, sh(gl.VERTEX_SHADER, VS));
+      gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, fs));
+      gl.linkProgram(pr);
+      if(!gl.getProgramParameter(pr,gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(pr));
+      const u={}; names.forEach(n=>u[n]=gl.getUniformLocation(pr,n));
+      return {pr,u};
+    };
+    this.ps = prog(FS_SHAPE, ['uRes','uLow','uC','uB','uFA','uFB','uSdfA','uSdfB','uCorner',
+      'uMorph','uRectMix','uRadius','uHasShape','uTime','uWob','uDpr','uRange']);
+    this.pp = prog(FS_PHOTO, ['uRes','uC','uB','uSA','uSB','uM','uTA','uTB','uShape',
+      'uMix','uZoom','uWob','uDpr','uLine','uHover','uRange']);
+    gl.useProgram(this.ps.pr);
+    gl.uniform1i(this.ps.u.uSdfA,2); gl.uniform1i(this.ps.u.uSdfB,3); gl.uniform1i(this.ps.u.uCorner,4);
+    gl.useProgram(this.pp.pr);
+    gl.uniform1i(this.pp.u.uTA,0); gl.uniform1i(this.pp.u.uTB,1); gl.uniform1i(this.pp.u.uShape,5);
+
     const vao = gl.createVertexArray(); gl.bindVertexArray(vao);
     const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,b);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
-    const loc = gl.getAttribLocation(pr,'aP');
-    gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
-    gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
-    this.u = {};
-    ['uRes','uC','uB','uSA','uSB','uM','uFA','uFB','uSdfA','uSdfB','uCorner','uTA','uTB',
-     'uMorph','uRectMix','uRadius','uHasShape','uMix','uZoom','uTime','uWob','uDpr','uLine','uHover']
-      .forEach(n => this.u[n] = gl.getUniformLocation(pr,n));
-    gl.uniform1i(this.u.uTA,0); gl.uniform1i(this.u.uTB,1);
-    gl.uniform1i(this.u.uSdfA,2); gl.uniform1i(this.u.uSdfB,3); gl.uniform1i(this.u.uCorner,4);
+    /* capa de la forma: textura RGBA8 con filtrado lineal + framebuffer */
+    this.shapeTex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D,this.shapeTex);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+    this.fbo = gl.createFramebuffer();
+    this.low = [0,0];
 
     this.tex=[]; this.size=[];
     imgs.forEach((im,i)=>this.setImage(i,im));
@@ -645,10 +682,22 @@ class Mask{
     this.tex[i]=t; this.size[i]=[im.width,im.height];
   }
   resize(){
-    const r=this.c.getBoundingClientRect(), d=this.dpr=targetDpr(this);
+    const r=this.c.getBoundingClientRect(), d=DPR();
     this.w=r.width; this.h=r.height;
     const W=Math.max(1,Math.round(r.width*d)), H=Math.max(1,Math.round(r.height*d));
     if(this.c.width!==W||this.c.height!==H){ this.c.width=W; this.c.height=H; }
+  }
+  /* tamaño de la capa de la forma; solo se realoca cuando cambia */
+  shapeLayer(k){
+    const gl=this.gl, W=Math.max(1,Math.round(this.c.width*k)), H=Math.max(1,Math.round(this.c.height*k));
+    if(this.low[0]!==W || this.low[1]!==H){
+      gl.bindTexture(gl.TEXTURE_2D,this.shapeTex);
+      gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA8,W,H,0,gl.RGBA,gl.UNSIGNED_BYTE,null);
+      gl.bindFramebuffer(gl.FRAMEBUFFER,this.fbo);
+      gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,this.shapeTex,0);
+      this.low=[W,H];
+    }
+    return this.low;
   }
   /* campo cuadrado (semi-lado en px) en el que entra una forma dentro de la caja */
   field(name,bw,bh){
@@ -657,54 +706,72 @@ class Mask{
     return 0.5*f*Math.max(sw,sh)*s.fieldRatio;
   }
   draw(s,time){
-    const gl=this.gl, u=this.u;
-    gl.useProgram(this.pr);
+    const gl=this.gl, d=DPR();
     const km=smooth(Math.min(.05,(performance.now()-(this._t||performance.now()))/1000),4);
     this._t=performance.now();
     this.mouse[0]=lerp(this.mouse[0],this.mt[0],km);
     this.mouse[1]=lerp(this.mouse[1],this.mt[1],km);
     this.hover=lerp(this.hover,this.ht,km);
     isMoving(this,s);
-    if(targetDpr(this)!==this.dpr) this.resize();
-    const d=this.dpr;
-    gl.viewport(0,0,this.c.width,this.c.height);
-    gl.clearColor(0,0,0,0); gl.clear(gl.COLOR_BUFFER_BIT);
+    const k=this.k=shapeScale(this), wob=(reduce||CALMO||window.LAB_NOWOB)?0:(s.wob||0);
+    const range=6*d, W=this.c.width, H=this.c.height;
 
-    const A=s.a||0, B=(s.b===undefined?A:s.b);
-    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,this.tex[A]);
-    gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D,this.tex[B]);
-    gl.uniform2f(u.uSA,this.size[A][0],this.size[A][1]);
-    gl.uniform2f(u.uSB,this.size[B][0],this.size[B][1]);
-
+    /* --- pasada 1: la forma, en su capa --- */
+    const [LW,LH]=this.shapeLayer(k);
+    gl.bindFramebuffer(gl.FRAMEBUFFER,this.fbo);
+    gl.viewport(0,0,LW,LH);
+    gl.disable(gl.BLEND);
+    const ps=this.ps.u; gl.useProgram(this.ps.pr);
     const hasShape = !!s.shapeA;
     if(hasShape){
       const sa=this.sdfTex(s.shapeA), sb=this.sdfTex(s.shapeB||s.shapeA);
       gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D,sa.tex);
       gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D,sb.tex);
-      gl.uniform2f(u.uFA, this.field(s.shapeA,s.bw,s.bh)*d, 0);
-      gl.uniform2f(u.uFB, this.field(s.shapeB||s.shapeA,s.bw,s.bh)*d, 0);
+      gl.uniform2f(ps.uFA, this.field(s.shapeA,s.bw,s.bh)*d, 0);
+      gl.uniform2f(ps.uFB, this.field(s.shapeB||s.shapeA,s.bw,s.bh)*d, 0);
     }else{
       gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D,this.cornerTex);
       gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D,this.cornerTex);
-      gl.uniform2f(u.uFA,1,0); gl.uniform2f(u.uFB,1,0);
+      gl.uniform2f(ps.uFA,1,0); gl.uniform2f(ps.uFB,1,0);
     }
     gl.activeTexture(gl.TEXTURE4); gl.bindTexture(gl.TEXTURE_2D,this.cornerTex);
+    gl.uniform2f(ps.uRes,W,H);
+    gl.uniform2f(ps.uLow,LW,LH);
+    gl.uniform2f(ps.uC,s.cx*d,s.cy*d);
+    gl.uniform2f(ps.uB,s.bw*d,s.bh*d);
+    gl.uniform1f(ps.uHasShape,hasShape?1:0);
+    gl.uniform1f(ps.uMorph,s.morph||0);
+    gl.uniform1f(ps.uRectMix,s.rectMix||0);
+    gl.uniform1f(ps.uRadius,(s.radius||0)*d);
+    gl.uniform1f(ps.uTime,time);
+    gl.uniform1f(ps.uWob,wob);
+    gl.uniform1f(ps.uDpr,d);
+    gl.uniform1f(ps.uRange,range);
+    gl.drawArrays(gl.TRIANGLES,0,3);
 
-    gl.uniform2f(u.uRes,this.c.width,this.c.height);
-    gl.uniform2f(u.uC,s.cx*d,s.cy*d);
-    gl.uniform2f(u.uB,s.bw*d,s.bh*d);
-    gl.uniform2f(u.uM,this.mouse[0],this.mouse[1]);
-    gl.uniform1f(u.uHasShape,hasShape?1:0);
-    gl.uniform1f(u.uMorph,s.morph||0);
-    gl.uniform1f(u.uRectMix,s.rectMix||0);
-    gl.uniform1f(u.uRadius,(s.radius||0)*d);
-    gl.uniform1f(u.uMix,s.mix||0);
-    gl.uniform1f(u.uZoom,s.zoom||1);
-    gl.uniform1f(u.uTime,time);
-    gl.uniform1f(u.uWob,(reduce||CALMO||window.LAB_NOWOB)?0:(s.wob||0));
-    gl.uniform1f(u.uDpr,d);
-    gl.uniform1f(u.uLine,LINE?1:0);
-    gl.uniform1f(u.uHover,this.hover);
+    /* --- pasada 2: la foto, a resolución completa --- */
+    gl.bindFramebuffer(gl.FRAMEBUFFER,null);
+    gl.viewport(0,0,W,H);
+    gl.clearColor(0,0,0,0); gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.enable(gl.BLEND);
+    const pp=this.pp.u; gl.useProgram(this.pp.pr);
+    const A=s.a||0, B=(s.b===undefined?A:s.b);
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,this.tex[A]);
+    gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D,this.tex[B]);
+    gl.activeTexture(gl.TEXTURE5); gl.bindTexture(gl.TEXTURE_2D,this.shapeTex);
+    gl.uniform2f(pp.uSA,this.size[A][0],this.size[A][1]);
+    gl.uniform2f(pp.uSB,this.size[B][0],this.size[B][1]);
+    gl.uniform2f(pp.uRes,W,H);
+    gl.uniform2f(pp.uC,s.cx*d,s.cy*d);
+    gl.uniform2f(pp.uB,s.bw*d,s.bh*d);
+    gl.uniform2f(pp.uM,this.mouse[0],this.mouse[1]);
+    gl.uniform1f(pp.uMix,s.mix||0);
+    gl.uniform1f(pp.uZoom,s.zoom||1);
+    gl.uniform1f(pp.uWob,wob);
+    gl.uniform1f(pp.uDpr,d);
+    gl.uniform1f(pp.uLine,LINE?1:0);
+    gl.uniform1f(pp.uHover,this.hover);
+    gl.uniform1f(pp.uRange,range);
     gl.drawArrays(gl.TRIANGLES,0,3);
   }
 }
@@ -982,7 +1049,7 @@ function loadImg(src){return new Promise((res,rej)=>{const i=new Image();i.onloa
     <div class="r">Temblor <button data-t="wob" aria-pressed="true">Sí</button></div>
     <div class="r">Sombras de texto <button data-t="shadow" aria-pressed="true">Sí</button></div>
     <div class="r">Fotos livianas <button data-t="light" aria-pressed="false">No</button></div>
-    <div class="r">Bajar al moverse <button data-t="adapt" aria-pressed="true">Sí</button></div>
+    <div class="r">Forma al moverse <span><button data-ss="1">1x</button><button data-ss="0.5">½</button><button data-ss="0.33">⅓</button></span></div>
   </div>
   <button class="go" id="dGo">Medir: bajar toda la página (12 s)</button>
   <div class="res" id="dRes"></div>
@@ -998,16 +1065,18 @@ function loadImg(src){return new Promise((res,rej)=>{const i=new Image();i.onloa
     if(buf.length>600) buf=buf.slice(-300);
     $('#dFps').textContent = n>2 ? Math.round(1000*n/s)+' fps' : '-';
     requestAnimationFrame(tick); })(last);
-  const info=()=>{ let px=0; (typeof ALL!=='undefined'?ALL:[]).forEach(m=>{ if(m.c) px+=m.c.width*m.c.height; });
-    $('#dInfo').textContent = `pantalla ${innerWidth}×${innerHeight} @${devicePixelRatio} · ${(px/1e6).toFixed(1)} Mpx de canvas`; };
+  const info=()=>{ let px=0, fx=0; (typeof ALL!=='undefined'?ALL:[]).forEach(m=>{ if(m.c) px+=m.c.width*m.c.height; if(m.low) fx+=m.low[0]*m.low[1]; });
+    $('#dInfo').textContent = `pantalla ${innerWidth}×${innerHeight} @${devicePixelRatio} · foto ${(px/1e6).toFixed(1)} Mpx · forma ${(fx/1e6).toFixed(1)} Mpx`; };
   setInterval(info,1000);
 
-  const state={dpr:2,cut:true,wob:true,shadow:true,light:false,adapt:true};
+  const state={dpr:2,cut:true,wob:true,shadow:true,light:false,ss:SHAPE_MOTION()};
   function relayout(){ if(typeof ALL!=='undefined') ALL.forEach(m=>m.resize()); if(typeof applyCuts==='function') applyCuts(); info(); }
   function paint(){
     document.querySelectorAll('#diag [data-dpr]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.dpr===state.dpr)));
+    document.querySelectorAll('#diag [data-ss]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.ss===state.ss)));
     document.querySelectorAll('#diag [data-t]').forEach(b=>{ const on=state[b.dataset.t]; b.setAttribute('aria-pressed',String(on)); b.textContent=on?'Sí':'No'; });
   }
+  document.querySelectorAll('#diag [data-ss]').forEach(b=>b.onclick=()=>{ state.ss=+b.dataset.ss; window.LAB_SHAPESCALE=state.ss; paint(); });
   document.querySelectorAll('#diag [data-dpr]').forEach(b=>b.onclick=()=>{ state.dpr=+b.dataset.dpr; window.LAB_MAXDPR=state.dpr; paint(); relayout(); });
   /* imágenes livianas: se re-decodifican desde IMG y se bajan a 1280 px de lado mayor */
   const MAP=[['hero'],['proposito','mision','valores','personal'],['cifras'],['suelos','alimentos','energia','comunidad']];
@@ -1027,7 +1096,6 @@ function loadImg(src){return new Promise((res,rej)=>{const i=new Image();i.onloa
     const t=b.dataset.t; state[t]=!state[t]; paint();
     if(t==='cut'){ window.LAB_NOCUT=!state.cut; relayout(); }
     if(t==='wob') window.LAB_NOWOB=!state.wob;
-    if(t==='adapt') window.LAB_NOADAPT=!state.adapt;
     if(t==='shadow') document.body.classList.toggle('lab-noshadow',!state.shadow);
     if(t==='light'){ b.textContent='…'; await swapImages(state.light); paint(); }
   });
@@ -1047,7 +1115,7 @@ function loadImg(src){return new Promise((res,rej)=>{const i=new Image();i.onloa
         const sorted=f.slice().sort((a,b)=>a-b), med=sorted[Math.floor(sorted.length/2)];
         const avg=f.reduce((a,b)=>a+b,0)/f.length, slow=f.filter(x=>x>med*1.6).length;
         const on=[`res ${state.dpr}x`, state.cut?'cortes':'sin cortes', state.wob?'temblor':'sin temblor',
-                  state.shadow?'sombras':'sin sombras', state.light?'fotos livianas':'fotos originales', state.adapt?'baja al moverse':'resolución fija'].join(' · ');
+                  state.shadow?'sombras':'sin sombras', state.light?'fotos livianas':'fotos originales', 'forma al moverse '+(state.ss===1?'1x':state.ss===0.5?'½':'⅓')].join(' · ');
         const line=`${$('#dEng').textContent}: ${Math.round(1000/avg)} fps prom · ${(100*slow/f.length).toFixed(0)}% cuadros lentos · peor ${Math.round(sorted[sorted.length-1])} ms\n${on}`;
         $('#dRes').textContent = line + ($('#dRes').textContent ? '\n\n'+$('#dRes').textContent : '');
         go.disabled=false; go.textContent='Medir: bajar toda la página (12 s)';
