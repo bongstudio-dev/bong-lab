@@ -485,6 +485,20 @@ function toRect(name){
 }
 
 let P5_OK = true, LINE = false, CALMO = false;
+/* ---------- resolución adaptativa: más baja mientras la máscara se mueve ---------- */
+const MOTION_DPR = () => window.LAB_MOTIONDPR || (innerWidth < 1024 ? 1 : 1.5);
+const STILL_MS = 250;
+function sigOf(s,m){ return [s.cx,s.cy,s.bw,s.bh,s.radius||0, s.morph||0,s.rectMix||0,s.zoom||1,s.mix||0, m.mouse[0],m.mouse[1],m.hover]; }
+function isMoving(m,s){
+  const now=performance.now(), sig=sigOf(s,m), prev=m._sig; m._sig=sig;
+  let changed = !prev || ((s.wob||0)>1e-3 && !(reduce||CALMO||window.LAB_NOWOB));
+  if(prev && !changed) for(let i=0;i<sig.length;i++){ if(Math.abs(sig[i]-prev[i]) > (i<5?0.25:0.002)){ changed=true; break; } }
+  if(changed) m._lastMove=now;
+  m.moving = now-(m._lastMove||0) < STILL_MS;
+  return m.moving;
+}
+function targetDpr(m){ return (m.moving && !window.LAB_NOADAPT) ? Math.min(DPR(), MOTION_DPR()) : DPR(); }
+
 const ALL = [];
 
 class Mask{
@@ -520,8 +534,9 @@ class Mask{
     const r=this.box.getBoundingClientRect();
     this.w=r.width; this.h=r.height;
     const W=Math.max(1,Math.round(r.width)), H=Math.max(1,Math.round(r.height));
-    if(this.p.width!==W || this.p.height!==H || this.p.pixelDensity()!==DPR()){
-      this.p.pixelDensity(DPR()); this.p.resizeCanvas(W,H,true);
+    const d=this.dpr=targetDpr(this);
+    if(this.p.width!==W || this.p.height!==H || this.p.pixelDensity()!==d){
+      this.p.pixelDensity(d); this.p.resizeCanvas(W,H,true);
     }
   }
   /* escala que hace entrar la forma (contain) en la caja */
@@ -574,6 +589,8 @@ class Mask{
     this.mouse[0]=lerp(this.mouse[0],this.mt[0],km);
     this.mouse[1]=lerp(this.mouse[1],this.mt[1],km);
     this.hover=lerp(this.hover,this.ht,km);
+    isMoving(this,s);
+    if(targetDpr(this)!==this.dpr) this.resize();
     p.clear();
     const ctx=p.drawingContext, path=this.path(s,time);
     const A=s.a||0, B=(s.b===undefined?A:s.b), t=smooth01(s.mix||0);
@@ -860,6 +877,7 @@ function loadImg(src){return new Promise((res,rej)=>{const i=new Image();i.onloa
     <div class="r">Temblor <button data-t="wob" aria-pressed="true">Sí</button></div>
     <div class="r">Sombras de texto <button data-t="shadow" aria-pressed="true">Sí</button></div>
     <div class="r">Fotos livianas <button data-t="light" aria-pressed="false">No</button></div>
+    <div class="r">Bajar al moverse <button data-t="adapt" aria-pressed="true">Sí</button></div>
   </div>
   <button class="go" id="dGo">Medir: bajar toda la página (12 s)</button>
   <div class="res" id="dRes"></div>
@@ -879,7 +897,7 @@ function loadImg(src){return new Promise((res,rej)=>{const i=new Image();i.onloa
     $('#dInfo').textContent = `pantalla ${innerWidth}×${innerHeight} @${devicePixelRatio} · ${(px/1e6).toFixed(1)} Mpx de canvas`; };
   setInterval(info,1000);
 
-  const state={dpr:2,cut:true,wob:true,shadow:true,light:false};
+  const state={dpr:2,cut:true,wob:true,shadow:true,light:false,adapt:true};
   function relayout(){ if(typeof ALL!=='undefined') ALL.forEach(m=>m.resize()); if(typeof applyCuts==='function') applyCuts(); info(); }
   function paint(){
     document.querySelectorAll('#diag [data-dpr]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.dpr===state.dpr)));
@@ -904,6 +922,7 @@ function loadImg(src){return new Promise((res,rej)=>{const i=new Image();i.onloa
     const t=b.dataset.t; state[t]=!state[t]; paint();
     if(t==='cut'){ window.LAB_NOCUT=!state.cut; relayout(); }
     if(t==='wob') window.LAB_NOWOB=!state.wob;
+    if(t==='adapt') window.LAB_NOADAPT=!state.adapt;
     if(t==='shadow') document.body.classList.toggle('lab-noshadow',!state.shadow);
     if(t==='light'){ b.textContent='…'; await swapImages(state.light); paint(); }
   });
@@ -923,7 +942,7 @@ function loadImg(src){return new Promise((res,rej)=>{const i=new Image();i.onloa
         const sorted=f.slice().sort((a,b)=>a-b), med=sorted[Math.floor(sorted.length/2)];
         const avg=f.reduce((a,b)=>a+b,0)/f.length, slow=f.filter(x=>x>med*1.6).length;
         const on=[`res ${state.dpr}x`, state.cut?'cortes':'sin cortes', state.wob?'temblor':'sin temblor',
-                  state.shadow?'sombras':'sin sombras', state.light?'fotos livianas':'fotos originales'].join(' · ');
+                  state.shadow?'sombras':'sin sombras', state.light?'fotos livianas':'fotos originales', state.adapt?'baja al moverse':'resolución fija'].join(' · ');
         const line=`${$('#dEng').textContent}: ${Math.round(1000/avg)} fps prom · ${(100*slow/f.length).toFixed(0)}% cuadros lentos · peor ${Math.round(sorted[sorted.length-1])} ms\n${on}`;
         $('#dRes').textContent = line + ($('#dRes').textContent ? '\n\n'+$('#dRes').textContent : '');
         go.disabled=false; go.textContent='Medir: bajar toda la página (12 s)';
