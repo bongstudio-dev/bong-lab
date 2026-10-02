@@ -8,8 +8,6 @@ def sym(f,i):
     inner=re.sub(r'^.*?<svg[^>]*>|</svg>\s*$','',v,flags=re.S).strip()
     return '<symbol id="%s" viewBox="%s">%s</symbol>'%(i,vb,inner)
 t=t.replace('/*__LOGOS__*/', sym('logo-blanco.svg','logo-blanco')+sym('simbolo-color.svg','simbolo'))
-import base64
-t=t.replace('__FOTO__','data:image/jpeg;base64,'+base64.b64encode(open('campo.jpg','rb').read()).decode())
 aj=json.loads(open('assets.json').read()); aj.pop('iconos',None)
 n=open('notas.json').read().replace('</','<\\/')
 a=json.dumps(aj,ensure_ascii=False,separators=(',',':')).replace('</','<\\/')

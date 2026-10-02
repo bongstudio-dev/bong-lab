@@ -8,7 +8,10 @@
   sitio actual (`urls.csv`, en Drive).
 - `assets.json`: las 18 formas oficiales del sistema.
 - `logo-blanco.svg`, `simbolo-color.svg`: exportados del Figma Master.
-- `campo.jpg`: la foto del header.
+- La foto del header no se embebe: son `../campo.webp` (2560 px) y
+  `../campo-m.webp` (1200 px, mobile), sacadas del original en
+  `01 Profertil/Caso de Estudio/Animacion/Editables/Assets/Imagenes/`
+  con `cwebp -q 70 -resize <ancho> 0`.
 
 Regenerar la página:
 
