@@ -282,7 +282,8 @@ button.sub { cursor: pointer; transition: background 160ms ease, color 160ms eas
 /* --- Panel de filtros: barra fija full rounded con "Todas" y las tres
    categorias con mas notas; arriba se despliega el panel con las demas y el
    año. En mobile la barra se reduce a un boton "Filtros" y el panel trae
-   todas las categorias. Abre y cierra animando la fila del panel (0fr a 1fr)
+   todas las categorias. Abre y cierra animando el alto del panel (medido en
+   JS: animar 0fr a 1fr en un contenedor de alto automatico falla en Chrome)
    y, en mobile, el ancho. */
 .filters {
   /* left y right en 0 con margen auto: con left 50% el ancho se calcula sobre
@@ -292,9 +293,9 @@ button.sub { cursor: pointer; transition: background 160ms ease, color 160ms eas
   z-index: 40;
   width: fit-content; max-width: min(100% - 24px, 980px);
   max-height: calc(100% - 110px);
-  display: grid; grid-template-rows: minmax(0, 0fr) auto; grid-template-columns: minmax(0, 1fr);
+  display: flex; flex-direction: column;
   border-radius: 24px;
-  transition: grid-template-rows 420ms var(--ease), width 420ms var(--ease), border-radius 420ms var(--ease);
+  transition: width 420ms var(--ease), border-radius 420ms var(--ease);
   background: var(--glass);
   border: 1px solid rgba(255, 255, 255, 0.92);
   box-shadow: 0 24px 60px -24px rgba(10, 30, 74, 0.5);
@@ -302,16 +303,20 @@ button.sub { cursor: pointer; transition: background 160ms ease, color 160ms eas
   -webkit-backdrop-filter: blur(22px) saturate(1.4);
   overflow: hidden;
 }
-.filters.open { grid-template-rows: minmax(0, 1fr) auto; border-radius: 26px; }
+.filters.open { border-radius: 26px; }
 /* El panel no ensancha la barra: los años se acomodan al ancho que ya tiene.
    Cerrado queda invisible (fuera del tab) recien cuando termina de bajar. */
 .f-body {
-  contain: inline-size; overflow-y: auto; min-height: 0;
+  contain: inline-size; flex: 0 1 auto; min-height: 0; height: 0; overflow: hidden;
   border-bottom: 1px solid transparent;
   visibility: hidden; opacity: 0;
-  transition: opacity 260ms ease, border-color 260ms ease, visibility 0s linear 420ms;
+  transition: height 420ms var(--ease), opacity 260ms ease, border-color 260ms ease, visibility 0s linear 420ms;
 }
-.filters.open .f-body { visibility: visible; opacity: 1; border-bottom-color: var(--line); transition: opacity 320ms ease 80ms, border-color 260ms ease; }
+.filters.open .f-body { visibility: visible; opacity: 1; border-bottom-color: var(--line); transition: height 420ms var(--ease), opacity 320ms ease 80ms, border-color 260ms ease; }
+/* Mientras anima no hay scroll (si no, aparece la barra a mitad de camino):
+   se habilita recien con .listo, cuando el panel termino de abrir. */
+.filters.open.listo .f-body { height: auto; overflow-y: auto; }
+.f-bar { flex: none; }
 .f-in { padding: 18px 20px 14px; display: grid; gap: 14px; }
 .filters .f-cats { display: grid; }
 .f-group { display: grid; gap: 8px; }
@@ -771,12 +776,10 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
       return '<button type="button" class="lbl" style="--pc:' + x.f.bg + '" data-f="tipo" data-v="' + x.id + '" aria-pressed="' + !!estado.tipos[x.id] + '">' + x.nombre + "</button>";
     }
     // Barra: "Todas" y las tres categorias con mas notas (mas la activa, si es
-    // otra). Panel: en desktop las demas; en mobile, como no hay barra, todas.
+    // otra). Panel: todas, en desktop y en mobile.
     var barra = TIPOS.filter(function (x) { return PRINCIPALES.indexOf(x.id) !== -1 || estado.tipos[x.id]; });
-    var resto = TIPOS.filter(function (x) { return PRINCIPALES.indexOf(x.id) === -1; });
     $("fTipos").innerHTML = todas + barra.map(pill).join("");
-    $("fTiposTodas").innerHTML = esMobile.matches ? todas + TIPOS.map(pill).join("") : resto.map(pill).join("");
-    $("fCatsLabel").textContent = esMobile.matches ? "Categoría" : "Más categorías";
+    $("fTiposTodas").innerHTML = todas + TIPOS.map(pill).join("");
     $("fAnios").innerHTML = ANIOS.map(function (a) {
       return '<button type="button" class="sub sub-anio" data-f="anio" data-v="' + a + '" aria-pressed="' + !!estado.anios[a] + '">' + a + '<b class="n">' + contar("anio", a) + "</b></button>";
     }).join("");
@@ -845,7 +848,37 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   function limpiar() { estado.tipos = {}; estado.anios = {}; estado.q = ""; $("q").value = ""; aplicar(); }
   $("fClear").addEventListener("click", limpiar);
   $("emptyReset").addEventListener("click", limpiar);
-  function abrirFiltros(si) { $("filters").classList.toggle("open", si); $("fToggle").setAttribute("aria-expanded", String(si)); }
+  // El panel anima su alto en px: se mide el alto final (con el ancho final,
+  // sin transiciones y sin pintar), se arranca desde el actual y al terminar
+  // queda en auto con scroll (.listo).
+  var tListo;
+  function abrirFiltros(si) {
+    var f = $("filters"), b = $("fBody");
+    clearTimeout(tListo);
+    var desde = b.offsetHeight;
+    f.style.transition = b.style.transition = "none";
+    f.classList.remove("listo");
+    f.classList.toggle("open", si);
+    b.style.height = "";
+    var hasta = si ? (f.classList.add("listo"), b.offsetHeight) : 0;
+    f.classList.remove("listo");
+    f.classList.toggle("open", !si);
+    b.style.height = desde + "px";
+    void f.offsetWidth;
+    f.style.transition = b.style.transition = "";
+    f.classList.toggle("open", si);
+    b.style.height = hasta + "px";
+    $("fToggle").setAttribute("aria-expanded", String(si));
+    // Respaldo del transitionend (sin animacion, p. ej. con movimiento reducido).
+    tListo = setTimeout(terminar, 460);
+  }
+  function terminar() {
+    var f = $("filters");
+    clearTimeout(tListo);
+    $("fBody").style.height = "";
+    if (f.classList.contains("open")) f.classList.add("listo");
+  }
+  $("fBody").addEventListener("transitionend", function (e) { if (e.target === this && e.propertyName === "height") terminar(); });
   $("fToggle").addEventListener("click", function () { abrirFiltros(!$("filters").classList.contains("open")); });
   abrirFiltros(false);
   function ordenar(o) { estado.orden = o; $("sortNew").setAttribute("aria-pressed", String(o === "new")); $("sortOld").setAttribute("aria-pressed", String(o === "old")); aplicar(); }
