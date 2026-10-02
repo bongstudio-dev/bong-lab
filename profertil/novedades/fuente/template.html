@@ -414,8 +414,10 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   .f-in { padding: 16px 14px 12px; }
   .lbl { --h: 30px; }
   /* Mobile: la barra es solo el boton "Filtros"; el panel trae categorias y año. */
-  .filters { width: var(--f-ancho-cerrado, min(100% - 48px, 380px)); border-radius: 28px; }
-  /* Abierto ocupa la columna del contenido (.wrap deja 16 px por lado). */
+  /* Cerrado y abierto ocupan la columna del contenido (.wrap deja 16 px por
+     lado): el ancho no se anima. El tweak puede probar un cerrado mas angosto
+     con --f-ancho-cerrado. */
+  .filters { width: var(--f-ancho-cerrado, calc(100% - 32px)); border-radius: 28px; }
   .filters.open { width: calc(100% - 32px); }
   .f-main { display: none; }
   .f-bar { justify-content: center; padding: 4px; }

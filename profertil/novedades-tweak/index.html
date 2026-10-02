@@ -147,7 +147,7 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
 
     <div class="grupo llaves">
       <p class="rotulo">Opciones</p>
-      <label class="llave">Animar el ancho en mobile <input type="checkbox" id="ancho" checked></label>
+      <label class="llave">Animar el ancho en mobile <input type="checkbox" id="ancho"></label>
       <label class="llave">Cámara lenta (×4) <input type="checkbox" id="lenta"></label>
       <label class="llave">Repetir abrir y cerrar <input type="checkbox" id="loop"></label>
     </div>
@@ -193,22 +193,22 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
     { id: "anterior", nombre: "Primera versión", v: { abrir: 420, cerrar: 420, curva: [0.22, 1, 0.36, 1], fundido: 320, retraso: 80, flecha: 300 } }
   ];
   var CAMPOS = [
-    { k: "abrir", nombre: "Abrir", min: 120, max: 1200, paso: 10, ayuda: "Alto del panel, ancho en mobile y radio." },
+    { k: "abrir", nombre: "Abrir", min: 120, max: 1200, paso: 10, ayuda: "Alto del panel y radio." },
     { k: "cerrar", nombre: "Cerrar", min: 120, max: 1200, paso: 10, ayuda: "Lo mismo, de vuelta. Suele ir algo más rápido." },
     { k: "fundido", nombre: "Fundido del contenido", min: 0, max: 800, paso: 10, ayuda: "Al cerrar usa el 70% de este valor." },
     { k: "retraso", nombre: "Retraso del fundido", min: 0, max: 400, paso: 10, ayuda: "Cuánto espera el contenido antes de aparecer." },
     { k: "flecha", nombre: "Giro de la flecha", min: 80, max: 900, paso: 10, ayuda: "" }
   ];
-  var CLAVE = "novedades-tweak-v2";
+  var CLAVE = "novedades-tweak-v3";
   var v = JSON.parse(JSON.stringify(PRESETS[0].v));
-  v.ancho = true;
+  v.ancho = false;
 
   function leerHash() {
     var h = location.hash.slice(1); if (!h) return null;
     var o = {};
     h.split("&").forEach(function (p) { var kv = p.split("="); o[kv[0]] = decodeURIComponent(kv[1] || ""); });
     if (!o.curva) return null;
-    return { abrir: +o.abrir, cerrar: +o.cerrar, curva: o.curva.split(",").map(Number), fundido: +o.fundido, retraso: +o.retraso, flecha: +o.flecha, ancho: o.ancho !== "0" };
+    return { abrir: +o.abrir, cerrar: +o.cerrar, curva: o.curva.split(",").map(Number), fundido: +o.fundido, retraso: +o.retraso, flecha: +o.flecha, ancho: o.ancho === "1" };
   }
   try {
     var guardado = leerHash() || JSON.parse(localStorage.getItem(CLAVE) || "null");
@@ -298,7 +298,7 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
   function cssTxt() {
     return "--f-abrir: " + v.abrir + "ms;\n--f-cerrar: " + v.cerrar + "ms;\n--f-curva: " + curvaTxt() + ";\n--f-fundido: " + v.fundido +
       "ms;\n--f-fundido-retraso: " + v.retraso + "ms;\n--f-flecha: " + v.flecha + "ms;" +
-      (v.ancho ? "" : "\n/* sin animar el ancho en mobile (va dentro del @media de 640px) */\n--f-ancho-cerrado: calc(100% - 32px);");
+      (v.ancho ? "\n/* animar el ancho en mobile: cerrado mas angosto (va dentro del @media de 640px) */\n--f-ancho-cerrado: min(100% - 48px, 380px);" : "");
   }
   function hashTxt() {
     return "abrir=" + v.abrir + "&cerrar=" + v.cerrar + "&curva=" + v.curva.join(",") + "&fundido=" + v.fundido + "&retraso=" + v.retraso + "&flecha=" + v.flecha + "&ancho=" + (v.ancho ? 1 : 0);
@@ -327,7 +327,7 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
     r.setProperty("--f-fundido", v.fundido * k + "ms");
     r.setProperty("--f-fundido-retraso", v.retraso * k + "ms");
     r.setProperty("--f-flecha", v.flecha * k + "ms");
-    if (v.ancho) r.removeProperty("--f-ancho-cerrado"); else r.setProperty("--f-ancho-cerrado", "calc(100% - 32px)");
+    if (v.ancho) r.setProperty("--f-ancho-cerrado", "min(100% - 48px, 380px)"); else r.removeProperty("--f-ancho-cerrado");
   }
   function abierto() { var d = doc(); return !!(d && d.getElementById("filters") && d.getElementById("filters").classList.contains("open")); }
   function alternar() {
