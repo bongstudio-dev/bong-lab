@@ -156,7 +156,21 @@ h1 {
 .result-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; padding-block: 22px 16px; }
 .result-text { margin: 0; color: var(--ink-2); min-width: 0; }
 .result-text b { color: var(--azul); font-weight: 600; font-variant-numeric: tabular-nums; }
+.herramientas { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 .seg { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--line); }
+
+/* --- Vista: slider tipo zoom. A la izquierda tarjetas chicas (mas columnas),
+   a la derecha grandes. El cambio se anima con View Transitions donde hay. */
+.vista { display: inline-flex; align-items: center; gap: 10px; height: 38px; padding: 0 14px; border-radius: 999px; background: var(--line); color: var(--ink-2); }
+.vista svg { width: 16px; height: 16px; flex: none; fill: currentColor; }
+.vista input[type="range"] { -webkit-appearance: none; appearance: none; width: 120px; height: 20px; margin: 0; background: transparent; cursor: pointer; }
+.vista input[type="range"]::-webkit-slider-runnable-track { height: 4px; border-radius: 999px; background: linear-gradient(90deg, var(--azul) 0 var(--p, 50%), rgba(10, 30, 74, 0.16) var(--p, 50%) 100%); }
+.vista input[type="range"]::-moz-range-track { height: 4px; border-radius: 999px; background: rgba(10, 30, 74, 0.16); }
+.vista input[type="range"]::-moz-range-progress { height: 4px; border-radius: 999px; background: var(--azul); }
+.vista input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; margin-top: -7px; border-radius: 999px; background: var(--card); border: 0; box-shadow: 0 0 0 2px var(--azul), 0 2px 6px rgba(10, 30, 74, 0.25); transition: transform 160ms var(--ease); }
+.vista input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 999px; background: var(--card); border: 0; box-shadow: 0 0 0 2px var(--azul), 0 2px 6px rgba(10, 30, 74, 0.25); }
+.vista input[type="range"]:active::-webkit-slider-thumb { transform: scale(1.15); }
+::view-transition-group(*) { animation-duration: 420ms; animation-timing-function: cubic-bezier(0.67, 0, 0.24, 0.99); }
 .seg button { border: 0; background: transparent; cursor: pointer; padding: 6px 13px; border-radius: 999px; font-size: 0.86rem; color: var(--ink-2); }
 .seg button[aria-pressed="true"] { background: var(--card); color: var(--azul); font-weight: 500; box-shadow: 0 1px 3px rgba(10, 30, 74, 0.12); }
 
@@ -242,6 +256,16 @@ a.etq:hover .fl { background: var(--tx); color: #fff; }
 .card .media .etq { max-width: calc(100% - 20px); }
 .card .etq .lb { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .card .etq .lb > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Tarjetas anchas (vista con pocas columnas): la tipografia crece. */
+@container (min-width: 420px) {
+  .lead { padding: 26px 26px 4px; gap: 18px; }
+  .lead h3 { font-size: 2.1rem; line-height: 1.02; }
+  .meta { padding: 14px 18px 22px; }
+  .ttl { font-size: 1.55rem; line-height: 1.12; -webkit-line-clamp: 3; }
+  .when { font-size: 0.92rem; }
+  .etq { --s: 32px; }
+  .media .etq { top: 14px; left: 14px; }
+}
 @container (max-width: 250px) {
   .etq .full { display: none; }
   .etq .corto { display: inline; }
@@ -479,9 +503,16 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
 <main class="wrap">
   <div class="result-row">
     <p class="result-text" id="resultText" aria-live="polite"></p>
-    <div class="seg" role="group" aria-label="Orden">
-      <button type="button" id="sortNew" aria-pressed="true">Más recientes</button>
-      <button type="button" id="sortOld" aria-pressed="false">Más antiguas</button>
+    <div class="herramientas">
+      <label class="vista" title="Tamaño de las tarjetas">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1" y="1" width="4" height="4" rx="1.3"/><rect x="6" y="1" width="4" height="4" rx="1.3"/><rect x="11" y="1" width="4" height="4" rx="1.3"/><rect x="1" y="6" width="4" height="4" rx="1.3"/><rect x="6" y="6" width="4" height="4" rx="1.3"/><rect x="11" y="6" width="4" height="4" rx="1.3"/><rect x="1" y="11" width="4" height="4" rx="1.3"/><rect x="6" y="11" width="4" height="4" rx="1.3"/><rect x="11" y="11" width="4" height="4" rx="1.3"/></svg>
+        <input type="range" id="zoom" min="0" max="4" step="1" value="1" aria-label="Tamaño de las tarjetas">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1" y="1" width="14" height="14" rx="4.5"/></svg>
+      </label>
+      <div class="seg" role="group" aria-label="Orden">
+        <button type="button" id="sortNew" aria-pressed="true">Más recientes</button>
+        <button type="button" id="sortOld" aria-pressed="false">Más antiguas</button>
+      </div>
     </div>
   </div>
   <div class="grid" id="grid"></div>
@@ -709,7 +740,19 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
 
   /* --- Masonry ------------------------------------------------------------ */
   var cols = [];
-  function cuantasCols() { var w = grid.clientWidth; return w < 700 ? 2 : w < 1020 ? 3 : w < 1260 ? 4 : 5; }
+  // Columnas: automaticas segun el ancho, o las que elija el slider de vista.
+  // El slider va de tarjetas chicas (mas columnas) a grandes (menos).
+  function rangoCols() { var w = grid.clientWidth; return w < 700 ? [1, 2] : w < 1020 ? [2, 4] : [2, 6]; }
+  function colsAuto() { var w = grid.clientWidth; return w < 700 ? 2 : w < 1020 ? 3 : w < 1260 ? 4 : 5; }
+  var colsElegidas = null;
+  try { colsElegidas = Number(localStorage.getItem("novedades-cols")) || null; } catch (e) {}
+  function cuantasCols() { var r = rangoCols(); return colsElegidas ? Math.min(r[1], Math.max(r[0], colsElegidas)) : colsAuto(); }
+  function sincronizarZoom() {
+    var r = rangoCols(), z = $("zoom");
+    z.max = r[1] - r[0];
+    z.value = r[1] - cuantasCols();
+    z.style.setProperty("--p", (z.max > 0 ? (z.value / z.max) * 100 : 0) + "%");
+  }
   function armarCols() {
     grid.innerHTML = ""; cols = [];
     for (var i = 0, n = cuantasCols(); i < n; i++) { var c = document.createElement("div"); c.className = "gcol"; grid.appendChild(c); cols.push(c); }
@@ -720,6 +763,7 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
     var q = plano(estado.q.trim());
     var b = document.createElement("button");
     b.type = "button"; b.className = "card"; b.dataset.idx = idx;
+    b.style.viewTransitionName = "nota-" + n.id;
     var when = '<p class="when"><b>' + fecha(n.f) + "</b></p>";
     var h;
     if (conArte(n)) {
@@ -892,7 +936,19 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
     new IntersectionObserver(function (en) { if (en[0].isIntersecting && pintadas < lista.length) pintarTanda(); }, { rootMargin: "900px 0px" }).observe($("sentinel"));
   } else { TANDA = 1000; }
   var nCols = cuantasCols();
-  window.addEventListener("resize", function () { var n = cuantasCols(); if (n !== nCols) { nCols = n; repintar(true); } });
+  window.addEventListener("resize", function () { sincronizarZoom(); var n = cuantasCols(); if (n !== nCols) { nCols = n; repintar(true); } });
+  $("zoom").addEventListener("input", function (e) {
+    var r = rangoCols();
+    colsElegidas = r[1] - Number(e.target.value);
+    try { localStorage.setItem("novedades-cols", String(colsElegidas)); } catch (err) {}
+    sincronizarZoom();
+    var n = cuantasCols(); if (n === nCols) return;
+    nCols = n;
+    // Las tarjetas viajan a su lugar nuevo (View Transitions); sin soporte, cambia directo.
+    if (document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches) document.startViewTransition(function () { repintar(true); });
+    else repintar(true);
+  });
+  sincronizarZoom();
 
   // Arte de la banda: la hoja oficial sobre un bloque verde, como en el concepto web.
   $("bandArt").innerHTML = '<svg viewBox="0 0 560 520" preserveAspectRatio="xMaxYMax slice"><rect x="300" y="250" width="260" height="270" fill="#2D8035"/>' +
