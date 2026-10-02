@@ -41,12 +41,12 @@
 
   /* Animacion del panel de filtros. Se ajusta con el tweak de
      profertil/novedades-tweak/ y se pega aca. */
-  --f-abrir: 480ms;
-  --f-cerrar: 380ms;
-  --f-curva: cubic-bezier(0.4, 0, 0.2, 1);
-  --f-fundido: 300ms;
-  --f-fundido-retraso: 120ms;
-  --f-flecha: 380ms;
+  --f-abrir: 600ms;
+  --f-cerrar: 460ms;
+  --f-curva: cubic-bezier(0.67, 0, 0.24, 0.99);
+  --f-fundido: 360ms;
+  --f-fundido-retraso: 160ms;
+  --f-flecha: 460ms;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -424,6 +424,10 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   .f-txt { display: inline; }
   .f-count { position: static; order: 2; }
 }
+/* ?solo=dock: solo la barra de arriba y el dock de filtros, sin hero ni
+   tarjetas. Lo usa el tweak de la animacion. */
+.solo-dock .hero-foto, .solo-dock main { display: none; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
@@ -436,6 +440,7 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   <symbol id="badge-bg" viewBox="0 0 100 100"><path d="M32 0H68C76.4869 0 84.6263 3.37142 90.6274 9.37258C96.6286 15.3737 100 23.5131 100 32V68C100 76.4869 96.6286 84.6263 90.6274 90.6274C84.6263 96.6286 76.4869 100 68 100H32C23.5131 100 15.3737 96.6286 9.37258 90.6274C3.37142 84.6263 0 76.4869 0 68V32C0 23.5131 3.37142 15.3737 9.37258 9.37258C15.3737 3.37142 23.5131 0 32 0Z"/></symbol>
 </defs></svg>
 
+<script>if (/[?&]solo=dock\b/.test(location.search)) document.documentElement.classList.add("solo-dock");</script>
 <header class="top" id="top">
   <div class="wrap">
     <nav class="nav" id="nav" aria-label="Sitio">

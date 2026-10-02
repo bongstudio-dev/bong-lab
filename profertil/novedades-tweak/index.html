@@ -11,7 +11,8 @@
 <style>
 /* ==========================================================================
    Tweak de la animacion del panel de filtros de Novedades.
-   Carga la pagina real en un iframe (mismo origen) y le escribe las
+   Carga la pagina real en un iframe (mismo origen, con ?solo=dock: solo
+   navegacion y dock, sin hero ni tarjetas) y le escribe las
    variables --f-* en :root. Lo que sale de aca se pega tal cual en el
    :root de profertil/novedades/fuente/template.html.
    ========================================================================== */
@@ -109,7 +110,7 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
   <aside class="ctrl">
     <div>
       <h1>Panel de filtros</h1>
-      <p class="bajada">Ajuste en vivo de la animación de abrir y cerrar, sobre la página real de Novedades.</p>
+      <p class="bajada">Ajuste en vivo de la animación de abrir y cerrar del dock de filtros de Novedades. La vista muestra la navegación y el dock reales, sin las tarjetas.</p>
     </div>
 
     <div class="grupo">
@@ -173,7 +174,7 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
       <span class="estado" id="estado">Cargando la página…</span>
     </div>
     <div class="escena" id="escena">
-      <div class="marco" id="marco"><iframe id="frame" src="../novedades/" title="Novedades Profertil"></iframe></div>
+      <div class="marco" id="marco"><iframe id="frame" src="../novedades/?solo=dock" title="Navegación y filtros de Novedades Profertil"></iframe></div>
     </div>
   </section>
 </div>
@@ -186,10 +187,10 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
   /* --- Valores ------------------------------------------------------------
      Mismos nombres que las variables --f-* de la pagina. */
   var PRESETS = [
-    { id: "suave", nombre: "Suave (en la página)", v: { abrir: 480, cerrar: 380, curva: [0.4, 0, 0.2, 1], fundido: 300, retraso: 120, flecha: 380 } },
-    { id: "anterior", nombre: "Anterior", v: { abrir: 420, cerrar: 420, curva: [0.22, 1, 0.36, 1], fundido: 320, retraso: 80, flecha: 300 } },
+    { id: "default", nombre: "Default", v: { abrir: 600, cerrar: 460, curva: [0.67, 0, 0.24, 0.99], fundido: 360, retraso: 160, flecha: 460 } },
+    { id: "suave", nombre: "Suave", v: { abrir: 480, cerrar: 380, curva: [0.4, 0, 0.2, 1], fundido: 300, retraso: 120, flecha: 380 } },
     { id: "hoja", nombre: "Hoja", v: { abrir: 520, cerrar: 400, curva: [0.32, 0.72, 0, 1], fundido: 280, retraso: 60, flecha: 420 } },
-    { id: "calma", nombre: "Sin prisa", v: { abrir: 600, cerrar: 460, curva: [0.65, 0, 0.35, 1], fundido: 360, retraso: 160, flecha: 460 } }
+    { id: "anterior", nombre: "Primera versión", v: { abrir: 420, cerrar: 420, curva: [0.22, 1, 0.36, 1], fundido: 320, retraso: 80, flecha: 300 } }
   ];
   var CAMPOS = [
     { k: "abrir", nombre: "Abrir", min: 120, max: 1200, paso: 10, ayuda: "Alto del panel, ancho en mobile y radio." },
@@ -198,7 +199,7 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
     { k: "retraso", nombre: "Retraso del fundido", min: 0, max: 400, paso: 10, ayuda: "Cuánto espera el contenido antes de aparecer." },
     { k: "flecha", nombre: "Giro de la flecha", min: 80, max: 900, paso: 10, ayuda: "" }
   ];
-  var CLAVE = "novedades-tweak-v1";
+  var CLAVE = "novedades-tweak-v2";
   var v = JSON.parse(JSON.stringify(PRESETS[0].v));
   v.ancho = true;
 
@@ -352,9 +353,6 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
   function alCargar() {
     if (alCargar.listo) return; alCargar.listo = true;
     aplicar();
-    var w = frame.contentWindow;
-    // Que se vean tarjetas detras del vidrio, no la foto.
-    setTimeout(function () { w.scrollTo(0, w.innerWidth < 640 ? 560 : 460); }, 80);
     $("estado").textContent = "Cerrado";
     ciclo();
   }
@@ -380,8 +378,6 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
     vista = b.dataset.vista;
     Array.prototype.forEach.call(this.children, function (x) { x.setAttribute("aria-pressed", String(x === b)); });
     encuadrar();
-    // El iframe cambia de ancho: la pagina rearma la grilla; se vuelve a bajar.
-    setTimeout(function () { var w = frame.contentWindow; if (w) w.scrollTo(0, vista === "mobile" ? 560 : 460); }, 120);
   });
   window.addEventListener("resize", encuadrar);
   encuadrar();
