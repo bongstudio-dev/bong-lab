@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tweak panel de filtros</title>
+<meta name="description" content="Ajuste en vivo de la animación del panel de filtros de Novedades Profertil: duraciones, curva y fundido, sobre la página real.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=DM+Mono&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+   Tweak de la animacion del panel de filtros de Novedades.
+   Carga la pagina real en un iframe (mismo origen) y le escribe las
+   variables --f-* en :root. Lo que sale de aca se pega tal cual en el
+   :root de profertil/novedades/fuente/template.html.
+   ========================================================================== */
+:root {
+  color-scheme: light;
+  --azul: #003DA5;
+  --celeste: #4086FF;
+  --verde: #2D8035;
+  --tiza: #FFFEEF;
+  --bg: #E9E7D6;
+  --ink: #0A1E4A;
+  --ink-2: #44506E;
+  --ink-3: #737D96;
+  --line: rgba(10, 30, 74, 0.12);
+  --f-display: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "DM Sans", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "DM Mono", ui-monospace, Menlo, monospace;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.45; -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--celeste); outline-offset: 2px; }
+
+.app { display: grid; grid-template-columns: 380px minmax(0, 1fr); height: 100%; }
+.ctrl { overflow-y: auto; background: var(--tiza); border-right: 1px solid var(--line); padding: 22px 20px 28px; display: grid; gap: 22px; align-content: start; }
+.vista { position: relative; display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; }
+
+h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6rem; line-height: 1.05; letter-spacing: -0.02em; color: var(--azul); }
+.bajada { margin: 6px 0 0; color: var(--ink-2); font-size: 0.9rem; }
+.grupo { display: grid; gap: 10px; }
+.rotulo { margin: 0; font-size: 0.72rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { height: 32px; padding: 0 14px; border: 0; border-radius: 999px; background: rgba(0, 61, 165, 0.1); color: var(--azul); cursor: pointer; font-size: 0.86rem; transition: background 200ms ease, color 200ms ease; }
+.chip:hover { background: rgba(0, 61, 165, 0.18); }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--tiza); }
+
+/* Editor de curva */
+.curva { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.curva svg { width: 100%; height: auto; display: block; background: #fff; border-radius: 16px; border: 1px solid var(--line); touch-action: none; }
+.curva .eje { stroke: var(--line); stroke-width: 1; }
+.curva .guia { stroke: var(--ink-3); stroke-width: 1; stroke-dasharray: 3 4; }
+.curva .trazo { fill: none; stroke: var(--azul); stroke-width: 3; stroke-linecap: round; }
+.curva .brazo { stroke: var(--celeste); stroke-width: 1.5; }
+.curva .punto { fill: var(--celeste); stroke: #fff; stroke-width: 3; cursor: grab; }
+.curva .punto:active { cursor: grabbing; }
+.curva .extremo { fill: var(--azul); }
+.curva .bola { fill: var(--verde); }
+.nums { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.nums input { width: 100%; height: 34px; padding: 0 8px; border: 1px solid var(--line); border-radius: 10px; background: #fff; font-family: var(--f-mono); font-size: 0.82rem; text-align: center; }
+
+/* Deslizadores */
+.campo { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 4px 10px; }
+.campo label { font-size: 0.9rem; }
+.campo output { font-family: var(--f-mono); font-size: 0.82rem; color: var(--azul); font-variant-numeric: tabular-nums; }
+.campo input[type="range"] { grid-column: 1 / -1; width: 100%; accent-color: var(--azul); margin: 0; }
+.ayuda { grid-column: 1 / -1; margin: -2px 0 0; font-size: 0.78rem; color: var(--ink-3); }
+
+.llaves { display: grid; gap: 8px; }
+.llave { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 0.9rem; cursor: pointer; }
+.llave input { appearance: none; -webkit-appearance: none; width: 44px; height: 26px; border-radius: 999px; background: rgba(10, 30, 74, 0.18); position: relative; cursor: pointer; transition: background 200ms ease; flex: none; margin: 0; }
+.llave input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 999px; background: #fff; box-shadow: 0 1px 3px rgba(10, 30, 74, 0.3); transition: transform 240ms cubic-bezier(0.32, 0.72, 0, 1); }
+.llave input:checked { background: var(--verde); }
+.llave input:checked::after { transform: translateX(18px); }
+
+.acciones { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.btn { height: 44px; padding: 0 16px; border: 0; border-radius: 14px; cursor: pointer; font-weight: 500; background: rgba(10, 30, 74, 0.08); color: var(--ink); }
+.btn:hover { background: rgba(10, 30, 74, 0.14); }
+.btn.prim { grid-column: 1 / -1; background: var(--azul); color: #fff; }
+.btn.prim:hover { background: #00348c; }
+
+pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink); color: var(--tiza); font-family: var(--f-mono); font-size: 0.8rem; line-height: 1.6; white-space: pre-wrap; }
+.aviso { min-height: 1.2em; margin: 0; font-size: 0.82rem; color: var(--verde); }
+
+/* Vista previa */
+.barra-vista { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; }
+.seg { display: inline-flex; padding: 3px; border-radius: 999px; background: rgba(10, 30, 74, 0.1); }
+.seg button { border: 0; background: transparent; cursor: pointer; padding: 6px 14px; border-radius: 999px; font-size: 0.86rem; color: var(--ink-2); }
+.seg button[aria-pressed="true"] { background: var(--tiza); color: var(--azul); font-weight: 500; box-shadow: 0 1px 3px rgba(10, 30, 74, 0.12); }
+.estado { font-size: 0.82rem; color: var(--ink-3); }
+.escena { position: relative; min-height: 0; overflow: hidden; }
+.marco { position: absolute; top: 0; left: 50%; transform-origin: top center; border-radius: 20px; overflow: hidden; background: var(--bg); box-shadow: 0 30px 70px -30px rgba(10, 30, 74, 0.45), 0 0 0 1px var(--line); }
+.marco iframe { display: block; width: 100%; height: 100%; border: 0; }
+
+@media (max-width: 900px) {
+  .app { grid-template-columns: 1fr; height: auto; }
+  .ctrl { border-right: 0; border-bottom: 1px solid var(--line); order: 2; }
+  .vista { height: 78vh; order: 1; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="ctrl">
+    <div>
+      <h1>Panel de filtros</h1>
+      <p class="bajada">Ajuste en vivo de la animación de abrir y cerrar, sobre la página real de Novedades.</p>
+    </div>
+
+    <div class="grupo">
+      <p class="rotulo">Punto de partida</p>
+      <div class="chips" id="presets"></div>
+    </div>
+
+    <div class="grupo curva">
+      <p class="rotulo">Curva</p>
+      <svg id="curva" viewBox="-30 -30 260 300" aria-label="Curva de aceleración: arrastrá los dos puntos celestes">
+        <line class="eje" x1="0" y1="240" x2="200" y2="240"/>
+        <line class="eje" x1="0" y1="40" x2="200" y2="40"/>
+        <line class="eje" x1="0" y1="40" x2="0" y2="240"/>
+        <line class="eje" x1="200" y1="40" x2="200" y2="240"/>
+        <line class="guia" x1="0" y1="240" x2="200" y2="40"/>
+        <line class="brazo" id="b1"/>
+        <line class="brazo" id="b2"/>
+        <path class="trazo" id="trazo"/>
+        <circle class="extremo" cx="0" cy="240" r="5"/>
+        <circle class="extremo" cx="200" cy="40" r="5"/>
+        <circle class="bola" id="bola" cx="0" cy="240" r="6"/>
+        <circle class="punto" id="p1" r="9"/>
+        <circle class="punto" id="p2" r="9"/>
+      </svg>
+      <div class="nums">
+        <input id="x1" type="number" step="0.01" min="0" max="1" aria-label="x1">
+        <input id="y1" type="number" step="0.01" min="-0.5" max="1.5" aria-label="y1">
+        <input id="x2" type="number" step="0.01" min="0" max="1" aria-label="x2">
+        <input id="y2" type="number" step="0.01" min="-0.5" max="1.5" aria-label="y2">
+      </div>
+    </div>
+
+    <div class="grupo" id="campos"></div>
+
+    <div class="grupo llaves">
+      <p class="rotulo">Opciones</p>
+      <label class="llave">Animar el ancho en mobile <input type="checkbox" id="ancho" checked></label>
+      <label class="llave">Cámara lenta (×4) <input type="checkbox" id="lenta"></label>
+      <label class="llave">Repetir abrir y cerrar <input type="checkbox" id="loop"></label>
+    </div>
+
+    <div class="acciones">
+      <button class="btn prim" id="probar" type="button">Abrir / cerrar</button>
+      <button class="btn" id="copiarCss" type="button">Copiar CSS</button>
+      <button class="btn" id="copiarLink" type="button">Copiar link</button>
+    </div>
+    <p class="aviso" id="aviso" aria-live="polite"></p>
+
+    <div class="grupo">
+      <p class="rotulo">Para pegar en el :root de la página</p>
+      <pre id="css"></pre>
+    </div>
+  </aside>
+
+  <section class="vista">
+    <div class="barra-vista">
+      <div class="seg" role="group" aria-label="Vista">
+        <button type="button" data-vista="desktop" aria-pressed="true">Desktop</button>
+        <button type="button" data-vista="mobile" aria-pressed="false">Mobile</button>
+      </div>
+      <span class="estado" id="estado">Cargando la página…</span>
+    </div>
+    <div class="escena" id="escena">
+      <div class="marco" id="marco"><iframe id="frame" src="../novedades/" title="Novedades Profertil"></iframe></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+
+  /* --- Valores ------------------------------------------------------------
+     Mismos nombres que las variables --f-* de la pagina. */
+  var PRESETS = [
+    { id: "suave", nombre: "Suave (en la página)", v: { abrir: 480, cerrar: 380, curva: [0.4, 0, 0.2, 1], fundido: 300, retraso: 120, flecha: 380 } },
+    { id: "anterior", nombre: "Anterior", v: { abrir: 420, cerrar: 420, curva: [0.22, 1, 0.36, 1], fundido: 320, retraso: 80, flecha: 300 } },
+    { id: "hoja", nombre: "Hoja", v: { abrir: 520, cerrar: 400, curva: [0.32, 0.72, 0, 1], fundido: 280, retraso: 60, flecha: 420 } },
+    { id: "calma", nombre: "Sin prisa", v: { abrir: 600, cerrar: 460, curva: [0.65, 0, 0.35, 1], fundido: 360, retraso: 160, flecha: 460 } }
+  ];
+  var CAMPOS = [
+    { k: "abrir", nombre: "Abrir", min: 120, max: 1200, paso: 10, ayuda: "Alto del panel, ancho en mobile y radio." },
+    { k: "cerrar", nombre: "Cerrar", min: 120, max: 1200, paso: 10, ayuda: "Lo mismo, de vuelta. Suele ir algo más rápido." },
+    { k: "fundido", nombre: "Fundido del contenido", min: 0, max: 800, paso: 10, ayuda: "Al cerrar usa el 70% de este valor." },
+    { k: "retraso", nombre: "Retraso del fundido", min: 0, max: 400, paso: 10, ayuda: "Cuánto espera el contenido antes de aparecer." },
+    { k: "flecha", nombre: "Giro de la flecha", min: 80, max: 900, paso: 10, ayuda: "" }
+  ];
+  var CLAVE = "novedades-tweak-v1";
+  var v = JSON.parse(JSON.stringify(PRESETS[0].v));
+  v.ancho = true;
+
+  function leerHash() {
+    var h = location.hash.slice(1); if (!h) return null;
+    var o = {};
+    h.split("&").forEach(function (p) { var kv = p.split("="); o[kv[0]] = decodeURIComponent(kv[1] || ""); });
+    if (!o.curva) return null;
+    return { abrir: +o.abrir, cerrar: +o.cerrar, curva: o.curva.split(",").map(Number), fundido: +o.fundido, retraso: +o.retraso, flecha: +o.flecha, ancho: o.ancho !== "0" };
+  }
+  try {
+    var guardado = leerHash() || JSON.parse(localStorage.getItem(CLAVE) || "null");
+    if (guardado && guardado.curva && guardado.curva.length === 4) v = guardado;
+  } catch (e) {}
+
+  /* --- Panel de controles --------------------------------------------------- */
+  $("presets").innerHTML = PRESETS.map(function (p) { return '<button type="button" class="chip" data-p="' + p.id + '">' + p.nombre + "</button>"; }).join("");
+  $("presets").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-p]"); if (!b) return;
+    var p = PRESETS.filter(function (x) { return x.id === b.dataset.p; })[0];
+    var ancho = v.ancho;
+    v = JSON.parse(JSON.stringify(p.v)); v.ancho = ancho;
+    pintar(); aplicar(); probar();
+  });
+
+  $("campos").innerHTML = '<p class="rotulo">Tiempos</p>' + CAMPOS.map(function (c) {
+    return '<div class="campo"><label for="c-' + c.k + '">' + c.nombre + '</label><output id="o-' + c.k + '"></output>' +
+      '<input type="range" id="c-' + c.k + '" min="' + c.min + '" max="' + c.max + '" step="' + c.paso + '">' +
+      (c.ayuda ? '<p class="ayuda">' + c.ayuda + "</p>" : "") + "</div>";
+  }).join("");
+  CAMPOS.forEach(function (c) {
+    $("c-" + c.k).addEventListener("input", function (e) { v[c.k] = +e.target.value; pintar(); aplicar(); });
+  });
+  ["x1", "y1", "x2", "y2"].forEach(function (id, i) {
+    $(id).addEventListener("change", function (e) {
+      var n = parseFloat(e.target.value); if (isNaN(n)) return;
+      v.curva[i] = i % 2 === 0 ? Math.min(1, Math.max(0, n)) : Math.min(1.5, Math.max(-0.5, n));
+      pintar(); aplicar();
+    });
+  });
+  $("ancho").addEventListener("change", function (e) { v.ancho = e.target.checked; pintar(); aplicar(); });
+  $("lenta").addEventListener("change", function () { aplicar(); });
+
+  /* --- Editor de curva ----------------------------------------------------
+     Cuadro de 200 x 200 (de y = 40 a y = 240); la y deja lugar para curvas
+     que se pasan (rebote) por arriba o por abajo. */
+  var svg = $("curva");
+  function aPx(x, y) { return [x * 200, 240 - y * 200]; }
+  function curvaTxt() { return "cubic-bezier(" + v.curva.map(function (n) { return +n.toFixed(2); }).join(", ") + ")"; }
+  function dibujarCurva() {
+    var c = v.curva, p1 = aPx(c[0], c[1]), p2 = aPx(c[2], c[3]);
+    $("trazo").setAttribute("d", "M0 240C" + p1.join(" ") + " " + p2.join(" ") + " 200 40");
+    $("p1").setAttribute("cx", p1[0]); $("p1").setAttribute("cy", p1[1]);
+    $("p2").setAttribute("cx", p2[0]); $("p2").setAttribute("cy", p2[1]);
+    var b1 = $("b1"), b2 = $("b2");
+    b1.setAttribute("x1", 0); b1.setAttribute("y1", 240); b1.setAttribute("x2", p1[0]); b1.setAttribute("y2", p1[1]);
+    b2.setAttribute("x1", 200); b2.setAttribute("y1", 40); b2.setAttribute("x2", p2[0]); b2.setAttribute("y2", p2[1]);
+  }
+  var arrastre = null;
+  function puntoSvg(e) {
+    var pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+    return pt.matrixTransform(svg.getScreenCTM().inverse());
+  }
+  ["p1", "p2"].forEach(function (id, i) {
+    $(id).addEventListener("pointerdown", function (e) { arrastre = i; svg.setPointerCapture(e.pointerId); e.preventDefault(); });
+  });
+  svg.addEventListener("pointermove", function (e) {
+    if (arrastre === null) return;
+    var p = puntoSvg(e);
+    var x = Math.min(1, Math.max(0, p.x / 200)), y = Math.min(1.5, Math.max(-0.5, (240 - p.y) / 200));
+    v.curva[arrastre * 2] = Math.round(x * 100) / 100; v.curva[arrastre * 2 + 1] = Math.round(y * 100) / 100;
+    pintar(); aplicar();
+  });
+  svg.addEventListener("pointerup", function () { if (arrastre !== null) { arrastre = null; probar(); } });
+
+  // La bola recorre la curva con la duracion de abrir, para ver el ritmo sin el panel.
+  function bezier(t, a, b) { var u = 1 - t; return 3 * u * u * t * a + 3 * u * t * t * b + t * t * t; }
+  function correrBola() {
+    var dur = v.abrir * ($("lenta").checked ? 4 : 1), t0 = performance.now(), c = v.curva;
+    (function paso(ahora) {
+      var t = Math.min(1, (ahora - t0) / dur);
+      // t es el tiempo (eje x): se busca el parametro s con x(s) = t.
+      var s = t;
+      for (var i = 0; i < 8; i++) {
+        var x = bezier(s, c[0], c[2]) - t;
+        var d = 3 * (1 - s) * (1 - s) * c[0] + 6 * (1 - s) * s * (c[2] - c[0]) + 3 * s * s * (1 - c[2]);
+        if (Math.abs(d) < 1e-6) break; s = Math.min(1, Math.max(0, s - x / d));
+      }
+      var p = aPx(t, bezier(s, c[1], c[3]));
+      $("bola").setAttribute("cx", p[0]); $("bola").setAttribute("cy", p[1]);
+      if (t < 1) requestAnimationFrame(paso);
+    })(t0);
+  }
+
+  /* --- Salida ---------------------------------------------------------------- */
+  function cssTxt() {
+    return "--f-abrir: " + v.abrir + "ms;\n--f-cerrar: " + v.cerrar + "ms;\n--f-curva: " + curvaTxt() + ";\n--f-fundido: " + v.fundido +
+      "ms;\n--f-fundido-retraso: " + v.retraso + "ms;\n--f-flecha: " + v.flecha + "ms;" +
+      (v.ancho ? "" : "\n/* sin animar el ancho en mobile (va dentro del @media de 640px) */\n--f-ancho-cerrado: calc(100% - 32px);");
+  }
+  function hashTxt() {
+    return "abrir=" + v.abrir + "&cerrar=" + v.cerrar + "&curva=" + v.curva.join(",") + "&fundido=" + v.fundido + "&retraso=" + v.retraso + "&flecha=" + v.flecha + "&ancho=" + (v.ancho ? 1 : 0);
+  }
+  function pintar() {
+    CAMPOS.forEach(function (c) { $("c-" + c.k).value = v[c.k]; $("o-" + c.k).textContent = v[c.k] + " ms"; });
+    ["x1", "y1", "x2", "y2"].forEach(function (id, i) { if (document.activeElement !== $(id)) $(id).value = v.curva[i]; });
+    $("ancho").checked = v.ancho;
+    dibujarCurva();
+    $("css").textContent = cssTxt();
+    var igual = PRESETS.filter(function (p) { return JSON.stringify(p.v) === JSON.stringify({ abrir: v.abrir, cerrar: v.cerrar, curva: v.curva, fundido: v.fundido, retraso: v.retraso, flecha: v.flecha }); })[0];
+    Array.prototype.forEach.call($("presets").children, function (b) { b.setAttribute("aria-pressed", String(!!igual && b.dataset.p === igual.id)); });
+    try { localStorage.setItem(CLAVE, JSON.stringify(v)); } catch (e) {}
+    history.replaceState(null, "", "#" + hashTxt());
+  }
+
+  /* --- La pagina real -------------------------------------------------------- */
+  var frame = $("frame");
+  function doc() { try { return frame.contentDocument; } catch (e) { return null; } }
+  function aplicar() {
+    var d = doc(); if (!d || !d.documentElement) return;
+    var k = $("lenta").checked ? 4 : 1, r = d.documentElement.style;
+    r.setProperty("--f-abrir", v.abrir * k + "ms");
+    r.setProperty("--f-cerrar", v.cerrar * k + "ms");
+    r.setProperty("--f-curva", curvaTxt());
+    r.setProperty("--f-fundido", v.fundido * k + "ms");
+    r.setProperty("--f-fundido-retraso", v.retraso * k + "ms");
+    r.setProperty("--f-flecha", v.flecha * k + "ms");
+    if (v.ancho) r.removeProperty("--f-ancho-cerrado"); else r.setProperty("--f-ancho-cerrado", "calc(100% - 32px)");
+  }
+  function abierto() { var d = doc(); return !!(d && d.getElementById("filters") && d.getElementById("filters").classList.contains("open")); }
+  function alternar() {
+    var d = doc(); if (!d) return;
+    var b = d.getElementById("fToggle"); if (!b) return;
+    if (!abierto()) correrBola();
+    b.click();
+    $("estado").textContent = abierto() ? "Abierto" : "Cerrado";
+  }
+  function probar() { if (!$("loop").checked) { if (abierto()) { alternar(); setTimeout(alternar, v.cerrar * ($("lenta").checked ? 4 : 1) + 250); } else alternar(); } }
+  $("probar").addEventListener("click", alternar);
+
+  var tLoop;
+  function ciclo() {
+    clearTimeout(tLoop);
+    if (!$("loop").checked) return;
+    var k = $("lenta").checked ? 4 : 1;
+    alternar();
+    tLoop = setTimeout(ciclo, (abierto() ? v.abrir : v.cerrar) * k + (abierto() ? 900 : 700));
+  }
+  $("loop").addEventListener("change", ciclo);
+
+  function alCargar() {
+    if (alCargar.listo) return; alCargar.listo = true;
+    aplicar();
+    var w = frame.contentWindow;
+    // Que se vean tarjetas detras del vidrio, no la foto.
+    setTimeout(function () { w.scrollTo(0, w.innerWidth < 640 ? 560 : 460); }, 80);
+    $("estado").textContent = "Cerrado";
+    ciclo();
+  }
+  // Si el iframe ya cargo antes de que corriera este script, no llega el load.
+  frame.addEventListener("load", alCargar);
+  (function esperar() {
+    var d = doc();
+    if (d && d.readyState === "complete" && d.getElementById("fToggle")) alCargar();
+    else if (!alCargar.listo) setTimeout(esperar, 150);
+  })();
+
+  /* --- Vista desktop / mobile ---------------------------------------------- */
+  var VISTAS = { desktop: [1280, 800], mobile: [390, 760] };
+  var vista = "desktop";
+  function encuadrar() {
+    var e = $("escena"), m = $("marco"), tam = VISTAS[vista];
+    var esc = Math.min(1, (e.clientWidth - 32) / tam[0], (e.clientHeight - 16) / tam[1]);
+    m.style.width = tam[0] + "px"; m.style.height = tam[1] + "px";
+    m.style.transform = "translateX(-50%) scale(" + esc + ")";
+  }
+  document.querySelector(".seg").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-vista]"); if (!b) return;
+    vista = b.dataset.vista;
+    Array.prototype.forEach.call(this.children, function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+    encuadrar();
+    // El iframe cambia de ancho: la pagina rearma la grilla; se vuelve a bajar.
+    setTimeout(function () { var w = frame.contentWindow; if (w) w.scrollTo(0, vista === "mobile" ? 560 : 460); }, 120);
+  });
+  window.addEventListener("resize", encuadrar);
+  encuadrar();
+
+  /* --- Copiar ------------------------------------------------------------------ */
+  function copiar(txt, msj) {
+    function ok() { $("aviso").textContent = msj; setTimeout(function () { $("aviso").textContent = ""; }, 2400); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, function () { prompt("Copiá esto:", txt); });
+    else prompt("Copiá esto:", txt);
+  }
+  $("copiarCss").addEventListener("click", function () { copiar(cssTxt(), "CSS copiado."); });
+  $("copiarLink").addEventListener("click", function () { copiar(location.href, "Link copiado, con estos valores."); });
+
+  pintar();
+})();
+</script>
+</body>
+</html>

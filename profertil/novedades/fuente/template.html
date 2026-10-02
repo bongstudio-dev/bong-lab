@@ -38,6 +38,15 @@
   --f-body: "DM Sans", "Helvetica Neue", Arial, sans-serif;
   --f-mono: "DM Mono", ui-monospace, Menlo, monospace;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Animacion del panel de filtros. Se ajusta con el tweak de
+     profertil/novedades-tweak/ y se pega aca. */
+  --f-abrir: 480ms;
+  --f-cerrar: 380ms;
+  --f-curva: cubic-bezier(0.4, 0, 0.2, 1);
+  --f-fundido: 300ms;
+  --f-fundido-retraso: 120ms;
+  --f-flecha: 380ms;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -290,7 +299,7 @@ button.sub { cursor: pointer; transition: background 160ms ease, color 160ms eas
   max-height: calc(100% - 110px);
   display: flex; flex-direction: column;
   border-radius: 24px;
-  transition: width 420ms var(--ease), border-radius 420ms var(--ease);
+  transition: width var(--f-cerrar) var(--f-curva), border-radius var(--f-cerrar) var(--f-curva);
   background: var(--glass);
   border: 1px solid rgba(255, 255, 255, 0.92);
   box-shadow: 0 24px 60px -24px rgba(10, 30, 74, 0.5);
@@ -298,16 +307,16 @@ button.sub { cursor: pointer; transition: background 160ms ease, color 160ms eas
   -webkit-backdrop-filter: blur(22px) saturate(1.4);
   overflow: hidden;
 }
-.filters.open { border-radius: 26px; }
+.filters.open { border-radius: 26px; transition-duration: var(--f-abrir); }
 /* El panel no ensancha la barra: los años se acomodan al ancho que ya tiene.
    Cerrado queda invisible (fuera del tab) recien cuando termina de bajar. */
 .f-body {
   contain: inline-size; flex: 0 1 auto; min-height: 0; height: 0; overflow: hidden;
   border-bottom: 1px solid transparent;
   visibility: hidden; opacity: 0;
-  transition: height 420ms var(--ease), opacity 260ms ease, border-color 260ms ease, visibility 0s linear 420ms;
+  transition: height var(--f-cerrar) var(--f-curva), opacity calc(var(--f-fundido) * 0.7) ease, border-color 260ms ease, visibility 0s linear var(--f-cerrar);
 }
-.filters.open .f-body { visibility: visible; opacity: 1; border-bottom-color: var(--line); transition: height 420ms var(--ease), opacity 320ms ease 80ms, border-color 260ms ease; }
+.filters.open .f-body { visibility: visible; opacity: 1; border-bottom-color: var(--line); transition: height var(--f-abrir) var(--f-curva), opacity var(--f-fundido) ease var(--f-fundido-retraso), border-color 260ms ease; }
 /* Mientras anima no hay scroll (si no, aparece la barra a mitad de camino):
    se habilita recien con .listo, cuando el panel termino de abrir. */
 .filters.open.listo .f-body { height: auto; overflow-y: auto; }
@@ -328,7 +337,7 @@ button.sub { cursor: pointer; transition: background 160ms ease, color 160ms eas
 }
 .f-txt { display: none; }
 .f-toggle:hover { background: var(--line); }
-.f-toggle svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 300ms var(--ease); }
+.f-toggle svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform var(--f-flecha) var(--f-curva); }
 .filters.open .f-toggle svg { transform: rotate(180deg); }
 .f-count { position: absolute; top: 2px; right: 2px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 999px; background: var(--verde); color: #fff; display: grid; place-items: center; font-size: 0.66rem; font-variant-numeric: tabular-nums; }
 .f-clear { justify-self: start; border: 0; background: transparent; cursor: pointer; padding: 4px 0; color: var(--azul); font-size: 0.88rem; text-decoration: underline; text-underline-offset: 3px; }
@@ -405,8 +414,9 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   .f-in { padding: 16px 14px 12px; }
   .lbl { --h: 30px; }
   /* Mobile: la barra es solo el boton "Filtros"; el panel trae categorias y año. */
-  .filters { width: min(100% - 48px, 380px); border-radius: 28px; }
-  .filters.open { width: calc(100% - 24px); }
+  .filters { width: var(--f-ancho-cerrado, min(100% - 48px, 380px)); border-radius: 28px; }
+  /* Abierto ocupa la columna del contenido (.wrap deja 16 px por lado). */
+  .filters.open { width: calc(100% - 32px); }
   .f-main { display: none; }
   .f-bar { justify-content: center; padding: 4px; }
   .f-toggle { width: auto; height: 46px; padding: 0 22px 0 26px; color: var(--ink); font-family: var(--f-display); font-size: 1.04rem; }
@@ -829,17 +839,21 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   $("emptyReset").addEventListener("click", limpiar);
   // El panel anima su alto en px: se mide el alto final (con el ancho final,
   // sin transiciones y sin pintar), se arranca desde el actual y al terminar
-  // queda en auto con scroll (.listo).
+  // queda en auto con scroll (.listo). Mientras dura, el contenido queda fijo
+  // en el ancho final: si no, en mobile las pastillas se reacomodan cuadro a
+  // cuadro mientras el panel se ensancha y la animacion se ve sucia.
   var tListo;
   function abrirFiltros(si) {
     var f = $("filters"), b = $("fBody");
     clearTimeout(tListo);
-    var desde = b.offsetHeight;
+    var desde = b.offsetHeight, anchoAhora = b.firstElementChild.offsetWidth;
     f.style.transition = b.style.transition = "none";
     f.classList.remove("listo");
     f.classList.toggle("open", si);
     b.style.height = "";
     var hasta = si ? (f.classList.add("listo"), b.offsetHeight) : 0;
+    var ancho = si ? b.clientWidth : anchoAhora;
+    b.firstElementChild.style.width = ancho + "px";
     f.classList.remove("listo");
     f.classList.toggle("open", !si);
     b.style.height = desde + "px";
@@ -849,12 +863,14 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
     b.style.height = hasta + "px";
     $("fToggle").setAttribute("aria-expanded", String(si));
     // Respaldo del transitionend (sin animacion, p. ej. con movimiento reducido).
-    tListo = setTimeout(terminar, 460);
+    var dur = parseFloat(getComputedStyle(document.documentElement).getPropertyValue(si ? "--f-abrir" : "--f-cerrar")) || 420;
+    tListo = setTimeout(terminar, dur + 60);
   }
   function terminar() {
     var f = $("filters");
     clearTimeout(tListo);
     $("fBody").style.height = "";
+    $("fBody").firstElementChild.style.width = "";
     if (f.classList.contains("open")) f.classList.add("listo");
   }
   $("fBody").addEventListener("transitionend", function (e) { if (e.target === this && e.propertyName === "height") terminar(); });
