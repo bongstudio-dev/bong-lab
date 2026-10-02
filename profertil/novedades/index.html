@@ -243,7 +243,8 @@ a.etq:hover .fl { background: var(--tx); color: #fff; }
 }
 
 /* --- Pastilla principal de la barra: full rounded, relleno con el color de
-   la familia del tipo y texto tiza. La activa suma un aro del mismo color. */
+   la familia del tipo y texto tiza. El azul oscuro queda reservado para la
+   activa (sin aro); "Todas" sin elegir es transparente. */
 .lbl {
   --h: 30px;
   display: inline-flex; align-items: center; flex: none;
@@ -252,12 +253,12 @@ a.etq:hover .fl { background: var(--tx); color: #fff; }
   background: var(--pc, var(--azul)); color: var(--tiza);
   font-family: var(--f-display); font-size: calc(var(--h) * 0.47); font-weight: 400;
   white-space: nowrap; cursor: pointer;
-  opacity: 0.88;
-  transition: opacity 160ms ease, box-shadow 160ms ease;
+  transition: background 240ms var(--ease), color 240ms var(--ease);
 }
-.lbl:hover { opacity: 1; }
-.lbl[aria-pressed="true"] { opacity: 1; box-shadow: 0 0 0 2px var(--tiza), 0 0 0 3.5px var(--pc, var(--azul)); }
-.lbl-todas { --pc: var(--ink); }
+.lbl:hover { background: color-mix(in srgb, var(--pc, var(--azul)) 86%, var(--ink)); }
+.lbl[aria-pressed="true"] { background: var(--ink); color: var(--tiza); }
+.lbl-todas { background: transparent; color: var(--ink); }
+.lbl-todas:hover { background: var(--line); }
 
 /* --- Subcategoria (cultivo): relleno del color, texto tiza. Sin badge
    ni flecha, para no competir con la etiqueta principal de la nota. */
@@ -278,9 +279,11 @@ button.sub { cursor: pointer; transition: background 160ms ease, color 160ms eas
 .sub .n { font-weight: 400; opacity: 0.7; font-variant-numeric: tabular-nums; }
 .m-body .sub { --h: 28px; }
 
-/* --- Panel de filtros: barra fija full rounded, del ancho de las pastillas;
-   arriba se despliega el panel con el año. En mobile la barra se reduce a un
-   boton "Filtros" y el panel trae tambien las categorias. */
+/* --- Panel de filtros: barra fija full rounded con "Todas" y las tres
+   categorias con mas notas; arriba se despliega el panel con las demas y el
+   año. En mobile la barra se reduce a un boton "Filtros" y el panel trae
+   todas las categorias. Abre y cierra animando la fila del panel (0fr a 1fr)
+   y, en mobile, el ancho. */
 .filters {
   /* left y right en 0 con margen auto: con left 50% el ancho se calcula sobre
      media pantalla y las pastillas quedan cortadas. */
@@ -289,8 +292,9 @@ button.sub { cursor: pointer; transition: background 160ms ease, color 160ms eas
   z-index: 40;
   width: fit-content; max-width: min(100% - 24px, 980px);
   max-height: calc(100% - 110px);
-  display: grid; grid-template-rows: minmax(0, 1fr) auto; grid-template-columns: minmax(0, 1fr);
-  border-radius: 999px;
+  display: grid; grid-template-rows: minmax(0, 0fr) auto; grid-template-columns: minmax(0, 1fr);
+  border-radius: 24px;
+  transition: grid-template-rows 420ms var(--ease), width 420ms var(--ease), border-radius 420ms var(--ease);
   background: var(--glass);
   border: 1px solid rgba(255, 255, 255, 0.92);
   box-shadow: 0 24px 60px -24px rgba(10, 30, 74, 0.5);
@@ -298,11 +302,18 @@ button.sub { cursor: pointer; transition: background 160ms ease, color 160ms eas
   -webkit-backdrop-filter: blur(22px) saturate(1.4);
   overflow: hidden;
 }
-.filters.open { border-radius: 26px; }
-/* El panel no ensancha la barra: los años se acomodan al ancho que ya tiene. */
-.f-body { contain: inline-size; overflow-y: auto; padding: 18px 20px 14px; display: grid; gap: 14px; border-bottom: 1px solid var(--line); }
-.filters:not(.open) .f-body { display: none; }
-.filters .f-cats { display: none; }
+.filters.open { grid-template-rows: minmax(0, 1fr) auto; border-radius: 26px; }
+/* El panel no ensancha la barra: los años se acomodan al ancho que ya tiene.
+   Cerrado queda invisible (fuera del tab) recien cuando termina de bajar. */
+.f-body {
+  contain: inline-size; overflow-y: auto; min-height: 0;
+  border-bottom: 1px solid transparent;
+  visibility: hidden; opacity: 0;
+  transition: opacity 260ms ease, border-color 260ms ease, visibility 0s linear 420ms;
+}
+.filters.open .f-body { visibility: visible; opacity: 1; border-bottom-color: var(--line); transition: opacity 320ms ease 80ms, border-color 260ms ease; }
+.f-in { padding: 18px 20px 14px; display: grid; gap: 14px; }
+.filters .f-cats { display: grid; }
 .f-group { display: grid; gap: 8px; }
 .f-label { margin: 0; font-size: 0.74rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
 .f-row { display: flex; flex-wrap: wrap; gap: 7px; padding: 3px; }
@@ -391,11 +402,11 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   .when { font-size: 0.76rem; }
   .ttl { font-size: 0.96rem; }
   .etq-sm { --s: 21px; }
-  .f-body { padding: 16px 14px 12px; }
+  .f-in { padding: 16px 14px 12px; }
   .lbl { --h: 30px; }
   /* Mobile: la barra es solo el boton "Filtros"; el panel trae categorias y año. */
+  .filters { width: min(100% - 48px, 380px); border-radius: 28px; }
   .filters.open { width: calc(100% - 24px); }
-  .filters .f-cats { display: grid; }
   .f-main { display: none; }
   .f-bar { justify-content: center; padding: 4px; }
   .f-toggle { width: auto; height: 46px; padding: 0 22px 0 26px; color: var(--ink); font-family: var(--f-display); font-size: 1.04rem; }
@@ -480,11 +491,11 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
 </main>
 
 <section class="filters" id="filters" aria-label="Filtros">
-  <div class="f-body" id="fBody">
-    <div class="f-group f-cats"><p class="f-label">Categoría</p><div class="f-row" id="fTiposTodas"></div></div>
+  <div class="f-body" id="fBody"><div class="f-in">
+    <div class="f-group f-cats"><p class="f-label" id="fCatsLabel">Categoría</p><div class="f-row" id="fTiposTodas"></div></div>
     <div class="f-group"><p class="f-label">Año</p><div class="f-row" id="fAnios"></div></div>
     <button class="f-clear" id="fClear" type="button" hidden>Limpiar filtros</button>
-  </div>
+  </div></div>
   <div class="f-bar">
     <div class="f-main" id="fTipos" role="group" aria-label="Tipo de nota"></div>
     <button class="f-toggle" id="fToggle" type="button" aria-expanded="false" aria-controls="fBody" aria-label="Más filtros"><span class="f-txt">Filtros</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg><span class="f-count" id="fCount" hidden>0</span></button>
@@ -738,6 +749,9 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
 
   /* --- Años ----------------------------------------------------------------- */
   var ANIOS = [];
+  var PRINCIPALES = TIPOS.map(function (x) {
+    return { id: x.id, n: NOTAS.filter(function (n) { return n.tp === x.id; }).length };
+  }).sort(function (a, b) { return b.n - a.n; }).slice(0, 3).map(function (x) { return x.id; });
   NOTAS.forEach(function (n) { if (n.anio && ANIOS.indexOf(n.anio) === -1) ANIOS.push(n.anio); });
   ANIOS.sort().reverse();
   $("lede").innerHTML = "Las <b>" + NOTAS.length + " notas</b> que hoy publica el sitio, de " + ANIOS[ANIOS.length - 1] + " a " + ANIOS[0] + ", en un solo lugar. Buscá por palabra o filtrá por categoría y año.";
@@ -752,13 +766,17 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   }
   function pintarFiltros() {
     var ninguno = !activos(estado.tipos).length;
-    var pills = '<button type="button" class="lbl lbl-todas" data-f="todas" aria-pressed="' + ninguno + '">Todas</button>' +
-      TIPOS.map(function (x) {
-        return '<button type="button" class="lbl" style="--pc:' + x.f.bg + '" data-f="tipo" data-v="' + x.id + '" aria-pressed="' + !!estado.tipos[x.id] + '">' + x.nombre + "</button>";
-      }).join("");
-    // La barra muestra las categorias en una fila que se desliza; el panel abierto las muestra todas.
-    $("fTipos").innerHTML = pills;
-    $("fTiposTodas").innerHTML = pills;
+    var todas = '<button type="button" class="lbl lbl-todas" data-f="todas" aria-pressed="' + ninguno + '">Todas</button>';
+    function pill(x) {
+      return '<button type="button" class="lbl" style="--pc:' + x.f.bg + '" data-f="tipo" data-v="' + x.id + '" aria-pressed="' + !!estado.tipos[x.id] + '">' + x.nombre + "</button>";
+    }
+    // Barra: "Todas" y las tres categorias con mas notas (mas la activa, si es
+    // otra). Panel: en desktop las demas; en mobile, como no hay barra, todas.
+    var barra = TIPOS.filter(function (x) { return PRINCIPALES.indexOf(x.id) !== -1 || estado.tipos[x.id]; });
+    var resto = TIPOS.filter(function (x) { return PRINCIPALES.indexOf(x.id) === -1; });
+    $("fTipos").innerHTML = todas + barra.map(pill).join("");
+    $("fTiposTodas").innerHTML = esMobile.matches ? todas + TIPOS.map(pill).join("") : resto.map(pill).join("");
+    $("fCatsLabel").textContent = esMobile.matches ? "Categoría" : "Más categorías";
     $("fAnios").innerHTML = ANIOS.map(function (a) {
       return '<button type="button" class="sub sub-anio" data-f="anio" data-v="' + a + '" aria-pressed="' + !!estado.anios[a] + '">' + a + '<b class="n">' + contar("anio", a) + "</b></button>";
     }).join("");
@@ -790,7 +808,7 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   function aplicar() { filtrar(); resumen(); pintarFiltros(); repintar(false); }
 
   /* --- Eventos -------------------------------------------------------------- */
-  esMobile.addEventListener("change", resumen);
+  esMobile.addEventListener("change", function () { resumen(); pintarFiltros(); });
   var tq;
   $("q").addEventListener("input", function (e) { clearTimeout(tq); tq = setTimeout(function () { estado.q = e.target.value; aplicar(); }, 120); });
   $("qClear").addEventListener("click", function () { $("q").value = ""; estado.q = ""; aplicar(); $("q").focus(); });
@@ -819,8 +837,10 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   $("filters").addEventListener("click", function (e) {
     var b = e.target.closest("[data-f]"); if (!b) return;
     if (b.dataset.f === "todas") { estado.tipos = {}; aplicar(); return; }
-    var m = { tipo: estado.tipos, anio: estado.anios }[b.dataset.f];
-    m[b.dataset.v] = !m[b.dataset.v]; aplicar();
+    // Categoria: una sola a la vez (tocar la activa vuelve a "Todas"). Año: varios.
+    if (b.dataset.f === "tipo") { var on = !estado.tipos[b.dataset.v]; estado.tipos = {}; if (on) estado.tipos[b.dataset.v] = true; }
+    else estado.anios[b.dataset.v] = !estado.anios[b.dataset.v];
+    aplicar();
   });
   function limpiar() { estado.tipos = {}; estado.anios = {}; estado.q = ""; $("q").value = ""; aplicar(); }
   $("fClear").addEventListener("click", limpiar);
