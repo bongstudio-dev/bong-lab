@@ -1,0 +1,841 @@
+<title>Novedades Profertil</title>
+<meta name="description" content="Maqueta del archivo de notas de profertil.com.ar sobre el concepto web del manual de marca: las 471 notas reales del sitio actual, con buscador y filtros.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=DM+Mono&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+   Novedades Profertil: maqueta del archivo de notas.
+   Layout: barra fija con logo, menu y la lupa que se expande en buscador;
+   hero con foto del concepto web (manual p. 110); grilla masonry de tarjetas
+   y panel de filtros flotante (categoria y año).
+   Paleta, pares de color, formas e iconos son los oficiales del manual de
+   marca y de las herramientas del sistema. Un solo tema, a proposito: el
+   manual define la web sobre tiza y no tiene version oscura.
+   ========================================================================== */
+:root {
+  color-scheme: light;
+  /* Paleta del manual (p. 46) */
+  --azul: #003DA5;
+  --celeste: #4086FF;
+  --verde: #2D8035;
+  --verde-claro: #5EB53A;
+  --amarillo: #EABA2C;
+  --naranja: #E57F19;
+  --terra: #8A4818;
+  --tiza: #FFFEEF;
+
+  --bg: #E9E7D6;
+  --card: #FFFEEF;
+  --ink: #0A1E4A;
+  --ink-2: #44506E;
+  --ink-3: #737D96;
+  --line: rgba(10, 30, 74, 0.1);
+  --glass: rgba(255, 254, 239, 0.78);
+  --shadow: 0 1px 2px rgba(10, 30, 74, 0.06), 0 12px 28px -16px rgba(10, 30, 74, 0.28);
+
+  --f-display: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "DM Sans", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "DM Mono", ui-monospace, Menlo, monospace;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { background: var(--bg); }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+button { font: inherit; color: inherit; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--celeste); outline-offset: 2px; }
+.wrap { width: min(100% - 32px, 1320px); margin-inline: auto; }
+.ico { display: block; width: 100%; height: 100%; }
+
+/* --- Barra superior fija ---------------------------------------------------
+   Logo, menu y lupa. Arriba de la foto es transparente; al bajar toma el azul.
+   La busqueda vive en la lupa: se expande hacia la izquierda y tapa el menu,
+   asi la navegacion y el buscador no compiten. */
+.top { position: fixed; inset: 0 0 auto; z-index: 50; padding-top: env(safe-area-inset-top, 0px); transition: background 260ms ease, box-shadow 260ms ease; }
+.top.solid { background: rgba(0, 61, 165, 0.94); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 10px 30px -18px rgba(0, 20, 60, 0.7); }
+.nav { position: relative; display: flex; align-items: center; gap: 14px; height: 76px; padding-right: 58px; transition: height 260ms var(--ease); }
+.nav .menu, .nav .menu-mobile { margin-left: auto; margin-right: auto; }
+.logo { display: block; flex: none; color: var(--tiza); fill: currentColor; line-height: 0; }
+.logo svg { width: 74px; height: auto; aspect-ratio: 1458 / 1021; transition: width 260ms var(--ease); }
+.menu {
+  display: flex; gap: 2px; padding: 7px;
+  border-radius: 999px;
+  background: rgba(255, 254, 239, 0.14);
+  border: 1px solid rgba(255, 254, 239, 0.22);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  transition: opacity 220ms ease;
+}
+.menu span { padding: 7px 14px; border-radius: 999px; font-size: 0.82rem; white-space: nowrap; color: rgba(255, 254, 239, 0.9); }
+.menu span[aria-current] { background: var(--tiza); color: var(--azul); font-weight: 500; }
+.menu-mobile { display: none; align-items: center; gap: 8px; padding: 8px 14px; color: var(--tiza); transition: opacity 220ms ease; }
+.menu-mobile i { display: grid; grid-template-columns: repeat(2, 7px); gap: 3px; }
+.menu-mobile i b { width: 7px; height: 7px; border-radius: 999px; border: 1.5px solid currentColor; }
+.nav.buscando .menu, .nav.buscando .menu-mobile { opacity: 0; pointer-events: none; }
+
+.busca {
+  position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+  display: flex; align-items: center;
+  width: 48px; height: 48px;
+  border-radius: 999px;
+  background: rgba(255, 254, 239, 0.16);
+  border: 1px solid rgba(255, 254, 239, 0.24);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  overflow: hidden;
+  transition: width 420ms var(--ease), background 220ms ease, border-color 220ms ease;
+}
+.busca.open { width: min(480px, calc(100% - 96px)); background: var(--tiza); border-color: #fff; box-shadow: var(--shadow); }
+.lupa { width: 46px; height: 46px; flex: none; border: 0; border-radius: 999px; background: transparent; color: var(--tiza); cursor: pointer; display: grid; place-items: center; }
+.busca.open .lupa { color: var(--azul); }
+.lupa svg { width: 20px; height: 20px; }
+.busca input {
+  flex: 1; min-width: 0; border: 0; outline: none; background: transparent;
+  font-family: var(--f-display); font-size: 1.04rem; color: var(--ink); padding: 0 4px;
+  opacity: 0; transition: opacity 200ms ease;
+}
+.busca.open input { opacity: 1; }
+.busca input::placeholder { color: var(--ink-3); }
+.busca input::-webkit-search-cancel-button { display: none; }
+.busca:not(.open) .q-clear, .busca:not(.open) .q-count { display: none; }
+.q-clear { width: 32px; height: 32px; flex: none; border: 0; border-radius: 999px; background: transparent; color: var(--ink-3); cursor: pointer; display: grid; place-items: center; }
+.q-clear:hover { background: var(--line); color: var(--ink); }
+.q-clear svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.q-count { flex: none; margin-right: 5px; padding: 6px 10px; border-radius: 999px; background: #fff; color: var(--ink-2); font-size: 0.8rem; font-variant-numeric: tabular-nums; }
+
+/* --- Hero con foto (concepto web, p. 110) -------------------------------- */
+.hero-foto {
+  position: relative; overflow: hidden;
+  color: var(--tiza);
+  background: #3f6a1c url("__FOTO__") center 60% / cover no-repeat;
+  padding-top: 76px;
+}
+.hero-foto::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(0, 24, 66, 0.55) 0%, rgba(0, 24, 66, 0) 26%),
+    linear-gradient(90deg, rgba(0, 24, 66, 0.62) 0%, rgba(0, 24, 66, 0.18) 58%, rgba(0, 24, 66, 0) 80%);
+}
+.band-art { position: absolute; inset: 0 0 auto auto; width: min(40vw, 520px); height: 100%; pointer-events: none; }
+.band-art svg { position: absolute; right: 0; bottom: 0; height: 100%; width: auto; }
+.hero { position: relative; z-index: 1; display: grid; gap: 18px; padding-block: clamp(48px, 9vw, 120px) clamp(40px, 6vw, 72px); max-width: 760px; }
+.kicker { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 0.86rem; color: rgba(255, 254, 239, 0.88); }
+.sample { padding: 4px 10px; border-radius: 999px; border: 1px dashed rgba(255, 254, 239, 0.6); font-size: 0.76rem; }
+h1 {
+  margin: 0;
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: clamp(3.2rem, 11vw, 7.6rem);
+  line-height: 0.88;
+  letter-spacing: -0.045em;
+  text-shadow: 0 2px 30px rgba(0, 24, 66, 0.25);
+}
+.lede { margin: 0; max-width: 52ch; font-size: clamp(1rem, 1.6vw, 1.14rem); line-height: 1.5; color: var(--tiza); text-shadow: 0 1px 12px rgba(0, 24, 66, 0.35); }
+.lede b { font-weight: 600; }
+
+/* --- Resultado ------------------------------------------------------------ */
+.result-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; padding-block: 22px 16px; }
+.result-text { margin: 0; color: var(--ink-2); min-width: 0; }
+.result-text b { color: var(--azul); font-weight: 600; font-variant-numeric: tabular-nums; }
+.seg { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--line); }
+.seg button { border: 0; background: transparent; cursor: pointer; padding: 6px 13px; border-radius: 999px; font-size: 0.86rem; color: var(--ink-2); }
+.seg button[aria-pressed="true"] { background: var(--card); color: var(--azul); font-weight: 500; box-shadow: 0 1px 3px rgba(10, 30, 74, 0.12); }
+
+/* --- Grilla --------------------------------------------------------------- */
+.grid { display: flex; gap: 16px; align-items: flex-start; padding-bottom: 170px; }
+.gcol { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+.sentinel { height: 1px; }
+
+.card {
+  position: relative; display: grid; text-align: left;
+  border: 0; padding: 0; cursor: pointer;
+  background: var(--card);
+  border-radius: 26px;
+  box-shadow: var(--shadow);
+  transition: transform 320ms var(--ease), box-shadow 320ms var(--ease);
+  animation: entra 420ms var(--ease) both;
+}
+.card:hover { transform: translateY(-3px); box-shadow: 0 1px 2px rgba(10, 30, 74, 0.06), 0 18px 34px -16px rgba(10, 30, 74, 0.34); }
+@keyframes entra { from { transform: translateY(8px); } to { transform: none; } }
+@supports (corner-shape: squircle) { .card, .media, .m-art { corner-shape: squircle; } }
+
+.media { position: relative; margin: 8px 8px 0; border-radius: 19px; overflow: hidden; line-height: 0; max-width: 100%; }
+.media > svg { display: block; width: 100%; height: auto; }
+.media .etq { position: absolute; top: 10px; left: 10px; }
+.play { position: absolute; top: 10px; right: 10px; width: 36px; height: 36px; border-radius: 999px; background: rgba(255, 254, 239, 0.94); display: grid; place-items: center; }
+.play svg { width: 12px; height: 12px; fill: var(--azul); margin-left: 2px; }
+
+.lead { padding: 18px 18px 2px; display: grid; gap: 14px; justify-items: start; }
+.lead h3 {
+  margin: 0;
+  font-family: var(--f-display); font-weight: 600;
+  font-size: 1.36rem; line-height: 1.06; letter-spacing: -0.025em;
+  color: var(--azul);
+  text-wrap: balance;
+}
+.meta { padding: 12px 18px 18px; display: grid; gap: 8px; min-width: 0; }
+.when { margin: 0; font-size: 0.84rem; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.when b { font-weight: 500; color: var(--ink-2); }
+.ttl {
+  margin: 0;
+  font-family: var(--f-display); font-weight: 500;
+  font-size: 1.1rem; line-height: 1.2; letter-spacing: -0.015em;
+  color: var(--ink);
+  display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+}
+mark { background: rgba(234, 186, 44, 0.42); color: inherit; border-radius: 3px; padding: 0 1px; }
+.tags { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 4px; }
+.more { font-size: 0.86rem; color: var(--ink-3); padding-left: 2px; }
+
+/* --- Etiqueta: componente `Etiqueta` del Figma Master (manual p. 64) -------
+   Badge (forma del sistema sobre el color de la familia) + rotulo blanco con
+   el texto en el color de la familia + dato y flecha opcionales. Radio = 32%
+   del alto (p. 66) y texto al 44% del alto, como en los tamanos S/M/L. */
+.etq { --s: 26px; display: inline-flex; align-items: stretch; gap: calc(var(--s) * 0.06); height: var(--s); flex: none; font-family: var(--f-display); font-weight: 400; }
+.etq .bd { width: var(--s); height: var(--s); flex: none; display: block; }
+.etq .lb, .etq .dt, .etq .fl {
+  display: inline-flex; align-items: center;
+  padding: 0 calc(var(--s) * 0.36);
+  border-radius: calc(var(--s) * 0.32);
+  font-size: calc(var(--s) * 0.48);
+  line-height: 1; white-space: nowrap;
+}
+.etq .lb { background: #fff; color: var(--tx); }
+.etq .dt { background: var(--fo); color: var(--eb); font-variant-numeric: tabular-nums; }
+.etq .fl { width: var(--s); padding: 0; justify-content: center; background: #fff; color: var(--tx); }
+.etq .fl svg { width: 46%; height: 46%; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.etq-sm { --s: 24px; }
+button.etq { border: 0; padding: 0; background: transparent; cursor: pointer; color: inherit; }
+button.etq .lb { transition: background 160ms ease, color 160ms ease; }
+button.etq:hover .lb { box-shadow: inset 0 0 0 1.5px var(--tx); }
+button.etq[aria-pressed="true"] .lb { background: var(--tx); color: #fff; }
+a.etq { text-decoration: none; }
+a.etq:hover .fl { background: var(--tx); color: #fff; }
+.media .etq .lb, .m-art .etq .lb { box-shadow: none; }
+.etq .corto { display: none; }
+/* La etiqueta nunca se sale de la tarjeta: la tarjeta es contenedor y, si es
+   angosta, la etiqueta pasa al nombre corto y suelta el año. Si aun asi no
+   entra, el rotulo se corta con puntos suspensivos. */
+.card { container-type: inline-size; }
+.card .etq { max-width: 100%; }
+.card .media .etq { max-width: calc(100% - 20px); }
+.card .etq .lb { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.card .etq .lb > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@container (max-width: 250px) {
+  .etq .full { display: none; }
+  .etq .corto { display: inline; }
+  .etq .dt { display: none; }
+}
+
+/* --- Pastilla principal de la barra: full rounded, relleno con el color de
+   la familia del tipo y texto tiza. La activa suma un aro del mismo color. */
+.lbl {
+  --h: 30px;
+  display: inline-flex; align-items: center; flex: none;
+  height: var(--h); padding: 0 calc(var(--h) * 0.48);
+  border: 0; border-radius: 999px;
+  background: var(--pc, var(--azul)); color: var(--tiza);
+  font-family: var(--f-display); font-size: calc(var(--h) * 0.47); font-weight: 400;
+  white-space: nowrap; cursor: pointer;
+  opacity: 0.88;
+  transition: opacity 160ms ease, box-shadow 160ms ease;
+}
+.lbl:hover { opacity: 1; }
+.lbl[aria-pressed="true"] { opacity: 1; box-shadow: 0 0 0 2px var(--tiza), 0 0 0 3.5px var(--pc, var(--azul)); }
+.lbl-todas { --pc: var(--ink); }
+
+/* --- Subcategoria (cultivo): relleno del color, texto tiza. Sin badge
+   ni flecha, para no competir con la etiqueta principal de la nota. */
+.sub {
+  --h: 22px;
+  display: inline-flex; align-items: center; gap: 6px; flex: none;
+  height: var(--h); padding: 0 calc(var(--h) * 0.42);
+  border: 0; border-radius: calc(var(--h) * 0.32);
+  background: var(--c); color: var(--tiza);
+  font-family: var(--f-body); font-size: calc(var(--h) * 0.5); font-weight: 500; line-height: 1;
+  white-space: nowrap;
+}
+button.sub { cursor: pointer; transition: background 160ms ease, color 160ms ease; }
+.f-body .sub { --h: 32px; background: color-mix(in srgb, var(--c) 16%, #fff); color: var(--c); }
+.f-body .sub:hover { background: color-mix(in srgb, var(--c) 28%, #fff); }
+.f-body .sub[aria-pressed="true"] { background: var(--c); color: var(--tiza); }
+.sub-anio { --c: var(--azul); font-variant-numeric: tabular-nums; }
+.sub .n { font-weight: 400; opacity: 0.7; font-variant-numeric: tabular-nums; }
+.m-body .sub { --h: 28px; }
+
+/* --- Panel de filtros: barra fija con las pastillas principales; arriba se
+   despliegan las subcategorias. */
+.filters {
+  position: fixed; left: 50%; transform: translateX(-50%);
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  z-index: 40;
+  width: min(100% - 24px, 980px);
+  max-height: calc(100% - 110px);
+  display: grid; grid-template-rows: minmax(0, 1fr) auto; grid-template-columns: minmax(0, 1fr);
+  border-radius: 26px;
+  background: var(--glass);
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  box-shadow: 0 24px 60px -24px rgba(10, 30, 74, 0.5);
+  backdrop-filter: blur(22px) saturate(1.4);
+  -webkit-backdrop-filter: blur(22px) saturate(1.4);
+  overflow: hidden;
+}
+.f-body { overflow-y: auto; padding: 18px 20px 14px; display: grid; gap: 14px; border-bottom: 1px solid var(--line); }
+.filters:not(.open) .f-body { display: none; }
+.f-group { display: grid; gap: 8px; }
+.f-label { margin: 0; font-size: 0.74rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+.f-row { display: flex; flex-wrap: wrap; gap: 7px; padding: 3px; }
+.f-bar { display: flex; align-items: center; gap: 6px; padding: 9px 8px 9px 10px; }
+.f-main { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; flex: 1; min-width: 0; padding: 5px; }
+.f-main::-webkit-scrollbar { display: none; }
+.f-toggle {
+  position: relative; flex: none;
+  width: 36px; height: 36px; border: 0; border-radius: 13px;
+  background: transparent; color: var(--ink-2); cursor: pointer;
+  display: grid; place-items: center;
+}
+.f-toggle:hover { background: var(--line); }
+.f-toggle svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 300ms var(--ease); }
+.filters.open .f-toggle svg { transform: rotate(180deg); }
+.f-count { position: absolute; top: 2px; right: 2px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 6px; background: var(--verde); color: #fff; display: grid; place-items: center; font-size: 0.66rem; font-variant-numeric: tabular-nums; }
+.f-clear { justify-self: start; border: 0; background: transparent; cursor: pointer; padding: 4px 0; color: var(--azul); font-size: 0.88rem; text-decoration: underline; text-underline-offset: 3px; }
+
+/* --- Vacio ---------------------------------------------------------------- */
+.empty { padding: 60px 0 200px; display: grid; justify-items: center; gap: 14px; text-align: center; }
+.empty svg { width: 64px; height: 76px; }
+.empty p { margin: 0; max-width: 42ch; color: var(--ink-2); font-size: 1.05rem; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 40px; padding: 0 18px;
+  border: 0; border-radius: 13px; cursor: pointer; text-decoration: none;
+  background: var(--verde); color: #fff; font-weight: 500; font-size: 0.95rem;
+}
+.btn:hover { background: #256c2c; }
+.btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* --- Detalle ---------------------------------------------------------------- */
+dialog.modal {
+  width: min(100% - 24px, 760px); max-height: calc(100% - 32px);
+  padding: 0; border: 0; border-radius: 28px;
+  background: var(--card); color: var(--ink);
+  box-shadow: 0 30px 80px -20px rgba(10, 30, 74, 0.55);
+  overflow: hidden;
+}
+dialog.modal[open] { display: grid; grid-template-rows: minmax(0, 1fr) auto; animation: sube 360ms var(--ease); }
+@keyframes sube { from { transform: translateY(16px); opacity: 0.4; } to { transform: none; opacity: 1; } }
+dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blur(4px); }
+.m-scroll { overflow-y: auto; padding: 10px; }
+.m-art { position: relative; border-radius: 20px; overflow: hidden; line-height: 0; }
+.m-art > svg { width: 100%; height: auto; display: block; }
+.m-art .etq { position: absolute; top: 14px; left: 14px; --s: 32px; }
+.m-body { padding: 20px 16px 12px; display: grid; gap: 14px; }
+.m-date { margin: 0; color: var(--ink-3); font-size: 0.92rem; }
+.m-body h2 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: clamp(1.7rem, 4.4vw, 2.5rem); line-height: 1.02; letter-spacing: -0.035em; color: var(--azul); text-wrap: balance; }
+.m-bajada { margin: 0; max-width: 62ch; font-size: 1.06rem; line-height: 1.55; }
+.m-data { margin: 2px 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1px; background: var(--line); border-radius: 16px; overflow: hidden; }
+.m-data div { background: var(--card); padding: 12px 14px; display: grid; gap: 2px; min-width: 0; }
+.m-data dt { font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.m-data dd { margin: 0; font-weight: 500; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.m-data .ruta { grid-column: 1 / -1; }
+.m-data .ruta dd { font-family: var(--f-mono); font-size: 0.8rem; font-weight: 400; color: var(--ink-2); }
+.m-nav { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; border-top: 1px solid var(--line); }
+.m-nav .pos { font-size: 0.86rem; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.m-nav-group { display: flex; gap: 6px; }
+.icon-btn { width: 42px; height: 42px; border-radius: 13px; border: 0; background: var(--line); cursor: pointer; display: grid; place-items: center; }
+.icon-btn:hover { background: rgba(10, 30, 74, 0.16); }
+.icon-btn:disabled { opacity: 0.35; cursor: default; }
+.icon-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+@media (max-width: 860px) {
+  .menu span:not([aria-current]) { display: none; }
+}
+@media (max-width: 640px) {
+  .menu { display: none; }
+  .menu-mobile { display: inline-flex; border-radius: 999px; background: rgba(255, 254, 239, 0.14); border: 1px solid rgba(255, 254, 239, 0.2); font-size: 0.82rem; }
+  .nav { height: 66px; }
+  .logo svg { width: 62px; }
+  .busca.open { width: calc(100% - 78px); }
+  .band-art { width: 46vw; height: 46%; top: auto; bottom: 0; opacity: 0.95; }
+  .grid, .gcol { gap: 10px; }
+  .card { border-radius: 20px; }
+  .media { margin: 6px 6px 0; border-radius: 15px; }
+  .media .etq { top: 7px; left: 7px; --s: 22px; }
+  .play { width: 28px; height: 28px; top: 7px; right: 7px; }
+  .lead { padding: 13px 12px 2px; gap: 10px; }
+  .lead h3 { font-size: 1.08rem; }
+  .lead .etq { --s: 22px; }
+  .meta { padding: 9px 12px 13px; gap: 6px; }
+  .when { font-size: 0.76rem; }
+  .ttl { font-size: 0.96rem; }
+  .etq-sm { --s: 21px; }
+  .f-body { padding: 16px 14px 12px; }
+  .lbl { --h: 30px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="defs">
+  <!-- Logo oficial, exportado del Figma Master (◆ Logos) -->
+  /*__LOGOS__*/
+  <!-- Fondo del badge: el squircle del componente (radio 32%) -->
+  <symbol id="badge-bg" viewBox="0 0 100 100"><path d="M32 0H68C76.4869 0 84.6263 3.37142 90.6274 9.37258C96.6286 15.3737 100 23.5131 100 32V68C100 76.4869 96.6286 84.6263 90.6274 90.6274C84.6263 96.6286 76.4869 100 68 100H32C23.5131 100 15.3737 96.6286 9.37258 90.6274C3.37142 84.6263 0 76.4869 0 68V32C0 23.5131 3.37142 15.3737 9.37258 9.37258C15.3737 3.37142 23.5131 0 32 0Z"/></symbol>
+</defs></svg>
+
+<header class="top" id="top">
+  <div class="wrap">
+    <nav class="nav" id="nav" aria-label="Sitio">
+      <a class="logo" href="https://www.profertil.com.ar/" aria-label="Profertil">
+        <svg viewBox="0 0 1458 1021" aria-hidden="true"><use href="#logo-blanco"/></svg>
+      </a>
+      <div class="menu" aria-hidden="true">
+        <span>Home</span><span>Empresa</span><span>Sostenibilidad</span><span>Productos y Servicios</span><span aria-current="page">Novedades</span><span>Compliance</span>
+      </div>
+      <span class="menu-mobile" aria-hidden="true"><i><b></b><b></b><b></b><b></b></i>Menú</span>
+      <div class="busca" id="busca" role="search">
+        <button class="lupa" id="goSearch" type="button" aria-label="Buscar notas" aria-expanded="false" aria-controls="q"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></button>
+        <input id="q" type="search" autocomplete="off" placeholder="Buscá: trigo, becas…" aria-label="Buscar notas" tabindex="-1">
+        <button class="q-clear" id="qClear" type="button" aria-label="Borrar búsqueda" hidden><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+        <span class="q-count" id="qCount">0</span>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<section class="hero-foto" id="heroFoto">
+  <div class="band-art" id="bandArt" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="hero">
+      <div class="kicker"><span>profertil.com.ar · Noticias recientes</span><span class="sample">Maqueta · notas reales del sitio actual</span></div>
+      <h1>Novedades</h1>
+      <p class="lede" id="lede"></p>
+    </div>
+  </div>
+</section>
+
+<main class="wrap">
+  <div class="result-row">
+    <p class="result-text" id="resultText" aria-live="polite"></p>
+    <div class="seg" role="group" aria-label="Orden">
+      <button type="button" id="sortNew" aria-pressed="true">Más recientes</button>
+      <button type="button" id="sortOld" aria-pressed="false">Más antiguas</button>
+    </div>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" hidden>
+    <svg viewBox="0 0 555 662" aria-hidden="true"><use href="#simbolo"/></svg>
+    <p id="emptyText"></p>
+    <button class="btn" id="emptyReset" type="button">Ver todas las notas</button>
+  </div>
+  <div class="sentinel" id="sentinel"></div>
+</main>
+
+<section class="filters" id="filters" aria-label="Filtros">
+  <div class="f-body" id="fBody">
+    <div class="f-group"><p class="f-label">Categoría</p><div class="f-row" id="fTiposTodas"></div></div>
+    <div class="f-group"><p class="f-label">Año</p><div class="f-row" id="fAnios"></div></div>
+    <button class="f-clear" id="fClear" type="button" hidden>Limpiar filtros</button>
+  </div>
+  <div class="f-bar">
+    <div class="f-main" id="fTipos" role="group" aria-label="Tipo de nota"></div>
+    <button class="f-toggle" id="fToggle" type="button" aria-expanded="false" aria-controls="fBody" aria-label="Más filtros"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg><span class="f-count" id="fCount" hidden>0</span></button>
+  </div>
+</section>
+
+<dialog class="modal" id="modal" aria-labelledby="mTitle">
+  <div class="m-scroll" id="mScroll"></div>
+  <div class="m-nav">
+    <div class="m-nav-group">
+      <button class="icon-btn" id="mPrev" type="button" aria-label="Nota anterior"><svg viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg></button>
+      <button class="icon-btn" id="mNext" type="button" aria-label="Nota siguiente"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></button>
+    </div>
+    <span class="pos" id="mPos"></span>
+    <button class="icon-btn" id="mClose" type="button" aria-label="Cerrar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+</dialog>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------------------------------------------------------------
+     Datos reales: las 471 notas de /noticias-recientes/ del crawl del sitio
+     actual (urls.csv, agosto 2026). Por nota: titulo (t), fecha (f), ruta
+     (u), palabras (w), imagenes (i), video (v), bajada propia si tiene (b)
+     y subcategoria de WordPress (s). Tipo (tp) y cultivos (c)
+     salen de una clasificacion por palabras clave sobre titulo y URL:
+     es una propuesta para mostrar, no una carga editorial revisada.
+     --------------------------------------------------------------------- */
+  var NOTAS = /*__NOTAS__*/[];
+  var A = /*__ASSETS__*/{};
+
+  // Formas e iconos oficiales a <symbol>, una sola vez.
+  var defs = document.getElementById("defs");
+  var simbolos = "";
+  Object.keys(A.formas).forEach(function (k) { simbolos += '<symbol id="f-' + k + '" viewBox="' + A.formas[k].vb + '">' + A.formas[k].d + "</symbol>"; });
+  defs.insertAdjacentHTML("beforeend", simbolos);
+
+  /* --- Taxonomia ---------------------------------------------------------
+     Tipos: las cinco categorias de la plantilla Nota del tablero de
+     auditoria B1. El arte de la tarjeta usa un par de color canonico del
+     generador de patrones de otra familia. Cultivo va como subcategoria. */
+  // Familias del componente Etiqueta: fondo del badge, forma y texto.
+  // La invertida da vuelta fondo y forma; el dato usa la forma de fondo.
+  var FAM = {
+    azul: { bg: "#003DA5", fo: "#4086FF", tx: "#003DA5" },
+    verde: { bg: "#2D8035", fo: "#5EB53A", tx: "#2D8035" },
+    amarillo: { bg: "#EABA2C", fo: "#E57F19", tx: "#E57F19" },
+    naranja: { bg: "#E57F19", fo: "#8A4818", tx: "#E57F19" }
+  };
+  function fam(nombre, inv) { var f = FAM[nombre]; return inv ? { bg: f.fo, fo: f.bg, tx: f.tx } : f; }
+  var TIPOS = [
+    { id: "institucional", nombre: "Institucional", forma: "escudo", f: fam("azul") },
+    { id: "comercial", nombre: "Comercial", forma: "barras", f: fam("naranja") },
+    { id: "somos", nombre: "Somos Profertil", corto: "Somos", forma: "circulos", f: fam("verde", true) },
+    { id: "tecnico", nombre: "Artículo técnico", corto: "Técnico", forma: "lupa", f: fam("verde") },
+    { id: "aviso", nombre: "Aviso a la comunidad", corto: "Aviso", forma: "casco", f: fam("amarillo") },
+    { id: "financiera", nombre: "Gacetilla financiera", corto: "Financiera", forma: "grafico", f: fam("azul", true) }
+  ];
+  var CULTIVOS = [
+    { id: "trigo", nombre: "Trigo", forma: "trigo" }, { id: "maiz", nombre: "Maíz", forma: "hoja" },
+    { id: "soja", nombre: "Soja", forma: "capas" }, { id: "girasol", nombre: "Girasol", forma: "flor" },
+    { id: "pasturas", nombre: "Pasturas", forma: "ondas" }, { id: "cebada-arroz", nombre: "Cebada, arroz y otros", forma: "estrella" }
+  ];
+  CULTIVOS.forEach(function (c) { c.f = fam("verde", true); c.c = "#5EB53A"; });
+  var POR = {};
+  TIPOS.concat(CULTIVOS).forEach(function (x) { POR[x.id] = x; });
+
+  var MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+  var MC = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+  function fecha(f, larga) {
+    if (!f) return "Sin fecha";
+    var p = f.split("-");
+    var m = Number(p[1]) - 1;
+    return larga ? Number(p[2]) + " de " + MESES[m] + " de " + p[0] : Number(p[2]) + " " + MC[m] + " " + p[0];
+  }
+
+  function plano(s) { return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(); }
+  function esc(s) { return s.replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function resaltar(texto, q) {
+    if (!q) return esc(texto);
+    var norm = "";
+    for (var i = 0; i < texto.length; i++) norm += plano(texto[i]).charAt(0) || texto[i];
+    var out = "", desde = 0, at;
+    while ((at = norm.indexOf(q, desde)) !== -1) {
+      out += esc(texto.slice(desde, at)) + "<mark>" + esc(texto.slice(at, at + q.length)) + "</mark>";
+      desde = at + q.length;
+    }
+    return out + esc(texto.slice(desde));
+  }
+
+  // Una sola categorizacion: donde WordPress ya tiene categoria, manda esa
+  // (es la del cliente); el resto queda con el tipo de nota de la plantilla.
+  var DESDE_WP = { "comunicacion-institucional": "institucional", "comunicacion-comercial": "comercial", "somos-profertil": "somos" };
+  NOTAS.forEach(function (n, k) {
+    n.id = k;
+    if (DESDE_WP[n.s]) n.tp = DESDE_WP[n.s];
+    n.anio = n.f ? n.f.slice(0, 4) : "";
+    n.buscable = plano([n.t, n.b, n.u.replace(/-/g, " "), POR[n.tp].nombre].join(" "));
+  });
+
+  /* --- Arte de tarjeta -----------------------------------------------------
+     Sin fotos (el sitio actual no se puede bajar desde aca): composiciones
+     con las 18 formas oficiales sobre el par de color del tipo de nota, figura
+     sobre fondo, como en el generador de patrones. */
+  function rnd32(a) {
+    return function () {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  var FORMA_TEMA = {
+    trigo: ["trigo"], maiz: ["plantas", "trigo"], soja: ["hoja", "plantas"], girasol: ["sol", "flor"], pasturas: ["plantas", "hoja"], "cebada-arroz": ["trigo", "plantas"],
+    aviso: ["casco", "escudo", "ondas"], financiera: ["grafico", "barras"], tecnico: ["lupa", "suelo", "capas"], somos: ["circulos", "flor", "c", "estrella"],
+    suelos: ["suelo", "capas", "ondas", "hoja"], alimentos: ["trigo", "hoja", "plantas", "flor"], energia: ["sol", "industria", "urea", "c"], comunidades: ["circulos", "flor", "c", "estrella"]
+  };
+  function formasDe(n) {
+    var l = [];
+    n.c.forEach(function (c) { l = l.concat(FORMA_TEMA[c]); });
+    if (n.tp !== "institucional" && n.tp !== "comercial") l = l.concat(FORMA_TEMA[n.tp]);
+    if (!l.length) l = l.concat(FORMA_TEMA[n.p[0]]);
+    return l;
+  }
+  var PARES = { azul: ["#003DA5", "#4086FF"], verde: ["#2D8035", "#5EB53A"], amarillo: ["#EABA2C", "#E57F19"], naranja: ["#E57F19", "#8A4818"] };
+  var PARES_CONTRA = {
+    institucional: ["verde", "amarillo", "naranja"], financiera: ["verde", "amarillo", "naranja"], somos: ["azul", "amarillo", "naranja"],
+    tecnico: ["azul", "amarillo", "naranja"], comercial: ["azul", "verde"], aviso: ["azul", "verde"]
+  };
+  function usar(f, x, y, w, h, rot, color) {
+    var cx = x + w / 2, cy = y + h / 2;
+    return '<g transform="rotate(' + rot + " " + cx + " " + cy + ')"><use href="#f-' + f + '" x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="' + color + '"/></g>';
+  }
+  function arte(n, W, H, semilla) {
+    var r = rnd32(semilla);
+    // El par sale de una familia distinta a la del tipo, para que la etiqueta
+    // principal (badge y dato en el color del tipo) no se pierda sobre el arte.
+    var opciones = PARES_CONTRA[n.tp];
+    var par = PARES[opciones[n.id % opciones.length]];
+    var inv = r() < 0.3;
+    var fig = inv ? par[1] : par[0], fondo = inv ? par[0] : par[1];
+    var fs = formasDe(n);
+    var f1 = fs[Math.floor(r() * fs.length)];
+    var f2 = fs[Math.floor(r() * fs.length)];
+    var s = '<svg viewBox="0 0 ' + W + " " + H + '" aria-hidden="true"><rect width="' + W + '" height="' + H + '" fill="' + fondo + '"/>';
+    var modo = r();
+    var rots = [0, 90, 180, 270];
+    if (modo < 0.42) {
+      // Una forma grande que se sale del cuadro, como la hoja del concepto web.
+      var t = Math.max(W, H) * (1.05 + r() * 0.35);
+      s += usar(f1, W - t * (0.62 + r() * 0.2), H - t * (0.66 + r() * 0.2), t, t, rots[Math.floor(r() * 4)], fig);
+    } else if (modo < 0.72) {
+      // Dos formas enfrentadas.
+      var m = Math.min(W / 2, H) * 0.92;
+      s += usar(f1, W / 2 - m - 4, (H - m) / 2, m, m, rots[Math.floor(r() * 4)], fig);
+      s += usar(f2, W / 2 + 4, (H - m) / 2, m, m, rots[Math.floor(r() * 4)], fig);
+    } else {
+      // Grilla: la logica del patron.
+      var cols = W > H ? 3 : 2, filas = Math.max(1, Math.round(cols * H / W));
+      var cw = W / cols, ch = H / filas, lado = Math.min(cw, ch) * 0.82;
+      for (var y = 0; y < filas; y++) for (var x = 0; x < cols; x++) {
+        var f = (x + y) % 2 ? f2 : f1;
+        s += usar(f, x * cw + (cw - lado) / 2, y * ch + (ch - lado) / 2, lado, lado, rots[(x + y * 3) % 4], fig);
+      }
+    }
+    return s + "</svg>";
+  }
+  var PROP = [[4, 3], [1, 1], [3, 4], [4, 3], [5, 4]];
+
+  function badge(x) {
+    return '<svg class="bd" viewBox="0 0 100 100" aria-hidden="true"><use href="#badge-bg" width="100" height="100" fill="' + x.f.bg + '"/>' +
+      '<use href="#f-' + x.forma + '" x="21" y="21" width="58" height="58" fill="' + x.f.fo + '"/></svg>';
+  }
+  var FLECHA = '<span class="fl"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 8v10H8"/></svg></span>';
+  function vars(x) { return "--eb:" + x.f.bg + ";--fo:" + x.f.fo + ";--tx:" + x.f.tx; }
+  // o = { dato, flecha, cls, tag, attrs }
+  function etq(id, o) {
+    o = o || {};
+    var x = POR[id], tag = o.tag || "span";
+    return "<" + tag + ' class="etq ' + (o.cls || "") + '" style="' + vars(x) + '"' + (o.attrs || "") + ">" + badge(x) +
+      '<span class="lb">' + (x.corto ? '<span class="full">' + x.nombre + '</span><span class="corto">' + x.corto + "</span>" : x.nombre) + "</span>" + (o.dato != null ? '<span class="dt">' + o.dato + "</span>" : "") + (o.flecha ? FLECHA : "") + "</" + tag + ">";
+  }
+
+  /* --- Estado ------------------------------------------------------------- */
+  var estado = { q: "", tipos: {}, anios: {}, orden: "new" };
+  var lista = [];
+  var pintadas = 0;
+  var TANDA = 30;
+  var $ = function (id) { return document.getElementById(id); };
+  var grid = $("grid");
+  function activos(o) { return Object.keys(o).filter(function (k) { return o[k]; }); }
+
+  function pasa(n, salvo) {
+    var q = plano(estado.q.trim());
+    if (q && n.buscable.indexOf(q) === -1) return false;
+    var ts = activos(estado.tipos), as = activos(estado.anios);
+    if (salvo !== "tipo" && ts.length && ts.indexOf(n.tp) === -1) return false;
+    if (salvo !== "anio" && as.length && as.indexOf(n.anio) === -1) return false;
+    return true;
+  }
+  function filtrar() {
+    lista = NOTAS.filter(function (n) { return pasa(n); });
+    if (estado.orden === "new") lista.reverse();
+  }
+
+  /* --- Masonry ------------------------------------------------------------ */
+  var cols = [];
+  function cuantasCols() { var w = grid.clientWidth; return w < 700 ? 2 : w < 1020 ? 3 : w < 1260 ? 4 : 5; }
+  function armarCols() {
+    grid.innerHTML = ""; cols = [];
+    for (var i = 0, n = cuantasCols(); i < n; i++) { var c = document.createElement("div"); c.className = "gcol"; grid.appendChild(c); cols.push(c); }
+  }
+  function conArte(n) { return n.v || ((n.id * 2654435761) >>> 0) % 100 < 46; }
+
+  function tarjeta(n, idx) {
+    var q = plano(estado.q.trim());
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "card"; b.dataset.idx = idx;
+    var when = '<p class="when"><b>' + fecha(n.f) + "</b></p>";
+    var h;
+    if (conArte(n)) {
+      var pr = PROP[n.id % PROP.length];
+      h = '<div class="media">' + arte(n, pr[0] * 60, pr[1] * 60, n.id * 7919 + 13) + etq(n.tp, { dato: n.anio }) +
+        (n.v ? '<span class="play"><svg viewBox="0 0 12 14"><path d="M0 0l12 7-12 7Z"/></svg></span>' : "") + "</div>" +
+        '<div class="meta">' + when + '<p class="ttl">' + resaltar(n.t, q) + "</p></div>";
+    } else {
+      h = '<div class="lead">' + etq(n.tp, { dato: n.anio }) + "<h3>" + resaltar(n.t, q) + '</h3></div><div class="meta">' + when + "</div>";
+    }
+    b.innerHTML = h;
+    b.setAttribute("aria-label", n.t + ". " + POR[n.tp].nombre + ", " + fecha(n.f, true));
+    return b;
+  }
+  function pintarTanda() {
+    var hasta = Math.min(pintadas + TANDA, lista.length);
+    for (var i = pintadas; i < hasta; i++) {
+      var corta = cols[0];
+      for (var c = 1; c < cols.length; c++) if (cols[c].offsetHeight < corta.offsetHeight) corta = cols[c];
+      corta.appendChild(tarjeta(lista[i], i));
+    }
+    pintadas = hasta;
+  }
+  function repintar(mantener) {
+    var objetivo = mantener ? Math.max(pintadas, TANDA) : TANDA;
+    armarCols(); pintadas = 0;
+    while (pintadas < Math.min(objetivo, lista.length)) pintarTanda();
+    $("empty").hidden = lista.length > 0;
+  }
+
+  /* --- Años ----------------------------------------------------------------- */
+  var ANIOS = [];
+  NOTAS.forEach(function (n) { if (n.anio && ANIOS.indexOf(n.anio) === -1) ANIOS.push(n.anio); });
+  ANIOS.sort().reverse();
+  $("lede").innerHTML = "Las <b>" + NOTAS.length + " notas</b> que hoy publica el sitio, de " + ANIOS[ANIOS.length - 1] + " a " + ANIOS[0] + ", en un solo lugar. Buscá por palabra o filtrá por categoría y año.";
+
+  /* --- Filtros ------------------------------------------------------------ */
+  function contar(campo, v) {
+    return NOTAS.reduce(function (s, n) {
+      if (!pasa(n, campo)) return s;
+      var ok = campo === "tipo" ? n.tp === v : n.anio === v;
+      return s + (ok ? 1 : 0);
+    }, 0);
+  }
+  function pintarFiltros() {
+    var ninguno = !activos(estado.tipos).length;
+    var pills = '<button type="button" class="lbl lbl-todas" data-f="todas" aria-pressed="' + ninguno + '">Todas</button>' +
+      TIPOS.map(function (x) {
+        return '<button type="button" class="lbl" style="--pc:' + x.f.bg + '" data-f="tipo" data-v="' + x.id + '" aria-pressed="' + !!estado.tipos[x.id] + '">' + x.nombre + "</button>";
+      }).join("");
+    // La barra muestra las categorias en una fila que se desliza; el panel abierto las muestra todas.
+    $("fTipos").innerHTML = pills;
+    $("fTiposTodas").innerHTML = pills;
+    $("fAnios").innerHTML = ANIOS.map(function (a) {
+      return '<button type="button" class="sub sub-anio" data-f="anio" data-v="' + a + '" aria-pressed="' + !!estado.anios[a] + '">' + a + '<b class="n">' + contar("anio", a) + "</b></button>";
+    }).join("");
+  }
+  function resumen() {
+    var partes = [];
+    [[estado.tipos, TIPOS]].forEach(function (g) {
+      var a = activos(g[0]).map(function (k) { return POR[k].nombre; });
+      if (a.length) partes.push(a.join(", "));
+    });
+    var as = activos(estado.anios).sort();
+    if (as.length) partes.push(as.join(", "));
+    var q = estado.q.trim();
+    var t = "<b>" + lista.length + "</b> " + (lista.length === 1 ? "nota" : "notas");
+    if (q) t += " con «" + esc(q) + "»";
+    if (partes.length) t += " · " + esc(partes.join(" · "));
+    if (!q && !partes.length) t = "Todas las notas · <b>" + lista.length + "</b>";
+    $("resultText").innerHTML = t;
+    $("qCount").textContent = lista.length;
+    var nf = activos(estado.tipos).length + as.length;
+    var nsub = as.length;
+    $("fCount").hidden = nsub === 0; $("fCount").textContent = nsub;
+    $("fClear").hidden = nf === 0;
+    $("qClear").hidden = !q;
+    $("emptyText").textContent = q
+      ? "Ninguna nota coincide con «" + q + "»" + (nf ? " con esos filtros" : "") + ". Probá con otra palabra o limpiá los filtros."
+      : "Ninguna nota cumple esa combinación de filtros. Sacá alguno para ver más.";
+  }
+  function aplicar() { filtrar(); resumen(); pintarFiltros(); repintar(false); }
+
+  /* --- Eventos -------------------------------------------------------------- */
+  var tq;
+  $("q").addEventListener("input", function (e) { clearTimeout(tq); tq = setTimeout(function () { estado.q = e.target.value; aplicar(); }, 120); });
+  $("qClear").addEventListener("click", function () { $("q").value = ""; estado.q = ""; aplicar(); $("q").focus(); });
+  function abrirBusca(si) {
+    $("busca").classList.toggle("open", si);
+    $("nav").classList.toggle("buscando", si);
+    $("goSearch").setAttribute("aria-expanded", String(si));
+    $("q").tabIndex = si ? 0 : -1;
+    if (si) setTimeout(function () { $("q").focus(); }, 60);
+  }
+  $("goSearch").addEventListener("click", function () {
+    var abierta = $("busca").classList.contains("open");
+    if (!abierta) abrirBusca(true);
+    else if (!$("q").value) abrirBusca(false);
+    else $("q").focus();
+  });
+  $("q").addEventListener("blur", function () { setTimeout(function () { if (!$("q").value && document.activeElement !== $("q")) abrirBusca(false); }, 180); });
+  $("q").addEventListener("keydown", function (e) { if (e.key === "Escape") { $("q").value = ""; estado.q = ""; aplicar(); abrirBusca(false); } });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "/" && document.activeElement !== $("q") && !$("modal").open) { e.preventDefault(); abrirBusca(true); }
+  });
+  // La barra toma el azul cuando termina la foto.
+  function barraSolida() { $("top").classList.toggle("solid", window.scrollY > $("heroFoto").offsetHeight - 80); }
+  window.addEventListener("scroll", barraSolida, { passive: true });
+  barraSolida();
+  $("filters").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-f]"); if (!b) return;
+    if (b.dataset.f === "todas") { estado.tipos = {}; aplicar(); return; }
+    var m = { tipo: estado.tipos, anio: estado.anios }[b.dataset.f];
+    m[b.dataset.v] = !m[b.dataset.v]; aplicar();
+  });
+  function limpiar() { estado.tipos = {}; estado.anios = {}; estado.q = ""; $("q").value = ""; aplicar(); }
+  $("fClear").addEventListener("click", limpiar);
+  $("emptyReset").addEventListener("click", limpiar);
+  function abrirFiltros(si) { $("filters").classList.toggle("open", si); $("fToggle").setAttribute("aria-expanded", String(si)); }
+  $("fToggle").addEventListener("click", function () { abrirFiltros(!$("filters").classList.contains("open")); });
+  abrirFiltros(false);
+  function ordenar(o) { estado.orden = o; $("sortNew").setAttribute("aria-pressed", String(o === "new")); $("sortOld").setAttribute("aria-pressed", String(o === "old")); aplicar(); }
+  $("sortNew").addEventListener("click", function () { ordenar("new"); });
+  $("sortOld").addEventListener("click", function () { ordenar("old"); });
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(function (en) { if (en[0].isIntersecting && pintadas < lista.length) pintarTanda(); }, { rootMargin: "900px 0px" }).observe($("sentinel"));
+  } else { TANDA = 1000; }
+  var nCols = cuantasCols();
+  window.addEventListener("resize", function () { var n = cuantasCols(); if (n !== nCols) { nCols = n; repintar(true); } });
+
+  // Arte de la banda: la hoja oficial sobre un bloque verde, como en el concepto web.
+  $("bandArt").innerHTML = '<svg viewBox="0 0 560 520" preserveAspectRatio="xMaxYMax slice"><rect x="300" y="250" width="260" height="270" fill="#2D8035"/>' +
+    usar("hoja", 250, 120, 380, 380, 0, "#EABA2C") + "</svg>";
+
+  /* --- Detalle ---------------------------------------------------------------- */
+  var modal = $("modal");
+  var actual = -1;
+  function abrirNota(idx) {
+    actual = idx;
+    var n = lista[idx];
+    var q = plano(estado.q.trim());
+    var h = '<div class="m-art">' + arte(n, 720, 300, n.id * 7919 + 13) + etq(n.tp, { dato: n.anio }) + "</div>";
+    h += '<div class="m-body"><p class="m-date">' + fecha(n.f, true) + "</p>";
+    h += '<h2 id="mTitle">' + resaltar(n.t, q) + "</h2>";
+    if (n.b) h += '<p class="m-bajada">' + resaltar(n.b, q) + "</p>";
+    h += '<dl class="m-data">' +
+      "<div><dt>Publicada</dt><dd>" + fecha(n.f) + "</dd></div>" +
+      "<div><dt>Palabras</dt><dd>" + n.w.toLocaleString("es-AR") + "</dd></div>" +
+      "<div><dt>Imágenes</dt><dd>" + n.i + (n.v ? " + video" : "") + "</dd></div>" +
+      "<div><dt>Categoría</dt><dd>" + POR[n.tp].nombre + "</dd></div>" +
+      '<div class="ruta"><dt>Ruta actual</dt><dd>/index.php/' + esc(n.u) + "</dd></div></dl>";
+    h += '<div><a class="btn" href="https://www.profertil.com.ar/index.php/' + esc(n.u) + '" target="_blank" rel="noopener">Ver la nota original <svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></a></div></div>';
+    $("mScroll").innerHTML = h;
+    $("mScroll").scrollTop = 0;
+    $("mPos").textContent = (idx + 1) + " / " + lista.length;
+    $("mPrev").disabled = idx === 0;
+    $("mNext").disabled = idx === lista.length - 1;
+    if (!modal.open) modal.showModal();
+  }
+  grid.addEventListener("click", function (e) { var c = e.target.closest(".card"); if (c) abrirNota(Number(c.dataset.idx)); });
+  $("mPrev").addEventListener("click", function () { if (actual > 0) abrirNota(actual - 1); });
+  $("mNext").addEventListener("click", function () { if (actual < lista.length - 1) abrirNota(actual + 1); });
+  $("mClose").addEventListener("click", function () { modal.close(); });
+  modal.addEventListener("click", function (e) { if (e.target === modal) modal.close(); });
+  modal.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowLeft" && actual > 0) abrirNota(actual - 1);
+    if (e.key === "ArrowRight" && actual < lista.length - 1) abrirNota(actual + 1);
+  });
+
+  aplicar();
+})();
+</script>
