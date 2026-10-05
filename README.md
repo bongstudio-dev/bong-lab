@@ -1,6 +1,6 @@
 # Bong Lab
 
-Experimentos generativos de Bong Studio, publicados con GitHub Pages.
+Experimentos, prototipos y herramientas de Bong Studio, publicados con GitHub Pages.
 
 Portada: https://bongstudio-dev.github.io/bong-lab/
 
