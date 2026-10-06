@@ -13,8 +13,9 @@
    Tweak de la animacion del panel de filtros de Novedades.
    Carga la pagina real en un iframe (mismo origen, con ?solo=dock: solo
    navegacion y dock, sin hero ni tarjetas) y le escribe las
-   variables --f-* en :root. Lo que sale de aca se pega tal cual en el
-   :root de profertil/novedades/fuente/template.html.
+   variables --f-* en :root. Lo que sale de aca se carga en las variables
+   Web/Movimiento/Filtros * del Figma Master y se vuelve a exportar
+   (ver profertil/novedades/fuente/LEEME.md, "Tokens").
    ========================================================================== */
 :root {
   color-scheme: light;
@@ -160,7 +161,7 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
     <p class="aviso" id="aviso" aria-live="polite"></p>
 
     <div class="grupo">
-      <p class="rotulo">Para pegar en el :root de la página</p>
+      <p class="rotulo">Valores para cargar en Figma (Web/Movimiento)</p>
       <pre id="css"></pre>
     </div>
   </aside>

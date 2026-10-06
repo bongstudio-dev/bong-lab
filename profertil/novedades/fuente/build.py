@@ -2,6 +2,11 @@ import json, os
 AQUI = os.path.dirname(os.path.abspath(__file__))
 os.chdir(AQUI)
 t=open('template.html').read()
+# Tokens: el :root sale de tokens.json (exportado de las variables del Figma Master).
+tk=json.load(open('tokens.json'))['tokens']
+lineas='\n  '.join('--%s: %s; /* %s */'%(k,v['valor'],v['figma']) for k,v in tk.items())
+assert '/*__TOKENS__*/' in t
+t=t.replace('/*__TOKENS__*/', lineas)
 import re
 def sym(f,i):
     v=open(f).read(); vb=re.search(r'viewBox="([^"]+)"',v).group(1)

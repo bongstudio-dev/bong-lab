@@ -20,48 +20,56 @@
    ========================================================================== */
 :root {
   color-scheme: light;
-  /* Paleta del manual (p. 46) */
-  --azul: #003DA5;
-  --celeste: #4086FF;
-  --verde: #2D8035;
-  --verde-claro: #5EB53A;
-  --amarillo: #EABA2C;
-  --naranja: #E57F19;
-  --terra: #8A4818;
-  --tiza: #FFFEEF;
+  /* Tokens del sistema: los genera build.py desde tokens.json, que se
+     exporta de las variables del Figma Master. No escribir valores aca:
+     se cambian en Figma. */
+  --azul: #003DA5; /* Marca/Azul */
+  --celeste: #4086FF; /* Marca/Celeste */
+  --verde: #2D8035; /* Marca/Verde */
+  --verde-claro: #5EB53A; /* Marca/Verde Claro */
+  --amarillo: #EABA2C; /* Marca/Amarillo */
+  --naranja: #E57F19; /* Marca/Naranja */
+  --terra: #8A4818; /* Marca/Terra */
+  --tiza: #FFFEEF; /* Observados/Crema */
+  --color-blanco: #FFFFFF; /* Neutro/Blanco */
+  --color-negro: #000000; /* Neutro/Negro */
+  --color-gris-slogan: #676668; /* Neutro/Gris Slogan */
+  --color-verde-oscuro: #154B1A; /* Observados/Verde Oscuro */
+  --color-gris: #D9D9D9; /* Observados/Gris */
+  --bg: #E9E7D6; /* Web/Fondo */
+  --card: #FFFEEF; /* Web/Superficie */
+  --ink: #0A1E4A; /* Web/Tinta */
+  --ink-2: #44506E; /* Web/Tinta secundaria */
+  --ink-3: #737D96; /* Web/Tinta terciaria */
+  --barra: rgba(0, 61, 165, 0.94); /* Web/Barra */
+  --line: rgba(10, 30, 74, 0.1); /* Web/Línea */
+  --glass: rgba(255, 254, 239, 0.78); /* Web/Vidrio */
+  --etq-s: 22px; /* Web/Etiqueta/S */
+  --etq-m: 27px; /* Web/Etiqueta/M */
+  --etq-l: 32px; /* Web/Etiqueta/L */
+  --btn-s: 40px; /* Web/Botón/S */
+  --btn-m: 44px; /* Web/Botón/M */
+  --btn-l: 48px; /* Web/Botón/L */
+  --f-abrir: 600ms; /* Web/Movimiento/Filtros abrir */
+  --f-cerrar: 460ms; /* Web/Movimiento/Filtros cerrar */
+  --f-fundido: 360ms; /* Web/Movimiento/Filtros fundido */
+  --f-fundido-retraso: 160ms; /* Web/Movimiento/Filtros fundido retraso */
+  --f-flecha: 460ms; /* Web/Movimiento/Filtros flecha */
+  --f-chica: 280ms; /* Web/Movimiento/Compacto */
+  --t-buscador: 420ms; /* Web/Movimiento/Buscador */
+  --t-vista: 420ms; /* Web/Movimiento/Vista */
+  --carrusel-dura: 7000ms; /* Web/Movimiento/Carrusel duración */
+  --carrusel-pase: 700ms; /* Web/Movimiento/Carrusel pase */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1); /* Web/Movimiento/Curva base */
+  --f-curva: cubic-bezier(0.67, 0, 0.24, 0.99); /* Web/Movimiento/Curva filtros */
+  --curva-vista: cubic-bezier(0.67, 0, 0.24, 0.99); /* Web/Movimiento/Curva vista */
+  --f-chica-curva: cubic-bezier(0.32, 0.72, 0, 1); /* Web/Movimiento/Curva compacto */
+  --carrusel-curva: cubic-bezier(0.65, 0, 0.25, 1); /* Web/Movimiento/Curva carrusel */
 
-  --bg: #E9E7D6;
-  --card: #FFFEEF;
-  --ink: #0A1E4A;
-  --ink-2: #44506E;
-  --ink-3: #737D96;
-  --line: rgba(10, 30, 74, 0.1);
-  --glass: rgba(255, 254, 239, 0.78);
   --shadow: 0 1px 2px rgba(10, 30, 74, 0.06), 0 12px 28px -16px rgba(10, 30, 74, 0.28);
-
   --f-display: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
   --f-body: "DM Sans", "Helvetica Neue", Arial, sans-serif;
   --f-mono: "DM Mono", ui-monospace, Menlo, monospace;
-  --ease: cubic-bezier(0.22, 1, 0.36, 1);
-
-  /* Animacion del panel de filtros. Se ajusta con el tweak de
-     profertil/novedades-tweak/ y se pega aca. */
-  --f-abrir: 600ms;
-  --f-cerrar: 460ms;
-  --f-curva: cubic-bezier(0.67, 0, 0.24, 0.99);
-  --f-fundido: 360ms;
-  --f-fundido-retraso: 160ms;
-  --f-flecha: 460ms;
-  /* Escala de la etiqueta, la misma del componente Etiqueta del master:
-     S la de las tarjetas en mobile, L la mas grande (detalle, header,
-     tarjetas anchas) y M el cruce de las dos. */
-  --etq-s: 22px;
-  --etq-m: 27px;
-  --etq-l: 32px;
-  /* Pastilla compacta en mobile, como la barra de direcciones de Safari:
-     corta y con la curva de los paneles de iOS. */
-  --f-chica: 280ms;
-  --f-chica-curva: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -89,7 +97,7 @@ a { color: inherit; }
    asi la navegacion y el buscador no compiten. Abierta, en el lugar de la
    lupa aparece un boton circular igual con la X: se cierra donde se abrio. */
 .top { position: fixed; inset: 0 0 auto; z-index: 50; padding-top: env(safe-area-inset-top, 0px); transition: background 260ms ease, box-shadow 260ms ease; }
-.top.solid { background: rgba(0, 61, 165, 0.94); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 10px 30px -18px rgba(0, 20, 60, 0.7); }
+.top.solid { background: var(--barra); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 10px 30px -18px rgba(0, 20, 60, 0.7); }
 .nav { position: relative; display: flex; align-items: center; gap: 14px; height: 76px; padding-right: 58px; transition: height 260ms var(--ease); }
 .nav .menu, .nav .menu-mobile { margin-left: auto; margin-right: auto; }
 .logo { display: block; flex: none; color: var(--tiza); fill: currentColor; line-height: 0; }
@@ -118,7 +126,7 @@ a { color: inherit; }
   border: 1px solid rgba(255, 254, 239, 0.24);
   backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
   overflow: hidden;
-  transition: width 420ms var(--ease), right 420ms var(--ease), background 220ms ease, border-color 220ms ease;
+  transition: width var(--t-buscador) var(--ease), right var(--t-buscador) var(--ease), background 220ms ease, border-color 220ms ease;
 }
 .busca.open { right: 56px; width: min(480px, calc(100% - 152px)); background: var(--tiza); border-color: #fff; box-shadow: var(--shadow); }
 .busca-x {
@@ -131,11 +139,11 @@ a { color: inherit; }
   color: var(--tiza); cursor: pointer;
   display: grid; place-items: center;
   opacity: 0; visibility: hidden;
-  transition: opacity 200ms ease, transform 420ms var(--ease), background 200ms ease, color 200ms ease, visibility 0s linear 420ms;
+  transition: opacity 200ms ease, transform var(--t-buscador) var(--ease), background 200ms ease, color 200ms ease, visibility 0s linear var(--t-buscador);
 }
 .busca-x svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
 .busca-x:hover { background: var(--tiza); color: var(--azul); }
-.nav.buscando .busca-x { opacity: 1; visibility: visible; transform: translateY(-50%); transition: opacity 220ms ease 120ms, transform 420ms var(--ease), background 200ms ease, color 200ms ease; }
+.nav.buscando .busca-x { opacity: 1; visibility: visible; transform: translateY(-50%); transition: opacity 220ms ease 120ms, transform var(--t-buscador) var(--ease), background 200ms ease, color 200ms ease; }
 .lupa { width: 46px; height: 46px; flex: none; border: 0; border-radius: 999px; background: transparent; color: var(--tiza); cursor: pointer; display: grid; place-items: center; }
 .busca.open .lupa { color: var(--azul); }
 .lupa svg { width: 20px; height: 20px; }
@@ -185,7 +193,7 @@ a { color: inherit; }
 .d-bajada { margin: 0; max-width: 56ch; font-size: clamp(1rem, 1.4vw, 1.12rem); line-height: 1.5; color: rgba(255, 254, 239, 0.9); }
 .d-cta {
   display: inline-flex; align-items: center; gap: 10px;
-  height: 48px; padding: 0 22px 0 24px;
+  height: var(--btn-l); padding: 0 22px 0 24px;
   border: 0; border-radius: 999px; cursor: pointer;
   background: var(--tiza); color: var(--azul);
   font-family: var(--f-display); font-size: 1.02rem; font-weight: 500;
@@ -228,7 +236,7 @@ a { color: inherit; }
   position: absolute; z-index: -1; top: 3px; left: 0; bottom: 3px; width: 0;
   border-radius: 999px; background: var(--card); box-shadow: 0 1px 3px rgba(10, 30, 74, 0.12);
   pointer-events: none;
-  transition: transform 420ms cubic-bezier(0.67, 0, 0.24, 0.99), width 420ms cubic-bezier(0.67, 0, 0.24, 0.99);
+  transition: transform var(--t-vista) var(--curva-vista), width var(--t-vista) var(--curva-vista);
 }
 .seg-ind.quieto { transition: none; }
 .seg.vista .seg-ind { view-transition-name: ind-vista; }
@@ -245,7 +253,7 @@ a { color: inherit; }
 .seg.vista button { display: grid; place-items: center; padding: 6px 11px; }
 .seg.vista svg { width: 15px; height: 15px; fill: currentColor; }
 @media (max-width: 640px) { .seg.vista [data-vista="chico"] { display: none; } }
-::view-transition-group(*) { animation-duration: 420ms; animation-timing-function: cubic-bezier(0.67, 0, 0.24, 0.99); }
+::view-transition-group(*) { animation-duration: var(--t-vista); animation-timing-function: var(--curva-vista); }
 .seg button { border: 0; background: transparent; cursor: pointer; padding: 6px 13px; border-radius: 999px; font-size: 0.86rem; color: var(--ink-2); transition: color 240ms ease; }
 .seg button[aria-pressed="true"] { color: var(--azul); font-weight: 500; }
 
@@ -451,7 +459,7 @@ button.sub { cursor: pointer; transition: background 160ms ease, color 160ms eas
 .empty p { margin: 0; max-width: 42ch; color: var(--ink-2); font-size: 1.05rem; }
 .btn {
   display: inline-flex; align-items: center; gap: 8px;
-  height: 40px; padding: 0 18px;
+  height: var(--btn-s); padding: 0 18px;
   border: 0; border-radius: 13px; cursor: pointer; text-decoration: none;
   background: var(--verde); color: #fff; font-weight: 500; font-size: 0.95rem;
 }
@@ -504,7 +512,7 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   .d-in { gap: 16px; }
   .d-kick { font-size: 0.86rem; gap: 10px; }
   .d-kick .etq { --s: var(--etq-m); }
-  .d-cta { height: 44px; font-size: 0.96rem; }
+  .d-cta { height: var(--btn-m); font-size: 0.96rem; }
   .d-nav { bottom: calc(22px + env(safe-area-inset-bottom, 0px)); }
   .d-segs { gap: 6px; }
   .d-flechas { display: none; }
@@ -1176,7 +1184,11 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   }).join("");
   var slides = $("dSlides").children, segs = $("dSegs").children, dk = -1;
   var barras = [].map.call(segs, function (s) { return s.querySelector(".d-bar i"); });
-  var DURA = 7000, PASE = 700, CURVA = "cubic-bezier(0.65, 0, 0.25, 1)";
+  // Tiempos del carrusel: salen de los tokens (--carrusel-*), como el resto.
+  var raiz = getComputedStyle(document.documentElement);
+  var DURA = parseFloat(raiz.getPropertyValue("--carrusel-dura")) || 7000;
+  var PASE = parseFloat(raiz.getPropertyValue("--carrusel-pase")) || 700;
+  var CURVA = raiz.getPropertyValue("--carrusel-curva").trim() || "cubic-bezier(0.65, 0, 0.25, 1)";
   var dEl = $("dest"), motivos = {}, pausado = false;
   function pausa(motivo, si) {
     motivos[motivo] = si;
