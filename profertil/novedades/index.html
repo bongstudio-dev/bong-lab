@@ -76,7 +76,8 @@ a { color: inherit; }
 /* --- Barra superior fija ---------------------------------------------------
    Logo, menu y lupa. Arriba de la foto es transparente; al bajar toma el azul.
    La busqueda vive en la lupa: se expande hacia la izquierda y tapa el menu,
-   asi la navegacion y el buscador no compiten. */
+   asi la navegacion y el buscador no compiten. Abierta, en el lugar de la
+   lupa aparece un boton circular igual con la X: se cierra donde se abrio. */
 .top { position: fixed; inset: 0 0 auto; z-index: 50; padding-top: env(safe-area-inset-top, 0px); transition: background 260ms ease, box-shadow 260ms ease; }
 .top.solid { background: rgba(0, 61, 165, 0.94); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 10px 30px -18px rgba(0, 20, 60, 0.7); }
 .nav { position: relative; display: flex; align-items: center; gap: 14px; height: 76px; padding-right: 58px; transition: height 260ms var(--ease); }
@@ -107,9 +108,24 @@ a { color: inherit; }
   border: 1px solid rgba(255, 254, 239, 0.24);
   backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
   overflow: hidden;
-  transition: width 420ms var(--ease), background 220ms ease, border-color 220ms ease;
+  transition: width 420ms var(--ease), right 420ms var(--ease), background 220ms ease, border-color 220ms ease;
 }
-.busca.open { width: min(480px, calc(100% - 96px)); background: var(--tiza); border-color: #fff; box-shadow: var(--shadow); }
+.busca.open { right: 56px; width: min(480px, calc(100% - 152px)); background: var(--tiza); border-color: #fff; box-shadow: var(--shadow); }
+.busca-x {
+  position: absolute; right: 0; top: 50%; transform: translateY(-50%) scale(0.6);
+  width: 48px; height: 48px; padding: 0;
+  border-radius: 999px;
+  background: rgba(255, 254, 239, 0.16);
+  border: 1px solid rgba(255, 254, 239, 0.24);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  color: var(--tiza); cursor: pointer;
+  display: grid; place-items: center;
+  opacity: 0; visibility: hidden;
+  transition: opacity 200ms ease, transform 420ms var(--ease), background 200ms ease, color 200ms ease, visibility 0s linear 420ms;
+}
+.busca-x svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.busca-x:hover { background: var(--tiza); color: var(--azul); }
+.nav.buscando .busca-x { opacity: 1; visibility: visible; transform: translateY(-50%); transition: opacity 220ms ease 120ms, transform 420ms var(--ease), background 200ms ease, color 200ms ease; }
 .lupa { width: 46px; height: 46px; flex: none; border: 0; border-radius: 999px; background: transparent; color: var(--tiza); cursor: pointer; display: grid; place-items: center; }
 .busca.open .lupa { color: var(--azul); }
 .lupa svg { width: 20px; height: 20px; }
@@ -121,10 +137,7 @@ a { color: inherit; }
 .busca.open input { opacity: 1; }
 .busca input::placeholder { color: var(--ink-3); }
 .busca input::-webkit-search-cancel-button { display: none; }
-.busca:not(.open) .q-clear, .busca:not(.open) .q-count { display: none; }
-.q-clear { width: 32px; height: 32px; flex: none; border: 0; border-radius: 999px; background: transparent; color: var(--ink-3); cursor: pointer; display: grid; place-items: center; }
-.q-clear:hover { background: var(--line); color: var(--ink); }
-.q-clear svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.busca:not(.open) .q-count { display: none; }
 .q-count { flex: none; margin-right: 5px; padding: 6px 10px; border-radius: 999px; background: #fff; color: var(--ink-2); font-size: 0.8rem; font-variant-numeric: tabular-nums; }
 
 /* --- Destacadas: carrusel a pantalla completa ---------------------------
@@ -149,13 +162,6 @@ a { color: inherit; }
 .d-art { position: absolute; inset: 0; overflow: hidden; }
 .d-art svg { display: block; width: 100%; height: 100%; transform: scale(1.08); transition: transform 9s linear; }
 .d-slide.on .d-art svg { transform: none; }
-.d-slide::after {
-  content: ""; position: absolute; inset: 0; pointer-events: none;
-  background:
-    linear-gradient(180deg, rgba(0, 20, 50, 0.32) 0%, rgba(0, 20, 50, 0) 20%),
-    linear-gradient(0deg, rgba(0, 20, 50, 0.55) 0%, rgba(0, 20, 50, 0.22) 30%, rgba(0, 20, 50, 0) 55%),
-    linear-gradient(90deg, rgba(0, 20, 50, 0.3) 0%, rgba(0, 20, 50, 0) 62%);
-}
 .d-txt { position: absolute; z-index: 1; left: 0; right: 0; bottom: clamp(140px, 21vh, 200px); }
 .d-in { display: grid; gap: 22px; justify-items: start; max-width: 1040px; }
 .d-kick { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; font-size: 0.95rem; color: rgba(255, 254, 239, 0.88); }
@@ -165,7 +171,6 @@ a { color: inherit; }
   font-family: var(--f-display); font-weight: 600;
   font-size: clamp(2.3rem, 6.2vw, 5.8rem); line-height: 0.94; letter-spacing: -0.04em;
   text-wrap: balance;
-  text-shadow: 0 2px 30px rgba(0, 24, 66, 0.25);
 }
 .d-bajada { margin: 0; max-width: 56ch; font-size: clamp(1rem, 1.4vw, 1.12rem); line-height: 1.5; color: rgba(255, 254, 239, 0.9); }
 .d-cta {
@@ -180,19 +185,17 @@ a { color: inherit; }
 .d-cta svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 260ms var(--ease); }
 .d-cta:hover svg { transform: translateX(3px); }
 
-/* Indicadores: una barra por nota con numero y titulo, como en las stories:
-   las anteriores llenas y la actual llenandose (las mueve el JS). */
+/* Indicadores: una barra por nota, como en las stories: las anteriores
+   llenas y la actual llenandose (las mueve el JS). Sin texto: el titulo ya
+   esta en la placa. */
 .d-nav { position: absolute; z-index: 2; left: 0; right: 0; bottom: calc(26px + env(safe-area-inset-bottom, 0px)); }
-.d-nav .wrap { display: flex; align-items: flex-start; gap: 28px; }
+.d-nav .wrap { display: flex; align-items: center; gap: 28px; }
 .d-segs { flex: 1; min-width: 0; display: grid; grid-template-columns: repeat(var(--n, 5), minmax(0, 1fr)); gap: 16px; }
-.d-seg { display: grid; gap: 10px; padding: 0 0 4px; border: 0; background: transparent; cursor: pointer; text-align: left; color: rgba(255, 254, 239, 0.56); transition: color 240ms ease; }
+.d-seg { display: grid; padding: 14px 0; border: 0; background: transparent; cursor: pointer; text-align: left; color: rgba(255, 254, 239, 0.56); transition: color 240ms ease; }
 .d-seg:hover, .d-seg.on { color: var(--tiza); }
 .d-bar { display: block; height: 2px; border-radius: 2px; background: rgba(255, 254, 239, 0.26); overflow: hidden; }
 .d-bar i { display: block; height: 100%; background: var(--tiza); transform: scaleX(0); transform-origin: left; }
-.d-seg-t { display: flex; gap: 10px; font-size: 0.84rem; line-height: 1.3; }
-.d-seg-t b { flex: none; font-family: var(--f-mono); font-weight: 400; font-size: 0.78rem; padding-top: 1px; }
-.d-seg-t span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.d-flechas { flex: none; display: flex; gap: 8px; margin-top: -10px; }
+.d-flechas { flex: none; display: flex; gap: 8px; }
 .d-flecha {
   width: 46px; height: 46px; border-radius: 999px; cursor: pointer;
   border: 1px solid rgba(255, 254, 239, 0.3); background: rgba(255, 254, 239, 0.08); color: var(--tiza);
@@ -470,9 +473,7 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   .menu-mobile { display: inline-flex; border-radius: 999px; background: rgba(255, 254, 239, 0.14); border: 1px solid rgba(255, 254, 239, 0.2); font-size: 0.82rem; }
   .nav { height: 66px; }
   .logo svg { width: 62px; }
-  .busca.open { width: calc(100% - 78px); }
-  /* En vertical la forma grande queda detras del texto: velo mas firme abajo. */
-  .d-slide::after { background: linear-gradient(180deg, rgba(0, 20, 50, 0.32) 0%, rgba(0, 20, 50, 0) 18%), linear-gradient(0deg, rgba(0, 20, 50, 0.82) 0%, rgba(0, 20, 50, 0.6) 34%, rgba(0, 20, 50, 0) 62%); }
+  .busca.open { width: calc(100% - 134px); }
   .d-txt { bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
   .d-in { gap: 16px; }
   .d-kick { font-size: 0.86rem; gap: 10px; }
@@ -480,8 +481,7 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   .d-cta { height: 44px; font-size: 0.96rem; }
   .d-nav { bottom: calc(22px + env(safe-area-inset-bottom, 0px)); }
   .d-segs { gap: 6px; }
-  .d-seg { padding: 14px 0; }
-  .d-seg-t, .d-flechas { display: none; }
+  .d-flechas { display: none; }
   .grid, .gcol { gap: 10px; }
   .card { border-radius: 20px; }
   .media { margin: 6px 6px 0; border-radius: 15px; }
@@ -555,9 +555,9 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
       <div class="busca" id="busca" role="search">
         <button class="lupa" id="goSearch" type="button" aria-label="Buscar notas" aria-expanded="false" aria-controls="q"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></button>
         <input id="q" type="search" autocomplete="off" placeholder="Buscá: trigo, becas…" aria-label="Buscar notas" tabindex="-1">
-        <button class="q-clear" id="qClear" type="button" aria-label="Borrar búsqueda" hidden><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
         <span class="q-count" id="qCount">0</span>
       </div>
+      <button class="busca-x" id="qClose" type="button" aria-label="Cerrar buscador" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </nav>
   </div>
 </header>
@@ -682,6 +682,9 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
     var m = Number(p[1]) - 1;
     return larga ? Number(p[2]) + " de " + MESES[m] + " de " + p[0] : Number(p[2]) + " " + MC[m] + " " + p[0];
   }
+
+  // Fecha para el dato de la etiqueta: "30 de junio 2026".
+  function fechaDato(f) { return f ? fecha(f, true).replace(/ de (\d{4})$/, " $1") : ""; }
 
   function plano(s) { return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(); }
   function esc(s) { return s.replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
@@ -921,7 +924,6 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
     var nsub = esMobile.matches ? nf : as.length;
     $("fCount").hidden = nsub === 0; $("fCount").textContent = nsub;
     $("fClear").hidden = nf === 0;
-    $("qClear").hidden = !q;
     $("emptyText").textContent = q
       ? "Ninguna nota coincide con «" + q + "»" + (nf ? " con esos filtros" : "") + ". Probá con otra palabra o limpiá los filtros."
       : "Ninguna nota cumple esa combinación de filtros. Sacá alguno para ver más.";
@@ -932,12 +934,15 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   esMobile.addEventListener("change", function () { resumen(); pintarFiltros(); });
   var tq;
   $("q").addEventListener("input", function (e) { clearTimeout(tq); tq = setTimeout(function () { estado.q = e.target.value; aplicar(); }, 120); });
-  $("qClear").addEventListener("click", function () { $("q").value = ""; estado.q = ""; aplicar(); $("q").focus(); });
+  // La X cierra el buscador y borra la busqueda (como Escape).
+  function cerrarBusca() { $("q").value = ""; estado.q = ""; aplicar(); abrirBusca(false); $("goSearch").focus(); }
+  $("qClose").addEventListener("click", cerrarBusca);
   function abrirBusca(si) {
     $("busca").classList.toggle("open", si);
     $("nav").classList.toggle("buscando", si);
     $("goSearch").setAttribute("aria-expanded", String(si));
     $("q").tabIndex = si ? 0 : -1;
+    $("qClose").tabIndex = si ? 0 : -1;
     if (si) setTimeout(function () { $("q").focus(); }, 60);
   }
   $("goSearch").addEventListener("click", function () {
@@ -947,7 +952,7 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
     else $("q").focus();
   });
   $("q").addEventListener("blur", function () { setTimeout(function () { if (!$("q").value && document.activeElement !== $("q")) abrirBusca(false); }, 180); });
-  $("q").addEventListener("keydown", function (e) { if (e.key === "Escape") { $("q").value = ""; estado.q = ""; aplicar(); abrirBusca(false); } });
+  $("q").addEventListener("keydown", function (e) { if (e.key === "Escape") cerrarBusca(); });
   document.addEventListener("keydown", function (e) {
     if (e.key === "/" && document.activeElement !== $("q") && !$("modal").open) { e.preventDefault(); abrirBusca(true); }
   });
@@ -1094,7 +1099,7 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
     return '<article class="d-slide" role="group" aria-roledescription="nota" aria-label="' + (k + 1) + " de " + dest.length + '" inert>' +
       '<div class="d-art">' + arteDest(n, k) + "</div>" +
       '<div class="d-txt"><div class="wrap"><div class="d-in">' +
-      '<div class="d-kick">' + etq(n.tp, { dato: n.anio }) + "<span>" + fecha(n.f, true) + "</span></div>" +
+      '<div class="d-kick">' + etq(n.tp, { dato: fechaDato(n.f) }) + "</div>" +
       "<h2>" + esc(n.t) + "</h2>" +
       (n.b ? '<p class="d-bajada">' + esc(n.b) + "</p>" : "") +
       '<button class="d-cta" type="button" data-k="' + k + '">Leer la nota ' + FLECHA_CTA + "</button>" +
@@ -1103,7 +1108,7 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   $("dSegs").style.setProperty("--n", dest.length);
   $("dSegs").innerHTML = dest.map(function (n, k) {
     return '<button class="d-seg" type="button" data-k="' + k + '" aria-label="Ver destacada ' + (k + 1) + ": " + esc(n.t) + '">' +
-      '<span class="d-bar"><i></i></span><span class="d-seg-t"><b>' + (k < 9 ? "0" : "") + (k + 1) + "</b><span>" + esc(n.t) + "</span></span></button>";
+      '<span class="d-bar"><i></i></span></button>';
   }).join("");
   var slides = $("dSlides").children, segs = $("dSegs").children, dk = -1;
   var barras = [].map.call(segs, function (s) { return s.querySelector(".d-bar i"); });
