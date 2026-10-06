@@ -504,7 +504,12 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   .filters.open { width: calc(100% - 32px); }
   .f-main { display: none; }
   .f-bar { justify-content: center; padding: 4px; }
-  .f-toggle { width: auto; height: 46px; padding: 0 22px 0 26px; color: var(--ink); font-family: var(--f-display); font-size: 1.04rem; }
+  .f-toggle { width: auto; height: 46px; padding: 0 22px 0 26px; color: var(--ink); font-family: var(--f-display); font-size: 1.04rem; transition: height var(--f-cerrar) var(--f-curva), padding var(--f-cerrar) var(--f-curva), font-size var(--f-cerrar) var(--f-curva); }
+  /* Bajando, la pastilla se achica a lo justo para "Filtros" y deja ver mas
+     tarjetas; subiendo vuelve a su tamaño. Abierta nunca esta chica. */
+  .filters.chica:not(.open) { width: 128px; }
+  .filters.chica:not(.open):has(.f-count:not([hidden])) { width: 154px; }
+  .filters.chica:not(.open) .f-toggle { height: 36px; padding: 0 14px 0 18px; font-size: 0.94rem; }
   .f-toggle:hover { background: transparent; }
   .f-txt { display: inline; }
   .f-count { position: static; order: 2; }
@@ -959,6 +964,17 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   // La barra toma el azul cuando termina el carrusel.
   function barraSolida() { $("top").classList.toggle("solid", window.scrollY > $("dest").offsetHeight - 80); }
   window.addEventListener("scroll", barraSolida, { passive: true });
+  // Mobile: el dock de filtros se achica al bajar y vuelve al subir. Umbral de
+  // unos px para que el rebote del scroll no lo haga titilar.
+  var yAntes = window.scrollY;
+  window.addEventListener("scroll", function () {
+    var y = window.scrollY, dy = y - yAntes;
+    if (Math.abs(dy) < 8) return;
+    yAntes = y;
+    var f = $("filters");
+    if (!esMobile.matches || f.classList.contains("open")) { f.classList.remove("chica"); return; }
+    f.classList.toggle("chica", dy > 0 && y > 40);
+  }, { passive: true });
   barraSolida();
   $("filters").addEventListener("click", function (e) {
     var b = e.target.closest("[data-f]"); if (!b) return;
