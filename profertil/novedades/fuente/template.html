@@ -47,6 +47,10 @@
   --f-fundido: 360ms;
   --f-fundido-retraso: 160ms;
   --f-flecha: 460ms;
+  /* Pastilla compacta en mobile, como la barra de direcciones de Safari:
+     corta y con la curva de los paneles de iOS. */
+  --f-chica: 280ms;
+  --f-chica-curva: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -496,15 +500,22 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
      lado): el ancho no se anima. El tweak puede probar un cerrado mas angosto
      con --f-ancho-cerrado. */
   .filters { width: var(--f-ancho-cerrado, calc(100% - 32px)); border-radius: 28px; }
-  .filters.open { width: calc(100% - 32px); }
+  .filters.open { width: calc(100% - 32px); transition-duration: var(--f-abrir), var(--f-abrir), var(--f-abrir), 520ms, 300ms; }
   .f-main { display: none; }
   .f-bar { justify-content: center; padding: 4px; }
-  .f-toggle { width: auto; height: 46px; padding: 0 22px 0 26px; color: var(--ink); font-family: var(--f-display); font-size: 1.04rem; transition: height var(--f-cerrar) var(--f-curva), padding var(--f-cerrar) var(--f-curva), font-size var(--f-cerrar) var(--f-curva); }
-  /* Bajando, la pastilla se achica a lo justo para "Filtros" y deja ver mas
-     tarjetas; subiendo vuelve a su tamaño. Abierta nunca esta chica. */
-  .filters.chica:not(.open) { width: 128px; }
-  .filters.chica:not(.open):has(.f-count:not([hidden])) { width: 154px; }
-  .filters.chica:not(.open) .f-toggle { height: 36px; padding: 0 14px 0 18px; font-size: 0.94rem; }
+  .f-toggle { width: auto; height: 46px; padding: 0 22px 0 26px; color: var(--ink); font-family: var(--f-display); font-size: 1.04rem; transition: height var(--f-chica) var(--f-chica-curva), padding var(--f-chica) var(--f-chica-curva), gap var(--f-chica) var(--f-chica-curva), font-size var(--f-chica) var(--f-chica-curva); }
+  .f-toggle svg { transition: transform var(--f-flecha) var(--f-curva), width var(--f-chica) var(--f-chica-curva), height var(--f-chica) var(--f-chica-curva); }
+  /* Bajando, la pastilla se compacta como la barra de direcciones de Safari:
+     angosta, mas baja, con el texto y la flecha mas chicos y pegada al borde.
+     Subiendo (o al llegar al final) vuelve. Abierta nunca esta chica. El ancho
+     del cerrado y el abierto es el mismo, asi que esta transicion solo corre
+     al compactar y al volver. */
+  .filters { transition: width var(--f-chica) var(--f-chica-curva), bottom var(--f-chica) var(--f-chica-curva), border-radius var(--f-cerrar) var(--f-curva), transform 520ms var(--ease), opacity 300ms ease; }
+  .filters.chica:not(.open) { width: 104px; bottom: calc(6px + env(safe-area-inset-bottom, 0px)); }
+  .filters.chica:not(.open):has(.f-count:not([hidden])) { width: 128px; }
+  .filters.chica:not(.open) .f-toggle { height: 30px; padding: 0 12px 0 15px; gap: 5px; font-size: 0.82rem; }
+  .filters.chica:not(.open) .f-toggle svg { width: 13px; height: 13px; }
+  .filters.chica:not(.open) .f-count { transform: scale(0.85); }
   .f-toggle:hover { background: transparent; }
   .f-txt { display: inline; }
   .f-count { position: static; order: 2; }
@@ -952,7 +963,8 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
     yAntes = y;
     var f = $("filters");
     if (!esMobile.matches || f.classList.contains("open")) { f.classList.remove("chica"); return; }
-    f.classList.toggle("chica", dy > 0 && y > 40);
+    var alFinal = y + window.innerHeight >= document.documentElement.scrollHeight - 4;
+    f.classList.toggle("chica", dy > 0 && y > 40 && !alFinal);
   }, { passive: true });
   barraSolida();
   $("filters").addEventListener("click", function (e) {
