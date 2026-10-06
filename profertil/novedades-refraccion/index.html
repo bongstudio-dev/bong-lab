@@ -164,8 +164,12 @@ a { color: inherit; }
    barra de la nota se llena y al terminar entra la siguiente deslizandose de
    costado. Tocar a la derecha pasa, a la izquierda vuelve, mantener apretado
    pausa y en touch la placa sigue al dedo. Se frena tambien con el foco del
-   teclado, fuera de vista o con la nota abierta. Sin fotos todavia: el fondo
-   es el arte de formas de las tarjetas, en grande. */
+   teclado, fuera de vista o con la nota abierta.
+   Cada placa es la foto de la nota recortada como una hoja (dos esquinas
+   opuestas redondeadas) entre dos Flores del sistema enormes, una detras y
+   otra delante: el mismo lenguaje que las piezas de redes (Figma Master,
+   Header de noticias · con foto). Las tres capas se mueven lento y a distinta
+   velocidad (parallax); ver "Profundidad" en el JS. */
 .dest {
   position: relative; overflow: hidden;
   height: 100vh; height: 100svh; min-height: 540px;
@@ -177,17 +181,28 @@ a { color: inherit; }
 .d-slide { position: absolute; inset: 0; visibility: hidden; transform: translateX(100%); will-change: transform; }
 .d-slide.vis { visibility: visible; }
 .d-slide.on { z-index: 1; }
-.d-art { position: absolute; inset: 0; overflow: hidden; }
-.d-art svg { display: block; width: 100%; height: 100%; transform: scale(1.08); transition: transform 9s linear; }
-.d-slide.on .d-art svg { transform: none; }
-.d-txt { position: absolute; z-index: 1; left: 0; right: 0; bottom: clamp(140px, 21vh, 200px); }
-.d-in { display: grid; gap: 22px; justify-items: start; max-width: 1040px; }
+.d-slide { overflow: hidden; background: var(--fondo); }
+.d-art { position: absolute; inset: 0; }
+/* Escena: la caja de la foto. Las flores se ubican en unidades de su ancho
+   (cqw), asi los arcos cruzan las mismas esquinas en cualquier pantalla. En
+   desktop la foto va a la derecha y sangra por el borde. */
+.d-esc { position: absolute; z-index: 1; top: 15.5%; bottom: 15.5%; right: -2.8vw; width: 50vw; container-type: size; }
+.d-capa { position: absolute; display: block; height: auto; transform: translate3d(var(--x, 0px), var(--y, 0px), 0); will-change: transform; }
+.d-capa svg { display: block; width: 100%; height: auto; }
+.d-atras { --x: var(--a-x); --y: var(--a-y); width: 236cqw; left: 36cqw; top: -179cqw; color: var(--atras); }
+.d-frente { --x: var(--f-x); --y: var(--f-y); z-index: 2; width: 181cqw; left: -76cqw; top: calc(100cqh - 9.7cqw); color: var(--frente); }
+.d-foto { --x: var(--p-x); --y: var(--p-y); z-index: 1; inset: 0; overflow: hidden; border-radius: 0 37cqw 0 37cqw; background: rgba(255, 254, 239, 0.12); }
+.d-foto img { display: block; width: 100%; height: 100%; object-fit: cover; transform: scale(1.1); transition: transform 9s linear, opacity 600ms ease; }
+.d-foto img.carga { opacity: 0; }
+.d-slide.on .d-foto img { transform: scale(1.02); }
+.d-txt { position: absolute; z-index: 3; left: 0; right: 0; bottom: clamp(140px, 21vh, 200px); }
+.d-in { display: grid; gap: 22px; justify-items: start; max-width: min(46vw, 680px); }
 .d-kick { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; font-size: 0.95rem; color: rgba(255, 254, 239, 0.88); }
 .d-kick .etq { --s: var(--etq-l); }
 .d-in h2 {
-  margin: 0; max-width: 20ch;
+  margin: 0;
   font-family: var(--f-display); font-weight: 600;
-  font-size: clamp(2.3rem, 6.2vw, 5.8rem); line-height: 0.94; letter-spacing: -0.04em;
+  font-size: clamp(2.3rem, 5.4vw, 5.4rem); line-height: 0.94; letter-spacing: -0.04em;
   text-wrap: balance;
 }
 .d-bajada { margin: 0; max-width: 56ch; font-size: clamp(1rem, 1.4vw, 1.12rem); line-height: 1.5; color: rgba(255, 254, 239, 0.9); }
@@ -507,8 +522,14 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   .nav { height: 66px; }
   .logo svg { width: 62px; }
   .busca.open { width: calc(100% - 134px); }
-  .d-txt { bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
-  .d-in { gap: 16px; }
+  /* Mobile: como la historia. Texto arriba y la foto abajo, a todo el ancho. */
+  .d-slide { display: flex; flex-direction: column; padding: 92px 0 calc(74px + env(safe-area-inset-bottom, 0px)); }
+  .d-txt { position: relative; bottom: auto; order: 1; }
+  .d-art { position: relative; inset: auto; order: 2; flex: 1; min-height: 0; }
+  .d-esc { top: 30px; bottom: 0; right: -10px; left: -10px; width: auto; }
+  .d-atras { width: 228cqw; left: 54cqw; top: -162cqw; }
+  .d-frente { width: 192cqw; left: -63cqw; top: calc(100cqh - 37.5cqw); }
+  .d-in { gap: 16px; max-width: none; }
   .d-kick { font-size: 0.86rem; gap: 10px; }
   .d-kick .etq { --s: var(--etq-m); }
   .d-cta { height: var(--btn-m); font-size: 0.96rem; }
@@ -1182,26 +1203,34 @@ html.refr .top.solid { background: rgba(0, 61, 165, 0.72); box-shadow: none; }
   var dest = DESTACADAS.length
     ? DESTACADAS.map(function (u) { return NOTAS.filter(function (n) { return n.u === u; })[0]; }).filter(Boolean)
     : NOTAS.slice(-5).reverse();
-  // Arte a sangre: una forma grande que se sale por la derecha y otra que
-  // asoma arriba. Fondos oscuros de la paleta (el texto tiza va encima) y la
-  // forma en un color vivo, como la hoja amarilla sobre verde del concepto web.
-  // Cada placa toma un par distinto, en orden.
-  var PARES_DEST = [["#2D8035", "#EABA2C"], ["#003DA5", "#4086FF"], ["#8A4818", "#E57F19"], ["#2D8035", "#5EB53A"], ["#003DA5", "#EABA2C"]];
-  function arteDest(n, k) {
-    var r = rnd32(n.id * 7919 + 101), W = 1600, H = 1000;
-    var par = PARES_DEST[k % PARES_DEST.length], fondo = par[0], fig = par[1];
-    var fs = formasDe(n), rots = [0, 90, 180, 270];
-    var f1 = fs[Math.floor(r() * fs.length)], f2 = fs[Math.floor(r() * fs.length)];
-    var t1 = H * (1.0 + r() * 0.15), t2 = H * (0.36 + r() * 0.1);
-    // xMax: en pantallas verticales se ve el lado de la forma grande.
-    return '<svg viewBox="0 0 ' + W + " " + H + '" preserveAspectRatio="xMaxYMid slice" aria-hidden="true"><rect width="' + W + '" height="' + H + '" fill="' + fondo + '"/>' +
-      usar(f1, W - t1 * (0.66 + r() * 0.1), H - t1 * (0.84 + r() * 0.1), t1, t1, rots[Math.floor(r() * 4)], fig) +
-      usar(f2, W * (0.36 + r() * 0.14), -t2 * (0.4 + r() * 0.16), t2, t2, rots[Math.floor(r() * 4)], fig) + "</svg>";
+  // Colores de cada placa: fondo, Flor de atras y Flor de adelante. Fondos
+  // oscuros de la paleta (el texto tiza va encima) y flores en dos colores
+  // vivos, como la historia de Practicas Profesionales (azul, verde, celeste).
+  var PARES_DEST = [
+    ["#2D8035", "#5EB53A", "#4086FF"],
+    ["#003DA5", "#2D8035", "#4086FF"],
+    ["#8A4818", "#E57F19", "#EABA2C"],
+    ["#2D8035", "#EABA2C", "#5EB53A"],
+    ["#003DA5", "#4086FF", "#EABA2C"]
+  ];
+  // Foto: la de la nota (n.img, la URL en el sitio actual) cuando este en los
+  // datos; mientras, fotos de banco de la marca para ver la composicion.
+  var FOTOS_DEMO = [1, 2, 3, 4, 5].map(function (i) { return "../novedades/fotos/demo-" + i + ".webp"; });
+  function flor() {
+    return '<svg viewBox="' + A.formas.flor.vb + '" aria-hidden="true"><use href="#f-flor" fill="currentColor"/></svg>';
+  }
+  function escena(n, k) {
+    var demo = FOTOS_DEMO[k % FOTOS_DEMO.length];
+    return '<div class="d-esc">' +
+      '<div class="d-capa d-atras">' + flor() + "</div>" +
+      '<div class="d-capa d-foto"><img class="carga" src="' + esc(n.img || demo) + '" data-demo="' + demo + '" alt="" decoding="async"' + (k ? ' loading="lazy"' : "") + "></div>" +
+      '<div class="d-capa d-frente">' + flor() + "</div></div>";
   }
   var FLECHA_CTA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
   $("dSlides").innerHTML = dest.map(function (n, k) {
-    return '<article class="d-slide" role="group" aria-roledescription="nota" aria-label="' + (k + 1) + " de " + dest.length + '" inert>' +
-      '<div class="d-art">' + arteDest(n, k) + "</div>" +
+    var c = PARES_DEST[k % PARES_DEST.length];
+    return '<article class="d-slide" role="group" aria-roledescription="nota" aria-label="' + (k + 1) + " de " + dest.length + '" inert style="--fondo:' + c[0] + ";--atras:" + c[1] + ";--frente:" + c[2] + '">' +
+      '<div class="d-art">' + escena(n, k) + "</div>" +
       '<div class="d-txt"><div class="wrap"><div class="d-in">' +
       '<div class="d-kick">' + etq(n.tp, { dato: fechaDato(n.f) }) + "</div>" +
       "<h2>" + esc(n.t) + "</h2>" +
@@ -1214,6 +1243,13 @@ html.refr .top.solid { background: rgba(0, 61, 165, 0.72); box-shadow: none; }
     return '<button class="d-seg" type="button" data-k="' + k + '" aria-label="Ver destacada ' + (k + 1) + ": " + esc(n.t) + '">' +
       '<span class="d-bar"><i></i></span></button>';
   }).join("");
+  // Las fotos aparecen con un fundido al cargar; si la de la nota falla, va la de prueba.
+  [].forEach.call($("dSlides").querySelectorAll(".d-foto img"), function (img) {
+    function lista() { img.classList.remove("carga"); }
+    if (img.complete && img.naturalWidth) lista();
+    img.addEventListener("load", lista);
+    img.addEventListener("error", function () { if (img.getAttribute("src") !== img.dataset.demo) img.src = img.dataset.demo; });
+  });
   var slides = $("dSlides").children, segs = $("dSegs").children, dk = -1;
   var barras = [].map.call(segs, function (s) { return s.querySelector(".d-bar i"); });
   // Tiempos del carrusel: salen de los tokens (--carrusel-*), como el resto.
@@ -1340,6 +1376,39 @@ html.refr .top.solid { background: rgba(0, 61, 165, 0.72); box-shadow: none; }
       $("filters").classList.toggle("fuera", tapa);
     }, { threshold: [0, 0.25, 0.4, 0.6, 1] }).observe(dEl);
   }
+  /* Profundidad: las tres capas de la placa se mueven a distinta velocidad.
+     La Flor de atras va lenta, la foto casi quieta y la de adelante mas rapida
+     y en sentido contrario. Las mueve una deriva lenta, el puntero (desktop) y
+     el scroll. Con reducir movimiento queda todo quieto. */
+  (function () {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // [px por unidad de puntero en x, en y, fraccion del scroll que se resta]
+    var CAPAS = { a: [-26, -18, 0.32], p: [-8, -6, 0.16], f: [44, 30, -0.06] };
+    var px = 0, py = 0, mx = 0, my = 0, est = dEl.style;
+    if (matchMedia("(pointer: fine)").matches) {
+      dEl.addEventListener("pointermove", function (e) {
+        if (e.pointerType !== "mouse") return;
+        var r = dEl.getBoundingClientRect();
+        px = (e.clientX - r.left) / r.width * 2 - 1;
+        py = (e.clientY - r.top) / r.height * 2 - 1;
+      });
+      dEl.addEventListener("pointerleave", function () { px = py = 0; });
+    }
+    function mover(t) {
+      requestAnimationFrame(mover);
+      var sy = window.scrollY;
+      if (sy > dEl.offsetHeight) return;
+      mx += (px - mx) * 0.04; my += (py - my) * 0.04;
+      var dx = Math.sin(t / 6100) * 0.45, dy = Math.cos(t / 7900) * 0.45;
+      Object.keys(CAPAS).forEach(function (k) {
+        var c = CAPAS[k], deriva = k === "p" ? 0.25 : 1;
+        est.setProperty("--" + k + "-x", ((mx + dx * deriva) * c[0]).toFixed(1) + "px");
+        est.setProperty("--" + k + "-y", ((my + dy * deriva) * c[1] + sy * c[2]).toFixed(1) + "px");
+      });
+    }
+    requestAnimationFrame(mover);
+  })();
+
   irA(0);
   requestAnimationFrame(tic);
 
