@@ -1,0 +1,31 @@
+/* --- Refraccion: el canvas WebGL va debajo de la UI (dock 40, barra 50) y
+   arriba del contenido. Con la refraccion prendida las piezas de vidrio
+   pierden su fondo y su blur: el cristal lo pinta el canvas. --------------- */
+#refr { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 39; pointer-events: none; }
+.d-nav { z-index: 41; }
+html.refr .filters,
+html.refr .top.solid,
+html.refr .nav .menu,
+html.refr .nav .menu-mobile,
+html.refr .busca:not(.open),
+html.refr .busca-x,
+html.refr .d-flecha {
+  background: transparent;
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+html.refr .filters { border-color: rgba(255, 255, 255, 0.55); }
+html.refr .top.solid { box-shadow: none; }
+html.refr .busca-x:hover, html.refr .d-flecha:hover { background: var(--tiza); }
+
+/* Selector de material: arriba a la izquierda, debajo de la barra. */
+.vidrio {
+  position: fixed; z-index: 60; left: 12px;
+  top: calc(env(safe-area-inset-top, 0px) + 84px);
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 34px; padding: 0 14px 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.7); border-radius: 999px;
+  background: rgba(10, 30, 74, 0.72); color: #fff; cursor: pointer;
+  font: 500 0.8rem var(--f-body);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+}
+.vidrio span { opacity: 0.7; font-family: var(--f-mono); font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; }
