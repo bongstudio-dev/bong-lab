@@ -45,6 +45,25 @@ a { color: inherit; }
 .wrap { width: min(100% - 32px, 1320px); margin-inline: auto; }
 .ico { display: block; width: 100%; height: 100%; }
 
+/* --- Tacto -----------------------------------------------------------------
+   Los :hover van todos dentro de (hover: hover) and (pointer: fine): en el
+   celular el primer toque deja el hover puesto hasta tocar otra cosa. Sin el
+   destello gris de Safari al tocar; en su lugar, cada control responde al
+   apoyar el dedo (:active) con el mismo cambio que el hover. */
+html { -webkit-tap-highlight-color: transparent; }
+button, a, [role="button"] { touch-action: manipulation; }
+button, [role="button"] { -webkit-user-select: none; user-select: none; }
+@media (hover: none) {
+  .card:active { transform: scale(0.985); transition-duration: 120ms; }
+  .lbl:active { background: color-mix(in srgb, var(--pc, var(--azul)) 86%, var(--ink)); }
+  .lbl-todas:active { background: var(--line); }
+  .f-body .sub:active { background: color-mix(in srgb, var(--c) 28%, #fff); }
+  .d-flecha:active, .busca-x:active { background: var(--tiza); color: var(--azul); }
+  .d-cta:active { background: #fff; }
+  .btn:active { background: #256c2c; }
+  .icon-btn:active { background: rgba(10, 30, 74, 0.16); }
+}
+
 /* --- Barra superior fija ---------------------------------------------------
    Logo, menu y lupa. Arriba de la foto es transparente; al bajar toma el azul.
    La busqueda vive en la lupa: se expande hacia la izquierda y tapa el menu,
@@ -96,7 +115,7 @@ a { color: inherit; }
   transition: opacity 200ms ease, transform var(--t-buscador) var(--ease), background 200ms ease, color 200ms ease, visibility 0s linear var(--t-buscador);
 }
 .busca-x svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
-.busca-x:hover { background: var(--tiza); color: var(--azul); }
+@media (hover: hover) and (pointer: fine) { .busca-x:hover { background: var(--tiza); color: var(--azul); } }
 .nav.buscando .busca-x { opacity: 1; visibility: visible; transform: translateY(-50%); transition: opacity 220ms ease 120ms, transform var(--t-buscador) var(--ease), background 200ms ease, color 200ms ease; }
 .lupa { width: 46px; height: 46px; flex: none; border: 0; border-radius: 999px; background: transparent; color: var(--tiza); cursor: pointer; display: grid; place-items: center; }
 .busca.open .lupa { color: var(--azul); }
@@ -217,9 +236,9 @@ a { color: inherit; }
   font-family: var(--f-display); font-size: 1.02rem; font-weight: 500;
   transition: background 200ms ease, color 200ms ease;
 }
-.d-cta:hover { background: #fff; }
+@media (hover: hover) and (pointer: fine) { .d-cta:hover { background: #fff; } }
 .d-cta svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 260ms var(--ease); }
-.d-cta:hover svg { transform: translateX(3px); }
+@media (hover: hover) and (pointer: fine) { .d-cta:hover svg { transform: translateX(3px); } }
 
 /* Indicadores: una barra por nota, como en las stories: las anteriores
    llenas y la actual llenandose (las mueve el JS). Sin texto: el titulo ya
@@ -228,7 +247,8 @@ a { color: inherit; }
 .d-nav .wrap { display: flex; align-items: center; gap: 28px; }
 .d-segs { flex: 1; min-width: 0; display: grid; grid-template-columns: repeat(var(--n, 5), minmax(0, 1fr)); gap: 16px; }
 .d-seg { display: grid; padding: 14px 0; border: 0; background: transparent; cursor: pointer; text-align: left; color: rgba(255, 254, 239, 0.56); transition: color 240ms ease; }
-.d-seg:hover, .d-seg.on { color: var(--tiza); }
+.d-seg.on { color: var(--tiza); }
+@media (hover: hover) and (pointer: fine) { .d-seg:hover { color: var(--tiza); } }
 .d-bar { display: block; height: 2px; border-radius: 2px; background: rgba(255, 254, 239, 0.26); overflow: hidden; }
 .d-bar i { display: block; height: 100%; background: var(--tiza); transform: scaleX(0); transform-origin: left; }
 .d-flechas { flex: none; display: flex; gap: 8px; }
@@ -238,7 +258,7 @@ a { color: inherit; }
   backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   display: grid; place-items: center; transition: background 200ms ease, color 200ms ease;
 }
-.d-flecha:hover { background: var(--tiza); color: var(--azul); }
+@media (hover: hover) and (pointer: fine) { .d-flecha:hover { background: var(--tiza); color: var(--azul); } }
 .d-flecha svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
 /* --- Resultado ------------------------------------------------------------ */
@@ -287,9 +307,9 @@ a { color: inherit; }
   border-radius: 26px;
   box-shadow: var(--shadow);
   transition: transform 320ms var(--ease), box-shadow 320ms var(--ease);
-  animation: entra 420ms var(--ease) both;
+  animation: entra 420ms var(--ease) backwards;
 }
-.card:hover { transform: translateY(-3px); box-shadow: 0 1px 2px rgba(10, 30, 74, 0.06), 0 18px 34px -16px rgba(10, 30, 74, 0.34); }
+@media (hover: hover) and (pointer: fine) { .card:hover { transform: translateY(-3px); box-shadow: 0 1px 2px rgba(10, 30, 74, 0.06), 0 18px 34px -16px rgba(10, 30, 74, 0.34); } }
 @keyframes entra { from { transform: translateY(8px); } to { transform: none; } }
 
 .media { position: relative; margin: 8px 8px 0; border-radius: 19px; overflow: hidden; line-height: 0; max-width: 100%; }
@@ -341,10 +361,10 @@ mark { background: rgba(234, 186, 44, 0.42); color: inherit; border-radius: 3px;
 .etq .fl svg { width: 46%; height: 46%; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
 button.etq { border: 0; padding: 0; background: transparent; cursor: pointer; color: inherit; }
 button.etq .lb { transition: background 160ms ease, color 160ms ease; }
-button.etq:hover .lb { box-shadow: inset 0 0 0 1.5px var(--tx); }
+@media (hover: hover) and (pointer: fine) { button.etq:hover .lb { box-shadow: inset 0 0 0 1.5px var(--tx); } }
 button.etq[aria-pressed="true"] .lb { background: var(--tx); color: #fff; }
 a.etq { text-decoration: none; }
-a.etq:hover .fl { background: var(--tx); color: #fff; }
+@media (hover: hover) and (pointer: fine) { a.etq:hover .fl { background: var(--tx); color: #fff; } }
 .media .etq .lb, .m-art .etq .lb { box-shadow: none; }
 .etq .corto { display: none; }
 /* La etiqueta nunca se sale de la tarjeta: la tarjeta es contenedor y, si es
@@ -384,10 +404,10 @@ a.etq:hover .fl { background: var(--tx); color: #fff; }
   white-space: nowrap; cursor: pointer;
   transition: background 240ms var(--ease), color 240ms var(--ease);
 }
-.lbl:hover { background: color-mix(in srgb, var(--pc, var(--azul)) 86%, var(--ink)); }
+@media (hover: hover) and (pointer: fine) { .lbl:hover { background: color-mix(in srgb, var(--pc, var(--azul)) 86%, var(--ink)); } }
 .lbl[aria-pressed="true"] { background: var(--ink); color: var(--tiza); }
 .lbl-todas { background: transparent; color: var(--ink); }
-.lbl-todas:hover { background: var(--line); }
+@media (hover: hover) and (pointer: fine) { .lbl-todas:hover { background: var(--line); } }
 
 /* --- Subcategoria (cultivo): relleno del color, texto tiza. Sin badge
    ni flecha, para no competir con la etiqueta principal de la nota. */
@@ -402,7 +422,7 @@ a.etq:hover .fl { background: var(--tx); color: #fff; }
 }
 button.sub { cursor: pointer; transition: background 160ms ease, color 160ms ease; }
 .f-body .sub { --h: 32px; background: color-mix(in srgb, var(--c) 16%, #fff); color: var(--c); }
-.f-body .sub:hover { background: color-mix(in srgb, var(--c) 28%, #fff); }
+@media (hover: hover) and (pointer: fine) { .f-body .sub:hover { background: color-mix(in srgb, var(--c) 28%, #fff); } }
 .f-body .sub[aria-pressed="true"] { background: var(--c); color: var(--tiza); }
 .sub-anio { --c: var(--azul); font-variant-numeric: tabular-nums; }
 .sub .n { font-weight: 400; opacity: 0.7; font-variant-numeric: tabular-nums; }
@@ -464,7 +484,7 @@ button.sub { cursor: pointer; transition: background 160ms ease, color 160ms eas
   display: flex; align-items: center; justify-content: center; gap: 8px;
 }
 .f-txt { display: none; }
-.f-toggle:hover { background: var(--line); }
+@media (hover: hover) and (pointer: fine) { .f-toggle:hover { background: var(--line); } }
 .f-toggle svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform var(--f-flecha) var(--f-curva); }
 .filters.open .f-toggle svg { transform: rotate(180deg); }
 .f-count { position: absolute; top: 2px; right: 2px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 999px; background: var(--verde); color: #fff; display: grid; place-items: center; font-size: 0.66rem; font-variant-numeric: tabular-nums; }
@@ -480,7 +500,7 @@ button.sub { cursor: pointer; transition: background 160ms ease, color 160ms eas
   border: 0; border-radius: 13px; cursor: pointer; text-decoration: none;
   background: var(--verde); color: #fff; font-weight: 500; font-size: 0.95rem;
 }
-.btn:hover { background: #256c2c; }
+@media (hover: hover) and (pointer: fine) { .btn:hover { background: #256c2c; } }
 .btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
 /* --- Detalle ---------------------------------------------------------------- */
@@ -514,7 +534,7 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
 .m-nav .pos { font-size: 0.86rem; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 .m-nav-group { display: flex; gap: 6px; }
 .icon-btn { width: 42px; height: 42px; border-radius: 13px; border: 0; background: var(--line); cursor: pointer; display: grid; place-items: center; }
-.icon-btn:hover { background: rgba(10, 30, 74, 0.16); }
+@media (hover: hover) and (pointer: fine) { .icon-btn:hover { background: rgba(10, 30, 74, 0.16); } }
 .icon-btn:disabled { opacity: 0.35; cursor: default; }
 .icon-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
