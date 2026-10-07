@@ -193,9 +193,24 @@ a { color: inherit; }
    --t (0 a 571 px) y desde 2011 quedan fijos: la foto deja de crecer y entra
    en pantalla, la Flor de atras baja y la de adelante crece hacia la izquierda.
    Los coeficientes de --t son la diferencia entre los dos frames (en px, con la
-   foto de 720) dividida 571. */
-.dest { --t: clamp(0px, 100vw - 1440px, 571px); }
-.d-esc { position: absolute; z-index: 1; top: 15.5%; bottom: 15.5%; right: calc(-2.8vw + var(--t) * 0.6); width: min(50vw, 80svh); container-type: size; }
+   foto de 720) dividida 571.
+   Zona segura del texto: la columna va del margen del contenido (--m) hasta la
+   foto menos 48 px (--g) y nunca es menor a 560 px (--col; en pantallas chicas,
+   media pantalla). Si no entra, cede la foto: primero se corre a la derecha y
+   sangra mas (hasta 12vw afuera) y despues se achica. El titulo se escala con
+   esa columna (ver .d-in h2). */
+.dest {
+  --t: clamp(0px, 100vw - 1440px, 571px);
+  --m: max(16px, (100vw - 1320px) / 2);
+  --g: 48px;
+  --col: min(560px, 50vw);
+  --f-ini: calc(var(--m) + var(--col) + var(--g));
+  --f-der0: calc(-2.8vw + var(--t) * 0.6);
+  --f-ancho0: min(50vw, 80svh);
+  --f-der: max(-12vw, min(var(--f-der0), 100vw - var(--f-ini) - var(--f-ancho0)));
+  --f-ancho: min(var(--f-ancho0), 100vw - var(--f-der) - var(--f-ini));
+}
+.d-esc { position: absolute; z-index: 1; top: 15.5%; bottom: 15.5%; right: var(--f-der); width: var(--f-ancho); container-type: size; }
 .d-capa { position: absolute; display: block; height: auto; }
 .d-capa svg { display: block; width: 100%; height: auto; }
 .d-atras { width: 236cqw; left: calc(36.1cqw + var(--t) * 0.1475); top: calc(-179.2cqw + var(--t) * 1.1955); color: var(--atras); }
@@ -208,15 +223,21 @@ a { color: inherit; }
 .d-slide.on .d-foto img { transform: scale(1.02); }
 /* El bloque de texto va centrado con la foto (Figma: 216 a 672 en 900 de alto). */
 .d-txt { position: absolute; z-index: 3; left: 0; right: 0; top: 50%; transform: translateY(calc(-50% - 6px)); }
-.d-in { display: grid; gap: 22px; justify-items: start; max-width: min(50vw, 720px); }
+.d-in { display: grid; gap: 22px; justify-items: start; max-width: min(720px, 100vw - var(--f-der) - var(--f-ancho) - var(--g) - var(--m)); container-type: inline-size; }
 .d-kick { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; font-size: 0.95rem; color: rgba(255, 254, 239, 0.88); }
 .d-kick .etq { --s: var(--etq-l); }
 .d-in h2 {
   margin: 0;
   font-family: var(--f-display); font-weight: 600;
-  font-size: clamp(2.3rem, 6.11vw, 5.5rem); line-height: 0.94; letter-spacing: -0.04em;
-  text-wrap: balance;
+  /* Entre 64 y 88: el 13.5% de la columna (unos 15 caracteres por linea) y,
+     en pantallas bajas, lo que deja el alto para 5 lineas entre la barra y los
+     indicadores. Los titulos de mas de 80 caracteres (el 10% de las notas) van
+     a 64 (.largo). Una palabra sin cortes (p. ej. "compartida.Profertil") se
+     parte antes que pisar la foto. */
+  font-size: clamp(64px, min(13.5cqi, (100svh - 330px) / 4.7), 88px); line-height: 0.94; letter-spacing: -0.04em;
+  text-wrap: balance; overflow-wrap: break-word;
 }
+.d-in h2.largo { font-size: 64px; }
 .d-bajada { margin: 0; max-width: 56ch; font-size: clamp(1rem, 1.4vw, 1.12rem); line-height: 1.5; color: rgba(255, 254, 239, 0.9); }
 .d-cta {
   display: inline-flex; align-items: center; gap: 10px;
@@ -544,6 +565,7 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   .d-atras { width: 228cqw; left: 54cqw; top: -162cqw; }
   .d-frente { width: 192cqw; left: -63cqw; top: calc(100cqh - 37.5cqw); }
   .d-in { gap: 16px; max-width: none; }
+  .d-in h2, .d-in h2.largo { font-size: 2.3rem; }
   .d-kick { font-size: 0.86rem; gap: 10px; }
   .d-kick .etq { --s: var(--etq-m); }
   .d-cta { height: var(--btn-m); font-size: 0.96rem; }
@@ -1214,7 +1236,7 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
       '<div class="d-art">' + escena(n, k) + "</div>" +
       '<div class="d-txt"><div class="wrap"><div class="d-in">' +
       '<div class="d-kick">' + etq(n.tp, { dato: fechaDato(n.f) }) + "</div>" +
-      "<h2>" + esc(n.t) + "</h2>" +
+      "<h2" + (n.t.length > 80 ? ' class="largo"' : "") + ">" + esc(n.t) + "</h2>" +
       (n.b ? '<p class="d-bajada">' + esc(n.b) + "</p>" : "") +
       '<button class="d-cta" type="button" data-k="' + k + '">Leer la nota ' + FLECHA_CTA + "</button>" +
       "</div></div></div></article>";
