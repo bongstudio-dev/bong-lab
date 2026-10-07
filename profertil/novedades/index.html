@@ -168,8 +168,9 @@ a { color: inherit; }
    Cada placa es la foto de la nota recortada como una hoja (dos esquinas
    opuestas redondeadas) entre dos Flores del sistema enormes, una detras y
    otra delante: el mismo lenguaje que las piezas de redes (Figma Master,
-   Header de noticias · con foto). Las tres capas se mueven lento y a distinta
-   velocidad (parallax); ver "Profundidad" en el JS. */
+   Header de noticias · con foto). Parallax: al pasar de placa y al hacer
+   scroll, la Flor de atras va mas lenta que la placa, la foto un poco y la de
+   adelante mas rapida; ver "Profundidad" en el JS. */
 .dest {
   position: relative; overflow: hidden;
   height: 100vh; height: 100svh; min-height: 540px;
@@ -187,11 +188,19 @@ a { color: inherit; }
    (cqw), asi los arcos cruzan las mismas esquinas en cualquier pantalla. En
    desktop la foto va a la derecha y sangra por el borde. */
 .d-esc { position: absolute; z-index: 1; top: 15.5%; bottom: 15.5%; right: -2.8vw; width: 50vw; container-type: size; }
+/* Cada capa se mueve en dos niveles: la capa sigue al scroll (--x, --y, los
+   escribe el JS en cada cuadro) y adentro .d-desliz acompana el pase de placa
+   con su propia velocidad: --sx es donde esta la placa (-1 a 1) y --k cuanto
+   se separa la capa de ella. Negativo va mas lento (lejos), positivo mas
+   rapido (cerca). --t es la misma transicion que la placa. */
 .d-capa { position: absolute; display: block; height: auto; transform: translate3d(var(--x, 0px), var(--y, 0px), 0); will-change: transform; }
+.d-desliz { display: block; transform: translate3d(calc(var(--sx, 0) * var(--k)), 0, 0); transition: var(--t, none); will-change: transform; }
 .d-capa svg { display: block; width: 100%; height: auto; }
-.d-atras { --x: var(--a-x); --y: var(--a-y); width: 236cqw; left: 36cqw; top: -179cqw; color: var(--atras); }
-.d-frente { --x: var(--f-x); --y: var(--f-y); z-index: 2; width: 181cqw; left: -76cqw; top: calc(100cqh - 9.7cqw); color: var(--frente); }
-.d-foto { --x: var(--p-x); --y: var(--p-y); z-index: 1; inset: 0; overflow: hidden; border-radius: 0 37cqw 0 37cqw; background: rgba(255, 254, 239, 0.12); }
+.d-atras { --x: var(--a-x); --y: var(--a-y); --k: -48vw; width: 236cqw; left: 36cqw; top: -179cqw; color: var(--atras); }
+.d-frente { --x: var(--f-x); --y: var(--f-y); --k: 38vw; z-index: 2; width: 181cqw; left: -76cqw; top: calc(100cqh - 9.7cqw); color: var(--frente); }
+.d-foto { --x: var(--p-x); --y: var(--p-y); --k: -16vw; z-index: 1; inset: 0; }
+.d-foto .d-desliz, .d-recorte { position: absolute; inset: 0; }
+.d-recorte { overflow: hidden; border-radius: 0 37cqw 0 37cqw; background: rgba(255, 254, 239, 0.12); }
 .d-foto img { display: block; width: 100%; height: 100%; object-fit: cover; transform: scale(1.1); transition: transform 9s linear, opacity 600ms ease; }
 .d-foto img.carga { opacity: 0; }
 .d-slide.on .d-foto img { transform: scale(1.02); }
@@ -582,6 +591,7 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
+  .d-desliz { transform: none; }
 }
 </style>
 </head>
@@ -1191,9 +1201,9 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   function escena(n, k) {
     var demo = FOTOS_DEMO[k % FOTOS_DEMO.length];
     return '<div class="d-esc">' +
-      '<div class="d-capa d-atras">' + flor() + "</div>" +
-      '<div class="d-capa d-foto"><img class="carga" src="' + esc(n.img || demo) + '" data-demo="' + demo + '" alt="" decoding="async"' + (k ? ' loading="lazy"' : "") + "></div>" +
-      '<div class="d-capa d-frente">' + flor() + "</div></div>";
+      '<div class="d-capa d-atras"><div class="d-desliz">' + flor() + "</div></div>" +
+      '<div class="d-capa d-foto"><div class="d-desliz"><div class="d-recorte"><img class="carga" src="' + esc(n.img || demo) + '" data-demo="' + demo + '" alt="" decoding="async"' + (k ? ' loading="lazy"' : "") + "></div></div></div>" +
+      '<div class="d-capa d-frente"><div class="d-desliz">' + flor() + "</div></div></div>";
   }
   var FLECHA_CTA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
   $("dSlides").innerHTML = dest.map(function (n, k) {
@@ -1232,9 +1242,14 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
     pausado = Object.keys(motivos).some(function (m) { return motivos[m]; });
   }
   function rot(k) { return (k + dest.length) % dest.length; }
-  function poner(i, x, animar) {
-    slides[i].style.transition = animar ? "transform " + PASE + "ms " + CURVA : "none";
-    slides[i].style.transform = "translateX(" + x + ")";
+  // Pone la placa i en f anchos de pantalla (0 en el centro, 1 a la derecha).
+  // Las capas de adentro leen --sx y --t para moverse a su propia velocidad.
+  function poner(i, f, animar) {
+    var t = animar ? "transform " + PASE + "ms " + CURVA : "none", s = slides[i].style;
+    s.transition = t;
+    s.transform = "translateX(" + f * 100 + "%)";
+    s.setProperty("--sx", f);
+    s.setProperty("--t", t);
   }
   // Pasa a la nota k. dir: 1 entra por la derecha, -1 por la izquierda.
   // yaPuesta: la placa nueva ya esta donde la dejo el dedo.
@@ -1242,16 +1257,16 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
     k = rot(k);
     var viejo = dk;
     transcurrido = 0;
-    if (k === viejo) { poner(k, "0px", true); return; }
+    if (k === viejo) { poner(k, 0, true); return; }
     dir = dir || (k > viejo ? 1 : -1);
     for (var i = 0; i < slides.length; i++) if (i !== viejo && i !== k) slides[i].classList.remove("vis");
-    if (!yaPuesta) poner(k, dir * 100 + "%", false);
+    if (!yaPuesta) poner(k, dir, false);
     slides[k].classList.add("vis");
     void slides[k].offsetWidth;
-    poner(k, "0px", viejo >= 0);
+    poner(k, 0, viejo >= 0);
     slides[k].classList.add("on"); slides[k].inert = false;
     if (viejo >= 0) {
-      poner(viejo, -dir * 100 + "%", true);
+      poner(viejo, -dir, true);
       slides[viejo].classList.remove("on"); slides[viejo].inert = true;
       setTimeout(function () { if (viejo !== dk && !arrastre) slides[viejo].classList.remove("vis"); }, PASE + 40);
     }
@@ -1311,8 +1326,8 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
     var dir = a.dx < 0 ? 1 : -1, v = rot(dk + dir);
     if (a.vecino !== v && a.vecino !== -1 && a.vecino !== dk) slides[a.vecino].classList.remove("vis");
     a.vecino = v; a.dir = dir;
-    poner(dk, a.dx + "px", false);
-    if (v !== dk) { slides[v].classList.add("vis"); poner(v, "calc(" + dir * 100 + "% + " + a.dx + "px)", false); }
+    poner(dk, a.dx / dEl.clientWidth, false);
+    if (v !== dk) { slides[v].classList.add("vis"); poner(v, dir + a.dx / dEl.clientWidth, false); }
   });
   function soltar(e, cancelar) {
     var a = arrastre; if (!a) return;
@@ -1323,8 +1338,8 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
       var rapido = Math.abs(a.dx) / Math.max(1, Date.now() - a.t0) > 0.5;
       if (!cancelar && (Math.abs(a.dx) > dEl.clientWidth * 0.2 || rapido)) irA(a.vecino, a.dir, true);
       else {
-        poner(dk, "0px", true);
-        if (a.vecino !== dk) { poner(a.vecino, a.dir * 100 + "%", true); var v = a.vecino; setTimeout(function () { if (v !== dk) slides[v].classList.remove("vis"); }, PASE + 40); }
+        poner(dk, 0, true);
+        if (a.vecino !== dk) { poner(a.vecino, a.dir, true); var v = a.vecino; setTimeout(function () { if (v !== dk) slides[v].classList.remove("vis"); }, PASE + 40); }
       }
       return;
     }
@@ -1345,34 +1360,25 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
       $("filters").classList.toggle("fuera", tapa);
     }, { threshold: [0, 0.25, 0.4, 0.6, 1] }).observe(dEl);
   }
-  /* Profundidad: las tres capas de la placa se mueven a distinta velocidad.
-     La Flor de atras va lenta, la foto casi quieta y la de adelante mas rapida
-     y en sentido contrario. Las mueve una deriva lenta, el puntero (desktop) y
-     el scroll. Con reducir movimiento queda todo quieto. */
+  /* Profundidad: el parallax del scroll. La placa sube con la pagina, pero
+     cada capa a su velocidad: la Flor de atras se queda mas (lejos), la foto
+     un poco y la de adelante sube mas rapido (cerca). Encima, una deriva muy
+     lenta de las flores. El del pase de placa lo hace el CSS (.d-desliz). Con
+     reducir movimiento queda todo quieto. */
   (function () {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    // [px por unidad de puntero en x, en y, fraccion del scroll que se resta]
-    var CAPAS = { a: [-26, -18, 0.32], p: [-8, -6, 0.16], f: [44, 30, -0.06] };
-    var px = 0, py = 0, mx = 0, my = 0, est = dEl.style;
-    if (matchMedia("(pointer: fine)").matches) {
-      dEl.addEventListener("pointermove", function (e) {
-        if (e.pointerType !== "mouse") return;
-        var r = dEl.getBoundingClientRect();
-        px = (e.clientX - r.left) / r.width * 2 - 1;
-        py = (e.clientY - r.top) / r.height * 2 - 1;
-      });
-      dEl.addEventListener("pointerleave", function () { px = py = 0; });
-    }
+    // [deriva en x, en y (px), fraccion del scroll que la capa se queda atras]
+    var CAPAS = { a: [14, 10, 0.45], p: [0, 0, 0.2], f: [22, 16, -0.25] };
+    var est = dEl.style;
     function mover(t) {
       requestAnimationFrame(mover);
       var sy = window.scrollY;
       if (sy > dEl.offsetHeight) return;
-      mx += (px - mx) * 0.04; my += (py - my) * 0.04;
-      var dx = Math.sin(t / 6100) * 0.45, dy = Math.cos(t / 7900) * 0.45;
+      var dx = Math.sin(t / 6100), dy = Math.cos(t / 7900);
       Object.keys(CAPAS).forEach(function (k) {
-        var c = CAPAS[k], deriva = k === "p" ? 0.25 : 1;
-        est.setProperty("--" + k + "-x", ((mx + dx * deriva) * c[0]).toFixed(1) + "px");
-        est.setProperty("--" + k + "-y", ((my + dy * deriva) * c[1] + sy * c[2]).toFixed(1) + "px");
+        var c = CAPAS[k];
+        est.setProperty("--" + k + "-x", (dx * c[0]).toFixed(1) + "px");
+        est.setProperty("--" + k + "-y", (dy * c[1] + sy * c[2]).toFixed(1) + "px");
       });
     }
     requestAnimationFrame(mover);
