@@ -122,7 +122,8 @@ a { color: inherit; }
    Cada placa es la foto de la nota recortada como una hoja (dos esquinas
    opuestas redondeadas) entre dos Flores del sistema enormes, una detras y
    otra delante: el mismo lenguaje que las piezas de redes (Figma Master,
-   Header de noticias · con foto). Sin parallax: las flores quedan quietas. */
+   Header de noticias · con foto). Parallax al hacer scroll y al pasar de
+   placa: ver "Profundidad" abajo. */
 .dest {
   position: relative; overflow: hidden;
   height: 100vh; height: 100svh; min-height: 540px;
@@ -137,8 +138,8 @@ a { color: inherit; }
 .d-slide { overflow: hidden; background: var(--fondo); }
 .d-art { position: absolute; inset: 0; }
 /* Escena: la caja de la foto. Las flores se ubican en unidades de su ancho
-   (cqw), asi los arcos cruzan las mismas esquinas en cualquier pantalla. Las
-   capas quedan quietas: se mueven solo con la placa, sin parallax ni deriva.
+   (cqw), asi los arcos cruzan las mismas esquinas en cualquier pantalla. Sin
+   deriva ni reaccion al mouse: las capas solo se mueven con el scroll y el pase.
    Composicion: Figma Master, "Destacadas con foto" Desktop normal (1440 x 900),
    Desktop ancho (2011 x 900) y Mobile (375 x 812), ajustada a ojo con Maru:
    armonica, no simetrica. La Flor de adelante compensa el peso de la foto y
@@ -167,10 +168,25 @@ a { color: inherit; }
 .d-esc { position: absolute; z-index: 1; top: 15.5%; bottom: 15.5%; right: var(--f-der); width: var(--f-ancho); container-type: size; }
 .d-capa { position: absolute; display: block; height: auto; }
 .d-capa svg { display: block; width: 100%; height: auto; }
-.d-atras { width: 236cqw; left: calc(36.1cqw + var(--t) * 0.1475); top: calc(-179.2cqw + var(--t) * 1.1955); color: var(--atras); }
-.d-frente { z-index: 2; width: calc(180.6cqw + var(--t) * 0.2862); left: calc(-157.1cqw - var(--t) * 0.2875); top: calc(100cqh - 22.8cqw - var(--t) * 0.1122); color: var(--frente); }
-.d-foto { z-index: 1; inset: 0; }
-.d-recorte { position: absolute; inset: 0; }
+/* Profundidad, en dos niveles y sin JS en cada cuadro:
+   - Scroll: la capa (.d-capa) sube con la pagina a su velocidad mediante una
+     animacion atada al scroll (animation-timeline), que el navegador mueve en el
+     mismo paso que la pagina. Asi no tironea en Safari (el parallax con JS
+     llegaba un cuadro tarde). Donde no hay soporte (Safari < 26) queda quieta.
+     --v es cuanto se queda atras por cada px de scroll: positivo va mas lento
+     (lejos), negativo mas rapido (cerca).
+   - Pase de placa: adentro, .d-desliz acompana el deslizamiento con su propia
+     velocidad: --sx es donde esta la placa (-1 a 1, lo escribe el JS al pasar)
+     y --k cuanto se separa de ella. --tr es la misma transicion que la placa. */
+.d-desliz { display: block; transform: translate3d(calc(var(--sx, 0) * var(--k)), 0, 0); transition: var(--tr, none); }
+@supports (animation-timeline: scroll()) {
+  .d-capa { animation: d-prof linear both; animation-timeline: scroll(root block); animation-range: 0px 1000px; }
+  @keyframes d-prof { to { transform: translate3d(0, calc(var(--v) * 1000px), 0); } }
+}
+.d-atras { --v: 0.45; --k: -48vw; width: 236cqw; left: calc(36.1cqw + var(--t) * 0.1475); top: calc(-179.2cqw + var(--t) * 1.1955); color: var(--atras); }
+.d-frente { --v: -0.25; --k: 38vw; z-index: 2; width: calc(180.6cqw + var(--t) * 0.2862); left: calc(-157.1cqw - var(--t) * 0.2875); top: calc(100cqh - 22.8cqw - var(--t) * 0.1122); color: var(--frente); }
+.d-foto { --v: 0.2; --k: -16vw; z-index: 1; inset: 0; }
+.d-foto .d-desliz, .d-recorte { position: absolute; inset: 0; }
 .d-recorte { overflow: hidden; border-radius: 0 37cqw 0 37cqw; background: rgba(255, 254, 239, 0.12); }
 .d-foto img { display: block; width: 100%; height: 100%; object-fit: cover; transform: scale(1.1); transition: transform 9s linear, opacity 600ms ease; }
 .d-foto img.carga { opacity: 0; }
@@ -570,6 +586,7 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
+  .d-desliz { transform: none; }
 }
 </style>
 
@@ -1163,9 +1180,9 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   function escena(n, k) {
     var demo = FOTOS_DEMO[k % FOTOS_DEMO.length];
     return '<div class="d-esc">' +
-      '<div class="d-capa d-atras">' + flor() + "</div>" +
-      '<div class="d-capa d-foto"><div class="d-recorte"><img class="carga" src="' + esc(n.img || demo) + '" data-demo="' + demo + '" alt="" decoding="async"' + (k ? ' loading="lazy"' : "") + "></div></div>" +
-      '<div class="d-capa d-frente">' + flor() + "</div></div>";
+      '<div class="d-capa d-atras"><div class="d-desliz">' + flor() + "</div></div>" +
+      '<div class="d-capa d-foto"><div class="d-desliz"><div class="d-recorte"><img class="carga" src="' + esc(n.img || demo) + '" data-demo="' + demo + '" alt="" decoding="async"' + (k ? ' loading="lazy"' : "") + "></div></div></div>" +
+      '<div class="d-capa d-frente"><div class="d-desliz">' + flor() + "</div></div></div>";
   }
   var FLECHA_CTA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
   $("dSlides").innerHTML = dest.map(function (n, k) {
@@ -1205,10 +1222,13 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   }
   function rot(k) { return (k + dest.length) % dest.length; }
   // Pone la placa i en f anchos de pantalla (0 en el centro, 1 a la derecha).
+  // Las capas de adentro leen --sx y --tr para moverse a su propia velocidad.
   function poner(i, f, animar) {
-    var s = slides[i].style;
-    s.transition = animar ? "transform " + PASE + "ms " + CURVA : "none";
+    var tr = animar ? "transform " + PASE + "ms " + CURVA : "none", s = slides[i].style;
+    s.transition = tr;
     s.transform = "translateX(" + f * 100 + "%)";
+    s.setProperty("--sx", f);
+    s.setProperty("--tr", tr);
   }
   // Pasa a la nota k. dir: 1 entra por la derecha, -1 por la izquierda.
   // yaPuesta: la placa nueva ya esta donde la dejo el dedo.
