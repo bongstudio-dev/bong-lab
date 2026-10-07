@@ -1,0 +1,85 @@
+/* ==========================================================================
+   Animadores de texto · Bong Studio
+   Un solo juego de animaciones de texto para todas las paginas. Se usan con
+   atributos: <h1 data-anim="sube">...</h1>. Ver LEEME.md y index.html.
+   Reglas (skill animate): solo transform, opacity, filter y clip-path; nunca
+   desde escala 0; curvas fuertes de salida; escalonado de 18 a 90 ms; con
+   movimiento reducido todo pasa a fundido.
+   ========================================================================== */
+:root {
+  --ta-curva: cubic-bezier(0.22, 1, 0.36, 1);      /* Web/Movimiento/Curva base del Master */
+  --ta-curva-mueve: cubic-bezier(0.65, 0, 0.25, 1); /* Web/Movimiento/Curva carrusel */
+  --ta-vel: 1;                                      /* 2 = mitad de velocidad (para revisar en camara lenta) */
+}
+
+.ta { --dur: 640ms; --paso: 45ms; --dx: 0px; --dy: 0.35em; --vx: 0%; --vy: 105%; --clip: inset(0 100% 0 0); }
+.ta .ta-u { display: inline-block; }
+.ta .ta-i { display: inline-block; will-change: transform, opacity; }
+.ta .ta-w { display: inline-block; white-space: nowrap; }
+.ta.ta-por-linea .ta-u { display: block; }
+.ta.ta-por-bloque .ta-u, .ta.ta-por-bloque .ta-i { display: block; }
+
+/* Ventana: cada unidad se recorta a su caja y el texto entra desde afuera.
+   El margen de abajo deja lugar a los descendentes (g, j, p, q, y). */
+.ta-e-ventana .ta-u { overflow: clip; padding-bottom: 0.12em; margin-bottom: -0.12em; vertical-align: top; }
+
+/* Parado hasta que entra en pantalla (o hasta que la pagina lo dispare). */
+.ta .ta-i {
+  animation-duration: calc(var(--dur) * var(--ta-vel));
+  animation-delay: calc(var(--k, 0) * var(--paso) * var(--ta-vel));
+  animation-timing-function: var(--ta-curva);
+  animation-fill-mode: backwards;
+  animation-play-state: paused;
+}
+.ta.ta-on .ta-i { animation-play-state: running; }
+.ta.ta-fin .ta-i { animation: none; }
+
+.ta-e-mueve .ta-i { animation-name: ta-mueve; }
+.ta-e-ventana .ta-i { animation-name: ta-ventana; }
+.ta-e-desenfoca .ta-i { animation-name: ta-desenfoca; }
+.ta-e-escala .ta-i { animation-name: ta-escala; transform-origin: 50% 80%; }
+.ta-e-funde .ta-i { animation-name: ta-funde; }
+.ta-e-escribe .ta-i { animation-name: ta-funde; animation-timing-function: steps(1, end); }
+.ta-e-cortina .ta-i { animation-name: ta-cortina; animation-timing-function: var(--ta-curva-mueve); }
+
+@keyframes ta-mueve { from { opacity: 0; transform: translate(var(--dx), var(--dy)); } }
+@keyframes ta-ventana { from { transform: translate(var(--vx), var(--vy)); } }
+@keyframes ta-desenfoca { from { opacity: 0; filter: blur(8px); transform: translate(var(--dx), var(--dy)); } }
+@keyframes ta-escala { from { opacity: 0; transform: scale(0.94); } }
+@keyframes ta-funde { from { opacity: 0; } }
+@keyframes ta-cortina { from { clip-path: var(--clip); } }
+
+/* Enciende: atado al scroll. Cada palabra pasa de apagada a llena mientras
+   el bloque cruza la pantalla. Solo opacidad: es texto que se lee. */
+.ta-e-enciende { view-timeline-name: --ta-bloque; }
+@supports (animation-timeline: view()) {
+  .ta-e-enciende .ta-i {
+    animation: ta-enciende linear both;
+    animation-timeline: --ta-bloque;
+    animation-range: cover calc(15% + var(--k) * var(--tramo, 1.1%)) cover calc(22% + var(--k) * var(--tramo, 1.1%));
+    animation-play-state: running;
+  }
+  @keyframes ta-enciende { from { opacity: 0.16; } }
+}
+
+/* Relevo: una palabra del titulo se va reemplazando por otras. */
+.ta-relevo { display: inline-grid; vertical-align: bottom; overflow: clip; padding-bottom: 0.12em; margin-bottom: -0.12em; }
+.ta-relevo > span { grid-area: 1 / 1; white-space: nowrap; transition: transform calc(560ms * var(--ta-vel)) var(--ta-curva), opacity calc(560ms * var(--ta-vel)) var(--ta-curva); transform: translateY(100%); opacity: 0; }
+.ta-relevo > span.ve { transform: none; opacity: 1; }
+.ta-relevo > span.fue { transform: translateY(-100%); opacity: 0; }
+
+/* Cifra: numeros con ancho fijo para que no bailen mientras cuentan. */
+.ta-e-cifra { font-variant-numeric: tabular-nums; }
+
+/* Marquesina: movimiento constante, lineal. */
+.ta-e-marquesina { display: flex; overflow: clip; white-space: nowrap; }
+.ta-e-marquesina .ta-tira { flex: none; padding-right: 0.6em; animation: ta-marquesina calc(var(--dur) * var(--ta-vel)) linear infinite; }
+@keyframes ta-marquesina { to { transform: translateX(-100%); } }
+
+/* Movimiento reducido: menos y mas suave, no cero. Todo entra fundido. */
+@media (prefers-reduced-motion: reduce) {
+  .ta:not(.ta-e-enciende) .ta-i { animation-name: ta-funde !important; animation-duration: 300ms; }
+  .ta-e-ventana .ta-u { overflow: visible; }
+  .ta-relevo > span, .ta-relevo > span.fue { transform: none; }
+  .ta-e-marquesina .ta-tira { animation: none; }
+}

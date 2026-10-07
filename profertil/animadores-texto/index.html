@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es" data-ta-manual>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Animadores de texto</title>
+<meta name="description" content="Probador de los animadores de texto de Bong Studio: cada uno con nombre, uso, valores y código, a distintos tamaños, fondos y velocidades.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=DM+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="animadores.css">
+<style>
+/* Probador: barra de controles fija arriba y una fila por animador
+   (ficha a la izquierda, escenario a la derecha). Colores y tipos de
+   Profertil, que es donde se usan primero. */
+:root {
+  --azul: #003DA5; --celeste: #4086FF; --verde: #2D8035; --verde-claro: #5EB53A; --amarillo: #EABA2C; --naranja: #E57F19;
+  --tiza: #FFFEEF; --bg: #E9E7D6; --ink: #0A1E4A; --ink-2: #44506E; --ink-3: #737D96; --line: rgba(10, 30, 74, 0.12);
+  --f-display: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "DM Sans", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "DM Mono", ui-monospace, Menlo, monospace;
+  --esc-bg: var(--tiza); --esc-tx: var(--azul);
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { background: var(--bg); -webkit-tap-highlight-color: transparent; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--f-body); -webkit-font-smoothing: antialiased; }
+button, input, select { font: inherit; color: inherit; }
+button { touch-action: manipulation; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--celeste); outline-offset: 2px; }
+.wrap { width: min(100% - 32px, 1320px); margin-inline: auto; }
+
+.cab { padding: 56px 0 28px; display: grid; gap: 10px; }
+.cab h1 { margin: 0; font: 600 clamp(36px, 5vw, 64px)/1 var(--f-display); letter-spacing: -0.04em; color: var(--azul); }
+.cab p { margin: 0; max-width: 70ch; color: var(--ink-2); }
+
+/* --- Controles ----------------------------------------------------------- */
+.ctl { position: sticky; top: 0; z-index: 10; background: rgba(233, 231, 214, 0.92); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); padding: 12px 0 calc(12px); padding-top: calc(12px + env(safe-area-inset-top, 0px)); }
+.ctl .wrap { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; }
+.grupo { display: flex; align-items: center; gap: 8px; }
+.grupo > span { font: 12px var(--f-mono); color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.04em; }
+.seg { display: inline-flex; padding: 3px; border-radius: 999px; background: rgba(10, 30, 74, 0.07); }
+.seg button { border: 0; background: transparent; padding: 5px 11px; border-radius: 999px; font-size: 13px; color: var(--ink-2); user-select: none; -webkit-user-select: none; transition: background-color 150ms ease, color 150ms ease; }
+.seg button[aria-pressed="true"] { background: var(--tiza); color: var(--azul); font-weight: 500; box-shadow: 0 1px 3px rgba(10, 30, 74, 0.12); }
+.texto { width: min(280px, 70vw); height: 34px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--tiza); font-size: 16px; }
+.btn { height: 36px; padding: 0 16px; border: 0; border-radius: 12px; background: var(--azul); color: var(--tiza); font-weight: 500; user-select: none; -webkit-user-select: none; transition: background-color 150ms ease, transform 120ms cubic-bezier(0.22, 1, 0.36, 1); }
+.btn:active { transform: scale(0.97); }
+
+/* --- Filas ----------------------------------------------------------------- */
+.lista { display: grid; gap: 16px; padding: 24px 0 120px; }
+.fila { display: grid; grid-template-columns: 300px minmax(0, 1fr); border-radius: 22px; overflow: hidden; background: #fff; border: 1px solid var(--line); }
+.ficha { padding: 22px; display: grid; align-content: start; gap: 12px; border-right: 1px solid var(--line); }
+.ficha h2 { margin: 0; font: 600 28px/1 var(--f-display); letter-spacing: -0.03em; color: var(--ink); }
+.ficha .slug { font: 13px var(--f-mono); color: var(--ink-3); }
+.ficha dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; font-size: 13px; }
+.ficha dt { color: var(--ink-3); }
+.ficha dd { margin: 0; color: var(--ink); font-variant-numeric: tabular-nums; }
+.ficha .uso { margin: 0; font-size: 14px; color: var(--ink-2); }
+.ficha .uso b { color: var(--ink); font-weight: 500; }
+.code { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 8px 8px 12px; border-radius: 10px; background: var(--bg); font: 12.5px var(--f-mono); color: var(--ink); overflow: hidden; }
+.code code { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.code button { flex: none; border: 0; border-radius: 8px; padding: 4px 9px; background: var(--tiza); font: 12px var(--f-body); color: var(--ink-2); }
+.escena { position: relative; background: var(--esc-bg); color: var(--esc-tx); padding: 44px 40px; display: grid; align-content: center; gap: 28px; min-height: 240px; transition: background-color 200ms ease, color 200ms ease; }
+.escena .t { margin: 0; font-family: var(--f-display); font-weight: 600; line-height: 1; letter-spacing: -0.035em; }
+.escena .t[data-tam="20"], .escena .t[data-tam="18"] { font-family: var(--f-body); font-weight: 400; line-height: 1.45; letter-spacing: 0; }
+.escena .t[data-tam="28"] { line-height: 1.12; letter-spacing: -0.02em; }
+.otra { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border: 0; border-radius: 12px; background: rgba(10, 30, 74, 0.08); color: inherit; display: grid; place-items: center; user-select: none; -webkit-user-select: none; transition: background-color 150ms ease, transform 120ms cubic-bezier(0.22, 1, 0.36, 1); }
+.otra svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.otra:active { transform: scale(0.94); }
+.nota-escena { position: absolute; left: 40px; bottom: 12px; font: 12px var(--f-mono); opacity: 0.6; }
+
+.sec { margin: 56px 0 4px; font: 12px var(--f-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); }
+
+/* Laboratorio */
+.lab .ficha { gap: 14px; }
+.lab label { display: grid; gap: 4px; font-size: 13px; color: var(--ink-3); }
+.lab select { height: 34px; border: 1px solid var(--line); border-radius: 10px; background: var(--tiza); padding: 0 8px; font-size: 16px; color: var(--ink); }
+.lab input[type=range] { width: 100%; accent-color: var(--azul); }
+.lab output { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+@media (hover: hover) and (pointer: fine) {
+  .seg button:not([aria-pressed="true"]):hover { color: var(--ink); }
+  .btn:hover { background: #0a4fc4; }
+  .otra:hover { background: rgba(10, 30, 74, 0.16); }
+  .code button:hover { color: var(--azul); }
+}
+@media (max-width: 860px) {
+  .fila { grid-template-columns: 1fr; }
+  .ficha { border-right: 0; border-bottom: 1px solid var(--line); }
+  .escena { padding: 40px 20px 36px; }
+  .nota-escena { left: 20px; }
+}
+</style>
+</head>
+<body>
+
+<header class="cab wrap">
+  <h1>Animadores de texto</h1>
+  <p>Un juego único de animaciones de texto para todas las páginas. Cada animador tiene nombre, uso y valores fijos; se aplica con un atributo (<code>data-anim="nombre"</code>) cargando <code>animadores.css</code> y <code>animadores.js</code>. Probalos a distintos tamaños y fondos, y en cámara lenta para revisar la curva.</p>
+</header>
+
+<div class="ctl">
+  <div class="wrap">
+    <div class="grupo"><span>Tamaño</span><div class="seg" id="tam">
+      <button data-v="escala" aria-pressed="true">Escala</button><button data-v="88">88</button><button data-v="64">64</button><button data-v="40">40</button><button data-v="28">28</button><button data-v="18">18</button>
+    </div></div>
+    <div class="grupo"><span>Fondo</span><div class="seg" id="fondo">
+      <button data-v="tiza" aria-pressed="true">Tiza</button><button data-v="azul">Azul</button><button data-v="verde">Verde</button><button data-v="naranja">Naranja</button>
+    </div></div>
+    <div class="grupo"><span>Velocidad</span><div class="seg" id="vel">
+      <button data-v="1" aria-pressed="true">1x</button><button data-v="2">0,5x</button><button data-v="5">0,2x</button>
+    </div></div>
+    <input class="texto" id="texto" type="text" placeholder="Probar con otro texto…" aria-label="Texto de prueba">
+    <button class="btn" id="todo" type="button">Repetir todos</button>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="lista" id="lista"></div>
+</main>
+
+<script src="animadores.js"></script>
+<script>
+// Fichas: nombre, para que se usa, que evitar y el texto de muestra.
+var FICHAS = [
+  { sec: "Entradas por palabra" },
+  { id: "sube", nombre: "Sube", uso: "Titulares y hero. Es el de la home: el animador por defecto.", evitar: "Texto corrido largo.", txt: "Damos vida a la tierra" },
+  { id: "ventana", nombre: "Ventana", uso: "Títulos grandes y aperturas de sección. Más editorial que Sube.", evitar: "Cuerpos chicos: el recorte se nota poco y suma ruido.", txt: "Producimos el nitrógeno del campo argentino" },
+  { id: "desliza", nombre: "Desliza", uso: "Listas, menús y textos que acompañan algo que entra de costado.", evitar: "Titulares centrados.", txt: "Empresa · Sostenibilidad · Compliance" },
+  { id: "enfoque", nombre: "Enfoque", uso: "Frases de marca y hero sobre foto: entra desde el desenfoque.", evitar: "Más de una vez por pantalla; el desenfoque cuesta más.", txt: "Más y mejores alimentos" },
+  { id: "asoma", nombre: "Asoma", uso: "Subtítulos, bajadas y llamados cortos.", evitar: "Titulares de más de una línea.", txt: "Conocé nuestros productos" },
+  { id: "funde", nombre: "Funde", uso: "Cuerpo de texto y todo lo que se lee: aparece sin moverse.", evitar: "Nada: es el piso seguro.", txt: "Con nuestro trabajo impulsamos el desarrollo de las comunidades donde operamos." },
+  { sec: "Por línea, letra o bloque" },
+  { id: "persiana", nombre: "Persiana", uso: "Párrafos destacados y citas: línea por línea, cada una en su ventana.", evitar: "Una sola línea (para eso, Ventana).", txt: "Aplicamos tecnología de vanguardia en cada eslabón de nuestra cadena para nutrir los cultivos de manera sustentable." },
+  { id: "grano", nombre: "Grano", uso: "Palabras sueltas, eyebrows, títulos de una palabra.", evitar: "Frases largas: letra por letra se hace eterno.", txt: "Novedades" },
+  { id: "cortina", nombre: "Cortina", uso: "Títulos de sección sobre color plano: se descubre de un lado al otro.", evitar: "Texto sobre foto.", txt: "Programas comunitarios" },
+  { id: "maquina", nombre: "Máquina", uso: "Buscadores, placeholders y datos técnicos: letra a letra, sin movimiento.", evitar: "Titulares de marca.", txt: "Buscá: trigo, becas, urea" },
+  { sec: "Atados al scroll y en loop" },
+  { id: "enciende", nombre: "Enciende", uso: "Manifiestos y propósito: cada palabra se enciende al scrollear. Es el de la home.", evitar: "Más de uno por página.", txt: "Aplicamos tecnología de vanguardia en cada eslabón de nuestra cadena para producir fertilizantes que nutren los cultivos.", nota: "Se mueve con el scroll" },
+  { id: "relevo", nombre: "Relevo", uso: "Hero con una palabra que cambia. Las opciones van en data-palabras.", evitar: "Más de cuatro opciones o frases largas en el hueco.", txt: "Nutrimos {}", palabras: "el trigo|el maíz|la soja|el girasol" },
+  { id: "cifra", nombre: "Cifra", uso: "Números destacados: cuenta hasta el valor. Respeta prefijos y sufijos.", evitar: "Datos que hay que leer exactos al instante (precios, fechas).", txt: "60%" },
+  { id: "marquesina", nombre: "Marquesina", uso: "Franjas de cierre o separadores: texto en loop, lineal y lento.", evitar: "Información necesaria: nadie la lee entera.", txt: "Trigo · Maíz · Soja · Girasol · Pasturas · Cebada ·" }
+];
+var P = Animadores.PRESETS;
+var ESCALA = [72, 40, 20];
+var estado = { tam: "escala", texto: "" };
+var REPETIR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5"/></svg>';
+var NOMBRES = { mueve: "desplaza + fundido", ventana: "recorte", desenfoca: "desenfoque + fundido", escala: "escala 0,94 + fundido", funde: "fundido", escribe: "aparece de golpe", cortina: "recorte (clip-path)", enciende: "opacidad atada al scroll", relevo: "recorte + fundido", cifra: "cuenta (ease-out)", marquesina: "lineal" };
+var DESDE = { abajo: "abajo", arriba: "arriba", izq: "izquierda", der: "derecha" };
+
+function attrs(f) { return 'data-anim="' + f.id + '"' + (f.palabras ? ' data-palabras="' + f.palabras + '"' : ""); }
+function textos(f) {
+  var t = estado.texto && !f.palabras ? estado.texto : f.txt;
+  if (f.id === "cifra" && estado.texto && !/\d/.test(estado.texto)) t = f.txt;
+  var tams = estado.tam === "escala" ? ESCALA : [Number(estado.tam)];
+  return tams.map(function (s) {
+    return '<p class="t" data-tam="' + s + '" style="font-size:min(' + s + 'px, ' + (s / 7.2).toFixed(1) + 'vw + 8px)" ' + attrs(f) + ">" + t + "</p>";
+  }).join("");
+}
+function fila(f) {
+  if (f.sec) return '<h3 class="sec">' + f.sec + "</h3>";
+  var p = P[f.id], dl = "<dt>Efecto</dt><dd>" + NOMBRES[p.efecto] + "</dd>";
+  if (p.por) dl += "<dt>Por</dt><dd>" + p.por + "</dd>";
+  if (p.desde && /mueve|ventana|desenfoca|cortina/.test(p.efecto)) dl += "<dt>Desde</dt><dd>" + DESDE[p.desde] + (p.dist ? " · " + p.dist : "") + "</dd>";
+  if (p.dur > 10) dl += "<dt>Duración</dt><dd>" + (p.dur >= 1000 ? (p.dur / 1000).toString().replace(".", ",") + " s" : p.dur + " ms") + "</dd>";
+  if (p.paso) dl += "<dt>Escalonado</dt><dd>" + p.paso + " ms</dd>";
+  if (p.intervalo) dl += "<dt>Cambia cada</dt><dd>" + (p.intervalo / 1000).toString().replace(".", ",") + " s</dd>";
+  var codigo = "<h2 " + attrs(f) + ">…</h2>";
+  return '<article class="fila" id="' + f.id + '"><div class="ficha"><div><h2>' + f.nombre + '</h2><span class="slug">data-anim="' + f.id + '"</span></div>' +
+    '<p class="uso"><b>Para:</b> ' + f.uso + '</p><p class="uso"><b>Evitar:</b> ' + f.evitar + "</p><dl>" + dl + "</dl>" +
+    '<div class="code"><code>' + codigo.replace(/</g, "&lt;") + '</code><button type="button" data-copia="' + codigo.replace(/"/g, "&quot;") + '">Copiar</button></div></div>' +
+    '<div class="escena">' + textos(f) + (f.id !== "enciende" ? '<button class="otra" type="button" aria-label="Repetir ' + f.nombre + '">' + REPETIR + "</button>" : "") +
+    (f.nota ? '<span class="nota-escena">' + f.nota + "</span>" : "") + "</div></article>";
+}
+var lista = document.getElementById("lista");
+function pintar() {
+  lista.innerHTML = FICHAS.map(fila).join("") + LAB;
+  document.fonts.ready.then(function () {
+    lista.querySelectorAll("[data-anim]").forEach(Animadores.iniciar);
+    labPintar();
+  });
+}
+
+// Laboratorio: combinar efecto, unidad y direccion para probar uno nuevo.
+var LAB = '<h3 class="sec">Laboratorio</h3><article class="fila lab"><div class="ficha"><h2>Combinar</h2>' +
+  '<label>Efecto<select id="lEf"><option value="mueve">Desplaza</option><option value="ventana">Ventana</option><option value="desenfoca">Desenfoque</option><option value="escala">Escala</option><option value="funde">Fundido</option><option value="cortina">Cortina</option><option value="escribe">Máquina</option></select></label>' +
+  '<label>Por<select id="lPor"><option>palabra</option><option>letra</option><option>linea</option><option>bloque</option></select></label>' +
+  '<label>Desde<select id="lDes"><option value="abajo">abajo</option><option value="arriba">arriba</option><option value="izq">izquierda</option><option value="der">derecha</option></select></label>' +
+  '<label>Duración <output id="oDur">640 ms</output><input id="lDur" type="range" min="200" max="1200" step="20" value="640"></label>' +
+  '<label>Escalonado <output id="oPaso">45 ms</output><input id="lPaso" type="range" min="0" max="120" step="1" value="45"></label>' +
+  '<div class="code"><code id="lCode"></code><button type="button" id="lCopia">Copiar</button></div></div>' +
+  '<div class="escena" id="lEsc"><button class="otra" type="button" id="lOtra" aria-label="Repetir">' + REPETIR + "</button></div></article>";
+function labPintar() {
+  var g = function (id) { return document.getElementById(id); };
+  var ef = g("lEf").value, por = g("lPor").value, des = g("lDes").value, dur = g("lDur").value, paso = g("lPaso").value;
+  g("oDur").textContent = dur + " ms"; g("oPaso").textContent = paso + " ms";
+  var a = 'data-anim="sube" data-efecto="' + ef + '" data-por="' + por + '" data-desde="' + des + '" data-dur="' + dur + '" data-paso="' + paso + '"';
+  g("lCode").textContent = "<h2 " + a + ">…</h2>";
+  g("lCopia").dataset.copia = g("lCode").textContent;
+  var tams = estado.tam === "escala" ? ESCALA : [Number(estado.tam)];
+  g("lEsc").querySelectorAll(".t").forEach(function (x) { x.remove(); });
+  g("lEsc").insertAdjacentHTML("afterbegin", tams.map(function (s) {
+    return '<p class="t" data-tam="' + s + '" style="font-size:min(' + s + 'px, ' + (s / 7.2).toFixed(1) + 'vw + 8px)" ' + a + ">" + (estado.texto || "Damos vida a la tierra para que produzca más") + "</p>";
+  }).join(""));
+  g("lEsc").querySelectorAll(".t").forEach(function (x) { Animadores.repetir(x); });
+}
+
+// Controles
+function seg(id, fn) {
+  var el = document.getElementById(id);
+  el.addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    el.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+    fn(b.dataset.v);
+  });
+}
+var FONDOS = { tiza: ["#FFFEEF", "#003DA5"], azul: ["#003DA5", "#FFFEEF"], verde: ["#2D8035", "#FFFEEF"], naranja: ["#E57F19", "#FFFEEF"] };
+seg("tam", function (v) { estado.tam = v; pintar(); });
+seg("fondo", function (v) { document.documentElement.style.setProperty("--esc-bg", FONDOS[v][0]); document.documentElement.style.setProperty("--esc-tx", FONDOS[v][1]); });
+seg("vel", function (v) { document.documentElement.style.setProperty("--ta-vel", v); repetirTodo(); });
+var tT;
+document.getElementById("texto").addEventListener("input", function (e) { clearTimeout(tT); tT = setTimeout(function () { estado.texto = e.target.value.trim(); pintar(); }, 350); });
+function repetirTodo() { lista.querySelectorAll("[data-anim]").forEach(function (el) { if (!el.classList.contains("ta-e-enciende")) Animadores.repetir(el); }); }
+document.getElementById("todo").addEventListener("click", repetirTodo);
+lista.addEventListener("click", function (e) {
+  var b = e.target.closest(".otra");
+  if (b) b.parentNode.querySelectorAll("[data-anim]").forEach(Animadores.repetir);
+  var c = e.target.closest("[data-copia]");
+  if (c) { navigator.clipboard.writeText(c.dataset.copia).then(function () { c.textContent = "Copiado"; setTimeout(function () { c.textContent = "Copiar"; }, 1200); }); }
+});
+lista.addEventListener("input", function (e) { if (e.target.closest(".lab")) labPintar(); });
+pintar();
+</script>
+</body>
+</html>
