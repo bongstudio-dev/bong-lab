@@ -183,30 +183,38 @@ a { color: inherit; }
 .d-slide { overflow: hidden; background: var(--fondo); }
 .d-art { position: absolute; inset: 0; }
 /* Escena: la caja de la foto. Las flores se ubican en unidades de su ancho
-   (cqw), asi los arcos cruzan las mismas esquinas en cualquier pantalla. En
-   desktop la foto va a la derecha y sangra por el borde. Las capas quedan
-   quietas: se mueven solo con la placa, sin parallax ni deriva. */
-.d-esc { position: absolute; z-index: 1; top: 15.5%; bottom: 15.5%; right: -2.8vw; width: 50vw; container-type: size; }
+   (cqw), asi los arcos cruzan las mismas esquinas en cualquier pantalla. Las
+   capas quedan quietas: se mueven solo con la placa, sin parallax ni deriva.
+   Composicion: Figma Master, "Destacadas con foto" Desktop normal (1440 x 900),
+   Desktop ancho (2011 x 900) y Mobile (375 x 812), ajustada a ojo con Maru:
+   armonica, no simetrica. La Flor de adelante compensa el peso de la foto y
+   de la Flor de atras. Hasta 1440 la foto es media pantalla y sangra por la
+   derecha; de 1440 a 2011 los valores pasan de una composicion a la otra con
+   --t (0 a 571 px) y desde 2011 quedan fijos: la foto deja de crecer y entra
+   en pantalla, la Flor de atras baja y la de adelante crece hacia la izquierda.
+   Los coeficientes de --t son la diferencia entre los dos frames (en px, con la
+   foto de 720) dividida 571. */
+.dest { --t: clamp(0px, 100vw - 1440px, 571px); }
+.d-esc { position: absolute; z-index: 1; top: 15.5%; bottom: 15.5%; right: calc(-2.8vw + var(--t) * 0.6); width: min(50vw, 80svh); container-type: size; }
 .d-capa { position: absolute; display: block; height: auto; }
 .d-capa svg { display: block; width: 100%; height: auto; }
-.d-atras { width: 236cqw; left: 36cqw; top: -179cqw; color: var(--atras); }
-/* La Flor de adelante arranca antes del borde izquierdo: llena el hueco bajo
-   el titulo y la punta derecha queda donde estaba. */
-.d-frente { z-index: 2; width: 211cqw; left: -106cqw; top: calc(100cqh - 9.7cqw); color: var(--frente); }
+.d-atras { width: 236cqw; left: calc(36.1cqw + var(--t) * 0.1475); top: calc(-179.2cqw + var(--t) * 1.1955); color: var(--atras); }
+.d-frente { z-index: 2; width: calc(180.6cqw + var(--t) * 0.2862); left: calc(-157.1cqw - var(--t) * 0.2875); top: calc(100cqh - 22.8cqw - var(--t) * 0.1122); color: var(--frente); }
 .d-foto { z-index: 1; inset: 0; }
 .d-recorte { position: absolute; inset: 0; }
 .d-recorte { overflow: hidden; border-radius: 0 37cqw 0 37cqw; background: rgba(255, 254, 239, 0.12); }
 .d-foto img { display: block; width: 100%; height: 100%; object-fit: cover; transform: scale(1.1); transition: transform 9s linear, opacity 600ms ease; }
 .d-foto img.carga { opacity: 0; }
 .d-slide.on .d-foto img { transform: scale(1.02); }
-.d-txt { position: absolute; z-index: 3; left: 0; right: 0; bottom: clamp(140px, 21vh, 200px); }
-.d-in { display: grid; gap: 22px; justify-items: start; max-width: min(46vw, 680px); }
+/* El bloque de texto va centrado con la foto (Figma: 216 a 672 en 900 de alto). */
+.d-txt { position: absolute; z-index: 3; left: 0; right: 0; top: 50%; transform: translateY(calc(-50% - 6px)); }
+.d-in { display: grid; gap: 22px; justify-items: start; max-width: min(50vw, 720px); }
 .d-kick { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; font-size: 0.95rem; color: rgba(255, 254, 239, 0.88); }
 .d-kick .etq { --s: var(--etq-l); }
 .d-in h2 {
   margin: 0;
   font-family: var(--f-display); font-weight: 600;
-  font-size: clamp(2.3rem, 5.4vw, 5.4rem); line-height: 0.94; letter-spacing: -0.04em;
+  font-size: clamp(2.3rem, 6.11vw, 5.5rem); line-height: 0.94; letter-spacing: -0.04em;
   text-wrap: balance;
 }
 .d-bajada { margin: 0; max-width: 56ch; font-size: clamp(1rem, 1.4vw, 1.12rem); line-height: 1.5; color: rgba(255, 254, 239, 0.9); }
@@ -529,10 +537,10 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   .logo svg { width: 62px; }
   .busca.open { width: calc(100% - 134px); }
   /* Mobile: como la historia. Texto arriba y la foto abajo, a todo el ancho. */
-  .d-slide { display: flex; flex-direction: column; padding: 92px 0 calc(74px + env(safe-area-inset-bottom, 0px)); }
-  .d-txt { position: relative; bottom: auto; order: 1; }
+  .d-slide { display: flex; flex-direction: column; padding: 96px 0 calc(74px + env(safe-area-inset-bottom, 0px)); }
+  .d-txt { position: relative; top: auto; transform: none; order: 1; }
   .d-art { position: relative; inset: auto; order: 2; flex: 1; min-height: 0; }
-  .d-esc { top: 30px; bottom: 0; right: -10px; left: -10px; width: auto; }
+  .d-esc { top: 34px; bottom: 0; right: -10px; left: -10px; width: auto; }
   .d-atras { width: 228cqw; left: 54cqw; top: -162cqw; }
   .d-frente { width: 192cqw; left: -63cqw; top: calc(100cqh - 37.5cqw); }
   .d-in { gap: 16px; max-width: none; }
