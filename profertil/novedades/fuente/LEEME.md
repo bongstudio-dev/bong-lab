@@ -30,9 +30,6 @@ Regenerar la página:
 python3 profertil/novedades/fuente/build.py
 ```
 
-Después regenerar también la rama con refracción
-(`python3 profertil/novedades-refraccion/fuente/build.py`) para que la siga.
-
 Rehacer `notas.json` desde el crawl:
 
 ```bash
