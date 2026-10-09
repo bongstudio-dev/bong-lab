@@ -27,9 +27,9 @@
   flecha, separado del dock 5 px y con su mismo alto (tambien cuando el dock
   se compacta al bajar). Va pegado abajo como el dock y en mobile se compacta
   con su misma transicion, asi Safari los mueve juntos al mostrar u ocultar su
-  barra (si el JS lo ubicara desde arriba, llegaria un cuadro tarde y saltaria). Es la accion principal de la barra, como la flecha
-  de bongstudio.ar: al principio de la lista apunta abajo y baja 80% de
-  pantalla; pasada media pantalla desde el principio de la lista apunta
+  barra (si el JS lo ubicara desde arriba, llegaria un cuadro tarde y
+  saltaria). Es la accion principal de la barra: al principio de la lista
+  apunta abajo y baja 80% de pantalla; pasada media pantalla desde el principio de la lista apunta
   arriba y vuelve al principio de la lista (no al carrusel, donde el dock se
   esconde). Con el panel de filtros abierto, primero lo cierra. Aparece y se
   va junto con el dock. El rebote vive solo en el giro de la flecha (resorte
@@ -38,7 +38,9 @@
   Todos esos valores son tokens `--ancla-*` (variables `Web/Ancla/*`,
   `Web/Resorte/Ancla *` y `Web/Proporción/Ancla *` en 06 · Web). Codigo: "Ancla"
   en `template.html` (CSS y JS). Documentado en el Figma Master, pagina
-  "▤ Novedades · Web", seccion "Ancla" del Doc (despues de "Dock de filtros").
+  "▤ Novedades · Web": seccion "Ancla" del Doc (despues de "Dock de
+  filtros") y componente interactivo `Web/Ancla` (seccion Filtros), con sus
+  estados y transiciones; esta puesto en los prototipos de Novedades.
 
 Regenerar la página:
 
