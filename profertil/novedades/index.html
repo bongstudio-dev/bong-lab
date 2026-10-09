@@ -646,6 +646,33 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   .f-txt { display: inline; }
   .f-count { position: static; order: 2; }
 }
+/* --- Ancla: la accion principal, afuera del dock -------------------------
+   Un circulo azul con la flecha, pegado a la derecha del dock pero separado
+   de el, como en bongstudio.ar. Es lo unico saturado de la barra. Baja o
+   vuelve al principio de la lista; la mueve el JS (ver "Ancla" abajo).
+   --a es el alto del dock cerrado; lo pone el JS. */
+.filters { right: calc(var(--a, 56px) + 5px); max-width: min(100% - 32px - var(--a, 56px), 980px); }
+.ancla {
+  position: fixed; left: 0; top: 0; z-index: 41;
+  width: var(--a, 56px); height: var(--a, 56px);
+  padding: 0; border: 0; background: none; cursor: pointer;
+  will-change: transform; transform: translate(-200px, -200px) scale(0);
+  transform-origin: left bottom; /* al compactarse no se abre el hueco con el dock */
+}
+.ancla-cuerpo {
+  display: grid; place-items: center; width: 100%; height: 100%;
+  border-radius: 50%; background: var(--azul); color: var(--tiza);
+  box-shadow: 0 14px 30px -14px rgba(0, 61, 165, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  will-change: transform;
+}
+.ancla svg { width: 44%; height: 44%; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; will-change: transform; }
+.ancla:focus-visible { outline: none; }
+.ancla:focus-visible .ancla-cuerpo { outline: 2px solid var(--celeste); outline-offset: 3px; }
+@media (max-width: 640px) {
+  .filters { width: var(--f-ancho-cerrado, calc(100% - 37px - var(--a, 56px))); }
+  .filters.open { width: calc(100% - 37px - var(--a, 56px)); }
+}
+
 /* ?solo=dock: solo la barra de arriba y el dock de filtros, sin carrusel ni
    tarjetas. Lo usa el tweak de la animacion. */
 .solo-dock .dest, .solo-dock main { display: none; }
@@ -750,6 +777,8 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
     <button class="f-toggle" id="fToggle" type="button" aria-expanded="false" aria-controls="fBody" aria-label="Más filtros"><span class="f-txt">Filtros</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg><span class="f-count" id="fCount" hidden>0</span></button>
   </div>
 </section>
+
+<button class="ancla" id="ancla" type="button" aria-label="Bajar"><span class="ancla-cuerpo"><svg viewBox="0 0 24 24" aria-hidden="true" style="transform: rotate(90deg)"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
 
 <dialog class="modal" id="modal" aria-labelledby="mTitle">
   <div class="m-scroll" id="mScroll"></div>
@@ -1234,6 +1263,67 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   modal.addEventListener("keydown", function (e) {
     if (e.key === "ArrowLeft" && actual > 0) abrirNota(actual - 1);
     if (e.key === "ArrowRight" && actual < ctx.length - 1) abrirNota(actual + 1);
+  });
+
+
+  /* --- Ancla --------------------------------------------------------------
+     Como la flecha de bongstudio.ar: una sola accion que cambia de sentido.
+     Arriba de la lista apunta abajo y baja una pantalla; mas abajo apunta
+     arriba y vuelve al principio de la lista (no al carrusel: ahi el dock se
+     esconde, y al volver al principio de las notas quedan a mano el orden y
+     los filtros). El rebote vive solo en el giro de la flecha; el circulo
+     sigue al dock sin rebote y aparece y se aplasta con resortes amortiguados. */
+  var ancla = $("ancla"), cuerpo = ancla.firstElementChild, flecha = cuerpo.firstElementChild;
+  var quieto = matchMedia("(prefers-reduced-motion: reduce)");
+  // Resortes: masa 1, rigidez k, amortiguacion c. c = 2*raiz(k) no rebota.
+  function R(x, k, c) { return { x: x, v: 0, t: x, k: k, c: c }; }
+  var M = {
+    s: R(0, 220, 29.7),    // aparece y desaparece con el dock, sin rebote
+    q: R(1, 600, 49),      // aplaste al apretar, sin rebote
+    r: R(90, 150, 13.5)    // giro: el unico que rebota (sobrepasa un poco y vuelve)
+  };
+  function inicioLista() { return Math.max(0, document.querySelector("main").offsetTop - $("top").offsetHeight - 8); }
+  function arriba() { return window.scrollY > inicioLista() + window.innerHeight * 0.6; }
+  function medir() {
+    var f = $("filters"), r = f.getBoundingClientRect();
+    // --a: el alto del dock cerrado y de tamano normal (se mide solo en ese estado).
+    if (!f.classList.contains("chica") && !f.classList.contains("open") && r.height > 20 && String(r.height) !== ancla.dataset.a) { ancla.dataset.a = r.height; document.documentElement.style.setProperty("--a", r.height + "px"); }
+    var a = Number(ancla.dataset.a) || 56;
+    var fuera = f.classList.contains("fuera");
+    M.s.t = fuera || modal.open || !lista.length ? 0 : 1;
+    var sube = arriba();
+    M.r.t = sube ? -90 : 90;
+    ancla.setAttribute("aria-label", sube ? "Volver al principio de las notas" : "Bajar");
+    ancla.tabIndex = M.s.t ? 0 : -1;
+    // Mismo alto que el dock: cuando se compacta, la bola lo acompana cuadro a
+    // cuadro (se lee el alto real mientras dura la transicion del dock).
+    var alto = f.classList.contains("open") ? 1 : Math.min(1, r.height / a);
+    return { x: r.right + 5, y: r.bottom - a, alto: alto };
+  }
+  function paso(s, dt) { var ac = -s.k * (s.x - s.t) - s.c * s.v; s.v += ac * dt; s.x += s.v * dt; }
+  var tAntes = performance.now();
+  function anim(now) {
+    var dt = Math.min(0.05, (now - tAntes) / 1000); tAntes = now;
+    var p = medir();
+    if (quieto.matches) { for (var k in M) { M[k].x = M[k].t; M[k].v = 0; } }
+    else { var n = Math.ceil(dt / 0.004); for (var j = 0; j < n; j++) for (var k2 in M) paso(M[k2], dt / n); }
+    var s = Math.max(0, M.s.x) * M.q.x * p.alto;
+    ancla.style.transform = "translate(" + p.x.toFixed(2) + "px," + p.y.toFixed(2) + "px) scale(" + s.toFixed(4) + ")";
+    flecha.style.transform = "rotate(" + M.r.x.toFixed(2) + "deg)";
+    requestAnimationFrame(anim);
+  }
+  requestAnimationFrame(anim);
+
+  ancla.addEventListener("pointerdown", function () { M.q.t = 0.92; });
+  function soltarAncla() { M.q.t = 1; }
+  ancla.addEventListener("pointerup", soltarAncla);
+  ancla.addEventListener("pointercancel", soltarAncla);
+  ancla.addEventListener("pointerleave", soltarAncla);
+  ancla.addEventListener("click", function () {
+    if ($("filters").classList.contains("open")) abrirFiltros(false);
+    var suave = quieto.matches ? "auto" : "smooth";
+    if (arriba()) window.scrollTo({ top: inicioLista(), behavior: suave });
+    else window.scrollBy({ top: Math.round(window.innerHeight * 0.8), behavior: suave });
   });
 
   /* --- Destacadas ---------------------------------------------------------------

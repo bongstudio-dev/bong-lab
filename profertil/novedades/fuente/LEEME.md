@@ -23,6 +23,17 @@
 - `../campo.webp` y `../campo-m.webp` (la foto de campo del header anterior,
   sacada de `01 Profertil/Caso de Estudio/Animacion/Editables/Assets/Imagenes/`
   con `cwebp -q 70 -resize <ancho> 0`) hoy no se usan.
+- El dock de filtros tiene al lado el **ancla**: un circulo azul con una
+  flecha, separado del dock 5 px y con su mismo alto (tambien cuando el dock
+  se compacta al bajar). Es la accion principal de la barra, como la flecha
+  de bongstudio.ar: al principio de la lista apunta abajo y baja 80% de
+  pantalla; pasada media pantalla desde el principio de la lista apunta
+  arriba y vuelve al principio de la lista (no al carrusel, donde el dock se
+  esconde). Con el panel de filtros abierto, primero lo cierra. Aparece y se
+  va junto con el dock. El rebote vive solo en el giro de la flecha (resorte
+  k 150, c 13,5: se pasa ~15° y vuelve); el circulo no rebota (aparece con
+  k 220, c 29,7 y al apretarlo baja a 92% con k 600, c 49). Codigo: "Ancla"
+  en `template.html` (CSS y JS). Documentado en el Figma Master.
 
 Regenerar la página:
 
