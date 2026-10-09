@@ -634,7 +634,14 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
 .ancla:focus-visible .ancla-cuerpo { outline: 2px solid var(--celeste); outline-offset: 3px; }
 @media (max-width: 640px) {
   .filters { width: var(--f-ancho-cerrado, calc(100% - 32px - var(--ancla-gap) - var(--a))); }
-  .filters.open { width: calc(100% - 32px - var(--ancla-gap) - var(--a)); }
+  /* Abierto, el panel toma toda la columna: crece hacia arriba y hacia el
+     costado, sobre el lugar del ancla (que se va mientras esta abierto).
+     Ancho y right se animan juntos con la curva del panel, asi el borde
+     izquierdo queda quieto en 16 px. Al cerrar, .cerrando (la pone el JS)
+     usa los tiempos de cierre; el compacto sigue con los suyos. */
+  .filters { transition: width var(--f-chica) var(--f-chica-curva), right var(--f-chica) var(--f-chica-curva), bottom var(--f-chica) var(--f-chica-curva), border-radius var(--f-cerrar) var(--f-curva), transform 520ms var(--ease), opacity 300ms ease; }
+  .filters.open { width: calc(100% - 32px); max-width: calc(100% - 32px); right: 0; transition-duration: var(--f-abrir), var(--f-abrir), var(--f-abrir), var(--f-abrir), 520ms, 300ms; transition-timing-function: var(--f-curva), var(--f-curva), var(--f-chica-curva), var(--f-curva), var(--ease), ease; }
+  .filters.cerrando { max-width: calc(100% - 32px); transition-duration: var(--f-cerrar), var(--f-cerrar), var(--f-chica), var(--f-cerrar), 520ms, 300ms; transition-timing-function: var(--f-curva), var(--f-curva), var(--f-chica-curva), var(--f-curva), var(--ease), ease; }
   /* Mobile: --a es 57, toggle 46 + 2 x 4 de f-bar + 2 de borde + 1 del
      f-body. El dock (ancho w) va centrado entre 0 y 100% - --a - gap: su borde
      derecho es (100% - --a - gap + w) / 2 y la bola arranca un gap despues.
@@ -1150,6 +1157,7 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
     b.style.height = desde + "px";
     void f.offsetWidth;
     f.style.transition = b.style.transition = "";
+    f.classList.toggle("cerrando", !si);
     f.classList.toggle("open", si);
     b.style.height = hasta + "px";
     $("fToggle").setAttribute("aria-expanded", String(si));
@@ -1160,6 +1168,7 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   function terminar() {
     var f = $("filters");
     clearTimeout(tListo);
+    f.classList.remove("cerrando");
     $("fBody").style.height = "";
     $("fBody").firstElementChild.style.width = "";
     if (f.classList.contains("open")) f.classList.add("listo");
@@ -1257,7 +1266,9 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   function medir() {
     var f = $("filters"), r = f.getBoundingClientRect();
     var fuera = f.classList.contains("fuera");
-    M.s.t = fuera || modal.open || !lista.length ? 0 : 1;
+    // En mobile el panel abierto ocupa su lugar: el ancla se va y vuelve
+    // recien cuando el panel termino de cerrar.
+    M.s.t = fuera || modal.open || !lista.length || (esMobile.matches && (f.classList.contains("open") || f.classList.contains("cerrando"))) ? 0 : 1;
     var sube = arriba();
     M.r.t = sube ? -90 : 90;
     ancla.setAttribute("aria-label", sube ? "Volver al principio de las notas" : "Bajar");

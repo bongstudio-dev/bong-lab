@@ -31,7 +31,9 @@
   saltaria). Es la accion principal de la barra: al principio de la lista
   apunta abajo y baja 80% de pantalla; pasada media pantalla desde el principio de la lista apunta
   arriba y vuelve al principio de la lista (no al carrusel, donde el dock se
-  esconde). Con el panel de filtros abierto, primero lo cierra. Aparece y se
+  esconde). En mobile, al abrir Filtros el panel toma toda la columna
+  (crece hacia arriba y hacia el costado, sobre el lugar del ancla) y el
+  ancla se va; vuelve cuando el panel termino de cerrar. Aparece y se
   va junto con el dock. El rebote vive solo en el giro de la flecha (resorte
   k 150, c 13,5: se pasa ~22° y se acomoda en 0,75 s); el circulo no rebota
   (aparece con k 220, c 29,7 y al apretarlo baja a 92% con k 600, c 49).
