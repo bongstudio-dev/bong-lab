@@ -604,14 +604,24 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
    Un circulo azul con la flecha, pegado a la derecha del dock pero separado
    de el, como en bongstudio.ar. Es lo unico saturado de la barra. Baja o
    vuelve al principio de la lista; la mueve el JS (ver "Ancla" abajo).
-   --a es el alto del dock cerrado; lo pone el JS. La separacion y los
-   resortes son tokens del Figma (--ancla-*, ver "Ancla" en el JS). */
-.filters { right: calc(var(--a, 56px) + var(--ancla-gap)); max-width: min(100% - 32px - var(--a, 56px), 980px); }
+   --a es el alto del dock cerrado: en desktop 30 de pastilla + 2 x 3 de
+   f-main + 2 x 5 de f-bar + 2 de borde + 1 del borde del f-body = 49. La
+   separacion y los resortes son tokens del Figma (--ancla-*, ver "Ancla" en
+   el JS). */
+:root { --a: 49px; }
+.filters { right: calc(var(--a) + var(--ancla-gap)); max-width: min(100% - 32px - var(--a), 980px); }
+/* Abajo se ancla con el mismo bottom que el dock (y la misma transicion al
+   compactarse): asi Safari, al mostrar o esconder su barra, mueve los dos
+   juntos. Si la altura la pusiera el JS desde arriba, la bola llegaria un
+   cuadro tarde y saltaria. En mobile la x y el alto tambien salen del CSS,
+   con la transicion del dock: su borde derecho es lineal en su ancho, asi
+   que los dos se mueven juntos cuadro a cuadro. En desktop la x la pone el JS
+   (--ancla-x: ahi el dock no se compacta). El JS solo pone la escala. */
 .ancla {
-  position: fixed; left: 0; top: 0; z-index: 41;
-  width: var(--a, 56px); height: var(--a, 56px);
+  position: fixed; left: var(--ancla-x, -200px); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 41;
+  width: var(--a); height: var(--a);
   padding: 0; border: 0; background: none; cursor: pointer;
-  will-change: transform; transform: translate(-200px, -200px) scale(0);
+  will-change: transform; transform: scale(0);
   transform-origin: left bottom; /* al compactarse no se abre el hueco con el dock */
 }
 .ancla-cuerpo {
@@ -624,8 +634,25 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
 .ancla:focus-visible { outline: none; }
 .ancla:focus-visible .ancla-cuerpo { outline: 2px solid var(--celeste); outline-offset: 3px; }
 @media (max-width: 640px) {
-  .filters { width: var(--f-ancho-cerrado, calc(100% - 32px - var(--ancla-gap) - var(--a, 56px))); }
-  .filters.open { width: calc(100% - 32px - var(--ancla-gap) - var(--a, 56px)); }
+  .filters { width: var(--f-ancho-cerrado, calc(100% - 32px - var(--ancla-gap) - var(--a))); }
+  .filters.open { width: calc(100% - 32px - var(--ancla-gap) - var(--a)); }
+  /* Mobile: --a es 57, toggle 46 + 2 x 4 de f-bar + 2 de borde + 1 del
+     f-body. El dock (ancho w) va centrado entre 0 y 100% - --a - gap: su borde
+     derecho es (100% - --a - gap + w) / 2 y la bola arranca un gap despues.
+     Con w = 100% - 32 - gap - --a da 100% - 16 - --a. Compacto, w es 104
+     (128 con contador) y el alto 41: toggle 30 + 2 x 4 de f-bar + 2 de
+     borde + 1 del borde del f-body. */
+  :root { --a: 57px; }
+  .ancla {
+    left: calc(100% - 16px - var(--a));
+    transition: bottom var(--f-chica) var(--f-chica-curva), left var(--f-chica) var(--f-chica-curva), width var(--f-chica) var(--f-chica-curva), height var(--f-chica) var(--f-chica-curva);
+  }
+  .filters.chica:not(.open) ~ .ancla {
+    bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+    left: calc((100% - var(--a) + var(--ancla-gap) + 104px) / 2);
+    width: 41px; height: 41px;
+  }
+  .filters.chica:not(.open):has(.f-count:not([hidden])) ~ .ancla { left: calc((100% - var(--a) + var(--ancla-gap) + 128px) / 2); }
 }
 
 /* ?solo=dock: solo la barra de arriba y el dock de filtros, sin carrusel ni
@@ -1230,29 +1257,24 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   function arriba() { return window.scrollY > inicioLista() + window.innerHeight * CAMBIO; }
   function medir() {
     var f = $("filters"), r = f.getBoundingClientRect();
-    // --a: el alto del dock cerrado y de tamano normal (se mide solo en ese estado).
-    if (!f.classList.contains("chica") && !f.classList.contains("open") && r.height > 20 && String(r.height) !== ancla.dataset.a) { ancla.dataset.a = r.height; document.documentElement.style.setProperty("--a", r.height + "px"); }
-    var a = Number(ancla.dataset.a) || 56;
     var fuera = f.classList.contains("fuera");
     M.s.t = fuera || modal.open || !lista.length ? 0 : 1;
     var sube = arriba();
     M.r.t = sube ? -90 : 90;
     ancla.setAttribute("aria-label", sube ? "Volver al principio de las notas" : "Bajar");
     ancla.tabIndex = M.s.t ? 0 : -1;
-    // Mismo alto que el dock: cuando se compacta, la bola lo acompana cuadro a
-    // cuadro (se lee el alto real mientras dura la transicion del dock).
-    var alto = f.classList.contains("open") ? 1 : Math.min(1, r.height / a);
-    return { x: r.right + GAP, y: r.bottom - a, alto: alto };
+    // Desktop: la x sale del dock (en mobile la pone el CSS).
+    if (!esMobile.matches) document.documentElement.style.setProperty("--ancla-x", (r.right + GAP).toFixed(2) + "px");
   }
   function paso(s, dt) { var ac = -s.k * (s.x - s.t) - s.c * s.v; s.v += ac * dt; s.x += s.v * dt; }
   var tAntes = performance.now();
   function anim(now) {
     var dt = Math.min(0.05, (now - tAntes) / 1000); tAntes = now;
-    var p = medir();
+    medir();
     if (quieto.matches) { for (var k in M) { M[k].x = M[k].t; M[k].v = 0; } }
     else { var n = Math.ceil(dt / 0.004); for (var j = 0; j < n; j++) for (var k2 in M) paso(M[k2], dt / n); }
-    var s = Math.max(0, M.s.x) * M.q.x * p.alto;
-    ancla.style.transform = "translate(" + p.x.toFixed(2) + "px," + p.y.toFixed(2) + "px) scale(" + s.toFixed(4) + ")";
+    var s = Math.max(0, M.s.x) * M.q.x;
+    ancla.style.transform = "scale(" + s.toFixed(4) + ")";
     flecha.style.transform = "rotate(" + M.r.x.toFixed(2) + "deg)";
     requestAnimationFrame(anim);
   }

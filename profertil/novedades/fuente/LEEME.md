@@ -25,7 +25,9 @@
   con `cwebp -q 70 -resize <ancho> 0`) hoy no se usan.
 - El dock de filtros tiene al lado el **ancla**: un circulo azul con una
   flecha, separado del dock 5 px y con su mismo alto (tambien cuando el dock
-  se compacta al bajar). Es la accion principal de la barra, como la flecha
+  se compacta al bajar). Va pegado abajo como el dock y en mobile se compacta
+  con su misma transicion, asi Safari los mueve juntos al mostrar u ocultar su
+  barra (si el JS lo ubicara desde arriba, llegaria un cuadro tarde y saltaria). Es la accion principal de la barra, como la flecha
   de bongstudio.ar: al principio de la lista apunta abajo y baja 80% de
   pantalla; pasada media pantalla desde el principio de la lista apunta
   arriba y vuelve al principio de la lista (no al carrusel, donde el dock se
