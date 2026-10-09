@@ -65,6 +65,16 @@
   --curva-vista: cubic-bezier(0.67, 0, 0.24, 0.99); /* Web/Movimiento/Curva vista */
   --f-chica-curva: cubic-bezier(0.32, 0.72, 0, 1); /* Web/Movimiento/Curva compacto */
   --carrusel-curva: cubic-bezier(0.65, 0, 0.25, 1); /* Web/Movimiento/Curva carrusel */
+  --ancla-gap: 5px; /* Web/Ancla/Separación */
+  --ancla-giro-k: 150; /* Web/Resorte/Ancla giro rigidez */
+  --ancla-giro-c: 13.5; /* Web/Resorte/Ancla giro amortiguación */
+  --ancla-aparecer-k: 220; /* Web/Resorte/Ancla aparecer rigidez */
+  --ancla-aparecer-c: 29.7; /* Web/Resorte/Ancla aparecer amortiguación */
+  --ancla-apretar-k: 600; /* Web/Resorte/Ancla apretar rigidez */
+  --ancla-apretar-c: 49; /* Web/Resorte/Ancla apretar amortiguación */
+  --ancla-apretar: 0.92; /* Web/Proporción/Ancla apretar */
+  --ancla-bajar: 0.8; /* Web/Proporción/Ancla bajar */
+  --ancla-cambio: 0.6; /* Web/Proporción/Ancla cambio */
 
   --shadow: 0 1px 2px rgba(10, 30, 74, 0.06), 0 12px 28px -16px rgba(10, 30, 74, 0.28);
   --f-display: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
@@ -650,8 +660,9 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
    Un circulo azul con la flecha, pegado a la derecha del dock pero separado
    de el, como en bongstudio.ar. Es lo unico saturado de la barra. Baja o
    vuelve al principio de la lista; la mueve el JS (ver "Ancla" abajo).
-   --a es el alto del dock cerrado; lo pone el JS. */
-.filters { right: calc(var(--a, 56px) + 5px); max-width: min(100% - 32px - var(--a, 56px), 980px); }
+   --a es el alto del dock cerrado; lo pone el JS. La separacion y los
+   resortes son tokens del Figma (--ancla-*, ver "Ancla" en el JS). */
+.filters { right: calc(var(--a, 56px) + var(--ancla-gap)); max-width: min(100% - 32px - var(--a, 56px), 980px); }
 .ancla {
   position: fixed; left: 0; top: 0; z-index: 41;
   width: var(--a, 56px); height: var(--a, 56px);
@@ -669,8 +680,8 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
 .ancla:focus-visible { outline: none; }
 .ancla:focus-visible .ancla-cuerpo { outline: 2px solid var(--celeste); outline-offset: 3px; }
 @media (max-width: 640px) {
-  .filters { width: var(--f-ancho-cerrado, calc(100% - 37px - var(--a, 56px))); }
-  .filters.open { width: calc(100% - 37px - var(--a, 56px)); }
+  .filters { width: var(--f-ancho-cerrado, calc(100% - 32px - var(--ancla-gap) - var(--a, 56px))); }
+  .filters.open { width: calc(100% - 32px - var(--ancla-gap) - var(--a, 56px)); }
 }
 
 /* ?solo=dock: solo la barra de arriba y el dock de filtros, sin carrusel ni
@@ -1276,14 +1287,19 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   var ancla = $("ancla"), cuerpo = ancla.firstElementChild, flecha = cuerpo.firstElementChild;
   var quieto = matchMedia("(prefers-reduced-motion: reduce)");
   // Resortes: masa 1, rigidez k, amortiguacion c. c = 2*raiz(k) no rebota.
+  // Los valores son tokens del Figma Master (06 · Web, Web/Resorte/* y
+  // Web/Proporción/*): build.py los pone en :root y aca se leen.
+  var raiz = getComputedStyle(document.documentElement);
+  function tk(n) { return parseFloat(raiz.getPropertyValue("--" + n)); }
+  var GAP = tk("ancla-gap"), APRETAR = tk("ancla-apretar"), BAJAR = tk("ancla-bajar"), CAMBIO = tk("ancla-cambio");
   function R(x, k, c) { return { x: x, v: 0, t: x, k: k, c: c }; }
   var M = {
-    s: R(0, 220, 29.7),    // aparece y desaparece con el dock, sin rebote
-    q: R(1, 600, 49),      // aplaste al apretar, sin rebote
-    r: R(90, 150, 13.5)    // giro: el unico que rebota (sobrepasa un poco y vuelve)
+    s: R(0, tk("ancla-aparecer-k"), tk("ancla-aparecer-c")), // aparece y se va con el dock, sin rebote
+    q: R(1, tk("ancla-apretar-k"), tk("ancla-apretar-c")),   // aplaste al apretar, sin rebote
+    r: R(90, tk("ancla-giro-k"), tk("ancla-giro-c"))          // giro: el unico que rebota
   };
   function inicioLista() { return Math.max(0, document.querySelector("main").offsetTop - $("top").offsetHeight - 8); }
-  function arriba() { return window.scrollY > inicioLista() + window.innerHeight * 0.6; }
+  function arriba() { return window.scrollY > inicioLista() + window.innerHeight * CAMBIO; }
   function medir() {
     var f = $("filters"), r = f.getBoundingClientRect();
     // --a: el alto del dock cerrado y de tamano normal (se mide solo en ese estado).
@@ -1298,7 +1314,7 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
     // Mismo alto que el dock: cuando se compacta, la bola lo acompana cuadro a
     // cuadro (se lee el alto real mientras dura la transicion del dock).
     var alto = f.classList.contains("open") ? 1 : Math.min(1, r.height / a);
-    return { x: r.right + 5, y: r.bottom - a, alto: alto };
+    return { x: r.right + GAP, y: r.bottom - a, alto: alto };
   }
   function paso(s, dt) { var ac = -s.k * (s.x - s.t) - s.c * s.v; s.v += ac * dt; s.x += s.v * dt; }
   var tAntes = performance.now();
@@ -1314,7 +1330,7 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   }
   requestAnimationFrame(anim);
 
-  ancla.addEventListener("pointerdown", function () { M.q.t = 0.92; });
+  ancla.addEventListener("pointerdown", function () { M.q.t = APRETAR; });
   function soltarAncla() { M.q.t = 1; }
   ancla.addEventListener("pointerup", soltarAncla);
   ancla.addEventListener("pointercancel", soltarAncla);
@@ -1323,7 +1339,7 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
     if ($("filters").classList.contains("open")) abrirFiltros(false);
     var suave = quieto.matches ? "auto" : "smooth";
     if (arriba()) window.scrollTo({ top: inicioLista(), behavior: suave });
-    else window.scrollBy({ top: Math.round(window.innerHeight * 0.8), behavior: suave });
+    else window.scrollBy({ top: Math.round(window.innerHeight * BAJAR), behavior: suave });
   });
 
   /* --- Destacadas ---------------------------------------------------------------

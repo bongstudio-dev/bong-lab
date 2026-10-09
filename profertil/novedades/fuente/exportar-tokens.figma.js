@@ -3,8 +3,10 @@
 // de un plugin de desarrollo). Toma las variables de 01 · Primitivas y 06 · Web
 // que tienen code syntax WEB del tipo var(--nombre), resuelve los alias y
 // devuelve { nombre: { valor, figma } }. Lo que devuelve va a tokens.json.
-// Movimiento/* sale en ms, las demas medidas en px. Si dos variables dan el
-// mismo nombre con valores distintos, lo informa en "conflictos".
+// Movimiento/* sale en ms; Resorte/* y Proporción/* sin unidad (rigidez,
+// amortiguacion, escalas y fracciones de pantalla); las demas medidas en px.
+// Si dos variables dan el mismo nombre con valores distintos, lo informa en
+// "conflictos".
 const cols = await figma.variables.getLocalVariableCollectionsAsync();
 const cn = Object.fromEntries(cols.map(c => [c.id, c.name]));
 const all = await figma.variables.getLocalVariablesAsync();
@@ -14,7 +16,10 @@ function resolver(v) { let val = v.valuesByMode[modo(v)], n = 0; while (val && v
 const h = x => Math.round(x * 255).toString(16).padStart(2, '0').toUpperCase();
 function fmt(v, val) {
   if (v.resolvedType === 'COLOR') { const a = val.a === undefined ? 1 : val.a; return a >= 0.999 ? '#' + h(val.r) + h(val.g) + h(val.b) : `rgba(${Math.round(val.r * 255)}, ${Math.round(val.g * 255)}, ${Math.round(val.b * 255)}, ${+a.toFixed(2)})`; }
-  if (v.resolvedType === 'FLOAT') return v.name.startsWith('Web/Movimiento/') ? `${val}ms` : `${val}px`;
+  if (v.resolvedType === 'FLOAT') {
+    if (/^Web\/(Resorte|Proporción)\//.test(v.name)) return String(+val.toFixed(4));
+    return v.name.startsWith('Web/Movimiento/') ? `${val}ms` : `${val}px`;
+  }
   return String(val);
 }
 const tokens = {}, conflictos = [];

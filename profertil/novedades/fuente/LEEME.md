@@ -31,8 +31,10 @@
   arriba y vuelve al principio de la lista (no al carrusel, donde el dock se
   esconde). Con el panel de filtros abierto, primero lo cierra. Aparece y se
   va junto con el dock. El rebote vive solo en el giro de la flecha (resorte
-  k 150, c 13,5: se pasa ~22° y se acomoda en 0,75 s); el circulo no rebota (aparece con
-  k 220, c 29,7 y al apretarlo baja a 92% con k 600, c 49). Codigo: "Ancla"
+  k 150, c 13,5: se pasa ~22° y se acomoda en 0,75 s); el circulo no rebota
+  (aparece con k 220, c 29,7 y al apretarlo baja a 92% con k 600, c 49).
+  Todos esos valores son tokens `--ancla-*` (variables `Web/Ancla/*`,
+  `Web/Resorte/Ancla *` y `Web/Proporción/Ancla *` en 06 · Web). Codigo: "Ancla"
   en `template.html` (CSS y JS). Documentado en el Figma Master, pagina
   "▤ Novedades · Web", seccion "Ancla" del Doc (despues de "Dock de filtros").
 
