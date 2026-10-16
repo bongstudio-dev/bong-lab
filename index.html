@@ -1,10 +1,54 @@
-<!doctype html>
+<!DOCTYPE html>
+<!-- firma:bong
+
+      ##########         #########
+      ###########      #############
+      ############   #################
+      ###########   ###################
+      ##########    ###################
+      ############  ###################
+      #############  #################
+      #############   ###############
+      ############      ###########
+
+                            #####
+      ##     ######     ##########
+      ####   ######   ###########
+      #####  ######  ###########
+      #############  ##########
+      #############  ###################
+      #############  ##################
+      #############   #################
+      #############     #############
+      #############        #######
+
+      BONG LAB · PROFERTIL
+      Experimentos, prototipos y herramientas para la web de Profertil.
+
+      Hola. Si estás leyendo esto, te gusta ver cómo están hechas las cosas.
+      A nosotros también.
+
+      Diseño y desarrollo: Bong Studio
+      Estudio de branding. Córdoba, Argentina. Desde 2019.
+      Lo que probamos antes de llevarlo al sitio: componentes, animaciones y herramientas.
+
+      CRÉDITOS
+      María Lopez / Brand Designer
+      Marcos Cousseau / Creative Director
+
+      CONTACTO
+      https://bongstudio.ar
+
+      BONG STUDIO · 2026 — Brutally Clear Branding — bongstudio.ar
+-->
 <html lang="es">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bong Lab</title>
-<meta name="description" content="Experimentos, prototipos y herramientas de Bong Studio.">
+<title>Bong Lab · Profertil</title>
+<meta name="description" content="Experimentos, prototipos y herramientas para la web de Profertil.">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <script>
   // Para sumar un experimento, agregá un objeto acá.
   // url: carpeta relativa a la raíz del repo, con barra final.
@@ -94,153 +138,231 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --fondo: #003DA5;
-    --texto: #FFFEEF;
-    --linea: rgba(255, 254, 239, 0.28);
-    --tenue: rgba(255, 254, 239, 0.72);
-  }
-  * { box-sizing: border-box; margin: 0; }
-  body {
-    background: var(--fondo);
-    color: var(--texto);
-    font-family: "Archivo", system-ui, sans-serif;
-    min-height: 100vh;
-    padding: 32px 16px 48px;
-    -webkit-font-smoothing: antialiased;
-  }
-  header, main, footer { max-width: 1120px; margin: 0 auto; }
-  header { margin-bottom: 40px; }
-  .eyebrow {
-    font-size: 12px; font-weight: 500; letter-spacing: 0.12em;
-    text-transform: uppercase; color: var(--tenue);
-  }
-  h1 {
-    font-size: clamp(40px, 12vw, 96px);
-    font-weight: 700; line-height: 0.95; letter-spacing: -0.03em;
-    margin-top: 12px;
-  }
-  .grilla {
-    list-style: none; padding: 0;
-    display: grid; gap: 16px;
-    grid-template-columns: 1fr;
-  }
-  .tarjeta {
-    display: flex; flex-direction: column; gap: 12px;
-    height: 100%; min-height: 200px;
-    padding: 20px;
-    border: 1px solid var(--linea);
-    border-radius: 4px;
-    color: inherit; text-decoration: none;
-    transition: background-color .2s, border-color .2s;
-  }
-  .tarjeta:hover, .tarjeta:focus-visible {
-    background: rgba(255, 254, 239, 0.08);
-    border-color: var(--texto);
-    outline: none;
-  }
-  .tarjeta h2 {
-    font-size: 24px; font-weight: 700; line-height: 1.1; letter-spacing: -0.01em;
-  }
-  .tarjeta p { font-size: 16px; line-height: 1.4; color: var(--tenue); }
-  .tarjeta .pie {
-    margin-top: auto; padding-top: 16px;
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .tarjeta .flecha { font-size: 20px; transition: transform .2s; }
-  .tarjeta:hover .flecha { transform: translateX(4px); }
-  .grupo { margin-bottom: 40px; }
-  .grupo > summary {
-    list-style: none; cursor: pointer;
-    display: flex; align-items: baseline; gap: 14px;
-    padding: 0 0 14px; margin-bottom: 20px;
-    border-bottom: 1px solid var(--linea);
-  }
-  .grupo > summary::-webkit-details-marker { display: none; }
-  .grupo > summary:focus-visible { outline: 2px solid var(--texto); outline-offset: 6px; }
-  .grupo h2.nombre {
-    font-size: clamp(22px, 4vw, 32px); font-weight: 700; letter-spacing: -0.02em; line-height: 1;
-  }
-  .grupo .cuenta { font-size: 12px; font-weight: 500; letter-spacing: 0.12em; color: var(--tenue); }
-  .grupo .chevron { margin-left: auto; font-size: 18px; color: var(--tenue); transition: transform .25s; }
-  .grupo[open] > summary .chevron { transform: rotate(180deg); }
-  footer { margin-top: 56px; font-size: 13px; color: var(--tenue); }
-  footer a { color: inherit; }
+/* Piel: sistema web de Profertil (Figma Master, colecciones 01 y 06), el mismo de Novedades y Arquitectura. */
+:root{
+  color-scheme:light;
+  --azul:#003DA5; --celeste:#4086FF;
+  --tiza:#FFFEEF; --bg:#E9E7D6; --card:#FFFEEF;
+  --ink:#0A1E4A; --ink-2:#44506E; --ink-3:#737D96;
+  --barra:rgba(0,61,165,.94); --line:rgba(10,30,74,.1);
+  --shadow:0 1px 2px rgba(10,30,74,.06),0 12px 28px -16px rgba(10,30,74,.28);
+  --shadow-up:0 2px 4px rgba(10,30,74,.06),0 22px 40px -20px rgba(10,30,74,.36);
+  --ease:cubic-bezier(.22,1,.36,1);
+  --f-display:"Familjen Grotesk","Helvetica Neue",Arial,sans-serif;
+  --f-body:"DM Sans","Helvetica Neue",Arial,sans-serif;
+  --r-card:26px;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html{background:var(--bg);-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--f-body);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+h1,h2,h3{font-family:var(--f-display);margin:0}
+p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
+:focus-visible{outline:2px solid var(--celeste);outline-offset:2px}
+.wrap{width:min(100% - 32px,1320px);margin-inline:auto}
 
-  @media (min-width: 640px) {
-    body { padding: 56px 32px 64px; }
-    .grilla { grid-template-columns: repeat(2, 1fr); gap: 20px; }
-    .tarjeta { padding: 28px; min-height: 240px; }
-  }
-  @media (min-width: 1024px) {
-    .grilla { grid-template-columns: repeat(3, 1fr); }
-  }
+/* barra fija: transparente sobre el header, azul al bajar */
+.top{position:fixed;inset:0 0 auto;z-index:50;transition:background 260ms ease,box-shadow 260ms ease}
+.top.solid{background:var(--barra);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 10px 30px -18px rgba(0,20,60,.7)}
+.nav{position:relative;width:min(100% - 32px,1320px);margin-inline:auto;display:flex;align-items:center;gap:14px;min-height:76px;padding:8px 58px 8px 0}
+.logo{display:block;flex:none;color:var(--tiza);line-height:0}
+.logo svg{width:74px;height:auto;aspect-ratio:1458/1021}
+/* Buscador: la lupa se expande hacia la izquierda; abierta, en su lugar queda la X (igual que Novedades y Arquitectura) */
+.busca{position:absolute;right:0;top:50%;transform:translateY(-50%);display:flex;align-items:center;width:48px;height:48px;border-radius:999px;background:rgba(255,254,239,.16);border:1px solid rgba(255,254,239,.24);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);overflow:hidden;transition:width 420ms var(--ease),right 420ms var(--ease),background 220ms ease,border-color 220ms ease}
+.busca.open{right:56px;width:min(480px,calc(100% - 152px));background:var(--tiza);border-color:#fff;box-shadow:var(--shadow)}
+.busca-x{position:absolute;right:0;top:50%;transform:translateY(-50%) scale(.6);width:48px;height:48px;padding:0;border-radius:999px;background:rgba(255,254,239,.16);border:1px solid rgba(255,254,239,.24);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:var(--tiza);display:grid;place-items:center;opacity:0;visibility:hidden;transition:opacity 200ms ease,transform 420ms var(--ease),background 200ms ease,color 200ms ease,visibility 0s linear 420ms}
+.busca-x svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+@media(hover:hover) and (pointer:fine){.busca-x:hover{background:var(--tiza);color:var(--azul)}}
+.busca-x:active{background:var(--tiza);color:var(--azul)}
+.nav.buscando .busca-x{opacity:1;visibility:visible;transform:translateY(-50%);transition:opacity 220ms ease 120ms,transform 420ms var(--ease),background 200ms ease,color 200ms ease}
+.lupa{width:46px;height:46px;flex:none;border:0;border-radius:999px;background:transparent;color:var(--tiza);display:grid;place-items:center;padding:0}
+.busca.open .lupa{color:var(--azul)}
+.lupa svg{width:20px;height:20px}
+.busca input{flex:1;min-width:0;border:0;outline:none;background:transparent;font-family:var(--f-display);font-size:1.04rem;color:var(--ink);padding:0 4px;opacity:0;transition:opacity 200ms ease}
+.busca.open input{opacity:1}
+.busca input::placeholder{color:var(--ink-3)}
+.busca input::-webkit-search-cancel-button{display:none}
+
+/* header azul con forma oficial */
+.hero{position:relative;overflow:hidden;background:var(--azul);color:var(--tiza);padding:150px 0 96px}
+.hero .in{width:min(100% - 32px,1320px);margin-inline:auto;position:relative;z-index:2}
+.hero .eyebrow{font:500 .78rem/1 var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:rgba(255,254,239,.72);margin-bottom:16px}
+.hero h1{font-weight:600;font-size:clamp(2.6rem,7vw,5.4rem);line-height:.95;letter-spacing:-.045em}
+.hero p{margin-top:16px;max-width:46ch;font-size:1.05rem;color:rgba(255,254,239,.86)}
+.forma{position:absolute;z-index:1;pointer-events:none}
+.f1{width:min(46vw,620px);right:-6%;top:-12%;color:var(--celeste)}
+
+/* Grupos en acordeón: número grande antes del título, chevron corto en círculo */
+main{padding:48px 0 120px}
+.grupo{border-bottom:1px solid var(--line)}
+.grupo:first-child{border-top:1px solid var(--line)}
+.cab{width:100%;display:flex;align-items:center;gap:clamp(16px,3vw,32px);border:0;background:none;padding:26px 12px;margin:0 -12px;width:calc(100% + 24px);border-radius:20px;text-align:left;color:var(--ink);transition:background 320ms var(--ease)}
+.cab .num{flex:none;min-width:2.1ch;font:500 clamp(2.4rem,5vw,3.6rem)/1 var(--f-display);letter-spacing:-.04em;color:var(--ink-3);transition:color 320ms var(--ease)}
+.cab .nombre{flex:1;font:600 clamp(1.5rem,3vw,2.2rem)/1.05 var(--f-display);letter-spacing:-.03em;transition:transform 420ms var(--ease)}
+.cab .chev{flex:none;width:44px;height:44px;border-radius:999px;display:grid;place-items:center;background:var(--card);color:var(--azul);box-shadow:var(--shadow);transition:background 320ms var(--ease),color 320ms var(--ease),transform 520ms var(--ease)}
+.cab .chev svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.grupo.abierto .cab .chev{transform:rotate(180deg)}
+@media(hover:hover) and (pointer:fine){
+  .cab:hover{background:rgba(255,254,239,.55)}
+  .cab:hover .num{color:var(--azul)}
+  .cab:hover .nombre{transform:translateX(6px)}
+  .cab:hover .chev{background:var(--azul);color:var(--tiza)}
+}
+.cab:active .chev{background:var(--azul);color:var(--tiza)}
+/* El cuerpo se despliega animando la fila de la grilla de 0fr a 1fr: mide solo, sin alturas fijas */
+.cuerpo{display:grid;grid-template-rows:0fr;transition:grid-template-rows 560ms var(--ease)}
+.grupo.abierto .cuerpo{grid-template-rows:1fr}
+.cuerpo>.in{min-height:0;overflow:hidden;margin:0 -16px;padding:0 16px}
+.grilla{list-style:none;margin:0;padding:4px 0 36px;display:grid;gap:16px;grid-template-columns:1fr;opacity:0;transform:translateY(-8px);transition:opacity 260ms ease,transform 560ms var(--ease)}
+.grupo.abierto .grilla{opacity:1;transform:none;transition:opacity 420ms ease 80ms,transform 560ms var(--ease)}
+.tarjeta{position:relative;display:flex;flex-direction:column;gap:10px;height:100%;min-height:210px;padding:24px 24px 22px;border-radius:var(--r-card);background:var(--card);box-shadow:var(--shadow);color:inherit;text-decoration:none;transition:transform 420ms var(--ease),box-shadow 420ms var(--ease)}
+.tarjeta h3{font-weight:600;font-size:1.4rem;line-height:1.1;letter-spacing:-.025em}
+.tarjeta p{color:var(--ink-2);font-size:.98rem;line-height:1.45;max-width:44ch}
+.tarjeta .ir{margin-top:auto;align-self:flex-end;width:40px;height:40px;border-radius:999px;display:grid;place-items:center;background:var(--bg);color:var(--azul);transition:background 320ms var(--ease),color 320ms var(--ease)}
+.tarjeta .ir svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform 420ms var(--ease)}
+@media(hover:hover) and (pointer:fine){
+  .tarjeta:hover{transform:translateY(-4px);box-shadow:var(--shadow-up)}
+  .tarjeta:hover .ir{background:var(--azul);color:var(--tiza)}
+  .tarjeta:hover .ir svg{transform:translateX(2px)}
+  .tarjeta:hover .ir.ext svg{transform:translate(2px,-2px)}
+}
+.vacio{padding:40px 0;color:var(--ink-2);font-family:var(--f-display);font-size:1.2rem}
+footer{padding:0 0 48px;font-size:.88rem;color:var(--ink-3)}
+footer a{color:inherit}
+
+@media (min-width:640px){ .grilla{grid-template-columns:repeat(2,1fr);gap:20px} }
+@media (min-width:1024px){ .grilla{grid-template-columns:repeat(3,1fr)} }
+@media (max-width:560px){ .hero{padding:130px 0 72px} .tarjeta{min-height:0;gap:8px} .tarjeta .ir{margin-top:8px} .cab{padding:20px 12px} .cab .chev{width:40px;height:40px} }
+@media (prefers-reduced-motion:reduce){ *,*::before,*::after{transition-duration:1ms!important} }
 </style>
 </head>
 <body>
-  <header>
-    <p class="eyebrow">Bong Studio · Experimentos, prototipos y herramientas</p>
+<header class="top" id="top">
+  <div class="nav">
+    <a class="logo" href="./" aria-label="Profertil"><svg viewBox="0 0 1458 1021" xmlns="http://www.w3.org/2000/svg" fill="currentColor" role="img" aria-label="Profertil">
+<path d="M781.717 0.0950403H778.009H444.67V675.816H685.119V444.493C609.438 435.465 604.874 374.26 605.635 353.447V312.01H613.526V347.079C677.038 352.877 693.01 392.793 696.338 419.974C699.666 392.793 715.639 352.877 779.15 347.079V312.01H787.042V353.447C787.707 374.355 783.143 436.225 706.131 444.683V676.006H719.917V450.196C739.408 455.993 759.85 459.034 781.812 459.034C908.55 459.034 1011.42 356.298 1011.42 229.517C1011.42 102.736 908.645 0 781.812 0M692.345 46.5687V0.0950403H700.141V46.8538C768.121 119.463 696.338 176.011 696.338 176.011C634.063 113.761 678.084 60.8244 692.345 46.5687ZM787.042 257.934C787.802 279.697 782.858 345.939 696.338 349.93C609.913 345.844 604.969 279.697 605.635 257.934V216.497H613.526V251.566C677.038 257.363 693.01 297.279 696.338 324.46C699.666 297.279 715.639 257.363 779.15 251.566V216.497H787.042V257.934ZM787.042 161.945C787.802 183.709 782.858 249.95 696.338 253.942C609.913 249.95 604.969 183.709 605.635 161.945V93.0423H613.526V155.577C677.038 161.375 693.01 201.291 696.338 228.472C699.666 201.291 715.639 161.375 779.15 155.577V93.0423H787.042V161.945Z"/>
+<path d="M77.4876 788.056C118.846 788.056 150.317 809.82 150.317 848.405C150.317 886.991 116.279 913.221 80.435 913.221C72.5436 913.221 64.5571 912.176 57.2362 908.374C84.5232 906.664 114.092 888.416 114.092 855.343C114.092 825.026 94.3163 812.956 68.9307 812.956C61.3246 812.956 54.0037 813.621 46.6828 815.047V970.529C46.6828 989.822 46.3975 1003.7 63.2261 1013.96V1015.01H0V1013.96C16.1631 1007.78 14.2615 982.219 14.2615 966.728V836.716C14.2615 821.224 16.1631 796.039 0.285219 789.102V788.056H77.4876Z"/>
+<path d="M563.044 899.157C563.044 969.485 509.326 1020.52 446.1 1020.52C382.874 1020.52 330.106 971.576 330.106 900.868C330.106 835.386 382.494 780.549 449.333 782.26C516.077 781.88 563.14 837.097 563.14 899.157M366.235 897.731C366.235 946.011 397.706 995.621 447.621 995.621C497.536 995.621 526.725 957.32 526.725 906C526.725 854.679 497.156 807.065 446.956 807.065C396.755 807.065 366.235 845.65 366.235 897.731Z"/>
+<path d="M618.662 966.633C618.662 982.124 616.095 1007.31 631.973 1013.87V1014.91H571.884V1013.87C588.142 1007.69 586.146 982.124 586.146 966.633V836.621C586.146 820.749 588.047 795.564 571.884 789.007V787.961H673.616C679.036 787.961 684.455 788.626 688.543 786.25H689.494V826.262H688.543C678.655 814.192 665.63 812.861 650.988 812.861C639.864 812.861 628.74 813.241 618.567 815.237V879.388H656.693C660.02 879.388 675.233 879.388 683.98 879.578C687.783 879.578 691.015 878.247 691.015 878.247C691.015 878.247 685.596 893.549 669.528 899.061C649.086 905.999 618.567 904.288 618.567 904.288V966.728"/>
+<path d="M759.19 989.917L799.597 990.107C820.514 992.198 842.477 984.975 858.355 969.769H859.306L845.044 1014.91H712.507V1013.87C728.67 1007.69 726.863 982.124 726.863 966.633V836.621C726.863 820.749 728.765 795.564 712.507 789.007V787.961H814.239C819.658 787.961 824.983 788.626 829.166 786.25H830.117V826.642H829.166C819.278 814.287 806.348 812.861 791.706 812.861C780.582 812.861 769.458 813.241 759.285 815.237V879.388H814.429C819.468 879.388 829.451 878.438 829.451 878.438C829.451 878.438 829.927 893.929 817.662 899.821C808.534 904.193 780.201 904.193 770.313 904.193H759.38V989.917"/>
+<path d="M1013.42 966.633L967.689 904.193C993.74 897.635 1018.18 873.875 1018.18 843.463C1018.18 813.051 994.976 787.961 952.382 787.961H876.701V789.006C892.864 795.564 890.677 820.749 890.677 836.62V966.633C890.677 982.124 892.864 1007.69 876.701 1013.87V1014.91H937.455V1013.87C921.197 1007.69 923.193 982.504 923.193 966.633V913.126H940.497L960.178 945.629L998.97 997.71C1008.48 1010.45 1018.94 1014.91 1035.76 1014.91H1065.05C1046.89 1002.56 1026.92 984.595 1013.61 966.633M943.635 891.362H923.098V812.196C930.419 810.77 937.36 809.82 944.776 809.44C966.073 808.394 985.754 822.935 985.754 847.74C985.754 874.256 966.739 887.466 943.73 891.362H943.635Z"/>
+<path d="M299.486 966.633L253.754 904.193C279.805 897.635 304.24 873.875 304.24 843.463C304.24 813.051 281.041 787.961 238.446 787.961H162.765V789.006C178.928 795.564 176.742 820.749 176.742 836.62V966.633C176.742 982.124 178.928 1007.69 162.765 1013.87V1014.91H223.424V1013.87C207.261 1007.69 209.163 982.504 209.163 966.633V913.126H226.372L246.053 945.629L284.844 997.71C294.352 1010.45 304.81 1014.91 321.734 1014.91H350.923C332.858 1002.56 312.797 984.595 299.486 966.633ZM229.7 891.362H209.163V812.196C216.484 810.77 223.424 809.82 230.84 809.44C252.138 808.394 271.819 822.935 271.819 847.74C271.819 874.256 252.803 887.466 229.7 891.362Z"/>
+<path d="M1146.15 970.149C1146.15 989.822 1145.77 1003.22 1162.6 1013.96V1015.01H1099.65V1013.96C1115.63 1007.4 1113.73 982.219 1113.73 966.727V812.956H1085.77C1072.08 812.956 1057.82 816.757 1047.93 826.736H1046.98L1058.11 785.68H1059.06C1062.86 787.39 1066.95 787.39 1071.04 788.056H1197.58C1203 788.056 1213.18 788.056 1213.18 788.056C1213.18 788.056 1207.28 803.072 1194.07 809.439C1184.94 813.811 1167.54 813.051 1157.08 813.051H1146.15V970.244"/>
+<path d="M1240.37 836.716C1240.37 820.844 1242.56 795.659 1226.3 789.102V788.056H1286.67V789.102C1270.8 795.659 1272.7 821.129 1272.7 836.716V966.728C1272.7 982.219 1270.8 1007.4 1286.67 1013.96V1015.01H1226.3V1013.96C1242.27 1007.78 1240.37 982.219 1240.37 966.728V836.716Z"/>
+<path d="M1400.86 990.107C1422.44 991.533 1441.17 983.55 1457.05 969.104H1458L1441.46 1015.01H1310.82V1013.96C1327.08 1007.78 1325.18 982.219 1325.18 966.728V836.716C1325.18 820.844 1327.08 795.659 1310.82 789.102V788.056H1371.57V789.102C1355.41 795.659 1357.6 821.129 1357.6 836.716V990.012L1400.86 990.202"/>
+</svg></a>
+    <div class="busca" id="busca" role="search">
+      <button class="lupa" id="goSearch" type="button" aria-label="Buscar en el laboratorio" aria-expanded="false" aria-controls="buscar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></button>
+      <input id="buscar" type="search" autocomplete="off" placeholder="Buscar en el laboratorio" aria-label="Buscar en el laboratorio" tabindex="-1">
+    </div>
+    <button class="busca-x" id="qClose" type="button" aria-label="Cerrar buscador" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+</header>
+
+<section class="hero">
+  <svg class="forma f1" viewBox="0 0 269 279" aria-hidden="true" fill="currentColor"><path d="M0.122525 0C104.518 6.16695 129.089 71.9464 134.315 111.945C139.551 71.9428 164.14 6.20302 268.503 0.0380859C269.392 27.8878 267.823 119.947 166.907 139.112C267.841 158.27 269.41 250.339 268.522 278.19C164.051 272.019 139.519 206.15 134.318 166.159C129.107 206.153 104.56 271.988 0.117642 278.158C-0.770961 250.306 0.797104 158.234 101.737 139.078C0.802177 119.92 -0.766054 27.8514 0.122525 0Z"/></svg>
+  <div class="in">
+    <p class="eyebrow">Bong Studio para Profertil</p>
     <h1>Bong Lab</h1>
-  </header>
-  <main id="principal"></main>
-  <footer>
-    <a href="https://bongstudio.ar">bongstudio.ar</a>
-  </footer>
+    <p>Experimentos, prototipos y herramientas que probamos antes de llevarlos al sitio.</p>
+  </div>
+</section>
+
+<main class="wrap">
+  <div id="principal"></div>
+  <p class="vacio" id="vacio" hidden>No hay nada con esa búsqueda.</p>
+</main>
+<footer class="wrap">
+  <a href="https://bongstudio.ar">bongstudio.ar</a>
+</footer>
+
 <script>
-  const principal = document.getElementById("principal");
-  const porGrupo = new Map(ORDEN_GRUPOS.map(g => [g, []]));
-  for (const e of EXPERIMENTOS) {
-    const g = e.grupo || "Otros";
-    if (!porGrupo.has(g)) porGrupo.set(g, []);
-    porGrupo.get(g).push(e);
+/* Bong Studio · Diseño y desarrollo · bongstudio.ar */
+const IR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12h10M13 8l4 4-4 4"/></svg>';
+const EXT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 16l8-8M10 8h6v6"/></svg>';
+const CHEV = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+const $ = s => document.querySelector(s);
+const plano = t => String(t).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");   // sin acentos ni mayúsculas, para buscar
+const esc = t => String(t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+const porGrupo = new Map(ORDEN_GRUPOS.map(g => [g, []]));
+for (const e of EXPERIMENTOS) {
+  const g = e.grupo || "Otros";
+  if (!porGrupo.has(g)) porGrupo.set(g, []);
+  porGrupo.get(g).push(e);
+}
+
+const principal = $("#principal");
+const grupos = [];
+let n = 0;
+for (const [nombre, lista] of porGrupo) {
+  if (!lista.length) continue;
+  n++;
+  const id = "g" + n;
+  const sec = document.createElement("section");
+  sec.className = "grupo abierto";
+  sec.innerHTML =
+    `<h2><button class="cab" type="button" aria-expanded="true" aria-controls="${id}">` +
+      `<span class="num" aria-hidden="true">${String(n).padStart(2, "0")}</span>` +
+      `<span class="nombre">${esc(nombre)}</span>` +
+      `<span class="chev" aria-hidden="true">${CHEV}</span>` +
+    `</button></h2>` +
+    `<div class="cuerpo" id="${id}"><div class="in"><ul class="grilla">` +
+      lista.map(e => {
+        const externo = /^https?:/.test(e.url);
+        return `<li data-q="${esc(plano(e.titulo + " " + e.descripcion + " " + nombre))}">` +
+          `<a class="tarjeta" href="${esc(e.url)}"${externo ? ' target="_blank" rel="noopener"' : ""}>` +
+          `<h3>${esc(e.titulo)}</h3><p>${esc(e.descripcion)}</p>` +
+          `<span class="ir${externo ? " ext" : ""}" aria-hidden="true">${externo ? EXT : IR}</span></a></li>`;
+      }).join("") +
+    `</ul></div></div>`;
+  principal.append(sec);
+  grupos.push(sec);
+}
+
+/* Acordeón: el cuerpo inerte mientras está cerrado, para que el teclado no entre a tarjetas ocultas */
+function abrir(sec, si) {
+  sec.classList.toggle("abierto", si);
+  sec.querySelector(".cab").setAttribute("aria-expanded", String(si));
+  sec.querySelector(".cuerpo").inert = !si;
+}
+principal.addEventListener("click", e => {
+  const cab = e.target.closest(".cab"); if (!cab) return;
+  const sec = cab.closest(".grupo");
+  abrir(sec, !sec.classList.contains("abierto"));
+});
+
+/* Buscador: filtra por título, descripción y grupo; abre los grupos que tienen resultados */
+function filtrar(q) {
+  let total = 0;
+  for (const sec of grupos) {
+    let k = 0;
+    sec.querySelectorAll("li").forEach(li => { const si = !q || li.dataset.q.includes(q); li.hidden = !si; if (si) k++; });
+    sec.hidden = !k; total += k;
+    if (q && k) abrir(sec, true);
   }
-  for (const [nombre, lista] of porGrupo) {
-    if (!lista.length) continue;
-    const det = document.createElement("details");
-    det.className = "grupo";
-    det.open = true;
-    const sum = document.createElement("summary");
-    const h2 = document.createElement("h2");
-    h2.className = "nombre";
-    h2.textContent = nombre;
-    const cuenta = document.createElement("span");
-    cuenta.className = "cuenta";
-    cuenta.textContent = String(lista.length).padStart(2, "0");
-    const chevron = document.createElement("span");
-    chevron.className = "chevron";
-    chevron.setAttribute("aria-hidden", "true");
-    chevron.textContent = "↓";
-    sum.append(h2, cuenta, chevron);
-    const ul = document.createElement("ul");
-    ul.className = "grilla";
-    for (const e of lista) {
-      const li = document.createElement("li");
-      const a = document.createElement("a");
-      a.className = "tarjeta";
-      a.href = e.url;
-      const t = document.createElement("h2");
-      t.textContent = e.titulo;
-      const p = document.createElement("p");
-      p.textContent = e.descripcion;
-      const pie = document.createElement("div");
-      pie.className = "pie";
-      const cliente = document.createElement("span");
-      cliente.className = "eyebrow";
-      cliente.textContent = e.cliente;
-      const flecha = document.createElement("span");
-      flecha.className = "flecha";
-      flecha.setAttribute("aria-hidden", "true");
-      flecha.textContent = "→";
-      pie.append(cliente, flecha);
-      a.append(t, p, pie);
-      li.append(a);
-      ul.append(li);
-    }
-    det.append(sum, ul);
-    principal.append(det);
-  }
+  $("#vacio").hidden = total > 0;
+}
+function abrirBusca(si) {
+  $("#busca").classList.toggle("open", si); $(".nav").classList.toggle("buscando", si);
+  $("#goSearch").setAttribute("aria-expanded", String(si));
+  $("#buscar").tabIndex = si ? 0 : -1; $("#qClose").tabIndex = si ? 0 : -1;
+  if (si) setTimeout(() => $("#buscar").focus(), 60);
+}
+function cerrarBusca() { $("#buscar").value = ""; filtrar(""); abrirBusca(false); }
+$("#buscar").addEventListener("input", e => filtrar(plano(e.target.value.trim())));
+$("#qClose").addEventListener("click", () => { cerrarBusca(); $("#goSearch").focus(); });
+$("#goSearch").addEventListener("click", () => { if (!$("#busca").classList.contains("open")) abrirBusca(true); else if (!$("#buscar").value) abrirBusca(false); else $("#buscar").focus(); });
+$("#buscar").addEventListener("blur", () => setTimeout(() => { if (!$("#buscar").value && document.activeElement !== $("#buscar")) abrirBusca(false); }, 180));
+$("#buscar").addEventListener("keydown", e => { if (e.key === "Escape") cerrarBusca(); });
+document.addEventListener("keydown", e => { if (e.key === "/" && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) { e.preventDefault(); abrirBusca(true); } });
+
+/* La barra se vuelve azul cuando el header sale de vista */
+const top_ = $("#top");
+new IntersectionObserver(([en]) => top_.classList.toggle("solid", !en.isIntersecting), { rootMargin: "-76px 0px 0px 0px" }).observe($(".hero"));
 </script>
 </body>
 </html>
