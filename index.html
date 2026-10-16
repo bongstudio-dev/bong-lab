@@ -206,11 +206,7 @@ main{padding:48px 0 120px}
 .cab .chev svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .grupo.abierto .cab .chev{transform:rotate(180deg)}
 @media(hover:hover) and (pointer:fine){
-  html:not(.sin-hover-color) .cab:hover .num,html:not(.sin-hover-color) .cab:hover .nombre{color:var(--azul)}
-  html:not(.sin-hover-grupo) .cab:hover{background:rgba(255,254,239,.55)}
-  html:not(.sin-hover-grupo) .cab:hover .num{color:var(--azul)}
-  html:not(.sin-hover-grupo) .cab:hover .nombre{transform:translateX(6px)}
-  html:not(.sin-hover-grupo) .cab:hover .chev{background:var(--azul);color:var(--tiza)}
+  .cab:hover .num,.cab:hover .nombre{color:var(--azul)}
 }
 .cab:active .chev{background:var(--azul);color:var(--tiza)}
 /* El cuerpo se despliega animando la fila de la grilla de 0fr a 1fr: mide solo, sin alturas fijas */
@@ -225,40 +221,20 @@ main{padding:48px 0 120px}
 .tarjeta .ir{margin-top:auto;align-self:flex-end;width:40px;height:40px;border-radius:999px;display:grid;place-items:center;background:var(--bg);color:var(--azul);transition:background 320ms var(--ease),color 320ms var(--ease)}
 .tarjeta .ir svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform 420ms var(--ease)}
 @media(hover:hover) and (pointer:fine){
-  html:not(.sin-hover-tarjeta) .tarjeta:hover{transform:translateY(-4px);box-shadow:var(--shadow-up)}
-  html:not(.sin-hover-tarjeta) .tarjeta:hover .ir{background:var(--azul);color:var(--tiza)}
-  html:not(.sin-hover-tarjeta) .tarjeta:hover .ir svg{transform:translateX(2px)}
-  html:not(.sin-hover-tarjeta) .tarjeta:hover .ir.ext svg{transform:translate(2px,-2px)}
+  .tarjeta:hover{transform:translateY(-4px);box-shadow:var(--shadow-up)}
+  .tarjeta:hover .ir{background:var(--azul);color:var(--tiza)}
+  .tarjeta:hover .ir svg{transform:translateX(2px)}
+  .tarjeta:hover .ir.ext svg{transform:translate(2px,-2px)}
 }
 .vacio{padding:40px 0;color:var(--ink-2);font-family:var(--f-display);font-size:1.2rem}
-footer{padding:0 0 48px;font-size:.88rem;color:var(--ink-3)}
-footer a{color:inherit}
 
 @media (min-width:640px){ .grilla{grid-template-columns:repeat(2,1fr);gap:20px} }
 @media (min-width:1024px){ .grilla{grid-template-columns:repeat(3,1fr)} }
 @media (max-width:560px){ .hero{padding:130px 0 72px} .tarjeta{min-height:0;gap:8px} .tarjeta .ir{margin-top:8px} .cab{padding:20px 12px} .cab .chev{width:40px;height:40px} }
-/* Tweaker: cada interruptor apaga un movimiento con una clase en <html> */
-.sin-despliegue .cuerpo,.sin-despliegue .cab .chev{transition:none}
-.sin-fundido .grilla,.sin-fundido .grupo.abierto .grilla{opacity:1;transform:none;transition:none}
-.sin-buscador .busca,.sin-buscador .busca-x,.sin-buscador .nav.buscando .busca-x,.sin-buscador .busca input{transition:none}
-.sin-barra .top{transition:none}
-.tw-boton{position:fixed;right:16px;bottom:16px;z-index:60;width:48px;height:48px;border-radius:999px;border:1px solid rgba(255,255,255,.92);background:rgba(255,254,239,.78);backdrop-filter:blur(22px) saturate(1.4);-webkit-backdrop-filter:blur(22px) saturate(1.4);color:var(--azul);display:grid;place-items:center;box-shadow:0 18px 40px -18px rgba(10,30,74,.5);transition:background 220ms ease,color 220ms ease}
-.tw-boton svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
-.tw-boton[aria-expanded=true]{background:var(--azul);color:var(--tiza);border-color:var(--azul)}
-.tw{position:fixed;right:16px;bottom:76px;z-index:60;width:min(300px,calc(100% - 32px));padding:18px 18px 14px;border-radius:26px;border:1px solid rgba(255,255,255,.92);background:rgba(255,254,239,.86);backdrop-filter:blur(22px) saturate(1.4);-webkit-backdrop-filter:blur(22px) saturate(1.4);box-shadow:0 24px 60px -24px rgba(10,30,74,.5);transform-origin:right bottom;transition:opacity 220ms ease,transform 320ms var(--ease),visibility 0s}
-.tw:not(.open){opacity:0;transform:translateY(8px) scale(.97);visibility:hidden;transition:opacity 180ms ease,transform 320ms var(--ease),visibility 0s linear 320ms}
-.tw h2{font:600 1.1rem/1.1 var(--f-display);letter-spacing:-.02em;margin-bottom:4px}
-.tw .rot{font:500 .7rem/16px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin:14px 0 2px}
-.tw label{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:7px 0;font-size:.92rem;color:var(--ink);cursor:pointer}
-.tw input{position:absolute;opacity:0;pointer-events:none}
-.tw .sw{flex:none;width:36px;height:22px;border-radius:999px;background:rgba(10,30,74,.16);position:relative;transition:background 220ms ease}
-.tw .sw::after{content:"";position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(10,30,74,.2);transition:transform 260ms var(--ease)}
-.tw input:checked+.sw{background:var(--azul)}
-.tw input:checked+.sw::after{transform:translateX(14px)}
-.tw input:focus-visible+.sw{outline:2px solid var(--celeste);outline-offset:2px}
-.tw .acciones{display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
-.tw .acciones button{flex:1;height:32px;border:0;border-radius:999px;background:rgba(10,30,74,.07);font-size:.8rem;font-weight:500;color:var(--ink-2)}
-.tw .acciones button:hover{background:rgba(10,30,74,.12)}
+/* Crédito de Bong: el mismo badge del kit de marca de Profertil */
+.bong-credit{position:fixed;right:20px;bottom:18px;z-index:50;display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.92);border:1px solid rgba(6,32,79,.06);color:#004831;text-decoration:none;font-size:.78rem;font-weight:700;letter-spacing:-.01em;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:transform 160ms ease,border-color 160ms ease}
+.bong-credit svg{width:18px;height:auto;display:block;fill:currentColor}
+.bong-credit:hover{transform:translateY(-1px);border-color:rgba(6,32,79,.18)}
 @media (prefers-reduced-motion:reduce){ *,*::before,*::after{transition-duration:1ms!important} }
 </style>
 </head>
@@ -298,24 +274,15 @@ footer a{color:inherit}
   <div id="principal"></div>
   <p class="vacio" id="vacio" hidden>No hay nada con esa búsqueda.</p>
 </main>
-<button class="tw-boton" id="twBoton" type="button" aria-label="Ajustes de animación" aria-expanded="false" aria-controls="tw"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
-<div class="tw" id="tw" role="dialog" aria-label="Ajustes de animación">
-  <h2>Tweaks</h2>
-  <p class="rot">Hovers</p>
-  <label>Grupos: color<input type="checkbox" data-tw="hover-color"><span class="sw"></span></label>
-  <label>Grupos: fondo y corrimiento<input type="checkbox" data-tw="hover-grupo"><span class="sw"></span></label>
-  <label>Tarjetas<input type="checkbox" data-tw="hover-tarjeta"><span class="sw"></span></label>
-  <p class="rot">Animaciones</p>
-  <label>Despliegue del acordeón<input type="checkbox" data-tw="despliegue"><span class="sw"></span></label>
-  <label>Fundido de tarjetas<input type="checkbox" data-tw="fundido"><span class="sw"></span></label>
-  <label>Buscador<input type="checkbox" data-tw="buscador"><span class="sw"></span></label>
-  <label>Barra al bajar<input type="checkbox" data-tw="barra"><span class="sw"></span></label>
-  <div class="acciones"><button type="button" data-todo="1">Todo prendido</button><button type="button" data-todo="0">Todo apagado</button></div>
-</div>
-
-<footer class="wrap">
-  <a href="https://bongstudio.ar">bongstudio.ar</a>
-</footer>
+<a class="bong-credit" href="https://bongstudio.ar" target="_blank" rel="noreferrer">
+  <span>Desarrollado por</span>
+  <svg viewBox="0 0 66 78" aria-hidden="true">
+    <path d="M58.4946 5.4015C61.7586 8.7101 63.8526 13.3115 63.8526 18.3591C63.8526 23.4066 61.7586 27.9926 58.4946 31.3166C55.1843 34.6867 50.642 36.7181 45.5916 36.7181C40.5412 36.7181 35.9989 34.6714 32.7347 31.3166C29.4704 28.008 27.3763 23.4066 27.3763 18.3591C27.3763 13.3115 29.4704 8.7256 32.7347 5.4015C35.9989 2.0313 40.5874 0 45.5916 0C50.5958 0 55.1843 2.0467 58.4946 5.4015Z"/>
+    <path d="M21.9571 5.61687C22.7731 7.75597 22.7731 10.3105 21.9571 12.4958C21.1872 14.4348 19.8168 16.066 17.7689 16.9278C28.2238 18.7591 27.6234 36.1948 15.875 36.1948H0.015625V0.569275H14.4585C18.3387 0.569275 20.833 2.75457 21.9571 5.61687Z"/>
+    <path d="M0 40.565L0.0307999 76.7753H13.4728H25.1749V41.0268H13.4728V56.1233L0.600498 40.565H0Z"/>
+    <path d="M46.4542 58.7706L55.9547 42.3352C53.3984 40.9963 50.5037 40.2423 47.4242 40.2423C37.2464 40.2423 28.9934 48.4907 28.9934 58.6629C28.9934 68.8353 37.2464 77.0833 47.4242 77.0833C57.6017 77.0833 65.8087 68.8963 65.8547 58.7552H46.4542V58.7706Z"/>
+  </svg>
+</a>
 
 <script>
 /* Bong Studio · Diseño y desarrollo · bongstudio.ar */
@@ -397,27 +364,6 @@ $("#goSearch").addEventListener("click", () => { if (!$("#busca").classList.cont
 $("#buscar").addEventListener("blur", () => setTimeout(() => { if (!$("#buscar").value && document.activeElement !== $("#buscar")) abrirBusca(false); }, 180));
 $("#buscar").addEventListener("keydown", e => { if (e.key === "Escape") cerrarBusca(); });
 document.addEventListener("keydown", e => { if (e.key === "/" && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) { e.preventDefault(); abrirBusca(true); } });
-
-/* Tweaker: cada interruptor prendido = movimiento activo; se recuerda en este navegador */
-const tw = $("#tw"), twBoton = $("#twBoton"), llaves = [...tw.querySelectorAll("[data-tw]")];
-const TW_INICIO = { "hover-grupo": false };   // lo que arranca apagado; el resto, prendido
-let twEstado = {};
-try { twEstado = JSON.parse(localStorage.getItem("lab-tweaks-2") || "{}"); } catch (e) {}
-function twAplicar() {
-  for (const inp of llaves) {
-    const k = inp.dataset.tw, si = twEstado[k] ?? TW_INICIO[k] ?? true;
-    inp.checked = si;
-    document.documentElement.classList.toggle("sin-" + k, !si);
-  }
-  try { localStorage.setItem("lab-tweaks-2", JSON.stringify(twEstado)); } catch (e) {}
-}
-tw.addEventListener("change", e => { const k = e.target.dataset.tw; if (k) { twEstado[k] = e.target.checked; twAplicar(); } });
-tw.addEventListener("click", e => { const b = e.target.closest("[data-todo]"); if (!b) return; llaves.forEach(i => { twEstado[i.dataset.tw] = b.dataset.todo === "1"; }); twAplicar(); });
-function twAbrir(si) { tw.classList.toggle("open", si); twBoton.setAttribute("aria-expanded", String(si)); }
-twBoton.addEventListener("click", () => twAbrir(!tw.classList.contains("open")));
-document.addEventListener("click", e => { if (tw.classList.contains("open") && !tw.contains(e.target) && !twBoton.contains(e.target)) twAbrir(false); });
-document.addEventListener("keydown", e => { if (e.key === "Escape" && tw.classList.contains("open")) { twAbrir(false); twBoton.focus(); } });
-twAplicar();
 
 /* La barra se vuelve azul cuando el header sale de vista */
 const top_ = $("#top");
