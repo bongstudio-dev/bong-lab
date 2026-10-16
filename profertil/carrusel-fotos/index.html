@@ -131,7 +131,10 @@ body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f
 (function () {
   /* Todo pasa por una sola posicion
      suavizada, tambien el arrastre, y al soltar sigue por inercia hasta frenar sola. Sin encastre. */
-  const SUAVIZADO = 0.05;      // fraccion del camino restante que recorre por cuadro (a 60 fps)
+  const SUAVIZADO = 0.05;      // fraccion del camino restante que recorre por cuadro (a 60 fps), con mouse
+  /* Con el dedo el retardo se siente pesado: la foto tiene que ir pegada al dedo y frenar mas rapido. */
+  const SUAVIZADO_DEDO = 0.22;   // mientras se arrastra con el dedo (~70 ms de retardo)
+  const SUAVIZADO_TACTIL = 0.09; // despues de soltar en pantalla tactil (~180 ms, contra ~330 con mouse)
   const ROCE = 0.93;           // inercia: cuanto impulso conserva por cuadro al soltar
   const EMPUJE = 16;           // px de impulso por cada px/ms de velocidad del gesto
   const QUIETO = 0.4;          // px: por debajo de esto se da por llegado
@@ -151,6 +154,7 @@ body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f
     let impulso = 0;         // px por cuadro que se suman al objetivo al soltar
     let arrastre = null;     // { x0, base, xPrev, tPrev, vel, dist }
     let ultimo = 0, corriendo = false;
+    let tactil = false;      // el ultimo gesto fue con el dedo
 
     function medir() {
       const pasoViejo = paso;
@@ -186,7 +190,8 @@ body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f
         impulso *= Math.pow(ROCE, f);
         if (Math.abs(impulso) < 0.05) impulso = 0;
       }
-      actual += (objetivo - actual) * (reducido.matches ? 1 : 1 - Math.pow(1 - SUAVIZADO, f));
+      const suave = tactil ? (arrastre ? SUAVIZADO_DEDO : SUAVIZADO_TACTIL) : SUAVIZADO;
+      actual += (objetivo - actual) * (reducido.matches ? 1 : 1 - Math.pow(1 - suave, f));
       const llego = !arrastre && !impulso && Math.abs(objetivo - actual) < QUIETO;
       if (llego) actual = objetivo;
       pintar();
@@ -198,6 +203,7 @@ body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f
     function centrada() { return Math.round(objetivo / paso); }   // foto mas cercana a donde va
 
     pista.addEventListener('keydown', function (e) {
+      tactil = false;
       if (e.key === 'ArrowRight') { e.preventDefault(); irA((centrada() + 1) * paso); }
       else if (e.key === 'ArrowLeft') { e.preventDefault(); irA((centrada() - 1) * paso); }
     });
@@ -206,6 +212,7 @@ body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f
     pista.addEventListener('pointerdown', function (e) {
       if (e.pointerType === 'mouse' && e.button !== 0) return;
       impulso = 0;
+      tactil = e.pointerType !== 'mouse';
       arrastre = { x0: e.clientX, base: objetivo, xPrev: e.clientX, tPrev: e.timeStamp, vel: 0, dist: 0 };
       pista.setPointerCapture(e.pointerId);
       arrancar();
