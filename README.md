@@ -14,11 +14,14 @@ Portada: https://bongstudio-dev.github.io/bong-lab/
      titulo: "Nombre del experimento",
      cliente: "Cliente",
      descripcion: "Una línea que cuente qué es.",
+     grupo: "Nombre de la carpeta de la portada",
      url: "cliente/experimento/",
    },
    ```
 
-3. Hacé commit y push a `main`. Pages lo publica en uno o dos minutos en `https://bongstudio-dev.github.io/bong-lab/<cliente>/<experimento>/`.
+   `grupo` es la "carpeta" de la portada donde se muestra: solo agrupa visualmente y no cambia ninguna dirección. Si es un grupo nuevo, sumalo también a `ORDEN_GRUPOS` (define el orden).
+
+4. Hacé commit y push a `main`. Pages lo publica en uno o dos minutos en `https://bongstudio-dev.github.io/bong-lab/<cliente>/<experimento>/`.
 
 Para probarlo local, levantá un servidor desde la raíz (`python3 -m http.server 8777`) y abrí http://localhost:8777.
 

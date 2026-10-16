@@ -8,71 +8,86 @@
 <script>
   // Para sumar un experimento, agregá un objeto acá.
   // url: carpeta relativa a la raíz del repo, con barra final.
+  // grupo: la "carpeta" de la portada donde se muestra. Es solo visual: las
+  // direcciones de los experimentos no cambian. Si es un grupo nuevo, sumalo
+  // también a ORDEN_GRUPOS (define el orden en que aparecen).
+  const ORDEN_GRUPOS = ["Componentes y animación", "Novedades", "Sistema de formas", "Pruebas de máscaras", "Herramientas"];
   const EXPERIMENTOS = [
     {
       titulo: "Laboratorio generativo del Sistema de Formas",
       cliente: "Profertil",
       descripcion: "Las 17 formas del sistema en partículas, flujo, grilla y mosaico.",
+      grupo: "Sistema de formas",
       url: "profertil/formas/",
     },
     {
       titulo: "Laboratorio de refracción",
       cliente: "Profertil",
       descripcion: "Cristal tipo liquid glass sobre el Sistema de Formas.",
+      grupo: "Sistema de formas",
       url: "profertil/refraccion/",
     },
     {
       titulo: "Máscaras WebGL",
       cliente: "Profertil",
       descripcion: "Las formas del sistema como máscaras animadas de fotos al scrollear.",
+      grupo: "Pruebas de máscaras",
       url: "profertil/mascaras/",
     },
     {
       titulo: "Máscaras p5.js",
       cliente: "Profertil",
       descripcion: "La misma prueba de máscaras, dibujada con p5.js para comparar rendimiento.",
+      grupo: "Pruebas de máscaras",
       url: "profertil/mascaras-p5/",
     },
     {
       titulo: "Máscaras Three.js",
       cliente: "Profertil",
       descripcion: "La misma prueba de máscaras sobre Three.js, con los mismos shaders, para comparar peso y rendimiento.",
+      grupo: "Pruebas de máscaras",
       url: "profertil/mascaras-three/",
     },
     {
       titulo: "Novedades",
       cliente: "Profertil",
       descripcion: "Archivo de las 471 notas del sitio actual sobre el concepto web del manual: carrusel de destacadas, buscador, categoría y año.",
+      grupo: "Novedades",
       url: "profertil/novedades/",
     },
     {
       titulo: "Novedades · tweak del panel de filtros",
       cliente: "Profertil",
       descripcion: "Ajuste en vivo de la animación de los filtros de Novedades: curva, duraciones y fundido, sobre la página real.",
+      grupo: "Novedades",
       url: "profertil/novedades-tweak/",
     },
     {
       titulo: "Hero morph",
       cliente: "Profertil",
       descripcion: "La foto arranca a pantalla completa y con el scroll se transforma en forma, panel o grilla. Exporta sus valores en JSON.",
+      grupo: "Componentes y animación",
       url: "profertil/hero-morph/",
     },
     {
       titulo: "Animadores de texto",
       cliente: "Profertil",
       descripcion: "Catálogo de 14 animaciones de texto con nombre, uso y valores fijos, para unificarlas en todas las páginas. Con laboratorio para combinar.",
+      grupo: "Componentes y animación",
       url: "profertil/animadores-texto/",
     },
     {
       titulo: "Arquitectura del sitio",
       cliente: "Profertil",
       descripcion: "El mapa de profertil.com.ar para armarlo en vivo entre todos: árbol editable, conteo de páginas, plantillas, registros y arte, e historial de versiones.",
+      grupo: "Herramientas",
       url: "https://entregables.bongstudio.ar/profertil/arquitectura/",
     },
     {
       titulo: "Carrusel de fotos",
       cliente: "Profertil",
       descripcion: "Galería a ancho completo con loop, parallax en cada foto y una pastilla que sigue al cursor. Componente para la web.",
+      grupo: "Componentes y animación",
       url: "profertil/carrusel-fotos/",
     },
   ];
@@ -136,6 +151,21 @@
   }
   .tarjeta .flecha { font-size: 20px; transition: transform .2s; }
   .tarjeta:hover .flecha { transform: translateX(4px); }
+  .grupo { margin-bottom: 40px; }
+  .grupo > summary {
+    list-style: none; cursor: pointer;
+    display: flex; align-items: baseline; gap: 14px;
+    padding: 0 0 14px; margin-bottom: 20px;
+    border-bottom: 1px solid var(--linea);
+  }
+  .grupo > summary::-webkit-details-marker { display: none; }
+  .grupo > summary:focus-visible { outline: 2px solid var(--texto); outline-offset: 6px; }
+  .grupo h2.nombre {
+    font-size: clamp(22px, 4vw, 32px); font-weight: 700; letter-spacing: -0.02em; line-height: 1;
+  }
+  .grupo .cuenta { font-size: 12px; font-weight: 500; letter-spacing: 0.12em; color: var(--tenue); }
+  .grupo .chevron { margin-left: auto; font-size: 18px; color: var(--tenue); transition: transform .25s; }
+  .grupo[open] > summary .chevron { transform: rotate(180deg); }
   footer { margin-top: 56px; font-size: 13px; color: var(--tenue); }
   footer a { color: inherit; }
 
@@ -154,36 +184,62 @@
     <p class="eyebrow">Bong Studio · Experimentos, prototipos y herramientas</p>
     <h1>Bong Lab</h1>
   </header>
-  <main>
-    <ul class="grilla" id="grilla"></ul>
-  </main>
+  <main id="principal"></main>
   <footer>
     <a href="https://bongstudio.ar">bongstudio.ar</a>
   </footer>
 <script>
-  const grilla = document.getElementById("grilla");
+  const principal = document.getElementById("principal");
+  const porGrupo = new Map(ORDEN_GRUPOS.map(g => [g, []]));
   for (const e of EXPERIMENTOS) {
-    const li = document.createElement("li");
-    const a = document.createElement("a");
-    a.className = "tarjeta";
-    a.href = e.url;
+    const g = e.grupo || "Otros";
+    if (!porGrupo.has(g)) porGrupo.set(g, []);
+    porGrupo.get(g).push(e);
+  }
+  for (const [nombre, lista] of porGrupo) {
+    if (!lista.length) continue;
+    const det = document.createElement("details");
+    det.className = "grupo";
+    det.open = true;
+    const sum = document.createElement("summary");
     const h2 = document.createElement("h2");
-    h2.textContent = e.titulo;
-    const p = document.createElement("p");
-    p.textContent = e.descripcion;
-    const pie = document.createElement("div");
-    pie.className = "pie";
-    const cliente = document.createElement("span");
-    cliente.className = "eyebrow";
-    cliente.textContent = e.cliente;
-    const flecha = document.createElement("span");
-    flecha.className = "flecha";
-    flecha.setAttribute("aria-hidden", "true");
-    flecha.textContent = "→";
-    pie.append(cliente, flecha);
-    a.append(h2, p, pie);
-    li.append(a);
-    grilla.append(li);
+    h2.className = "nombre";
+    h2.textContent = nombre;
+    const cuenta = document.createElement("span");
+    cuenta.className = "cuenta";
+    cuenta.textContent = String(lista.length).padStart(2, "0");
+    const chevron = document.createElement("span");
+    chevron.className = "chevron";
+    chevron.setAttribute("aria-hidden", "true");
+    chevron.textContent = "↓";
+    sum.append(h2, cuenta, chevron);
+    const ul = document.createElement("ul");
+    ul.className = "grilla";
+    for (const e of lista) {
+      const li = document.createElement("li");
+      const a = document.createElement("a");
+      a.className = "tarjeta";
+      a.href = e.url;
+      const t = document.createElement("h2");
+      t.textContent = e.titulo;
+      const p = document.createElement("p");
+      p.textContent = e.descripcion;
+      const pie = document.createElement("div");
+      pie.className = "pie";
+      const cliente = document.createElement("span");
+      cliente.className = "eyebrow";
+      cliente.textContent = e.cliente;
+      const flecha = document.createElement("span");
+      flecha.className = "flecha";
+      flecha.setAttribute("aria-hidden", "true");
+      flecha.textContent = "→";
+      pie.append(cliente, flecha);
+      a.append(t, p, pie);
+      li.append(a);
+      ul.append(li);
+    }
+    det.append(sum, ul);
+    principal.append(det);
   }
 </script>
 </body>
