@@ -196,7 +196,16 @@ button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
 .f1{width:min(40vw,540px);right:-4%;top:-8%;color:var(--amarillo)}   /* Forma/Trigo: primaria Azul + Amarillo */
 
 /* Grupos en acordeón: número grande antes del título, chevron corto en círculo */
-main{padding:48px 0 120px}
+main{padding:40px 0 120px}
+/* Expandir y plegar todo: los mismos botones del mapa de Arquitectura */
+.controles{display:flex;justify-content:flex-end;margin-bottom:16px}
+.grp{display:inline-flex;gap:2px;padding:3px;border-radius:999px;background:var(--line);flex:none}
+.ib{width:32px;height:30px;border:0;border-radius:999px;background:transparent;color:var(--ink-2);display:grid;place-items:center;padding:0;transition:background 180ms ease,color 180ms ease,box-shadow 180ms ease,opacity 180ms ease}
+.ib svg{width:16px;height:16px;fill:currentColor;stroke:none}
+.ib svg .r{stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}
+@media(hover:hover) and (pointer:fine){.ib:hover:not(:disabled){background:var(--card);color:var(--azul);box-shadow:0 1px 3px rgba(10,30,74,.12)}}
+.ib:active:not(:disabled){background:var(--card);color:var(--azul)}
+.ib:disabled{opacity:.35;cursor:default}
 .grupo{border-bottom:1px solid var(--line)}
 .grupo:first-child{border-top:1px solid var(--line)}
 .cab{width:100%;display:flex;align-items:center;gap:clamp(16px,3vw,32px);border:0;background:none;padding:26px 12px;margin:0 -12px;width:calc(100% + 24px);border-radius:20px;text-align:left;color:var(--ink);transition:background 320ms var(--ease)}
@@ -271,6 +280,12 @@ main{padding:48px 0 120px}
 </section>
 
 <main class="wrap">
+  <div class="controles">
+    <div class="grp" role="group" aria-label="Grupos">
+      <button class="ib" id="bAbrir" type="button" title="Expandir todo" aria-label="Expandir todo"><svg viewBox="-1 -1 17 17" aria-hidden="true"><path class="r" d="M7.5 1 12.2 5.6H2.8ZM2.8 9.4h9.4L7.5 14Z"/></svg></button>
+      <button class="ib" id="bCerrar" type="button" title="Plegar todo" aria-label="Plegar todo"><svg viewBox="-1 -1 17 17" aria-hidden="true"><path class="r" d="M2.8 1h9.4L7.5 5.6ZM7.5 9.4l4.7 4.6H2.8Z"/></svg></button>
+    </div>
+  </div>
   <div id="principal"></div>
   <p class="vacio" id="vacio" hidden>No hay nada con esa búsqueda.</p>
 </main>
@@ -333,12 +348,23 @@ function abrir(sec, si) {
   sec.classList.toggle("abierto", si);
   sec.querySelector(".cab").setAttribute("aria-expanded", String(si));
   sec.querySelector(".cuerpo").inert = !si;
+  estadoControles();
 }
+/* Expandir/plegar todo; cada botón se apaga cuando ya no tiene nada que hacer */
+function estadoControles() {
+  const visibles = grupos.filter(g => !g.hidden);
+  $("#bAbrir").disabled = visibles.every(g => g.classList.contains("abierto"));
+  $("#bCerrar").disabled = visibles.every(g => !g.classList.contains("abierto"));
+}
+$("#bAbrir").addEventListener("click", () => grupos.forEach(g => abrir(g, true)));
+$("#bCerrar").addEventListener("click", () => grupos.forEach(g => abrir(g, false)));
 principal.addEventListener("click", e => {
   const cab = e.target.closest(".cab"); if (!cab) return;
   const sec = cab.closest(".grupo");
   abrir(sec, !sec.classList.contains("abierto"));
 });
+
+estadoControles();
 
 /* Buscador: filtra por título, descripción y grupo; abre los grupos que tienen resultados */
 function filtrar(q) {
@@ -350,6 +376,7 @@ function filtrar(q) {
     if (q && k) abrir(sec, true);
   }
   $("#vacio").hidden = total > 0;
+  estadoControles();
 }
 function abrirBusca(si) {
   $("#busca").classList.toggle("open", si); $(".nav").classList.toggle("buscando", si);
