@@ -126,7 +126,8 @@ body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f
 /* Bong Studio · Diseño y desarrollo · bongstudio.ar */
 (function () {
   /* Parametros medidos en el slider de referencia. */
-  const SUAVIZADO = 0.05;     // fraccion del camino restante que se recorre por cuadro a 60 fps (~0,33 s de constante de tiempo)
+  const DURACION = 900;       // ms que tarda en llegar a la foto destino, siempre los mismos: el frenado termina, no se arrastra
+  function frenado(t) { return 1 - Math.pow(1 - t, 4); }   // ease-out (quart): sale rapido y apoya suave
   const UMBRAL_ARRASTRE = 0.18; // cuanto hay que arrastrar (en fotos) para pasar a la siguiente
 
   document.querySelectorAll('.fotos').forEach(function (raiz) {
@@ -140,7 +141,8 @@ body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f
     let objetivo = 0;        // indice al que va (entero)
     let actual = 0;          // posicion suavizada (decimal)
     let arrastre = null;     // { x0, base, t }
-    let ultimo = performance.now(), corriendo = false;
+    let desde = 0, t0 = 0;   // tramo en curso: de donde salio y cuando
+    let corriendo = false;
 
     function medir() {
       ancho = pista.clientWidth;
@@ -168,20 +170,18 @@ body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f
     }
 
     function tick(ahora) {
-      const dt = Math.min(64, ahora - ultimo); ultimo = ahora;
-      if (!arrastre) {
-        const k = reducido.matches ? 1 : 1 - Math.pow(1 - SUAVIZADO, dt / 16.667); // independiente de la tasa de cuadros
-        actual += (objetivo - actual) * k;
-        if (Math.abs(objetivo - actual) < 0.0005) { actual = objetivo; corriendo = false; }
-      }
+      if (arrastre) { corriendo = false; return; }          // mientras se arrastra manda el puntero
+      const t = reducido.matches ? 1 : Math.min(1, Math.max(0, ahora - t0) / DURACION);
+      actual = desde + (objetivo - desde) * frenado(t);
+      if (t >= 1) { actual = objetivo; corriendo = false; }  // llega exacto, sin cola
       pintar();
       if (corriendo) requestAnimationFrame(tick);
     }
-    function arrancar() { if (!corriendo) { corriendo = true; ultimo = performance.now(); requestAnimationFrame(tick); } }
 
     function ir(i) {
       objetivo = i;   // sin tope: el indice sigue creciendo y la vuelta se resuelve al pintar
-      arrancar();
+      desde = actual; t0 = performance.now();   // si interrumpe un tramo, el nuevo sale desde donde esta
+      if (!corriendo) { corriendo = true; requestAnimationFrame(tick); }
     }
 
     pista.addEventListener('keydown', function (e) {
