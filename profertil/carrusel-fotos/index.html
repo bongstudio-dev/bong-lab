@@ -63,7 +63,7 @@
   --f-display: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
   --f-body: "DM Sans", "Helvetica Neue", Arial, sans-serif;
 
-  /* Movimiento del carrusel (medido en un slider de referencia). */
+  /* Movimiento del carrusel. */
   --slide-ancho: 74%;     /* ancho de cada foto respecto del carrusel */
   --slide-aire: 24px;     /* separacion entre fotos */
   --foto-ancho: 132%;     /* la foto es mas ancha que su marco: de ahi sale el parallax */
@@ -125,10 +125,14 @@ body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f
 <script>
 /* Bong Studio · Diseño y desarrollo · bongstudio.ar */
 (function () {
-  /* Parametros medidos en el slider de referencia. */
-  const DURACION = 900;       // ms que tarda en llegar a la foto destino, siempre los mismos: el frenado termina, no se arrastra
-  function frenado(t) { return 1 - Math.pow(1 - t, 4); }   // ease-out (quart): sale rapido y apoya suave
-  const UMBRAL_ARRASTRE = 0.18; // cuanto hay que arrastrar (en fotos) para pasar a la siguiente
+  /* Todo pasa por una sola posicion
+     suavizada, tambien el arrastre, y al soltar sigue por inercia hasta frenar sola. Sin encastre. */
+  const SUAVIZADO = 0.05;      // fraccion del camino restante que recorre por cuadro (a 60 fps)
+  const ROCE = 0.93;           // inercia: cuanto impulso conserva por cuadro al soltar
+  const EMPUJE = 16;           // px de impulso por cada px/ms de velocidad del gesto
+  const QUIETO = 0.4;          // px: por debajo de esto se da por llegado
+  const PARALAJE_CURVA = 0.84; // el corrimiento de la foto dentro del marco no es lineal
+  const PARALAJE_RANGO = 0.78; // fraccion de la distancia de salida en la que se completa el corrimiento
 
   document.querySelectorAll('.fotos').forEach(function (raiz) {
     const pista = raiz.querySelector('.fotos__pista');
@@ -137,83 +141,91 @@ body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f
     const n = fotos.length;
     const reducido = matchMedia('(prefers-reduced-motion: reduce)');
 
-    let ancho = 0, paso = 0, anchoFoto = 0, margen = 0, paralaje = 0, tope = 0;
-    let objetivo = 0;        // indice al que va (entero)
-    let actual = 0;          // posicion suavizada (decimal)
-    let arrastre = null;     // { x0, base, t }
-    let desde = 0, t0 = 0;   // tramo en curso: de donde salio y cuando
-    let corriendo = false;
+    let ancho = 0, paso = 0, anchoFoto = 0, margen = 0, tope = 0, rango = 0;
+    let objetivo = 0;        // a donde va, en px de recorrido
+    let actual = 0;          // donde esta (suavizado), en px
+    let impulso = 0;         // px por cuadro que se suman al objetivo al soltar
+    let arrastre = null;     // { x0, base, xPrev, tPrev, vel, dist }
+    let ultimo = 0, corriendo = false;
 
     function medir() {
+      const pasoViejo = paso;
       ancho = pista.clientWidth;
       anchoFoto = fotos[0].offsetWidth;
       const aire = parseFloat(getComputedStyle(pista).getPropertyValue('--slide-aire')) || 24;
       paso = anchoFoto + aire;
       margen = (ancho - anchoFoto) / 2;
-      const exceso = imgs[0].offsetWidth - anchoFoto;      // cuanto sobra la foto a cada lado: exceso / 2
-      tope = exceso / 2;
-      paralaje = tope / paso;                              // px de foto por px de desplazamiento
+      tope = Math.max(0, (imgs[0].offsetWidth - anchoFoto) / 2);   // cuanto sobra la foto a cada lado
+      rango = (ancho + anchoFoto) / 2 * PARALAJE_RANGO;
+      if (pasoViejo && paso !== pasoViejo) { const r = paso / pasoViejo; actual *= r; objetivo *= r; }
     }
 
     function pintar() {
-      for (let i = 0; i < fotos.length; i++) {
-        let d = i - actual;
-        d -= n * Math.round(d / n);                          // en loop: cada foto se ubica en su vuelta mas cercana
-        const rel = d * paso;                               // distancia al centro, en px
+      const total = n * paso;
+      for (let i = 0; i < n; i++) {
+        let rel = i * paso - actual;
+        rel -= total * Math.round(rel / total);             // en loop: cada foto en su vuelta mas cercana
         const x = margen + rel;
         if (x > ancho + 40 || x < -anchoFoto - 40) { fotos[i].style.visibility = 'hidden'; continue; }
         fotos[i].style.visibility = '';
-        fotos[i].style.transform = 'translate3d(' + x.toFixed(2) + 'px,0,0)';
-        const p = Math.max(-tope, Math.min(tope, -rel * paralaje));
-        imgs[i].style.transform = 'translate3d(calc(-50% + ' + p.toFixed(2) + 'px),0,0)';
+        fotos[i].style.transform = 'translate3d(' + x + 'px,0,0)';
+        const a = Math.max(-1, Math.min(1, -rel / rango));
+        const p = Math.sign(a) * Math.pow(Math.abs(a), PARALAJE_CURVA) * tope;
+        imgs[i].style.transform = 'translate3d(calc(-50% + ' + p + 'px),0,0)';
       }
     }
 
     function tick(ahora) {
-      if (arrastre) { corriendo = false; return; }          // mientras se arrastra manda el puntero
-      const t = reducido.matches ? 1 : Math.min(1, Math.max(0, ahora - t0) / DURACION);
-      actual = desde + (objetivo - desde) * frenado(t);
-      if (t >= 1) { actual = objetivo; corriendo = false; }  // llega exacto, sin cola
+      const f = Math.min(4, (ahora - ultimo) / 16.667); ultimo = ahora;   // cuadros de 60 fps transcurridos
+      if (!arrastre && impulso) {
+        objetivo += impulso * (1 - Math.pow(ROCE, f)) / (1 - ROCE);       // suma de la serie: igual a cualquier tasa de cuadros
+        impulso *= Math.pow(ROCE, f);
+        if (Math.abs(impulso) < 0.05) impulso = 0;
+      }
+      actual += (objetivo - actual) * (reducido.matches ? 1 : 1 - Math.pow(1 - SUAVIZADO, f));
+      const llego = !arrastre && !impulso && Math.abs(objetivo - actual) < QUIETO;
+      if (llego) actual = objetivo;
       pintar();
-      if (corriendo) requestAnimationFrame(tick);
+      if (llego) corriendo = false; else requestAnimationFrame(tick);
     }
+    function arrancar() { if (!corriendo) { corriendo = true; ultimo = performance.now(); requestAnimationFrame(tick); } }
 
-    function ir(i) {
-      objetivo = i;   // sin tope: el indice sigue creciendo y la vuelta se resuelve al pintar
-      desde = actual; t0 = performance.now();   // si interrumpe un tramo, el nuevo sale desde donde esta
-      if (!corriendo) { corriendo = true; requestAnimationFrame(tick); }
-    }
+    function irA(px) { impulso = 0; objetivo = px; arrancar(); }
+    function centrada() { return Math.round(objetivo / paso); }   // foto mas cercana a donde va
 
     pista.addEventListener('keydown', function (e) {
-      if (e.key === 'ArrowRight') { e.preventDefault(); ir(objetivo + 1); }
-      else if (e.key === 'ArrowLeft') { e.preventDefault(); ir(objetivo - 1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); irA((centrada() + 1) * paso); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); irA((centrada() - 1) * paso); }
     });
 
-    /* Arrastre con mouse o dedo: la foto sigue al puntero y al soltar elige destino. */
+    /* Arrastre con mouse o dedo: mueve el objetivo; la foto lo persigue con el mismo suavizado. */
     pista.addEventListener('pointerdown', function (e) {
       if (e.pointerType === 'mouse' && e.button !== 0) return;
-      arrastre = { x0: e.clientX, base: actual, t: performance.now(), movio: false };
+      impulso = 0;
+      arrastre = { x0: e.clientX, base: objetivo, xPrev: e.clientX, tPrev: e.timeStamp, vel: 0, dist: 0 };
       pista.setPointerCapture(e.pointerId);
+      arrancar();
     });
     pista.addEventListener('pointermove', function (e) {
       if (!arrastre) return;
       const dx = e.clientX - arrastre.x0;
-      if (Math.abs(dx) > 4) arrastre.movio = true;
-      actual = arrastre.base - dx / paso;
-      pintar();
+      const dt = Math.max(1, e.timeStamp - arrastre.tPrev);
+      arrastre.vel = arrastre.vel * 0.76 + (e.clientX - arrastre.xPrev) / dt * 0.24;   // velocidad del gesto, px/ms
+      arrastre.xPrev = e.clientX; arrastre.tPrev = e.timeStamp;
+      arrastre.dist = Math.max(arrastre.dist, Math.abs(dx));
+      objetivo = arrastre.base - dx;
     });
     function soltar(e) {
       if (!arrastre) return;
-      const dx = e.clientX - arrastre.x0;
-      const v = dx / Math.max(1, performance.now() - arrastre.t); // px por ms
       const a = arrastre; arrastre = null;
-      let destino = Math.round(actual);
-      if (Math.abs(dx) / paso > UMBRAL_ARRASTRE || Math.abs(v) > 0.4) destino = dx < 0 ? Math.ceil(a.base + 0.01) : Math.floor(a.base - 0.01);
-      if (!a.movio) { // un toque sobre una foto vecina la trae al centro
+      if (a.dist <= 8) {   // un toque sobre una foto vecina la trae al centro
         const r = pista.getBoundingClientRect(), x = e.clientX - r.left;
-        if (x < margen) destino = objetivo - 1; else if (x > margen + anchoFoto) destino = objetivo + 1;
+        if (x < margen) return irA((centrada() - 1) * paso);
+        if (x > margen + anchoFoto) return irA((centrada() + 1) * paso);
       }
-      ir(destino);
+      if (e.timeStamp - a.tPrev > 100) a.vel = 0;   // si se quedo quieto antes de soltar, no hay impulso
+      impulso = -a.vel * EMPUJE;
+      arrancar();
     }
     pista.addEventListener('pointerup', soltar);
     pista.addEventListener('pointercancel', soltar);
