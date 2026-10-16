@@ -206,10 +206,10 @@ main{padding:48px 0 120px}
 .cab .chev svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .grupo.abierto .cab .chev{transform:rotate(180deg)}
 @media(hover:hover) and (pointer:fine){
-  .cab:hover{background:rgba(255,254,239,.55)}
-  .cab:hover .num{color:var(--azul)}
-  .cab:hover .nombre{transform:translateX(6px)}
-  .cab:hover .chev{background:var(--azul);color:var(--tiza)}
+  html:not(.sin-hover-grupo) .cab:hover{background:rgba(255,254,239,.55)}
+  html:not(.sin-hover-grupo) .cab:hover .num{color:var(--azul)}
+  html:not(.sin-hover-grupo) .cab:hover .nombre{transform:translateX(6px)}
+  html:not(.sin-hover-grupo) .cab:hover .chev{background:var(--azul);color:var(--tiza)}
 }
 .cab:active .chev{background:var(--azul);color:var(--tiza)}
 /* El cuerpo se despliega animando la fila de la grilla de 0fr a 1fr: mide solo, sin alturas fijas */
@@ -224,10 +224,10 @@ main{padding:48px 0 120px}
 .tarjeta .ir{margin-top:auto;align-self:flex-end;width:40px;height:40px;border-radius:999px;display:grid;place-items:center;background:var(--bg);color:var(--azul);transition:background 320ms var(--ease),color 320ms var(--ease)}
 .tarjeta .ir svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform 420ms var(--ease)}
 @media(hover:hover) and (pointer:fine){
-  .tarjeta:hover{transform:translateY(-4px);box-shadow:var(--shadow-up)}
-  .tarjeta:hover .ir{background:var(--azul);color:var(--tiza)}
-  .tarjeta:hover .ir svg{transform:translateX(2px)}
-  .tarjeta:hover .ir.ext svg{transform:translate(2px,-2px)}
+  html:not(.sin-hover-tarjeta) .tarjeta:hover{transform:translateY(-4px);box-shadow:var(--shadow-up)}
+  html:not(.sin-hover-tarjeta) .tarjeta:hover .ir{background:var(--azul);color:var(--tiza)}
+  html:not(.sin-hover-tarjeta) .tarjeta:hover .ir svg{transform:translateX(2px)}
+  html:not(.sin-hover-tarjeta) .tarjeta:hover .ir.ext svg{transform:translate(2px,-2px)}
 }
 .vacio{padding:40px 0;color:var(--ink-2);font-family:var(--f-display);font-size:1.2rem}
 footer{padding:0 0 48px;font-size:.88rem;color:var(--ink-3)}
@@ -236,6 +236,28 @@ footer a{color:inherit}
 @media (min-width:640px){ .grilla{grid-template-columns:repeat(2,1fr);gap:20px} }
 @media (min-width:1024px){ .grilla{grid-template-columns:repeat(3,1fr)} }
 @media (max-width:560px){ .hero{padding:130px 0 72px} .tarjeta{min-height:0;gap:8px} .tarjeta .ir{margin-top:8px} .cab{padding:20px 12px} .cab .chev{width:40px;height:40px} }
+/* Tweaker: cada interruptor apaga un movimiento con una clase en <html> */
+.sin-despliegue .cuerpo,.sin-despliegue .cab .chev{transition:none}
+.sin-fundido .grilla,.sin-fundido .grupo.abierto .grilla{opacity:1;transform:none;transition:none}
+.sin-buscador .busca,.sin-buscador .busca-x,.sin-buscador .nav.buscando .busca-x,.sin-buscador .busca input{transition:none}
+.sin-barra .top{transition:none}
+.tw-boton{position:fixed;right:16px;bottom:16px;z-index:60;width:48px;height:48px;border-radius:999px;border:1px solid rgba(255,255,255,.92);background:rgba(255,254,239,.78);backdrop-filter:blur(22px) saturate(1.4);-webkit-backdrop-filter:blur(22px) saturate(1.4);color:var(--azul);display:grid;place-items:center;box-shadow:0 18px 40px -18px rgba(10,30,74,.5);transition:background 220ms ease,color 220ms ease}
+.tw-boton svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.tw-boton[aria-expanded=true]{background:var(--azul);color:var(--tiza);border-color:var(--azul)}
+.tw{position:fixed;right:16px;bottom:76px;z-index:60;width:min(300px,calc(100% - 32px));padding:18px 18px 14px;border-radius:26px;border:1px solid rgba(255,255,255,.92);background:rgba(255,254,239,.86);backdrop-filter:blur(22px) saturate(1.4);-webkit-backdrop-filter:blur(22px) saturate(1.4);box-shadow:0 24px 60px -24px rgba(10,30,74,.5);transform-origin:right bottom;transition:opacity 220ms ease,transform 320ms var(--ease),visibility 0s}
+.tw:not(.open){opacity:0;transform:translateY(8px) scale(.97);visibility:hidden;transition:opacity 180ms ease,transform 320ms var(--ease),visibility 0s linear 320ms}
+.tw h2{font:600 1.1rem/1.1 var(--f-display);letter-spacing:-.02em;margin-bottom:4px}
+.tw .rot{font:500 .7rem/16px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin:14px 0 2px}
+.tw label{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:7px 0;font-size:.92rem;color:var(--ink);cursor:pointer}
+.tw input{position:absolute;opacity:0;pointer-events:none}
+.tw .sw{flex:none;width:36px;height:22px;border-radius:999px;background:rgba(10,30,74,.16);position:relative;transition:background 220ms ease}
+.tw .sw::after{content:"";position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(10,30,74,.2);transition:transform 260ms var(--ease)}
+.tw input:checked+.sw{background:var(--azul)}
+.tw input:checked+.sw::after{transform:translateX(14px)}
+.tw input:focus-visible+.sw{outline:2px solid var(--celeste);outline-offset:2px}
+.tw .acciones{display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.tw .acciones button{flex:1;height:32px;border:0;border-radius:999px;background:rgba(10,30,74,.07);font-size:.8rem;font-weight:500;color:var(--ink-2)}
+.tw .acciones button:hover{background:rgba(10,30,74,.12)}
 @media (prefers-reduced-motion:reduce){ *,*::before,*::after{transition-duration:1ms!important} }
 </style>
 </head>
@@ -265,7 +287,7 @@ footer a{color:inherit}
 <section class="hero">
   <svg class="forma f1" viewBox="0 0 269 279" aria-hidden="true" fill="currentColor"><path d="M0.122525 0C104.518 6.16695 129.089 71.9464 134.315 111.945C139.551 71.9428 164.14 6.20302 268.503 0.0380859C269.392 27.8878 267.823 119.947 166.907 139.112C267.841 158.27 269.41 250.339 268.522 278.19C164.051 272.019 139.519 206.15 134.318 166.159C129.107 206.153 104.56 271.988 0.117642 278.158C-0.770961 250.306 0.797104 158.234 101.737 139.078C0.802177 119.92 -0.766054 27.8514 0.122525 0Z"/></svg>
   <div class="in">
-    <p class="eyebrow">Bong Studio para Profertil</p>
+    <p class="eyebrow">Profertil x Bong Studio</p>
     <h1>Bong Lab</h1>
     <p>Experimentos, prototipos y herramientas que probamos antes de llevarlos al sitio.</p>
   </div>
@@ -275,6 +297,20 @@ footer a{color:inherit}
   <div id="principal"></div>
   <p class="vacio" id="vacio" hidden>No hay nada con esa búsqueda.</p>
 </main>
+<button class="tw-boton" id="twBoton" type="button" aria-label="Ajustes de animación" aria-expanded="false" aria-controls="tw"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></button>
+<div class="tw" id="tw" role="dialog" aria-label="Ajustes de animación">
+  <h2>Tweaks</h2>
+  <p class="rot">Hovers</p>
+  <label>Grupos<input type="checkbox" data-tw="hover-grupo"><span class="sw"></span></label>
+  <label>Tarjetas<input type="checkbox" data-tw="hover-tarjeta"><span class="sw"></span></label>
+  <p class="rot">Animaciones</p>
+  <label>Despliegue del acordeón<input type="checkbox" data-tw="despliegue"><span class="sw"></span></label>
+  <label>Fundido de tarjetas<input type="checkbox" data-tw="fundido"><span class="sw"></span></label>
+  <label>Buscador<input type="checkbox" data-tw="buscador"><span class="sw"></span></label>
+  <label>Barra al bajar<input type="checkbox" data-tw="barra"><span class="sw"></span></label>
+  <div class="acciones"><button type="button" data-todo="1">Todo prendido</button><button type="button" data-todo="0">Todo apagado</button></div>
+</div>
+
 <footer class="wrap">
   <a href="https://bongstudio.ar">bongstudio.ar</a>
 </footer>
@@ -359,6 +395,26 @@ $("#goSearch").addEventListener("click", () => { if (!$("#busca").classList.cont
 $("#buscar").addEventListener("blur", () => setTimeout(() => { if (!$("#buscar").value && document.activeElement !== $("#buscar")) abrirBusca(false); }, 180));
 $("#buscar").addEventListener("keydown", e => { if (e.key === "Escape") cerrarBusca(); });
 document.addEventListener("keydown", e => { if (e.key === "/" && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) { e.preventDefault(); abrirBusca(true); } });
+
+/* Tweaker: cada interruptor prendido = movimiento activo; se recuerda en este navegador */
+const tw = $("#tw"), twBoton = $("#twBoton"), llaves = [...tw.querySelectorAll("[data-tw]")];
+let twEstado = {};
+try { twEstado = JSON.parse(localStorage.getItem("lab-tweaks") || "{}"); } catch (e) {}
+function twAplicar() {
+  for (const inp of llaves) {
+    const k = inp.dataset.tw, si = twEstado[k] !== false;
+    inp.checked = si;
+    document.documentElement.classList.toggle("sin-" + k, !si);
+  }
+  try { localStorage.setItem("lab-tweaks", JSON.stringify(twEstado)); } catch (e) {}
+}
+tw.addEventListener("change", e => { const k = e.target.dataset.tw; if (k) { twEstado[k] = e.target.checked; twAplicar(); } });
+tw.addEventListener("click", e => { const b = e.target.closest("[data-todo]"); if (!b) return; llaves.forEach(i => { twEstado[i.dataset.tw] = b.dataset.todo === "1"; }); twAplicar(); });
+function twAbrir(si) { tw.classList.toggle("open", si); twBoton.setAttribute("aria-expanded", String(si)); }
+twBoton.addEventListener("click", () => twAbrir(!tw.classList.contains("open")));
+document.addEventListener("click", e => { if (tw.classList.contains("open") && !tw.contains(e.target) && !twBoton.contains(e.target)) twAbrir(false); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && tw.classList.contains("open")) { twAbrir(false); twBoton.focus(); } });
+twAplicar();
 
 /* La barra se vuelve azul cuando el header sale de vista */
 const top_ = $("#top");
