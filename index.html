@@ -143,7 +143,7 @@
 /* Piel: sistema web de Profertil (Figma Master, colecciones 01 y 06), el mismo de Novedades y Arquitectura. */
 :root{
   color-scheme:light;
-  --azul:#003DA5; --celeste:#4086FF;
+  --azul:#003DA5; --celeste:#4086FF; --amarillo:#EABA2C;
   --tiza:#FFFEEF; --bg:#E9E7D6; --card:#FFFEEF;
   --ink:#0A1E4A; --ink-2:#44506E; --ink-3:#737D96;
   --barra:rgba(0,61,165,.94); --line:rgba(10,30,74,.1);
@@ -193,7 +193,7 @@ button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
 .hero h1{font-weight:600;font-size:clamp(2.6rem,7vw,5.4rem);line-height:.95;letter-spacing:-.045em}
 .hero p{margin-top:16px;max-width:46ch;font-size:1.05rem;color:rgba(255,254,239,.86)}
 .forma{position:absolute;z-index:1;pointer-events:none}
-.f1{width:min(46vw,620px);right:-6%;top:-12%;color:var(--celeste)}
+.f1{width:min(40vw,540px);right:-4%;top:-8%;color:var(--amarillo)}   /* Forma/Trigo: primaria Azul + Amarillo */
 
 /* Grupos en acordeón: número grande antes del título, chevron corto en círculo */
 main{padding:48px 0 120px}
@@ -201,11 +201,12 @@ main{padding:48px 0 120px}
 .grupo:first-child{border-top:1px solid var(--line)}
 .cab{width:100%;display:flex;align-items:center;gap:clamp(16px,3vw,32px);border:0;background:none;padding:26px 12px;margin:0 -12px;width:calc(100% + 24px);border-radius:20px;text-align:left;color:var(--ink);transition:background 320ms var(--ease)}
 .cab .num{flex:none;min-width:2.1ch;font:500 clamp(2.4rem,5vw,3.6rem)/1 var(--f-display);letter-spacing:-.04em;color:var(--ink-3);transition:color 320ms var(--ease)}
-.cab .nombre{flex:1;font:600 clamp(1.5rem,3vw,2.2rem)/1.05 var(--f-display);letter-spacing:-.03em;transition:transform 420ms var(--ease)}
+.cab .nombre{flex:1;font:600 clamp(1.5rem,3vw,2.2rem)/1.05 var(--f-display);letter-spacing:-.03em;transition:transform 420ms var(--ease),color 320ms var(--ease)}
 .cab .chev{flex:none;width:44px;height:44px;border-radius:999px;display:grid;place-items:center;background:var(--card);color:var(--azul);box-shadow:var(--shadow);transition:background 320ms var(--ease),color 320ms var(--ease),transform 520ms var(--ease)}
 .cab .chev svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .grupo.abierto .cab .chev{transform:rotate(180deg)}
 @media(hover:hover) and (pointer:fine){
+  html:not(.sin-hover-color) .cab:hover .num,html:not(.sin-hover-color) .cab:hover .nombre{color:var(--azul)}
   html:not(.sin-hover-grupo) .cab:hover{background:rgba(255,254,239,.55)}
   html:not(.sin-hover-grupo) .cab:hover .num{color:var(--azul)}
   html:not(.sin-hover-grupo) .cab:hover .nombre{transform:translateX(6px)}
@@ -285,7 +286,7 @@ footer a{color:inherit}
 </header>
 
 <section class="hero">
-  <svg class="forma f1" viewBox="0 0 269 279" aria-hidden="true" fill="currentColor"><path d="M0.122525 0C104.518 6.16695 129.089 71.9464 134.315 111.945C139.551 71.9428 164.14 6.20302 268.503 0.0380859C269.392 27.8878 267.823 119.947 166.907 139.112C267.841 158.27 269.41 250.339 268.522 278.19C164.051 272.019 139.519 206.15 134.318 166.159C129.107 206.153 104.56 271.988 0.117642 278.158C-0.770961 250.306 0.797104 158.234 101.737 139.078C0.802177 119.92 -0.766054 27.8514 0.122525 0Z"/></svg>
+  <svg class="forma f1" viewBox="0 0 263 292" aria-hidden="true" fill="currentColor"><path d="M0.269531 152.09C102.309 158.14 126.099 222.86 131.089 261.95C136.089 222.85 159.889 158.159 261.909 152.109C262.859 181.969 260.929 287.27 131.839 291.47C131.319 291.47 130.849 291.47 130.329 291.45C1.24927 287.24 -0.670468 181.94 0.269531 152.09ZM141.531 10.6104C188.391 57.4704 188.391 133.45 141.531 180.32L130.911 190.93L120.301 180.32C73.441 133.46 73.4412 57.4804 120.301 10.6104L130.911 0L141.531 10.6104Z"/></svg>
   <div class="in">
     <p class="eyebrow">Profertil x Bong Studio</p>
     <h1>Bong Lab</h1>
@@ -301,7 +302,8 @@ footer a{color:inherit}
 <div class="tw" id="tw" role="dialog" aria-label="Ajustes de animación">
   <h2>Tweaks</h2>
   <p class="rot">Hovers</p>
-  <label>Grupos<input type="checkbox" data-tw="hover-grupo"><span class="sw"></span></label>
+  <label>Grupos: color<input type="checkbox" data-tw="hover-color"><span class="sw"></span></label>
+  <label>Grupos: fondo y corrimiento<input type="checkbox" data-tw="hover-grupo"><span class="sw"></span></label>
   <label>Tarjetas<input type="checkbox" data-tw="hover-tarjeta"><span class="sw"></span></label>
   <p class="rot">Animaciones</p>
   <label>Despliegue del acordeón<input type="checkbox" data-tw="despliegue"><span class="sw"></span></label>
@@ -398,15 +400,16 @@ document.addEventListener("keydown", e => { if (e.key === "/" && !/INPUT|TEXTARE
 
 /* Tweaker: cada interruptor prendido = movimiento activo; se recuerda en este navegador */
 const tw = $("#tw"), twBoton = $("#twBoton"), llaves = [...tw.querySelectorAll("[data-tw]")];
+const TW_INICIO = { "hover-grupo": false };   // lo que arranca apagado; el resto, prendido
 let twEstado = {};
-try { twEstado = JSON.parse(localStorage.getItem("lab-tweaks") || "{}"); } catch (e) {}
+try { twEstado = JSON.parse(localStorage.getItem("lab-tweaks-2") || "{}"); } catch (e) {}
 function twAplicar() {
   for (const inp of llaves) {
-    const k = inp.dataset.tw, si = twEstado[k] !== false;
+    const k = inp.dataset.tw, si = twEstado[k] ?? TW_INICIO[k] ?? true;
     inp.checked = si;
     document.documentElement.classList.toggle("sin-" + k, !si);
   }
-  try { localStorage.setItem("lab-tweaks", JSON.stringify(twEstado)); } catch (e) {}
+  try { localStorage.setItem("lab-tweaks-2", JSON.stringify(twEstado)); } catch (e) {}
 }
 tw.addEventListener("change", e => { const k = e.target.dataset.tw; if (k) { twEstado[k] = e.target.checked; twAplicar(); } });
 tw.addEventListener("click", e => { const b = e.target.closest("[data-todo]"); if (!b) return; llaves.forEach(i => { twEstado[i.dataset.tw] = b.dataset.todo === "1"; }); twAplicar(); });
