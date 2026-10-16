@@ -78,7 +78,9 @@ body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f
 
 /* ---------- Carrusel de fotos ---------- */
 .fotos { position: relative; width: 100%; margin: 0; overflow: hidden; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
-.fotos__pista { position: relative; aspect-ratio: 1024 / 543; min-height: 260px; max-height: 90vh; outline: none; cursor: grab; }
+/* El ancho manda siempre: una foto al centro y un pedazo de cada vecina. Con ancho fijo, los topes de alto
+   solo recortan la foto en vertical (sin width:100%, aspect-ratio pasa el max-height al ancho y achica todo). */
+.fotos__pista { position: relative; width: 100%; aspect-ratio: 1024 / 543; min-height: 260px; max-height: 90vh; outline: none; cursor: grab; }
 .fotos__pista:active { cursor: grabbing; }
 .fotos__pista:focus-visible { outline: 3px solid var(--azul); outline-offset: -3px; border-radius: var(--radio); }
 .foto {
