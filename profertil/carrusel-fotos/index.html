@@ -83,13 +83,15 @@ body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f
 .fotos__pista:focus-visible { outline: 3px solid var(--azul); outline-offset: -3px; border-radius: var(--radio); }
 .foto {
   position: absolute; top: 0; left: 0; height: 100%; width: var(--slide-ancho); margin: 0;
-  border-radius: var(--radio); overflow: hidden; background: var(--card);
+  border-radius: var(--radio); overflow: hidden; background: var(--tono, var(--card)); /* color promedio de la foto: lo que se ve mientras carga */
   will-change: transform;
 }
 .foto img {
   position: absolute; top: 0; left: 50%; height: 100%; width: var(--foto-ancho);
   object-fit: cover; will-change: transform; pointer-events: none; -webkit-user-drag: none;
+  opacity: 0; transition: opacity .6s cubic-bezier(.25, .1, .25, 1);
 }
+.foto.is-cargada img { opacity: 1; }   /* entra con fundido recien cuando esta decodificada */
 /* Pastilla que sigue al cursor: cerca de el, con retardo, solo mientras se pasa sobre las fotos. */
 .fotos__cursor { position: fixed; left: 0; top: 0; z-index: 50; pointer-events: none; will-change: transform; }
 .fotos__pastilla {
@@ -112,11 +114,11 @@ body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f
   <section class="fotos" aria-roledescription="carrusel" aria-label="Galería de fotos">
     <p class="visually-hidden">Usá las flechas izquierda y derecha del teclado para recorrer las fotos.</p>
     <div class="fotos__pista" tabindex="0" role="group" aria-label="Fotos">
-      <figure class="foto"><img src="fotos/demo-1.webp" alt="" draggable="false"></figure>
-      <figure class="foto"><img src="fotos/demo-2.webp" alt="" draggable="false"></figure>
-      <figure class="foto"><img src="fotos/demo-3.webp" alt="" draggable="false"></figure>
-      <figure class="foto"><img src="fotos/demo-4.webp" alt="" draggable="false"></figure>
-      <figure class="foto"><img src="fotos/demo-5.webp" alt="" draggable="false"></figure>
+      <figure class="foto" style="--tono:#927E61"><img src="fotos/demo-1.webp" alt="" draggable="false" decoding="async"></figure>
+      <figure class="foto" style="--tono:#829283"><img src="fotos/demo-2.webp" alt="" draggable="false" decoding="async"></figure>
+      <figure class="foto" style="--tono:#99A0AA"><img src="fotos/demo-3.webp" alt="" draggable="false" decoding="async"></figure>
+      <figure class="foto" style="--tono:#B1AAA9"><img src="fotos/demo-4.webp" alt="" draggable="false" decoding="async"></figure>
+      <figure class="foto" style="--tono:#908C69"><img src="fotos/demo-5.webp" alt="" draggable="false" decoding="async"></figure>
     </div>
     <div class="fotos__cursor" aria-hidden="true"><span class="fotos__pastilla">Arrastrá</span></div>
   </section>
@@ -252,7 +254,12 @@ body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f
     pista.addEventListener('pointerleave', function () { sobre = false; pastilla.classList.remove('es-visible'); });
 
     new ResizeObserver(function () { medir(); pintar(); }).observe(pista);
-    imgs.forEach(function (im) { if (!im.complete) im.addEventListener('load', function () { medir(); pintar(); }); });
+    /* Se decodifican todas de entrada, tambien las que estan fuera de pantalla, para que ninguna
+       aparezca en blanco al entrar; cada una se muestra con fundido cuando esta lista. */
+    imgs.forEach(function (im, i) {
+      const lista = im.decode ? im.decode() : new Promise(function (ok) { im.complete ? ok() : im.addEventListener('load', ok); });
+      lista.catch(function () {}).then(function () { fotos[i].classList.add('is-cargada'); medir(); pintar(); });
+    });
     medir(); pintar();
   });
 })();
