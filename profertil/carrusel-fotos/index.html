@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<!-- firma:bong
+
+      ##########         #########
+      ###########      #############
+      ############   #################
+      ###########   ###################
+      ##########    ###################
+      ############  ###################
+      #############  #################
+      #############   ###############
+      ############      ###########
+
+                            #####
+      ##     ######     ##########
+      ####   ######   ###########
+      #####  ######  ###########
+      #############  ##########
+      #############  ###################
+      #############  ##################
+      #############   #################
+      #############     #############
+      #############        #######
+
+      PROFERTIL · CARRUSEL DE FOTOS
+      Componente web: galería de fotos con parallax y entrada suave.
+
+      Hola. Si estás leyendo esto, te gusta ver cómo están hechas las cosas.
+      A nosotros también.
+
+      Diseño y desarrollo: Bong Studio
+      Estudio de branding. Córdoba, Argentina. Desde 2019.
+      Prototipo del componente "Carrusel de fotos" para la web de Profertil.
+
+      CRÉDITOS
+      María Lopez / Brand Designer
+      Marcos Cousseau / Creative Director
+
+      CONTACTO
+      https://bongstudio.ar
+
+      BONG STUDIO · 2026 — Brutally Clear Branding — bongstudio.ar
+-->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Carrusel de fotos Profertil</title>
+<meta name="description" content="Prototipo del componente Carrusel de fotos para la web de Profertil.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+/* Tokens del sistema web de Profertil (Figma Master, colecciones 01 y 06). */
+:root {
+  color-scheme: light;
+  --bg: #E9E7D6;
+  --card: #FFFEEF;
+  --ink: #0A1E4A;
+  --azul: #003DA5;
+  --radio: 26px;
+  --f-display: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "DM Sans", "Helvetica Neue", Arial, sans-serif;
+
+  /* Movimiento del carrusel (medido en un slider de referencia). */
+  --slide-ancho: 74%;     /* ancho de cada foto respecto del carrusel */
+  --slide-aire: 24px;     /* separacion entre fotos */
+  --foto-ancho: 132%;     /* la foto es mas ancha que su marco: de ahi sale el parallax */
+}
+@media (max-width: 720px) { :root { --slide-ancho: 86%; --slide-aire: 12px; --radio: 20px; } }
+
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f-body); }
+.demo { padding: 72px 0 96px; }
+.demo h1 { font: 600 clamp(28px, 4vw, 44px)/1.05 var(--f-display); margin: 0 16px 8px; max-width: 1200px; }
+.demo p.bajada { margin: 0 16px 32px; color: #44506E; max-width: 560px; }
+
+/* ---------- Carrusel de fotos ---------- */
+.fotos { position: relative; width: 100%; margin: 0; overflow: hidden; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.fotos__pista { position: relative; aspect-ratio: 1024 / 543; min-height: 260px; max-height: 90vh; outline: none; cursor: grab; }
+.fotos__pista:active { cursor: grabbing; }
+.fotos__pista:focus-visible { outline: 3px solid var(--azul); outline-offset: -3px; border-radius: var(--radio); }
+.foto {
+  position: absolute; top: 0; left: 0; height: 100%; width: var(--slide-ancho); margin: 0;
+  border-radius: var(--radio); overflow: hidden; background: var(--card);
+  will-change: transform;
+}
+.foto img {
+  position: absolute; top: 0; left: 50%; height: 100%; width: var(--foto-ancho);
+  object-fit: cover; will-change: transform; pointer-events: none; -webkit-user-drag: none;
+}
+/* Pastilla que sigue al cursor: cerca de el, con retardo, solo mientras se pasa sobre las fotos. */
+.fotos__cursor { position: fixed; left: 0; top: 0; z-index: 50; pointer-events: none; will-change: transform; }
+.fotos__pastilla {
+  display: inline-flex; align-items: center; justify-content: center; height: 34px; padding: 0 16px;
+  border-radius: 999px; background: var(--azul); color: #fff;
+  font: 500 13px/1 var(--f-body); letter-spacing: .08em; text-transform: uppercase; white-space: nowrap;
+  transform-origin: left center; transform: translate(18px, -50%) scale(.4); opacity: 0;
+  transition: transform .5s cubic-bezier(.645, .045, .355, 1), opacity .35s cubic-bezier(.645, .045, .355, 1);
+}
+.fotos__pastilla.es-visible { transform: translate(18px, -50%) scale(1); opacity: 1; }
+@media (hover: none), (pointer: coarse) { .fotos__cursor { display: none; } }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>
+</head>
+<body>
+<main class="demo">
+  <h1>Carrusel de fotos</h1>
+  <p class="bajada">Pasá el mouse por las fotos y arrastrá, o usá las flechas del teclado. Gira en loop. Las fotos son de demo: se reemplazan por las del board.</p>
+
+  <section class="fotos" aria-roledescription="carrusel" aria-label="Galería de fotos">
+    <p class="visually-hidden">Usá las flechas izquierda y derecha del teclado para recorrer las fotos.</p>
+    <div class="fotos__pista" tabindex="0" role="group" aria-label="Fotos">
+      <figure class="foto"><img src="fotos/demo-1.webp" alt="" draggable="false"></figure>
+      <figure class="foto"><img src="fotos/demo-2.webp" alt="" draggable="false"></figure>
+      <figure class="foto"><img src="fotos/demo-3.webp" alt="" draggable="false"></figure>
+      <figure class="foto"><img src="fotos/demo-4.webp" alt="" draggable="false"></figure>
+      <figure class="foto"><img src="fotos/demo-5.webp" alt="" draggable="false"></figure>
+    </div>
+    <div class="fotos__cursor" aria-hidden="true"><span class="fotos__pastilla">Arrastrá</span></div>
+  </section>
+</main>
+
+<script>
+/* Bong Studio · Diseño y desarrollo · bongstudio.ar */
+(function () {
+  /* Parametros medidos en el slider de referencia. */
+  const SUAVIZADO = 0.05;     // fraccion del camino restante que se recorre por cuadro a 60 fps (~0,33 s de constante de tiempo)
+  const UMBRAL_ARRASTRE = 0.18; // cuanto hay que arrastrar (en fotos) para pasar a la siguiente
+
+  document.querySelectorAll('.fotos').forEach(function (raiz) {
+    const pista = raiz.querySelector('.fotos__pista');
+    const fotos = Array.from(pista.querySelectorAll('.foto'));
+    const imgs = fotos.map(function (f) { return f.querySelector('img'); });
+    const n = fotos.length;
+    const reducido = matchMedia('(prefers-reduced-motion: reduce)');
+
+    let ancho = 0, paso = 0, anchoFoto = 0, margen = 0, paralaje = 0, tope = 0;
+    let objetivo = 0;        // indice al que va (entero)
+    let actual = 0;          // posicion suavizada (decimal)
+    let arrastre = null;     // { x0, base, t }
+    let ultimo = performance.now(), corriendo = false;
+
+    function medir() {
+      ancho = pista.clientWidth;
+      anchoFoto = fotos[0].offsetWidth;
+      const aire = parseFloat(getComputedStyle(pista).getPropertyValue('--slide-aire')) || 24;
+      paso = anchoFoto + aire;
+      margen = (ancho - anchoFoto) / 2;
+      const exceso = imgs[0].offsetWidth - anchoFoto;      // cuanto sobra la foto a cada lado: exceso / 2
+      tope = exceso / 2;
+      paralaje = tope / paso;                              // px de foto por px de desplazamiento
+    }
+
+    function pintar() {
+      for (let i = 0; i < fotos.length; i++) {
+        let d = i - actual;
+        d -= n * Math.round(d / n);                          // en loop: cada foto se ubica en su vuelta mas cercana
+        const rel = d * paso;                               // distancia al centro, en px
+        const x = margen + rel;
+        if (x > ancho + 40 || x < -anchoFoto - 40) { fotos[i].style.visibility = 'hidden'; continue; }
+        fotos[i].style.visibility = '';
+        fotos[i].style.transform = 'translate3d(' + x.toFixed(2) + 'px,0,0)';
+        const p = Math.max(-tope, Math.min(tope, -rel * paralaje));
+        imgs[i].style.transform = 'translate3d(calc(-50% + ' + p.toFixed(2) + 'px),0,0)';
+      }
+    }
+
+    function tick(ahora) {
+      const dt = Math.min(64, ahora - ultimo); ultimo = ahora;
+      if (!arrastre) {
+        const k = reducido.matches ? 1 : 1 - Math.pow(1 - SUAVIZADO, dt / 16.667); // independiente de la tasa de cuadros
+        actual += (objetivo - actual) * k;
+        if (Math.abs(objetivo - actual) < 0.0005) { actual = objetivo; corriendo = false; }
+      }
+      pintar();
+      if (corriendo) requestAnimationFrame(tick);
+    }
+    function arrancar() { if (!corriendo) { corriendo = true; ultimo = performance.now(); requestAnimationFrame(tick); } }
+
+    function ir(i) {
+      objetivo = i;   // sin tope: el indice sigue creciendo y la vuelta se resuelve al pintar
+      arrancar();
+    }
+
+    pista.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight') { e.preventDefault(); ir(objetivo + 1); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); ir(objetivo - 1); }
+    });
+
+    /* Arrastre con mouse o dedo: la foto sigue al puntero y al soltar elige destino. */
+    pista.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      arrastre = { x0: e.clientX, base: actual, t: performance.now(), movio: false };
+      pista.setPointerCapture(e.pointerId);
+    });
+    pista.addEventListener('pointermove', function (e) {
+      if (!arrastre) return;
+      const dx = e.clientX - arrastre.x0;
+      if (Math.abs(dx) > 4) arrastre.movio = true;
+      actual = arrastre.base - dx / paso;
+      pintar();
+    });
+    function soltar(e) {
+      if (!arrastre) return;
+      const dx = e.clientX - arrastre.x0;
+      const v = dx / Math.max(1, performance.now() - arrastre.t); // px por ms
+      const a = arrastre; arrastre = null;
+      let destino = Math.round(actual);
+      if (Math.abs(dx) / paso > UMBRAL_ARRASTRE || Math.abs(v) > 0.4) destino = dx < 0 ? Math.ceil(a.base + 0.01) : Math.floor(a.base - 0.01);
+      if (!a.movio) { // un toque sobre una foto vecina la trae al centro
+        const r = pista.getBoundingClientRect(), x = e.clientX - r.left;
+        if (x < margen) destino = objetivo - 1; else if (x > margen + anchoFoto) destino = objetivo + 1;
+      }
+      ir(destino);
+    }
+    pista.addEventListener('pointerup', soltar);
+    pista.addEventListener('pointercancel', soltar);
+
+    /* Pastilla "Arrastrá": va detras del cursor con retardo (12% del camino por cuadro, ~0,13 s). */
+    const cursor = raiz.querySelector('.fotos__cursor');
+    const pastilla = cursor.querySelector('.fotos__pastilla');
+    let cx = 0, cy = 0, px = 0, py = 0, sobre = false, vuela = false, ultimoC = 0;
+    function volarCursor(ahora) {
+      const dt = Math.min(64, ahora - ultimoC); ultimoC = ahora;
+      const k = reducido.matches ? 1 : 1 - Math.pow(1 - 0.12, dt / 16.667);
+      px += (cx - px) * k; py += (cy - py) * k;
+      cursor.style.transform = 'translate3d(' + px.toFixed(1) + 'px,' + py.toFixed(1) + 'px,0)';
+      if (sobre || Math.abs(cx - px) > 0.3 || Math.abs(cy - py) > 0.3) requestAnimationFrame(volarCursor); else vuela = false;
+    }
+    function moverCursor(e) {
+      if (e.pointerType && e.pointerType !== 'mouse') return;
+      cx = e.clientX; cy = e.clientY;
+      if (!sobre) { sobre = true; px = cx; py = cy; pastilla.classList.add('es-visible'); }  // entra ya junto al cursor
+      if (!vuela) { vuela = true; ultimoC = performance.now(); requestAnimationFrame(volarCursor); }
+    }
+    pista.addEventListener('pointerenter', moverCursor);
+    pista.addEventListener('pointermove', moverCursor);
+    pista.addEventListener('pointerleave', function () { sobre = false; pastilla.classList.remove('es-visible'); });
+
+    new ResizeObserver(function () { medir(); pintar(); }).observe(pista);
+    imgs.forEach(function (im) { if (!im.complete) im.addEventListener('load', function () { medir(); pintar(); }); });
+    medir(); pintar();
+  });
+})();
+</script>
+</body>
+</html>
