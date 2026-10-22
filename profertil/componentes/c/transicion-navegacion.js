@@ -1,0 +1,120 @@
+/* Transiciones de página: qué pasa entre que se toca un link y aparece la página nueva. */
+(function () {
+  var COLORES = { azul: "#003DA5", verde: "#2D8035", amarillo: "#EABA2C", terra: "#8A4818" };
+  var CURVAS = { base: "cubic-bezier(.22, 1, .36, 1)", fuerte: "cubic-bezier(.67, 0, .24, .99)" };
+  var PAGINAS = [
+    ["inicio", "Inicio", "Damos vida a la tierra", "Nutrientes para el campo argentino, desde Bahía Blanca.", 1],
+    ["productos", "Productos", "Un nutriente para cada cultivo", "Urea granulada y soluciones con recomendación por zona.", 2],
+    ["novedades", "Novedades", "Lo último de Profertil", "Noticias de la planta, la comunidad y el campo.", 3]
+  ];
+
+  Libreria.sumar({
+    id: "transicion-pagina", nombre: "Transiciones de página", grupo: "Transiciones", alto: 680,
+    bajada: "El paso entre páginas: una persiana de color con el logo, una forma que crece o un fundido.",
+    nota: "Tocá el menú de arriba, adentro del escenario, para pasar de página.",
+    variantes: [["persiana", "Persiana con logo"], ["forma", "Forma que crece"], ["fundido", "Fundido"]],
+    controles: [
+      { id: "color", tipo: "seg", etiqueta: "Color", def: "azul", aplica: { attr: "data-color" }, opciones: [["azul", "Azul"], ["verde", "Verde"], ["amarillo", "Amarillo"], ["terra", "Terra"]] },
+      { id: "dur", tipo: "rango", etiqueta: "Duración de cada tramo", unidad: "ms", min: 300, max: 1400, paso: 20, def: 700, aplica: { var: "--dur", unidad: "ms" } },
+      { id: "curva", tipo: "seg", etiqueta: "Curva", def: "fuerte", aplica: { attr: "data-curva" }, opciones: [["base", "Base"], ["fuerte", "Fuerte (filtros)"]] },
+      { id: "forma", tipo: "select", etiqueta: "Forma (Forma que crece)", def: "flor", opciones: Object.keys(FORMAS).map(function (k) { return [k, k.charAt(0).toUpperCase() + k.slice(1)]; }) }
+    ],
+    css: function () {
+      return [
+        ".tp { --dur: 700ms; --f-d: \"Familjen Grotesk\", \"Helvetica Neue\", Arial, sans-serif; font: 400 16px/1.5 \"DM Sans\", \"Helvetica Neue\", Arial, sans-serif; color: #0A1E4A; min-height: 100vh; }",
+        Object.keys(COLORES).map(function (k) { return '.tp[data-color="' + k + '"] { --color: ' + COLORES[k] + '; }'; }).join("\n"),
+        Object.keys(CURVAS).map(function (k) { return '.tp[data-curva="' + k + '"] { --curva: ' + CURVAS[k] + '; }'; }).join("\n"),
+        ".tp__barra { position: fixed; z-index: 5; inset: 12px 12px auto; display: flex; justify-content: space-between; align-items: center; height: 56px; padding: 0 10px 0 18px; border-radius: 999px; background: rgba(0, 61, 165, .94); color: #FFFEEF; }",
+        ".tp__barra svg { display: block; height: 30px; width: auto; }",
+        ".tp__barra nav { display: flex; gap: 4px; }",
+        ".tp__barra button { height: 38px; padding: 0 16px; border: 0; border-radius: 999px; background: none; color: inherit; font: inherit; font-size: 14px; cursor: pointer; transition: background .25s; }",
+        ".tp__barra button:hover { background: rgba(255, 254, 239, .14); }",
+        ".tp__barra button[aria-current=\"page\"] { background: #FFFEEF; color: #003DA5; }",
+        ".tp__pagina { min-height: 100vh; padding: 140px clamp(20px, 6vw, 96px) 64px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; align-items: end; }",
+        ".tp__pagina h1 { margin: 0 0 16px; font: 500 clamp(40px, 6.4vw, 96px)/.98 var(--f-d); letter-spacing: -.04em; }",
+        ".tp__pagina p { margin: 0; max-width: 36ch; font-size: 18px; color: #44506E; }",
+        ".tp__pagina img { width: 100%; aspect-ratio: 4 / 5; max-height: 62vh; object-fit: cover; border-radius: 26px; }",
+        "",
+        "/* Persiana con logo: el paño sube, el logo aparece en el medio, cambia la página y el paño sigue de largo. */",
+        ".tp__velo { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; background: var(--color); color: #FFFEEF; pointer-events: none; transform: translateY(100%); }",
+        ".tp[data-color=\"amarillo\"] .tp__velo { color: #003DA5; }",
+        ".tp__velo svg { width: min(28vw, 180px); height: auto; opacity: 0; transform: translateY(14px); }",
+        ".tp__velo.entra { transition: transform var(--dur) var(--curva); transform: none; }",
+        ".tp__velo.entra svg { transition: opacity calc(var(--dur) * .6) var(--curva) calc(var(--dur) * .45), transform calc(var(--dur) * .8) var(--curva) calc(var(--dur) * .45); opacity: 1; transform: none; }",
+        ".tp__velo.sale { transition: transform var(--dur) var(--curva); transform: translateY(-100%); }",
+        ".tp__velo.sale svg { opacity: 1; transform: none; }",
+        "",
+        "/* Forma que crece: la forma sale del punto donde se tocó y cubre la pantalla. */",
+        ".tp__forma { position: fixed; z-index: 10; left: 0; top: 0; width: 120px; height: 120px; margin: -60px 0 0 -60px; color: var(--color); pointer-events: none; transform: translate(var(--x), var(--y)) scale(0.01); opacity: 0; }",
+        ".tp__forma svg { display: block; width: 100%; height: 100%; }",
+        ".tp__forma.entra { opacity: 1; transform: translate(var(--x), var(--y)) scale(var(--s)) rotate(20deg); transition: transform var(--dur) var(--curva); }",
+        ".tp__forma.sale { opacity: 0; transform: translate(var(--x), var(--y)) scale(var(--s)) rotate(20deg); transition: opacity calc(var(--dur) * .7) ease; }",
+        "",
+        "/* Fundido: la página vieja se va hacia arriba y la nueva sube desde abajo (View Transitions si el navegador las tiene). */",
+        "::view-transition-old(root) { animation: tp-sale calc(var(--dur, 700ms) * .7) var(--curva, ease) both; }",
+        "::view-transition-new(root) { animation: tp-entra var(--dur, 700ms) var(--curva, ease) calc(var(--dur, 700ms) * .25) both; }",
+        "@keyframes tp-sale { to { opacity: 0; transform: translateY(-24px); } }",
+        "@keyframes tp-entra { from { opacity: 0; transform: translateY(40px); } }",
+        ".tp__pagina.entra { animation: tp-entra var(--dur) var(--curva) both; }",
+        "",
+        "@media (max-width: 760px) { .tp__pagina { grid-template-columns: 1fr; padding-top: 110px; } .tp__barra button { padding: 0 10px; font-size: 13px; } .tp__barra svg { height: 24px; } }",
+        "@media (prefers-reduced-motion: reduce) { .tp__velo, .tp__forma { display: none; } ::view-transition-old(root), ::view-transition-new(root) { animation: none; } }"
+      ].join("\n");
+    },
+    html: function (s) {
+      var logo = LOGO_BLANCO.replace('<svg', '<svg aria-label="Profertil"');
+      var h = '<div class="tp" data-c="transicion-pagina">\n' +
+        '  <header class="tp__barra">' + logo + '<nav>' + PAGINAS.map(function (p, i) { return '<button type="button" data-ir="' + p[0] + '"' + (i ? '' : ' aria-current="page"') + '>' + p[1] + '</button>'; }).join("") + '</nav></header>\n' +
+        '  <main class="tp__pagina" id="tp-pagina"></main>\n';
+      if (s.variante === "persiana") h += '  <div class="tp__velo" aria-hidden="true">' + LOGO_BLANCO + '</div>\n';
+      if (s.variante === "forma") h += '  <div class="tp__forma" aria-hidden="true">' + formaSVG(s.forma) + '</div>\n';
+      h += '  <template id="tp-paginas">' + PAGINAS.map(function (p) {
+        return '<section data-p="' + p[0] + '"><div><h1>' + p[2] + '</h1><p>' + p[3] + '</p></div><img src="../novedades/fotos/demo-' + p[4] + '.webp" alt=""></section>';
+      }).join("") + '</template>\n';
+      return h + '</div>';
+    },
+    js: function (s) {
+      return [
+        "(function () {",
+        "  var raiz = document.querySelector('.tp'), pagina = document.getElementById('tp-pagina'), molde = document.getElementById('tp-paginas');",
+        "  var velo = raiz.querySelector('.tp__velo'), forma = raiz.querySelector('.tp__forma'), quieto = matchMedia('(prefers-reduced-motion: reduce)').matches;",
+        "  var ocupado = false;",
+        "  function dur() { return parseFloat(getComputedStyle(raiz).getPropertyValue('--dur')) || 700; }",
+        "  function poner(id) {",
+        "    var sec = molde.content.querySelector('[data-p=\"' + id + '\"]');",
+        "    pagina.innerHTML = sec.innerHTML; scrollTo(0, 0);",
+        "    raiz.querySelectorAll('[data-ir]').forEach(function (b) { b.toggleAttribute('aria-current', b.dataset.ir === id); if (b.dataset.ir === id) b.setAttribute('aria-current', 'page'); });",
+        "  }",
+        "  function espera(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }",
+        "  async function ir(id, e) {",
+        "    if (ocupado) return; ocupado = true; var d = dur();",
+        "    if (quieto) { poner(id); ocupado = false; return; }",
+        "    if (velo) {",
+        "      // Persiana: entra (d), se queda con el logo un momento, cambia la página y sale (d).",
+        "      velo.className = 'tp__velo entra'; await espera(d + d * .45);",
+        "      poner(id); velo.className = 'tp__velo sale'; await espera(d);",
+        "      velo.className = 'tp__velo';",
+        "    } else if (forma) {",
+        "      // Forma: crece desde el dedo hasta tapar la esquina más lejana.",
+        "      var x = e.clientX, y = e.clientY, lejos = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));",
+        "      forma.style.setProperty('--x', x + 'px'); forma.style.setProperty('--y', y + 'px'); forma.style.setProperty('--s', (lejos / 60 * 1.6).toFixed(2));",
+        "      forma.className = 'tp__forma'; void forma.offsetWidth; forma.className = 'tp__forma entra'; await espera(d);",
+        "      poner(id); forma.className = 'tp__forma sale'; await espera(d * .7);",
+        "      forma.className = 'tp__forma';",
+        "    } else if (document.startViewTransition) {",
+        "      // Los pseudo-elementos de la transición cuelgan de <html>: les pasamos la duración y la curva ahí.",
+        "      var cs = getComputedStyle(raiz), h = document.documentElement.style;",
+        "      h.setProperty('--dur', d + 'ms'); h.setProperty('--curva', cs.getPropertyValue('--curva'));",
+        "      await document.startViewTransition(function () { poner(id); }).finished;",
+        "    } else { poner(id); pagina.classList.remove('entra'); void pagina.offsetWidth; pagina.classList.add('entra'); }",
+        "    ocupado = false;",
+        "  }",
+        "  raiz.querySelector('.tp__barra nav').addEventListener('click', function (e) {",
+        "    var b = e.target.closest('[data-ir]'); if (b && !b.hasAttribute('aria-current')) ir(b.dataset.ir, e);",
+        "  });",
+        "  poner('inicio');",
+        "})();"
+      ].join("\n");
+    }
+  });
+})();
