@@ -56,7 +56,7 @@
         ".cifra { display: flex; flex-direction: column; gap: 12px; min-width: 0; color: var(--c-tinta); }",
         ".cifra__cab { display: flex; justify-content: space-between; align-items: center; gap: 8px; }",
         ".cifra__rotulo { font-size: 13px; line-height: 16px; color: var(--texto-2); }",
-        ".cifra__anio { display: inline-flex; align-items: center; height: var(--pastilla); padding: 0 calc(var(--pastilla) * .37); border-radius: calc(var(--pastilla) * .32); background: var(--c-dato); color: var(--c-dato-tinta); font-size: calc(var(--pastilla) * .48); line-height: 1; white-space: nowrap; }",
+        ".cifra__anio { display: inline-flex; align-items: center; height: var(--pastilla); padding: 0 calc(var(--pastilla) * .37); border-radius: calc(var(--pastilla) * .32); background: var(--c-dato); color: var(--c-dato-tinta); font-size: calc(var(--pastilla) * .48); line-height: 1; white-space: nowrap;  text-box: trim-both cap alphabetic; }",
         ".cifra__n { font: 500 var(--num)/1 \"Familjen Grotesk\", \"Helvetica Neue\", Arial, sans-serif; letter-spacing: -.047em; font-variant-numeric: tabular-nums; }",
         ".cifra__desc { margin: 0; font-size: 15px; line-height: 20px; color: var(--texto-2); }",
         "/* Tarjeta marfil */",

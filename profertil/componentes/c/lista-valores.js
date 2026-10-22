@@ -17,7 +17,7 @@
     nota: "Scrolleá dentro del escenario. Los valores y sus textos son de ejemplo.",
     variantes: [["palabras", "Palabras fijas", "La sección queda quieta; el scroll enciende una palabra por vez y cambia el texto del costado."], ["filas", "Filas que se abren", "Filas numeradas: la que cruza el centro se enciende y abre su texto."], ["columna", "Índice al costado", "Índice chico fijo a la izquierda con una marca; a la derecha, un bloque largo por valor."]],
     tamano: "ancha", previa: .28,
-    claves: ["Siempre hay una sola activa; las demás quedan al 15% de opacidad.", "La marca de posición dice cuánto falta de la lista: en Palabras fijas es una montañita en las reglas de los costados, que avanza con el scroll.", "Palabras fijas reparte el tramo en partes iguales: 70vh de scroll por valor.", "En Filas e Índice, la activa es la que cruza la mitad de la pantalla.", "En el índice, tocar un nombre lleva a su bloque."],
+    claves: ["Siempre hay una sola activa; las demás quedan al 15% de opacidad.", "La marca de posición dice cuánto falta de la lista: en Palabras fijas es una montañita en la regla de la izquierda, que avanza con el scroll; en mobile la regla va a la mitad de tamaño.", "Palabras fijas reparte el tramo en partes iguales: 70vh de scroll por valor.", "En Filas e Índice, la activa es la que cruza la mitad de la pantalla.", "En el índice, tocar un nombre lleva a su bloque."],
     accesibilidad: "Es una lista ordenada con su texto real; la activa se marca solo con opacidad. Con movimiento reducido no hay transiciones.",
     controles: [
       { id: "acento", tipo: "seg", etiqueta: "Color activo", def: "tinta", aplica: { attr: "data-acento" }, opciones: [["tinta", "Tinta"], ["azul", "Azul"], ["verde", "Verde"], ["naranja", "Naranja"]], desc: "Color de la palabra activa y de la marca." },
@@ -76,7 +76,9 @@
         "",
         "@media (max-width: 760px) {",
         "  .lv { --tam: 56px !important; }",
-        "  .lv__pin-in { grid-template-columns: 1fr; align-content: center; gap: 24px; padding: 0 40px; }",
+        "  .lv__pin-in { grid-template-columns: 1fr; align-content: center; gap: 24px; padding: 0 24px 0 52px; }",
+        "  /* En mobile la regla se achica a la mitad y se aleja del texto. */",
+        "  .lv__regla { width: 13px; left: 14px; top: 18vh; bottom: 18vh; } .lv__regla i { width: 13px; height: 1px; }",
         "  .lv__textos { min-height: 7.5em; }",
         "  .lv__dos { grid-template-columns: 1fr; } .lv__indice { position: sticky; top: 0; height: auto; z-index: 2; padding: 12px 0; background: var(--bg); }",
         "  .lv__indice ol { grid-auto-flow: column; overflow-x: auto; gap: 16px; padding: 0 0 6px; } .lv__marca { display: none; }",
@@ -88,7 +90,7 @@
       var v = s.variante, h = '<section class="lv" data-c="lista-valores">\n  <div class="lv__intro"><h2>Lo que nos guía todos los días</h2></div>\n';
       if (v === "palabras") {
         h += '  <div class="lv__pin" style="height: ' + (VALORES.length * 70 + 100) + 'vh">\n    <div class="lv__pin-in">\n' +
-          '      <span class="lv__regla lv__regla--izq" aria-hidden="true">' + RAYAS + '</span><span class="lv__regla lv__regla--der" aria-hidden="true">' + RAYAS + '</span>\n' +
+          '      <span class="lv__regla lv__regla--izq" aria-hidden="true">' + RAYAS + '</span>\n' +
           '      <ol>' + VALORES.map(function (x, i) { return '<li class="lv__palabra' + (i ? '' : ' activa') + '">' + x[0] + '</li>'; }).join("") + '</ol>\n' +
           '      <div class="lv__textos">' + VALORES.map(function (x, i) { return '<p' + (i ? '' : ' class="activa"') + '>' + x[1] + '</p>'; }).join("") + '</div>\n' +
           '    </div>\n  </div>\n';

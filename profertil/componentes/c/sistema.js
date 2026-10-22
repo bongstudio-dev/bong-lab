@@ -35,7 +35,7 @@
       "/* Etiqueta del sistema (Master, manual p. 64): radio 32% del alto, texto al 48%. S 22 / M 27 / L 32. */",
       ".etq { --s: 27px; display: inline-flex; align-items: stretch; gap: calc(var(--s) * .06); height: var(--s); flex: none; font-family: \"Familjen Grotesk\", \"Helvetica Neue\", Arial, sans-serif; font-weight: 400; }",
       ".etq .bd { width: var(--s); height: var(--s); flex: none; display: block; }",
-      ".etq .lb, .etq .dt { display: inline-flex; align-items: center; padding: 0 calc(var(--s) * .36); border-radius: calc(var(--s) * .32); font-size: calc(var(--s) * .48); line-height: 1; white-space: nowrap; }",
+      ".etq .lb, .etq .dt { display: inline-flex; align-items: center; padding: 0 calc(var(--s) * .36); border-radius: calc(var(--s) * .32); font-size: calc(var(--s) * .48); line-height: 1; white-space: nowrap;  text-box: trim-both cap alphabetic; }",
       ".etq .lb { background: #fff; color: var(--tx); }",
       ".etq .dt { background: var(--fo); color: #FFFEEF; font-variant-numeric: tabular-nums; }"
     ].join("\n"),

@@ -94,10 +94,11 @@ html { scrollbar-color: rgba(10, 30, 74, .25) transparent; }
 .centro { min-width: 0; }
 
 /* ---------- Galería ---------- */
-.gal { padding: 40px 32px 72px; max-width: 1400px; }
+.gal { padding: 40px 32px 72px; }
 .gal h1 { margin: 0 0 6px; font: 600 28px/1.1 var(--f-display); letter-spacing: -.025em; }
 .gal > p { margin: 0 0 32px; max-width: 56ch; color: var(--ink-2); }
-.grilla { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px 20px; }
+/* Tantas columnas como entren: en pantallas anchas la grilla llega hasta el borde derecho. */
+.grilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 32px 20px; }
 .tar { color: inherit; text-decoration: none; display: flex; flex-direction: column; gap: 10px; border: 0; padding: 0; background: none; text-align: left; }
 .tar__vista { position: relative; aspect-ratio: 16 / 10; overflow: hidden; border-radius: var(--r-l); background: var(--bg); box-shadow: 0 0 0 1px var(--line); pointer-events: none; transition: box-shadow .15s var(--ease); }
 .tar:hover .tar__vista { box-shadow: 0 0 0 1px rgba(10, 30, 74, .28); }
@@ -126,6 +127,8 @@ html { scrollbar-color: rgba(10, 30, 74, .25) transparent; }
 .ajustes { display: flex; flex-direction: column; }
 .ctl { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); align-items: center; gap: 12px; min-height: 44px; padding: 6px 0; border-top: 1px solid var(--line); }
 .ctl:last-child { border-bottom: 1px solid var(--line); }
+.ctl--desc { grid-template-columns: 1fr; gap: 8px; padding: 10px 0; }
+.ctl__desc { margin: 0; font-size: 12px; color: var(--ink-3); }
 /* Con cuatro opciones o más, el control va debajo del rótulo para que no se corten. */
 .ctl:has(.seg button:nth-child(4)) { grid-template-columns: 1fr; gap: 8px; padding: 10px 0; }
 .ctl > .et { font-size: 12.5px; color: var(--ink-2); }
@@ -134,7 +137,7 @@ html { scrollbar-color: rgba(10, 30, 74, .25) transparent; }
 .seg { position: relative; isolation: isolate; display: flex; padding: 3px; border-radius: 999px; background: var(--line); }
 .seg-ind { position: absolute; z-index: -1; top: 3px; left: 0; bottom: 3px; width: 0; border-radius: 999px; background: var(--card); box-shadow: 0 1px 3px rgba(10, 30, 74, .12); pointer-events: none; transition: transform 420ms cubic-bezier(.67, 0, .24, .99), width 420ms cubic-bezier(.67, 0, .24, .99); }
 .seg-ind.quieto { transition: none; }
-.seg button { flex: 1 1 0; min-width: 0; height: 28px; padding: 0 8px; border: 0; border-radius: 999px; background: transparent; font-size: 12px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 240ms ease; }
+.seg button { flex: 1 1 0; min-width: 0; height: 28px; padding: 0 8px; border: 0; border-radius: 999px; background: transparent; font-size: 12px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 240ms ease; display: inline-flex; align-items: center; justify-content: center; text-box: trim-both cap alphabetic; }
 .seg button[aria-pressed="true"] { color: var(--azul); font-weight: 500; }
 input[type="range"] { width: 100%; accent-color: var(--ink); margin: 0; }
 input[type="text"], select { width: 100%; height: 32px; padding: 0 10px; border: 0; border-radius: var(--r); background: var(--suave); font-size: 12.5px; }
@@ -151,7 +154,7 @@ input[type="text"], select { width: 100%; height: 32px; padding: 0 10px; border:
 .tabsc { display: flex; gap: 12px; }
 .tabsc button { border: 0; background: none; padding: 0; font: 400 12px/1 var(--f-mono); color: var(--ink-3); }
 .tabsc button[aria-pressed="true"] { color: var(--ink); }
-.btn { height: 30px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--azul); color: #fff; font-size: 12.5px; transition: transform .15s var(--ease); }
+.btn { height: 30px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--azul); color: #fff; font-size: 12.5px; transition: transform .15s var(--ease); display: inline-flex; align-items: center; justify-content: center; text-box: trim-both cap alphabetic; }
 .btn:active { transform: scale(.97); }
 pre { margin: 0; padding: 14px; max-height: 340px; overflow: auto; border-radius: var(--r); background: var(--card); box-shadow: inset 0 0 0 1px var(--line); font: 400 11.5px/1.6 var(--f-mono); tab-size: 2; }
 
@@ -192,7 +195,6 @@ details[open] summary .ico { transform: rotate(90deg); }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; } }
 
 @media (max-width: 1100px) {
-  .grilla { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .ficha { grid-template-columns: 1fr; padding: 16px; } .previa { position: relative; top: 0; height: 68vh; order: -1; } .doc { padding-top: 0; }
 }
 @media (max-width: 760px) {
@@ -200,7 +202,7 @@ details[open] summary .ico { transform: rotate(90deg); }
   .lado { position: static; height: auto; gap: 12px; border-right: 0; border-bottom: 1px solid var(--line); padding: 14px 16px; }
   .lado nav { flex-direction: row; overflow-x: auto; gap: 16px; }
   .grupo { flex: none; } .grupo ul { flex-direction: row; gap: 4px; } .item { width: auto; margin: 0; white-space: nowrap; }
-  .grilla { grid-template-columns: 1fr; } .gal { padding: 24px 16px 48px; }
+  .gal { padding: 24px 16px 48px; }
 }
 </style>
 </head>
@@ -246,7 +248,8 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
 <script src="c/transicion-seccion.js"></script>
 <script src="c/transicion-navegacion.js"></script>
 <script src="c/controles.js"></script>
-<script src="c/piezas-lab.js"></script>
+<script src="c/carrusel.js"></script>
+<script src="c/animadores.js"></script>
 <script>
 (function () {
   var L = Libreria.lista, $ = function (id) { return document.getElementById(id); };
@@ -286,9 +289,9 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
       '<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">' +
       '<link rel="stylesheet" href="tokens.css"><link rel="stylesheet" href="../animadores-texto/animadores.css">' +
       '<style>*,*::before,*::after{box-sizing:border-box}html,body{margin:0}body{background:#E9E7D6;color:#0A1E4A;font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}::selection{background:#003DA5;color:#FFFEEF}' +
-      (auto ? 'body{min-height:100vh;display:flex;flex-direction:column;justify-content:' + (c.sangrado ? 'flex-end' : 'center') + ';' + (c.sangrado ? '' : 'padding:clamp(20px,5vw,56px)') + '}body>*{width:100%}' : '') +
+      (auto ? 'body{min-height:100vh;display:flex;flex-direction:column;justify-content:' + (c.sangrado ? 'flex-end' : 'center') + ';' + (c.sangrado ? '' : c.pleno ? 'padding:clamp(20px,5vw,56px) 0' : 'padding:clamp(20px,5vw,56px)') + '}body>*{width:100%}' : '') +
       (mini ? 'html{scrollbar-width:none}html::-webkit-scrollbar{display:none}' : '') + '</style>' +
-      '<style>' + c.css(s) + '</style></head><body>' + (c.previo || '') + htmlFinal(c, s) +
+      '<style>' + c.css(s) + '</style></head><body>' + (mini ? '' : (c.previo || '')) + htmlFinal(c, s) +
       '<script src="formas.js"><\/script><script src="../animadores-texto/animadores.js"><\/script>' +
       (js ? '<script>' + js + '<\/script>' : '') + '</body></html>';
   }
@@ -356,8 +359,12 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
     if (k.tipo === "rango") return '<div class="ctl"><label class="et" for="t-' + k.id + '">' + et + '<small id="v-' + k.id + '">' + v + ' ' + (k.unidad || '') + '</small></label><input type="range" id="t-' + k.id + '" data-k="' + k.id + '" min="' + k.min + '" max="' + k.max + '" step="' + (k.paso || 1) + '" value="' + v + '"></div>';
     if (k.tipo === "seg") return '<div class="ctl"><span class="et" id="e-' + k.id + '">' + et + '</span><div class="seg" role="group" aria-labelledby="e-' + k.id + '" data-k="' + k.id + '"><span class="seg-ind" aria-hidden="true"></span>' + k.opciones.map(function (o) {
       return '<button type="button" data-val="' + o[0] + '" aria-pressed="' + (String(v) === String(o[0])) + '">' + esc(o[1]) + '</button>'; }).join("") + '</div></div>';
-    if (k.tipo === "select") return '<div class="ctl"><label class="et" for="t-' + k.id + '">' + et + '</label><select id="t-' + k.id + '" data-k="' + k.id + '">' + k.opciones.map(function (o) {
-      return '<option value="' + o[0] + '"' + (String(v) === String(o[0]) ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join("") + '</select></div>';
+    if (k.tipo === "select") {
+      var od = k.opciones.filter(function (o) { return String(o[0]) === String(v); })[0];
+      return '<div class="ctl' + (k.opciones[0][2] ? ' ctl--desc' : '') + '"><label class="et" for="t-' + k.id + '">' + et + '</label><select id="t-' + k.id + '" data-k="' + k.id + '">' + k.opciones.map(function (o) {
+        return '<option value="' + o[0] + '"' + (String(v) === String(o[0]) ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join("") + '</select>' +
+        (od && od[2] ? '<p class="ctl__desc" id="d-' + k.id + '">' + esc(od[2]) + '</p>' : '') + '</div>';
+    }
     if (k.tipo === "texto") return '<div class="ctl"><label class="et" for="t-' + k.id + '">' + et + '</label><input type="text" id="t-' + k.id + '" data-k="' + k.id + '" value="' + esc(v) + '"></div>';
     if (k.tipo === "interr") return '<div class="ctl"><span class="et" id="e-' + k.id + '">' + et + '</span><button type="button" class="interr" role="switch" aria-checked="' + v + '" aria-labelledby="e-' + k.id + '" data-k="' + k.id + '"></button></div>';
     return "";
@@ -450,7 +457,10 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
     var el = e.target, k = el.dataset && el.dataset.k; if (!k || !el.closest("#ajustes")) return;
     var c = ctrl(k);
     if (el.type === "range") { $("v-" + k).textContent = el.value + " " + (c.unidad || ""); if (c.aplica) cambio(k, parseFloat(el.value)); else estado[k] = parseFloat(el.value); }
-    else cambio(k, el.value);
+    else {
+      if (el.tagName === "SELECT" && $("d-" + k)) { var o = c.opciones.filter(function (x) { return String(x[0]) === el.value; })[0]; $("d-" + k).textContent = o[2]; }
+      cambio(k, el.value);
+    }
   });
   document.addEventListener("change", function (e) {
     var el = e.target, k = el.dataset && el.dataset.k, c = k && actual && ctrl(k);

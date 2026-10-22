@@ -18,7 +18,7 @@
       ["expande", "Se expande", "La foto arranca como tarjeta con aire y radio y crece hasta el borde."]
     ],
     tamano: "ancha", previa: .22,
-    claves: ["Cada foto ocupa la pantalla entera; la etiqueta, el título y la bajada van arriba a la izquierda, así no los tapa la foto siguiente.", "La etiqueta es la del sistema: badge con la forma de la categoría, rótulo blanco.", "El texto entra por líneas (cortadas a mano) cuando el panel queda en pantalla.", "Como páginas: el panel se mueve el 100% y su imagen solo el 20%, por eso parece que la foto se queda y el marco se corre.", "Todo se calcula en un solo requestAnimationFrame por scroll y solo mueve transform y clip-path."],
+    claves: ["Cada foto ocupa la pantalla entera. La etiqueta, el título y la bajada quedan fijos al medio a la izquierda; cuando entra la foto siguiente, el grupo de texto se va hacia arriba y entra el de la foto nueva.", "La etiqueta es la del sistema: badge con la forma de la categoría, rótulo blanco.", "El texto entra por líneas (cortadas a mano) cuando el panel queda en pantalla.", "Como páginas: el panel se mueve el 100% y su imagen solo el 20%, por eso parece que la foto se queda y el marco se corre.", "Todo se calcula en un solo requestAnimationFrame por scroll y solo mueve transform y clip-path."],
     accesibilidad: "Con movimiento reducido las fotos quedan quietas y el texto aparece sin animar. Las fotos de demo no llevan texto alternativo: en el sitio lo necesitan.",
     controles: [
       { id: "intensidad", tipo: "rango", etiqueta: "Intensidad del parallax", unidad: "%", min: 0, max: 100, def: 80, aplica: { var: "--intensidad" }, desc: "Cuánto se queda la imagen mientras su panel se mueve (80 = va al 20% de la velocidad)." },
@@ -38,8 +38,12 @@
         "/* La imagen es más alta que su panel en la misma medida en que se corre: así nunca queda una franja vacía. */",
         ".sf__media img { position: absolute; left: 0; top: calc(var(--intensidad) * -.5%); width: 100%; height: calc(100% + var(--intensidad) * 1%); object-fit: cover; transform: translate3d(0, var(--y, 0px), 0); will-change: transform; }",
         ".sf__media::after { content: \"\"; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(10, 30, 74, calc(var(--oscuro) / 100)), rgba(10, 30, 74, calc(var(--oscuro) / 400)) 55%, transparent); }",
-        "/* El texto va arriba: con la foto siguiente entrando desde abajo, así se lee hasta el final. */",
-        ".sf__txt { position: absolute; left: clamp(20px, 5vw, 64px); right: clamp(20px, 5vw, 64px); top: clamp(28px, 9vh, 96px); display: grid; justify-items: start; gap: 16px; max-width: 760px; }",
+        "/* El texto queda fijo al medio a la izquierda de la pantalla. */",
+        ".sf__txt { position: absolute; left: clamp(20px, 5vw, 64px); right: clamp(20px, 5vw, 64px); top: 50%; transform: translateY(-50%); display: grid; justify-items: start; gap: 16px; max-width: 760px; }",
+        "/* Como páginas y Apiladas: los grupos de texto viven en una capa propia, encima de las fotos, y se reemplazan uno por otro. */",
+        ".sf__textos { position: absolute; inset: 0; z-index: 2; pointer-events: none; }",
+        ".sf__textos .sf__txt.fue .sf__linea > span { transform: translateY(-105%); transition-delay: calc(var(--k, 0) * 40ms); }",
+        ".sf__textos .sf__txt.fue .etq { opacity: 0; transform: translateY(-8px); }",
         ".sf[data-etiqueta=\"false\"] .etq { display: none; }",
         ".sf__txt h3 { margin: 0; font: 500 clamp(34px, 5.4vw, 76px)/1 var(--f-d); letter-spacing: -.035em; }",
         ".sf__txt p { margin: 0; max-width: 40ch; font-size: 17px; opacity: .92; }",
@@ -71,7 +75,11 @@
           '        <div class="sf__txt">' + SIS.etiqueta(p[0]) + '<h3>' + lineas(p[1]) + '</h3><p>' + lineas(p[2]) + '</p></div>\n      </article>';
       }
       var h = '<section class="sf" data-c="scroll-fotos">\n  <div class="sf__intro"><h2>Lo que hacemos, de cerca</h2></div>\n';
-      if (v === "paginas" || v === "apiladas") h += '  <div class="sf__fijo" data-modo="' + v + '" style="height: ' + (PANELES.length * 100) + 'vh">\n    <div class="sf__fijo-in">\n      ' + PANELES.map(panel).join("\n      ") + '\n    </div>\n  </div>\n';
+      // Como páginas y Apiladas: las fotos van solas y los textos en una capa aparte, fija.
+      function soloFoto(p) { return '<article class="sf__panel">\n        <div class="sf__media"><img src="../novedades/fotos/demo-' + p[3] + '.webp" alt=""></div>\n      </article>'; }
+      function texto(p) { return '<div class="sf__txt">' + SIS.etiqueta(p[0]) + '<h3>' + lineas(p[1]) + '</h3><p>' + lineas(p[2]) + '</p></div>'; }
+      if (v === "paginas" || v === "apiladas") h += '  <div class="sf__fijo" data-modo="' + v + '" style="height: ' + (PANELES.length * 100) + 'vh">\n    <div class="sf__fijo-in">\n      ' + PANELES.map(soloFoto).join("\n      ") +
+        '\n      <div class="sf__textos">\n        ' + PANELES.map(texto).join("\n        ") + '\n      </div>\n    </div>\n  </div>\n';
       if (v === "expande") h += PANELES.map(function (p) { return '  <div class="sf__exp">\n    <div class="sf__exp-in">\n      ' + panel(p) + '\n    </div>\n  </div>\n'; }).join("");
       return h + '  <div class="sf__fin"><h2>Sigue el resto de la página</h2></div>\n</section>';
     },
@@ -79,6 +87,7 @@
       return "(" + function () {
         var raiz = document.querySelector(".sf"), quieto = matchMedia("(prefers-reduced-motion: reduce)").matches;
         var fijo = raiz.querySelector(".sf__fijo"), exps = [].slice.call(raiz.querySelectorAll(".sf__exp"));
+        var textos = [].slice.call(raiz.querySelectorAll(".sf__textos .sf__txt"));
         var paneles = [].slice.call(raiz.querySelectorAll(".sf__panel"));
         function lim(x) { return Math.min(1, Math.max(0, x)); }
         function suave(x) { return 1 - Math.pow(1 - x, 3); }
@@ -99,8 +108,10 @@
               }
               p.style.setProperty("--t", t.toFixed(2) + "%");
               p.querySelector(".sf__media").style.setProperty("--y", (y * p.offsetHeight / 100).toFixed(1) + "px");
-              p.classList.toggle("en-vista", Math.abs(d) < .35);
             });
+            // El texto cambia cuando la foto nueva ya ocupa más de la mitad: el que sale se va hacia arriba.
+            var activo = Math.round(a);
+            textos.forEach(function (t, i) { t.classList.toggle("en-vista", i === activo); t.classList.toggle("fue", i < activo); });
           }
           exps.forEach(function (x) {
             var r = x.getBoundingClientRect(), e = suave(lim(-r.top / (H * .8)));
@@ -111,7 +122,7 @@
         }
         var pedido = false;
         function pedir() { if (!pedido) { pedido = true; requestAnimationFrame(function () { pedido = false; tic(); }); } }
-        if (quieto) paneles.forEach(function (p) { p.classList.add("en-vista"); });
+        if (quieto) paneles.concat(textos).forEach(function (p) { p.classList.add("en-vista"); });
         addEventListener("scroll", pedir, { passive: true }); addEventListener("resize", pedir); tic();
       }.toString() + ")();";
     }
