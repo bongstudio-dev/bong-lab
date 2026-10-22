@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<!-- firma:bong
+
+      ##########         #########
+      ###########      #############
+      ############   #################
+      ###########   ###################
+      ##########    ###################
+      ############  ###################
+      #############  #################
+      #############   ###############
+      ############      ###########
+
+                            #####
+      ##     ######     ##########
+      ####   ######   ###########
+      #####  ######  ###########
+      #############  ##########
+      #############  ###################
+      #############  ##################
+      #############   #################
+      #############     #############
+      #############        #######
+
+      PROFERTIL · LIBRERÍA DE COMPONENTES
+      Componentes web para probar, ajustar y copiar.
+
+      Hola. Si estás leyendo esto, te gusta ver cómo están hechas las cosas.
+      A nosotros también.
+
+      Diseño y desarrollo: Bong Studio
+      Estudio de branding. Córdoba, Argentina. Desde 2019.
+      Cada componente tiene tweaks en vivo y el código listo para copiar.
+
+      CRÉDITOS
+      María Lopez / Brand Designer
+      Marcos Cousseau / Creative Director
+
+      CONTACTO
+      https://bongstudio.ar
+
+      BONG STUDIO · 2026 — Brutally Clear Branding — bongstudio.ar
+-->
+<html lang="es" data-ta-manual>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Componentes Profertil</title>
+<meta name="description" content="Librería de componentes de la web de Profertil: tweaks en vivo y código para copiar.">
+<link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../animadores-texto/animadores.css">
+<style>
+/* Tokens del sistema web de Profertil (Figma Master, colecciones 01 y 06). */
+:root {
+  color-scheme: light;
+  --bg: #E9E7D6; --card: #FFFEEF; --ink: #0A1E4A; --ink-2: #44506E; --ink-3: #737D96;
+  --azul: #003DA5; --line: rgba(10, 30, 74, .1);
+  --f-display: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "DM Sans", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --ease: cubic-bezier(.22, 1, .36, 1);
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 400 14px/1.4 var(--f-body); -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; }
+
+/* ---------- Estructura: sidebar angosta | escenario | tweaks ---------- */
+.app { display: grid; grid-template-columns: 176px minmax(0, 1fr) 280px; min-height: 100vh; }
+.lado { position: sticky; top: 0; height: 100vh; overflow: auto; padding: 20px 16px; border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 22px; }
+.lado__volver { font-size: 11px; color: var(--ink-3); text-decoration: none; letter-spacing: .01em; }
+.lado__volver:hover { color: var(--azul); }
+.lado__tit { font: 600 15px/1.1 var(--f-display); letter-spacing: -.02em; margin: 0; }
+.lado__tit small { display: block; margin-top: 4px; font: 400 11px/1.3 var(--f-body); letter-spacing: 0; color: var(--ink-3); }
+.lado nav { display: flex; flex-direction: column; gap: 18px; }
+.grupo h2 { margin: 0 0 6px; font: 500 10px/1 var(--f-body); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.grupo ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
+.item { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 6px 8px; margin: 0 -8px; border: 0; border-radius: 8px; background: none; text-align: left; font-size: 12px; color: var(--ink-2); text-decoration: none; transition: background .2s var(--ease), color .2s var(--ease); }
+.item { width: calc(100% + 16px); }
+.item:hover { background: rgba(10, 30, 74, .06); color: var(--ink); }
+.item[aria-current="true"] { background: var(--azul); color: #fff; }
+.item .fl { opacity: .5; font-size: 11px; }
+
+.centro { min-width: 0; padding: 20px 24px 48px; display: flex; flex-direction: column; gap: 16px; }
+.cab { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+.cab h1 { margin: 0; font: 600 clamp(22px, 2.4vw, 30px)/1.05 var(--f-display); letter-spacing: -.025em; }
+.cab p { margin: 6px 0 0; max-width: 56ch; font-size: 13px; color: var(--ink-2); }
+
+.escenario { border-radius: 22px; padding: clamp(20px, 4vw, 48px); display: flex; justify-content: center; align-items: flex-start; min-height: 360px; overflow: auto; background: var(--e-fondo, var(--bg)); box-shadow: inset 0 0 0 1px var(--line); transition: background .3s var(--ease); }
+.marco { width: 100%; max-width: 1160px; transition: max-width .45s var(--ease); }
+.marco[data-vista="mobile"] { max-width: 351px; }
+
+/* ---------- Tweaks ---------- */
+.tweaks { position: sticky; top: 0; height: 100vh; overflow: auto; padding: 20px 18px; border-left: 1px solid var(--line); display: flex; flex-direction: column; gap: 14px; }
+.tweaks h2 { margin: 0; font: 500 10px/1 var(--f-body); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.ctl { display: flex; flex-direction: column; gap: 6px; }
+.ctl > label, .ctl > .et { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--ink-2); }
+.ctl .val { font-variant-numeric: tabular-nums; color: var(--ink-3); }
+.seg { display: flex; flex-wrap: wrap; gap: 4px; }
+.seg button { flex: 1 1 auto; min-height: 28px; padding: 0 10px; border: 0; border-radius: 999px; background: rgba(10, 30, 74, .06); font-size: 12px; color: var(--ink-2); transition: background .2s var(--ease), color .2s var(--ease); }
+.seg button:hover { background: rgba(10, 30, 74, .11); }
+.seg button[aria-pressed="true"] { background: var(--azul); color: #fff; }
+input[type="range"] { width: 100%; accent-color: var(--azul); margin: 0; }
+input[type="text"] { height: 30px; padding: 0 10px; border: 0; border-radius: 8px; background: rgba(10, 30, 74, .06); font-size: 12.5px; }
+.interr { display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; color: var(--ink-2); }
+.interr button { position: relative; width: 36px; height: 20px; border: 0; border-radius: 999px; background: rgba(10, 30, 74, .18); transition: background .2s var(--ease); }
+.interr button::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform .25s var(--ease); }
+.interr button[aria-pressed="true"] { background: var(--azul); }
+.interr button[aria-pressed="true"]::after { transform: translateX(16px); }
+.btn { min-height: 32px; padding: 0 14px; border: 0; border-radius: 999px; background: var(--azul); color: #fff; font-size: 12.5px; transition: transform .15s var(--ease); }
+.btn:active { transform: scale(.97); }
+.btn--claro { background: rgba(10, 30, 74, .08); color: var(--ink); }
+hr { border: 0; border-top: 1px solid var(--line); width: 100%; margin: 2px 0; }
+
+/* ---------- Código ---------- */
+.codigo { border-radius: 18px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); overflow: hidden; }
+.codigo__barra { display: flex; justify-content: space-between; align-items: center; padding: 8px 8px 8px 14px; border-bottom: 1px solid var(--line); gap: 8px; }
+.codigo__barra .seg { flex: none; }
+.codigo__barra .seg button { flex: none; min-height: 26px; }
+.codigo pre { margin: 0; padding: 14px; max-height: 340px; overflow: auto; font: 400 12px/1.55 var(--f-mono); color: var(--ink); tab-size: 2; }
+.codigo small { color: var(--ink-3); font-size: 11px; }
+
+@media (max-width: 1100px) { .app { grid-template-columns: 176px minmax(0, 1fr); } .tweaks { grid-column: 1 / -1; position: static; height: auto; border-left: 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); align-items: start; } .tweaks > h2, .tweaks > hr, .tweaks > .btn { grid-column: 1 / -1; } }
+@media (max-width: 720px) {
+  .app { grid-template-columns: 1fr; }
+  .lado { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; border-right: 0; border-bottom: 1px solid var(--line); gap: 12px 20px; padding: 14px 16px; }
+  .lado nav { flex-direction: row; flex-wrap: wrap; gap: 4px 16px; } .grupo ul { flex-direction: row; flex-wrap: wrap; } .grupo h2 { display: none; }
+  .item { width: auto; margin: 0; } .centro { padding: 16px; }
+}
+
+/* ======================================================================
+   Componente: Cifras clave. Todo lo de abajo es lo que sale en "Código".
+   ====================================================================== */
+</style>
+<style id="css-componente"></style>
+</head>
+<body>
+<div class="app">
+  <aside class="lado">
+    <a class="lado__volver" href="../../">← Bong Lab</a>
+    <h1 class="lado__tit">Componentes<small>Profertil · web</small></h1>
+    <nav id="nav" aria-label="Componentes"></nav>
+  </aside>
+
+  <main class="centro">
+    <div class="cab">
+      <div><h1 id="nombre"></h1><p id="bajada"></p></div>
+      <div class="seg" id="vista" role="group" aria-label="Vista">
+        <button type="button" data-v="desktop" aria-pressed="true">Desktop</button>
+        <button type="button" data-v="mobile" aria-pressed="false">Mobile</button>
+      </div>
+    </div>
+    <div class="escenario" id="escenario"><div class="marco" id="marco" data-vista="desktop"></div></div>
+    <section class="codigo" aria-label="Código">
+      <div class="codigo__barra">
+        <div class="seg" id="tabs" role="group" aria-label="Lenguaje">
+          <button type="button" data-t="html" aria-pressed="true">HTML</button>
+          <button type="button" data-t="css" aria-pressed="false">CSS</button>
+        </div>
+        <small id="nota"></small>
+        <button type="button" class="btn" id="copiar">Copiar</button>
+      </div>
+      <pre id="pre" tabindex="0"></pre>
+    </section>
+  </main>
+
+  <aside class="tweaks" id="tweaks" aria-label="Tweaks"></aside>
+</div>
+
+<script src="../animadores-texto/animadores.js"></script>
+<script>
+/* ==========================================================================
+   Librería de componentes.
+   Para sumar uno: agregá un objeto a COMPONENTES con
+     id, nombre, grupo, bajada,
+     css      el CSS del componente (es el que se inyecta y el que se copia),
+     controles  lista de tweaks ({id, tipo, etiqueta, ...}),
+     estructural  ids de tweaks que obligan a rearmar el HTML,
+     html(estado)  el HTML completo del componente según los tweaks,
+     aplicar(raiz, estado)  actualiza el componente ya dibujado sin rearmarlo,
+     animar(raiz)  (opcional) dispara su animación.
+   ========================================================================== */
+var PALETAS = {          // 04 · Paleta del Master: Dominante, Complementario, Tercero, Tinta, Tinta tercero
+  azul:     { dom: "#003DA5", comp: "#4086FF", ter: "#2D8035", tinta: "#003DA5", tinter: "#FFFEEF", sobre: "#FFFEEF" },
+  verde:    { dom: "#2D8035", comp: "#5EB53A", ter: "#EABA2C", tinta: "#2D8035", tinter: "#2D8035", sobre: "#FFFEEF" },
+  amarillo: { dom: "#EABA2C", comp: "#E57F19", ter: "#2D8035", tinta: "#E57F19", tinter: "#FFFEEF", sobre: "#003DA5" },
+  naranja:  { dom: "#E57F19", comp: "#8A4818", ter: "#EABA2C", tinta: "#E57F19", tinter: "#E57F19", sobre: "#FFFEEF" }
+};
+
+var CIFRAS_CSS = [
+"/* Cifras clave · Profertil. Fuentes: Familjen Grotesk (500) y DM Sans (400). */",
+".cifras {",
+"  --f-display: \"Familjen Grotesk\", \"Helvetica Neue\", Arial, sans-serif;",
+"  --f-body: \"DM Sans\", \"Helvetica Neue\", Arial, sans-serif;",
+"  --card: #FFFEEF; --linea: rgba(10, 30, 74, .1); --texto-2: #44506E;",
+"  --num: 64px;        /* tamaño del número (en mobile se reduce solo) */",
+"  --pastilla: 27px;   /* alto de la pastilla del año: S 22 / M 27 / L 32 */",
+"  --radio: 26px;",
+"  --aire: 16px;",
+"  container-type: inline-size;",
+"  font-family: var(--f-body);",
+"}",
+"/* Paleta (04 · Paleta del Master) y combinación del dato (05 · Combinación). */",
+Object.keys(PALETAS).map(function (k) {
+  var p = PALETAS[k];
+  return '.cifras[data-paleta="' + k + '"] { --c-dom: ' + p.dom + '; --c-comp: ' + p.comp + '; --c-ter: ' + p.ter + '; --c-tinta: ' + p.tinta + '; --c-tinta-ter: ' + p.tinter + '; --c-sobre: ' + p.sobre + '; }';
+}).join("\n"),
+'.cifras[data-comb="secundaria"] { --c-dato: var(--c-comp); --c-dato-tinta: #FFFEEF; }',
+'.cifras[data-comb="terciaria"] { --c-dato: var(--c-ter); --c-dato-tinta: var(--c-tinta-ter); }',
+"",
+".cifras__lista { display: grid; grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr)); gap: var(--aire); }",
+".cifra { display: flex; flex-direction: column; gap: 12px; min-width: 0; color: var(--c-tinta); }",
+".cifra__cab { display: flex; justify-content: space-between; align-items: center; gap: 8px; }",
+".cifra__rotulo { font-size: 13px; line-height: 16px; color: var(--texto-2); }",
+".cifra__anio {",
+"  display: inline-flex; align-items: center; height: var(--pastilla); padding: 0 calc(var(--pastilla) * .37);",
+"  border-radius: calc(var(--pastilla) * .32); background: var(--c-dato); color: var(--c-dato-tinta);",
+"  font-size: calc(var(--pastilla) * .48); line-height: 1; white-space: nowrap;",
+"}",
+".cifra__n { font: 500 var(--num)/1 var(--f-display); letter-spacing: -.047em; font-variant-numeric: tabular-nums; }",
+".cifra__desc { margin: 0; font-size: 15px; line-height: 20px; color: var(--texto-2); }",
+"",
+"/* Variante: tarjeta marfil */",
+'.cifras[data-variante="tarjeta"] .cifra { padding: 20px 22px 24px; border-radius: var(--radio); background: var(--card); }',
+"/* Variante: sobre color (fondo = Dominante de la paleta) */",
+'.cifras[data-variante="color"] .cifra { padding: 20px 22px 24px; border-radius: var(--radio); background: var(--c-dom); color: var(--c-sobre); }',
+'.cifras[data-variante="color"] .cifra__rotulo, .cifras[data-variante="color"] .cifra__desc { color: var(--c-sobre); }',
+"/* Variante: sobre tiza (sin caja, línea fina arriba) */",
+'.cifras[data-variante="tiza"] .cifra { padding: 16px 0 8px; border-top: 1px solid var(--linea); }',
+"",
+"/* Mobile: 2 por fila, números más chicos. Responde al ancho del componente, no de la ventana. */",
+"@container (max-width: 720px) {",
+"  .cifras__lista { grid-template-columns: repeat(min(var(--cols, 4), 2), minmax(0, 1fr)); gap: calc(var(--aire) * .56); }",
+"  .cifra { gap: 8px; }",
+"  .cifra__n { font-size: calc(var(--num) * .69); }",
+"  .cifra__rotulo { font-size: 12px; } .cifra__desc { font-size: 13px; line-height: 17px; }",
+'  .cifras[data-variante="tarjeta"] .cifra, .cifras[data-variante="color"] .cifra { padding: 16px 16px 18px; border-radius: calc(var(--radio) * .77); }',
+"}"
+].join("\n");
+
+var CIFRAS_DATOS = [
+  ["Producción", "128", "miles de toneladas por año"],
+  ["Presencia", "24", "provincias con distribuidores"],
+  ["Equipo", "900", "personas en planta y oficinas"],
+  ["Cultivos", "12", "cultivos con recomendación"]
+];
+
+var COMPONENTES = [
+  {
+    id: "cifras", nombre: "Cifras clave", grupo: "Datos",
+    bajada: "Tres o cuatro números que cuentan escala. El año va siempre visible. Los datos de abajo son de ejemplo.",
+    nota: "Para que el número cuente hacen falta animadores.css y animadores.js; sin ellos queda el valor final.",
+    css: CIFRAS_CSS,
+    estructural: ["cant", "contar", "dur"],
+    controles: [
+      { id: "variante", tipo: "seg", etiqueta: "Variante", def: "tiza", opciones: [["tarjeta", "Tarjeta"], ["color", "Sobre color"], ["tiza", "Sobre tiza"]] },
+      { id: "paleta", tipo: "seg", etiqueta: "Paleta", def: "azul", opciones: [["azul", "Azul"], ["verde", "Verde"], ["amarillo", "Amarillo"], ["naranja", "Naranja"]] },
+      { id: "comb", tipo: "seg", etiqueta: "Combinación del dato", def: "secundaria", opciones: [["secundaria", "Secundaria"], ["terciaria", "Terciaria"]] },
+      { id: "cant", tipo: "seg", etiqueta: "Cantidad", def: "4", opciones: [["2", "2"], ["3", "3"], ["4", "4"]] },
+      "---",
+      { id: "num", tipo: "rango", etiqueta: "Número", unidad: "px", min: 32, max: 120, paso: 1, def: 64 },
+      { id: "pastilla", tipo: "rango", etiqueta: "Pastilla del año (S 22 · M 27 · L 32)", unidad: "px", min: 16, max: 40, paso: 1, def: 27 },
+      { id: "radio", tipo: "rango", etiqueta: "Radio", unidad: "px", min: 0, max: 40, paso: 1, def: 26 },
+      { id: "aire", tipo: "rango", etiqueta: "Separación", unidad: "px", min: 0, max: 48, paso: 1, def: 16 },
+      { id: "anio", tipo: "texto", etiqueta: "Año", def: "2025" },
+      "---",
+      { id: "contar", tipo: "interr", etiqueta: "Contar al entrar", def: true },
+      { id: "dur", tipo: "rango", etiqueta: "Duración del conteo", unidad: "ms", min: 400, max: 3000, paso: 100, def: 1400 },
+      { id: "repetir", tipo: "boton", etiqueta: "Repetir animación" }
+    ],
+    html: function (s) {
+      var n = parseInt(s.cant, 10), items = CIFRAS_DATOS.slice(0, n).map(function (d) {
+        return '    <article class="cifra">\n' +
+          '      <div class="cifra__cab"><span class="cifra__rotulo">' + d[0] + '</span><span class="cifra__anio">' + esc(s.anio) + '</span></div>\n' +
+          '      <strong class="cifra__n"' + (s.contar ? ' data-anim="cifra" data-dur="' + s.dur + '"' : '') + '>' + d[1] + '</strong>\n' +
+          '      <p class="cifra__desc">' + d[2] + '</p>\n' +
+          '    </article>';
+      }).join("\n");
+      return '<section class="cifras" data-variante="' + s.variante + '" data-paleta="' + s.paleta + '" data-comb="' + s.comb +
+        '" style="--cols: ' + n + '; --num: ' + s.num + 'px; --pastilla: ' + s.pastilla + 'px; --radio: ' + s.radio + 'px; --aire: ' + s.aire + 'px">\n' +
+        '  <div class="cifras__lista">\n' + items + '\n  </div>\n</section>';
+    },
+    aplicar: function (raiz, s) {
+      var r = raiz.querySelector(".cifras"); if (!r) return;
+      r.dataset.variante = s.variante; r.dataset.paleta = s.paleta; r.dataset.comb = s.comb;
+      r.style.setProperty("--num", s.num + "px"); r.style.setProperty("--pastilla", s.pastilla + "px");
+      r.style.setProperty("--radio", s.radio + "px"); r.style.setProperty("--aire", s.aire + "px");
+      r.querySelectorAll(".cifra__anio").forEach(function (e) { e.textContent = s.anio; });
+    },
+    animar: function (raiz) {
+      raiz.querySelectorAll("[data-anim]").forEach(function (el, i) { setTimeout(function () { Animadores.repetir(el); }, i * 90); });
+    }
+  }
+];
+
+/* Piezas que ya existen en el Lab como página propia. */
+var OTRAS = [
+  { nombre: "Carrusel de fotos", url: "../carrusel-fotos/" },
+  { nombre: "Animadores de texto", url: "../animadores-texto/" },
+  { nombre: "Novedades", url: "../novedades/" },
+  { nombre: "Hero morph", url: "../hero-morph/" }
+];
+
+/* ---------------------------------------------------------------- motor */
+function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+var $ = function (id) { return document.getElementById(id); };
+var actual = COMPONENTES[0], estado = {}, tab = "html", fondoEscenario = "web";
+var FONDOS = { web: "#E9E7D6", tiza: "#FFFEEF", blanco: "#FFFFFF" };
+
+function iniciarEstado(c) {
+  estado = {};
+  c.controles.forEach(function (k) { if (k !== "---" && k.tipo !== "boton") estado[k.id] = k.def; });
+}
+
+function dibujarNav() {
+  var grupos = {};
+  COMPONENTES.forEach(function (c) { (grupos[c.grupo] = grupos[c.grupo] || []).push(c); });
+  var h = Object.keys(grupos).map(function (g) {
+    return '<div class="grupo"><h2>' + esc(g) + '</h2><ul>' + grupos[g].map(function (c) {
+      return '<li><button type="button" class="item" data-c="' + c.id + '" aria-current="' + (c === actual) + '">' + esc(c.nombre) + '</button></li>';
+    }).join("") + '</ul></div>';
+  }).join("");
+  h += '<div class="grupo"><h2>Otras piezas del Lab</h2><ul>' + OTRAS.map(function (o) {
+    return '<li><a class="item" href="' + o.url + '">' + esc(o.nombre) + '<span class="fl">↗</span></a></li>';
+  }).join("") + '</ul></div>';
+  $("nav").innerHTML = h;
+}
+
+function dibujarTweaks() {
+  var h = '<h2>Tweaks</h2>';
+  actual.controles.forEach(function (k) {
+    if (k === "---") { h += "<hr>"; return; }
+    var v = estado[k.id];
+    if (k.tipo === "seg") {
+      h += '<div class="ctl"><div class="et">' + esc(k.etiqueta) + '</div><div class="seg" data-k="' + k.id + '">' +
+        k.opciones.map(function (o) { return '<button type="button" data-val="' + o[0] + '" aria-pressed="' + (String(v) === o[0]) + '">' + esc(o[1]) + '</button>'; }).join("") + '</div></div>';
+    } else if (k.tipo === "rango") {
+      h += '<div class="ctl"><label for="t-' + k.id + '"><span>' + esc(k.etiqueta) + '</span><span class="val" id="v-' + k.id + '">' + v + ' ' + k.unidad + '</span></label>' +
+        '<input type="range" id="t-' + k.id + '" data-k="' + k.id + '" min="' + k.min + '" max="' + k.max + '" step="' + k.paso + '" value="' + v + '"></div>';
+    } else if (k.tipo === "texto") {
+      h += '<div class="ctl"><label for="t-' + k.id + '"><span>' + esc(k.etiqueta) + '</span></label><input type="text" id="t-' + k.id + '" data-k="' + k.id + '" value="' + esc(v) + '"></div>';
+    } else if (k.tipo === "interr") {
+      h += '<div class="interr"><span>' + esc(k.etiqueta) + '</span><button type="button" data-k="' + k.id + '" aria-pressed="' + v + '" aria-label="' + esc(k.etiqueta) + '"></button></div>';
+    } else if (k.tipo === "boton") {
+      h += '<button type="button" class="btn" data-accion="' + k.id + '">' + esc(k.etiqueta) + '</button>';
+    }
+  });
+  h += '<hr><div class="ctl"><div class="et">Fondo del escenario</div><div class="seg" data-k="__fondo">' +
+    [["web", "Web"], ["tiza", "Tiza"], ["blanco", "Blanco"]].map(function (o) { return '<button type="button" data-val="' + o[0] + '" aria-pressed="' + (fondoEscenario === o[0]) + '">' + o[1] + '</button>'; }).join("") + '</div></div>';
+  $("tweaks").innerHTML = h;
+}
+
+function armarEscenario(animar) {
+  $("marco").innerHTML = actual.html(estado);
+  if (animar !== false && actual.animar) actual.animar($("marco"));
+}
+
+function codigo() {
+  var html = "<!-- " + actual.nombre + " · Profertil. " + (actual.nota || "") + " -->\n" + actual.html(estado);
+  $("pre").textContent = tab === "html" ? html : actual.css;
+}
+
+function cambio(id, valor) {
+  estado[id] = valor;
+  var est = actual.estructural.indexOf(id) !== -1;
+  if (est) armarEscenario(); else actual.aplicar($("marco"), estado);
+  codigo();
+}
+
+var tAnim;
+function conectar() {
+  $("tweaks").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    if (b.dataset.accion === "repetir") { if (actual.animar) actual.animar($("marco")); return; }
+    var seg = b.closest(".seg"), k = b.dataset.k || (seg && seg.dataset.k); if (!k) return;
+    if (seg) {
+      b.parentNode.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", x === b); });
+      if (k === "__fondo") { fondoEscenario = b.dataset.val; $("escenario").style.setProperty("--e-fondo", FONDOS[fondoEscenario]); return; }
+      cambio(k, b.dataset.val);
+    } else {
+      var on = b.getAttribute("aria-pressed") !== "true"; b.setAttribute("aria-pressed", on); cambio(k, on);
+    }
+  });
+  $("tweaks").addEventListener("input", function (e) {
+    var el = e.target, k = el.dataset.k; if (!k) return;
+    if (el.type === "range") {
+      var def = actual.controles.filter(function (c) { return c.id === k; })[0];
+      $("v-" + k).textContent = el.value + " " + def.unidad;
+      if (actual.estructural.indexOf(k) === -1) cambio(k, parseFloat(el.value)); else estado[k] = parseFloat(el.value);
+    } else { cambio(k, el.value); }
+  });
+  $("tweaks").addEventListener("change", function (e) {
+    var el = e.target, k = el.dataset.k;
+    if (el.type === "range" && actual.estructural.indexOf(k) !== -1) cambio(k, parseFloat(el.value));
+  });
+  $("nav").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-c]"); if (!b) return;
+    actual = COMPONENTES.filter(function (c) { return c.id === b.dataset.c; })[0]; abrir();
+  });
+  $("vista").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    $("vista").querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", x === b); });
+    $("marco").dataset.vista = b.dataset.v;
+  });
+  $("tabs").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return; tab = b.dataset.t;
+    $("tabs").querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", x === b); }); codigo();
+  });
+  $("copiar").addEventListener("click", function () {
+    var t = $("pre").textContent, b = $("copiar");
+    function ok() { b.textContent = "Copiado"; setTimeout(function () { b.textContent = "Copiar"; }, 1500); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, falla); else falla();
+    function falla() { var a = document.createElement("textarea"); a.value = t; document.body.appendChild(a); a.select(); try { document.execCommand("copy"); ok(); } catch (x) {} a.remove(); }
+  });
+}
+
+function abrir() {
+  iniciarEstado(actual);
+  $("css-componente").textContent = actual.css;
+  $("nombre").textContent = actual.nombre; $("bajada").textContent = actual.bajada; $("nota").textContent = actual.nota || "";
+  dibujarNav(); dibujarTweaks(); armarEscenario(); codigo();
+}
+
+conectar();
+document.fonts.ready.then(abrir);
+</script>
+</body>
+</html>
