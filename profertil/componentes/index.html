@@ -132,16 +132,19 @@ html { scrollbar-color: rgba(10, 30, 74, .25) transparent; }
 .ctl:has(.seg button:nth-child(4)) { grid-template-columns: 1fr; gap: 8px; padding: 10px 0; }
 .ctl > .et { font-size: 12.5px; color: var(--ink-2); }
 .ctl > .et small { display: block; font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
-.seg { display: flex; gap: 2px; padding: 2px; border-radius: var(--r); background: var(--suave); }
-.seg button { flex: 1 1 0; min-width: 0; height: 28px; padding: 0 6px; border: 0; border-radius: 8px; background: none; font-size: 12px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: background .15s var(--ease), color .15s var(--ease); }
-.seg button:hover { color: var(--ink); }
-.seg button[aria-pressed="true"] { background: var(--card); color: var(--ink); box-shadow: 0 1px 2px rgba(10, 30, 74, .12); }
+/* El Selector del sistema (Web/Selector del Master): cápsula de línea, indicador marfil que se desliza. */
+.seg { position: relative; isolation: isolate; display: flex; padding: 3px; border-radius: 999px; background: var(--line); }
+.seg-ind { position: absolute; z-index: -1; top: 3px; left: 0; bottom: 3px; width: 0; border-radius: 999px; background: var(--card); box-shadow: 0 1px 3px rgba(10, 30, 74, .12); pointer-events: none; transition: transform 420ms cubic-bezier(.67, 0, .24, .99), width 420ms cubic-bezier(.67, 0, .24, .99); }
+.seg-ind.quieto { transition: none; }
+.seg button { flex: 1 1 0; min-width: 0; height: 28px; padding: 0 8px; border: 0; border-radius: 999px; background: transparent; font-size: 12px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 240ms ease; }
+.seg button[aria-pressed="true"] { color: var(--azul); font-weight: 500; }
 input[type="range"] { width: 100%; accent-color: var(--ink); margin: 0; }
 input[type="text"], select { width: 100%; height: 32px; padding: 0 10px; border: 0; border-radius: var(--r); background: var(--suave); font-size: 12.5px; }
-.interr { justify-self: end; position: relative; width: 34px; height: 20px; border: 0; border-radius: 999px; background: rgba(10, 30, 74, .18); transition: background .15s var(--ease); }
-.interr::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform .2s var(--ease); }
-.interr[aria-checked="true"] { background: var(--ink); }
-.interr[aria-checked="true"]::after { transform: translateX(14px); }
+/* El interruptor del sistema (UI/Toggle del Master): 56 × 32, perilla de 26, verde prendido. */
+.interr { justify-self: end; position: relative; width: 56px; height: 32px; padding: 0; border: 0; border-radius: 16px; background: #D9D9D9; transition: background 200ms ease; }
+.interr::after { content: ""; position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(10, 30, 74, .2); transition: transform 240ms var(--ease); }
+.interr[aria-checked="true"] { background: #2D8035; }
+.interr[aria-checked="true"]::after { transform: translateX(24px); }
 
 /* Código: una sola acción principal, Copiar. */
 .codigo__cab { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
@@ -223,6 +226,7 @@ details[open] summary .ico { transform: rotate(90deg); }
      variantes   [[id, nombre, descripción], ...]
      alto        "auto" (el contenido, centrado) o un número (página con scroll propio)
      previa      0 a 1: hasta dónde scrollear la miniatura de la galería
+     mini        ancho en px al que se dibuja la miniatura (1280 por defecto; menos = más cerca)
      tamano      "ancha" | "media" | "chica": lugar en la galería
      controles   {id, tipo: seg|rango|texto|interr|select, etiqueta, def, desc, aplica}
                  aplica: {var: "--x", unidad} | {attr: "data-x"} | {texto: "selector"} = en vivo;
@@ -233,7 +237,7 @@ details[open] summary .ico { transform: rotate(90deg); }
    Las piezas que ya son una página del Lab se suman con {tipo: "pagina", src}.
    ========================================================================== */
 window.Libreria = { lista: [], sumar: function (c) { this.lista.push(c); } };
-var GRUPOS = ["Datos", "Navegación", "Listas", "Scroll", "Transiciones", "Medios", "Texto", "Páginas"];
+var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll", "Transiciones", "Medios", "Texto", "Páginas"];
 </script>
 <script src="c/cifras.js"></script>
 <script src="c/pie.js"></script>
@@ -242,6 +246,7 @@ var GRUPOS = ["Datos", "Navegación", "Listas", "Scroll", "Transiciones", "Medio
 <script src="c/scroll-fotos.js"></script>
 <script src="c/transicion-seccion.js"></script>
 <script src="c/transicion-navegacion.js"></script>
+<script src="c/controles.js"></script>
 <script src="c/piezas-lab.js"></script>
 <script>
 (function () {
@@ -315,8 +320,10 @@ var GRUPOS = ["Datos", "Navegación", "Listas", "Scroll", "Transiciones", "Medio
     scrollTo(0, 0);
     // Miniaturas en vivo: el iframe se dibuja a 1280 × 800 y se achica para cubrir la tarjeta.
     document.querySelectorAll("[data-mini]").forEach(function (fr) {
-      var c = porId(fr.dataset.mini), caja = fr.parentNode;
-      var ajustar = function () { fr.style.setProperty("--esc", Math.max(caja.clientWidth / 1280, caja.clientHeight / 800)); };
+      // Las piezas chicas (controles, avisos) se dibujan más angostas para que se vean de cerca.
+      var c = porId(fr.dataset.mini), caja = fr.parentNode, ancho = c.mini || 1280, alto = Math.round(ancho * .625);
+      fr.style.width = ancho + "px"; fr.style.height = alto + "px";
+      var ajustar = function () { fr.style.setProperty("--esc", Math.max(caja.clientWidth / ancho, caja.clientHeight / alto)); };
       new ResizeObserver(ajustar).observe(caja); ajustar();
       cargar(fr, c, inicial(c), function () {
         if (typeof c.alto === "number" && c.previa) try {
@@ -348,7 +355,7 @@ var GRUPOS = ["Datos", "Navegación", "Listas", "Scroll", "Transiciones", "Medio
   function control(k) {
     var v = estado[k.id], et = esc(k.etiqueta.replace(/ \(.+\)$/, ""));
     if (k.tipo === "rango") return '<div class="ctl"><label class="et" for="t-' + k.id + '">' + et + '<small id="v-' + k.id + '">' + v + ' ' + (k.unidad || '') + '</small></label><input type="range" id="t-' + k.id + '" data-k="' + k.id + '" min="' + k.min + '" max="' + k.max + '" step="' + (k.paso || 1) + '" value="' + v + '"></div>';
-    if (k.tipo === "seg") return '<div class="ctl"><span class="et" id="e-' + k.id + '">' + et + '</span><div class="seg" role="group" aria-labelledby="e-' + k.id + '" data-k="' + k.id + '">' + k.opciones.map(function (o) {
+    if (k.tipo === "seg") return '<div class="ctl"><span class="et" id="e-' + k.id + '">' + et + '</span><div class="seg" role="group" aria-labelledby="e-' + k.id + '" data-k="' + k.id + '"><span class="seg-ind" aria-hidden="true"></span>' + k.opciones.map(function (o) {
       return '<button type="button" data-val="' + o[0] + '" aria-pressed="' + (String(v) === String(o[0])) + '">' + esc(o[1]) + '</button>'; }).join("") + '</div></div>';
     if (k.tipo === "select") return '<div class="ctl"><label class="et" for="t-' + k.id + '">' + et + '</label><select id="t-' + k.id + '" data-k="' + k.id + '">' + k.opciones.map(function (o) {
       return '<option value="' + o[0] + '"' + (String(v) === String(o[0]) ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join("") + '</select></div>';
@@ -382,7 +389,7 @@ var GRUPOS = ["Datos", "Navegación", "Listas", "Scroll", "Transiciones", "Medio
         '<button type="button" id="completa" aria-label="Pantalla completa" title="Pantalla completa">' + ico("completa") + '</button>' +
       '</div></div></div>';
     $("centro").innerHTML = h; scrollTo(0, 0);
-    iframe = $("ifr"); dibujar(true); codigo();
+    iframe = $("ifr"); dibujar(true); codigo(); moverInds();
   }
 
   function dibujar(nuevo) {
@@ -436,6 +443,7 @@ var GRUPOS = ["Datos", "Navegación", "Listas", "Scroll", "Transiciones", "Medio
     var seg = b.closest("#ajustes .seg"), k = b.dataset.k || (seg && seg.dataset.k); if (!k) return;
     if (seg) {
       seg.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", x === b); });
+      moverInd(seg, true);
       var c = ctrl(k), val = b.dataset.val; if (c && typeof c.def === "number") val = parseFloat(val); cambio(k, val);
     } else if (b.classList.contains("interr")) { var on = b.getAttribute("aria-checked") !== "true"; b.setAttribute("aria-checked", on); cambio(k, on); }
   });
@@ -449,6 +457,18 @@ var GRUPOS = ["Datos", "Navegación", "Listas", "Scroll", "Transiciones", "Medio
     var el = e.target, k = el.dataset && el.dataset.k, c = k && actual && ctrl(k);
     if (el.type === "range" && c && !c.aplica) cambio(k, parseFloat(el.value));
   });
+
+  // El indicador del Selector va al botón elegido (igual que en Novedades).
+  function moverInd(seg, animar) {
+    var ind = seg.querySelector(".seg-ind"), b = seg.querySelector('button[aria-pressed="true"]');
+    if (!ind || !b || !b.offsetWidth) return;
+    if (!animar) ind.classList.add("quieto");
+    ind.style.width = b.offsetWidth + "px"; ind.style.transform = "translateX(" + b.offsetLeft + "px)";
+    if (!animar) { void ind.offsetWidth; ind.classList.remove("quieto"); }
+  }
+  function moverInds() { document.querySelectorAll("#ajustes .seg").forEach(function (s) { moverInd(s, false); }); }
+  addEventListener("resize", moverInds);
+  document.fonts && document.fonts.ready.then(moverInds);
 
   function ruta() {
     var p = decodeURIComponent(location.hash.slice(1)).split("/"), c = porId(p[0]);
