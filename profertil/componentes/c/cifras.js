@@ -29,7 +29,7 @@
       "---",
       { id: "num", tipo: "rango", etiqueta: "Número", unidad: "px", min: 32, max: 120, def: 64, aplica: { var: "--num", unidad: "px" }, desc: "Cuerpo del número en desktop." },
       { id: "pastilla", tipo: "rango", etiqueta: "Pastilla del año (S 22 · M 27 · L 32)", unidad: "px", min: 16, max: 40, def: 27, aplica: { var: "--pastilla", unidad: "px" }, desc: "Alto de la pastilla; el texto y el radio escalan con él." },
-      { id: "radio", tipo: "rango", etiqueta: "Radio", unidad: "px", min: 0, max: 40, def: 26, aplica: { var: "--radio", unidad: "px" }, desc: "Radio de la caja (Tarjeta y Sobre color)." },
+      { id: "radio", tipo: "rango", etiqueta: "Radio", solo: ["tarjeta", "color"], unidad: "px", min: 0, max: 40, def: 26, aplica: { var: "--radio", unidad: "px" }, desc: "Radio de la caja (Tarjeta y Sobre color)." },
       { id: "aire", tipo: "rango", etiqueta: "Separación", unidad: "px", min: 0, max: 48, def: 16, aplica: { var: "--aire", unidad: "px" }, desc: "Separación entre cifras." },
       { id: "anio", tipo: "texto", etiqueta: "Año", def: "2025", aplica: { texto: ".cifra__anio" }, desc: "Año de los datos." },
       "---",

@@ -61,7 +61,8 @@
       ".nav .menu button[aria-current] { background: #FFFEEF; color: #003DA5; font-weight: 500; }",
       ".nav .lupa { width: 48px; height: 48px; flex: none; display: grid; place-items: center; border-radius: 999px; background: rgba(255, 254, 239, .16); border: 1px solid rgba(255, 254, 239, .24); color: #FFFEEF; }",
       ".nav .lupa svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }",
-      "@media (max-width: 760px) { .nav .menu button { padding: 7px 9px; font-size: .76rem; } .nav .logo svg { width: 56px; } .nav .lupa { display: none; } }"
+      "/* Mobile: si los items no entran, la cápsula se desliza de costado en lugar de salirse de la pantalla. */",
+      "@media (max-width: 760px) { .nav { gap: 10px; } .nav .menu { min-width: 0; margin-right: 0; overflow-x: auto; scrollbar-width: none; } .nav .menu::-webkit-scrollbar { display: none; } .nav .menu button { flex: none; padding: 7px 10px; font-size: .76rem; } .nav .logo svg { width: 56px; } .nav .lupa { display: none; } }"
     ].join("\n")
   };
 })();

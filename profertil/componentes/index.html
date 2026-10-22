@@ -100,6 +100,7 @@ html { scrollbar-color: rgba(10, 30, 74, .25) transparent; }
 /* Tantas columnas como entren: en pantallas anchas la grilla llega hasta el borde derecho. */
 .grilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 32px 20px; }
 .tar { color: inherit; text-decoration: none; display: flex; flex-direction: column; gap: 10px; border: 0; padding: 0; background: none; text-align: left; }
+.tar[hidden] { display: none; }
 .tar__vista { position: relative; aspect-ratio: 16 / 10; overflow: hidden; border-radius: var(--r-l); background: var(--bg); box-shadow: 0 0 0 1px var(--line); pointer-events: none; transition: box-shadow .15s var(--ease); }
 .tar:hover .tar__vista { box-shadow: 0 0 0 1px rgba(10, 30, 74, .28); }
 .tar__vista iframe { position: absolute; left: 50%; top: 50%; width: 1280px; height: 800px; border: 0; transform-origin: 50% 50%; transform: translate(-50%, -50%) scale(var(--esc, .3)); background: var(--bg); }
@@ -125,16 +126,21 @@ html { scrollbar-color: rgba(10, 30, 74, .25) transparent; }
 
 /* Ajustes: filas simples, sin caja. */
 .ajustes { display: flex; flex-direction: column; }
-.ctl { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); align-items: center; gap: 12px; min-height: 44px; padding: 6px 0; border-top: 1px solid var(--line); }
+.ctl { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); min-width: 0; align-items: center; gap: 12px; min-height: 44px; padding: 6px 0; border-top: 1px solid var(--line); }
 .ctl:last-child { border-bottom: 1px solid var(--line); }
-.ctl--desc { grid-template-columns: 1fr; gap: 8px; padding: 10px 0; }
+.ctl--desc { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 10px 0; }
 .ctl__desc { margin: 0; font-size: 12px; color: var(--ink-3); }
-/* Con cuatro opciones o más, el control va debajo del rótulo para que no se corten. */
-.ctl:has(.seg button:nth-child(4)) { grid-template-columns: 1fr; gap: 8px; padding: 10px 0; }
+/* Con tres opciones o más, el control va debajo del rótulo para que no se corten.
+   (El primer hijo del .seg es el indicador: la tercera opción es el cuarto hijo.) */
+.ctl:has(.seg button:nth-child(4)) { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 10px 0; }
 .ctl > .et { font-size: 12.5px; color: var(--ink-2); }
 .ctl > .et small { display: block; font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 /* El Selector del sistema (Web/Selector del Master): cápsula de línea, indicador marfil que se desliza. */
-.seg { position: relative; isolation: isolate; display: flex; padding: 3px; border-radius: 999px; background: var(--line); }
+.seg { position: relative; isolation: isolate; display: flex; min-width: 0; padding: 3px; border-radius: 999px; background: var(--line); }
+/* Si las opciones no entran (cinco en mobile), la cápsula se desliza de costado en vez de cortarlas. */
+.seg.ancho { overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain; }
+.seg.ancho::-webkit-scrollbar { display: none; }
+.seg.ancho button { flex: 1 0 auto; text-overflow: clip; }
 .seg-ind { position: absolute; z-index: -1; top: 3px; left: 0; bottom: 3px; width: 0; border-radius: 999px; background: var(--card); box-shadow: 0 1px 3px rgba(10, 30, 74, .12); pointer-events: none; transition: transform 420ms cubic-bezier(.67, 0, .24, .99), width 420ms cubic-bezier(.67, 0, .24, .99); }
 .seg-ind.quieto { transition: none; }
 .seg button { flex: 1 1 0; min-width: 0; height: 28px; padding: 0 8px; border: 0; border-radius: 999px; background: transparent; font-size: 12px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 240ms ease; display: inline-flex; align-items: center; justify-content: center; text-box: trim-both cap alphabetic; }
@@ -189,20 +195,99 @@ details[open] summary .ico { transform: rotate(90deg); }
 .herr button { display: grid; place-items: center; width: 30px; height: 30px; border: 0; border-radius: 8px; background: none; color: var(--ink-2); transition: background .15s var(--ease), color .15s var(--ease); }
 .herr button:hover { background: var(--suave); color: var(--ink); }
 .previa:fullscreen { border-radius: 0; height: 100vh; }
+/* Pantalla completa sin la API (iPhone: Safari solo la da para video). La previa tapa todo con position: fixed. */
+.previa.pleno { position: fixed; inset: 0; z-index: 100; width: auto; height: 100vh; height: 100dvh; border-radius: 0; box-shadow: none; }
+html.con-pleno { overflow: hidden; }
 .saltar { position: absolute; left: 12px; top: -48px; z-index: 10; padding: 8px 12px; border-radius: var(--r); background: var(--ink); color: var(--card); text-decoration: none; }
 .saltar:focus { top: 12px; }
 .oculto { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+/* ---------- Dock de componentes (mobile) ----------
+   El dock de filtros de Novedades: una pastilla de vidrio abajo que abre un panel con las categorías
+   (Pastilla filtro del Master) y la lista de componentes. A la derecha, separada, el Ancla del Master:
+   el círculo azul con la flecha, la acción principal. En una ficha lleva al componente siguiente;
+   en la galería baja una pantalla o vuelve arriba. La flechita de anterior va adentro del dock. */
+.dock, .ancla { display: none; }
+@media (max-width: 760px) {
+  :root { --a: 57px; } /* alto del dock cerrado: 46 de botón + 2 × 4 de aire + 2 de borde + 1 del panel */
+  .dock {
+    position: fixed; z-index: 40; left: 16px; right: calc(16px + var(--a) + var(--ancla-gap));
+    bottom: calc(14px + env(safe-area-inset-bottom, 0px)); max-height: calc(100% - 110px);
+    display: flex; flex-direction: column; border-radius: 28px; overflow: hidden;
+    background: var(--glass); border: 1px solid var(--borde-vidrio); box-shadow: 0 24px 60px -24px rgba(10, 30, 74, .5);
+    backdrop-filter: blur(22px) saturate(1.4); -webkit-backdrop-filter: blur(22px) saturate(1.4);
+    transition: border-radius var(--f-cerrar) var(--f-curva);
+  }
+  .dock.open { border-radius: 26px; transition-duration: var(--f-abrir); }
+  .dk-body {
+    flex: 0 1 auto; min-height: 0; height: 0; overflow: hidden; visibility: hidden; opacity: 0; border-bottom: 1px solid transparent;
+    transition: height var(--f-cerrar) var(--f-curva), opacity calc(var(--f-fundido) * .7) ease, border-color 260ms ease, visibility 0s linear var(--f-cerrar);
+  }
+  .dock.open .dk-body { visibility: visible; opacity: 1; border-bottom-color: var(--line); transition: height var(--f-abrir) var(--f-curva), opacity var(--f-fundido) ease var(--f-fundido-retraso), border-color 260ms ease; }
+  .dock.open.listo .dk-body { height: auto; overflow-y: auto; overscroll-behavior: contain; }
+  .dk-in { padding: 16px 14px 10px; display: grid; gap: 10px; }
+  .dk-label { margin: 0; font: 500 11px/1 var(--f-body); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+  .dk-cats { display: flex; flex-wrap: wrap; gap: 7px; padding: 3px 0 8px; }
+  /* Web/Pastilla filtro: rellena (azul), la elegida en tinta; "Todas" sin elegir es transparente. */
+  .lbl { --h: 30px; display: inline-flex; align-items: center; flex: none; height: var(--h); padding: 0 calc(var(--h) * .48); border: 0; border-radius: 999px; background: var(--azul); color: var(--sobre-color); font: 400 calc(var(--h) * .47)/1 var(--f-display); white-space: nowrap; transition: background 240ms var(--ease), color 240ms var(--ease); text-box: trim-both cap alphabetic; }
+  .lbl[aria-pressed="true"] { background: var(--activo); color: var(--sobre-color); }
+  .lbl-todas { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+  .dk-lista { list-style: none; margin: 0; padding: 0; display: grid; }
+  .dk-item { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 11px 2px; border-top: 1px solid var(--line); color: var(--ink); text-decoration: none; font: 500 15px/1.2 var(--f-display); letter-spacing: -.01em; }
+  .dk-item small { flex: none; font: 400 12px/1 var(--f-body); letter-spacing: 0; color: var(--ink-3); }
+  .dk-item[aria-current="page"] { color: var(--azul); }
+  .dk-item[aria-current="page"]::before { content: ""; width: 7px; height: 7px; margin-right: -4px; border-radius: 50%; background: var(--azul); align-self: center; flex: none; }
+  .dk-item[aria-current="page"] span { flex: 1; }
+  .dk-bar { flex: none; display: flex; align-items: center; gap: 2px; padding: 4px; }
+  .dk-prev { flex: none; width: 46px; height: 46px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 999px; background: transparent; color: var(--ink-2); transition: opacity .2s ease, width var(--f-chica) var(--f-chica-curva); }
+  .dk-prev .ico { width: 20px; height: 20px; stroke-width: 2; }
+  .dk-prev:active { background: var(--line); }
+  .dk-prev:disabled { opacity: .3; }
+  .dock[data-modo="galeria"] .dk-prev { width: 0; opacity: 0; pointer-events: none; }
+  .dk-toggle { flex: 1; min-width: 0; height: 46px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 18px; border: 0; border-radius: 999px; background: transparent; color: var(--ink); font: 400 1.04rem/1 var(--f-display); }
+  .dock[data-modo="ficha"] .dk-toggle { padding-left: 4px; justify-content: space-between; }
+  .dk-txt { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-box: trim-both cap alphabetic; }
+  .dk-n { flex: none; font: 400 12px/1 var(--f-body); color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .dk-toggle svg { flex: none; width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform var(--f-flecha) var(--f-curva); }
+  .dock.open .dk-toggle svg { transform: rotate(180deg); }
+  .dk-der { display: flex; align-items: center; gap: 10px; }
+  /* Ancla: el círculo azul, pegado a la derecha del dock pero separado (Web/Ancla/Separación). La escala y el giro los pone el JS con resortes. */
+  .ancla { display: block; position: fixed; z-index: 41; right: 16px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); width: var(--a); height: var(--a); padding: 0; border: 0; background: none; transform: scale(0); transform-origin: 50% 50%; will-change: transform; }
+  .ancla-cuerpo { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%; background: var(--azul); color: var(--tiza); }
+  .ancla svg { width: 44%; height: 44%; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; will-change: transform; }
+  .ancla:focus-visible { outline: none; } .ancla:focus-visible .ancla-cuerpo { outline: 2px solid var(--celeste); outline-offset: 3px; }
+  html.con-pleno .dock, html.con-pleno .ancla { visibility: hidden; }
+}
+
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; } }
 
 @media (max-width: 1100px) {
   .ficha { grid-template-columns: 1fr; padding: 16px; } .previa { position: relative; top: 0; height: 68vh; order: -1; } .doc { padding-top: 0; }
 }
 @media (max-width: 760px) {
-  .app { grid-template-columns: 1fr; }
-  .lado { position: static; height: auto; gap: 12px; border-right: 0; border-bottom: 1px solid var(--line); padding: 14px 16px; }
-  .lado nav { flex-direction: row; overflow-x: auto; gap: 16px; }
-  .grupo { flex: none; } .grupo ul { flex-direction: row; gap: 4px; } .item { width: auto; margin: 0; white-space: nowrap; }
-  .gal { padding: 24px 16px 48px; }
+  /* Mobile: la navegación pasa al dock de abajo; arriba queda solo el encabezado. */
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .lado { position: static; height: auto; flex-direction: row-reverse; justify-content: space-between; align-items: center; gap: 12px; border-right: 0; border-bottom: 1px solid var(--line); padding: 14px 16px; }
+  .lado nav { display: none; }
+  body { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+  .gal { padding: 24px 16px 32px; }
+  .ficha { padding: 12px 16px 16px; gap: 24px; }
+  .previa { height: 64vh; height: 64svh; }
+  .doc { gap: 28px; padding-bottom: 24px; }
+  .doc h1 { font-size: 26px; }
+  /* En el teléfono no tiene sentido el marco de mobile: la previa ya es mobile. */
+  .herr #vista { display: none; }
+  .herr button { width: 38px; height: 38px; }
+  .ctl { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 10px 0; }
+  .ctl > .et small { display: inline; margin-left: 6px; }
+  .seg button { height: 32px; }
+  /* 16 px: con menos, Safari de iPhone hace zoom al enfocar el campo y la página queda corrida. */
+  input[type="text"], select { height: 40px; font-size: 16px; }
+  input[type="range"] { height: 28px; }
+  .tabsv { gap: 16px; overflow-x: auto; scrollbar-width: none; } .tabsv::-webkit-scrollbar { display: none; }
+  .tabsv button { flex: none; white-space: nowrap; }
+  .codigo__cab { flex-wrap: wrap; gap: 10px; }
+  .tabla { display: block; overflow-x: auto; }
+  .vecinos { display: none; } /* las flechas están en el dock */
 }
 </style>
 </head>
@@ -217,6 +302,17 @@ details[open] summary .ico { transform: rotate(90deg); }
   </aside>
   <main class="centro" id="centro" tabindex="-1"></main>
 </div>
+<section class="dock" id="dock" data-modo="galeria" aria-label="Componentes">
+  <div class="dk-body" id="dkBody"><div class="dk-in">
+    <p class="dk-label">Categoría</p><div class="dk-cats" id="dkCats" role="group" aria-label="Categoría"></div>
+    <p class="dk-label">Componentes</p><ul class="dk-lista" id="dkLista"></ul>
+  </div></div>
+  <div class="dk-bar">
+    <button type="button" class="dk-prev" id="dkPrev" aria-label="Componente anterior"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <button type="button" class="dk-toggle" id="dkToggle" aria-expanded="false" aria-controls="dkBody"><span class="dk-txt" id="dkTxt">Componentes</span><span class="dk-der"><span class="dk-n" id="dkN"></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg></span></button>
+  </div>
+</section>
+<button type="button" class="ancla" id="ancla" aria-label="Componente siguiente" tabindex="-1"><span class="ancla-cuerpo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
 
 <script src="formas.js"></script>
 <script>
@@ -228,7 +324,8 @@ details[open] summary .ico { transform: rotate(90deg); }
      previa      0 a 1: hasta dónde scrollear la miniatura de la galería
      mini        ancho en px al que se dibuja la miniatura (1280 por defecto; menos = más cerca)
      tamano      "ancha" | "media" | "chica": lugar en la galería
-     controles   {id, tipo: seg|rango|texto|interr|select, etiqueta, def, desc, aplica}
+     controles   {id, tipo: seg|rango|texto|interr|select, etiqueta, def, desc, aplica, solo}
+                 solo: ["variante", ...] = el ajuste se muestra solo en esas variantes (en las otras no hace nada).
                  aplica: {var: "--x", unidad} | {attr: "data-x"} | {texto: "selector"} = en vivo;
                  sin aplica, el componente se vuelve a dibujar.
      claves      lista: cómo se comporta (lo que hay que respetar al llevarlo al sitio)
@@ -259,6 +356,7 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
     mobile: '<path d="M8 3h8a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM11 18h2"/>',
     repetir: '<path d="M4 12a8 8 0 1 0 2.3-5.7M4 4v4h4"/>',
     completa: '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
+    salir: '<path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/>',
     izq: '<path d="M17 12H7M11 8l-4 4 4 4"/>',
     der: '<path d="M7 12h10M13 8l4 4-4 4"/>',
     abre: '<path d="M10 7l5 5-5 5"/>'
@@ -302,6 +400,7 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
 
   /* ---------------- sidebar ---------------- */
   function dibujarNav() {
+    dibujarDock();
     $("nav").innerHTML = GRUPOS.map(function (g) {
       var cs = L.filter(function (c) { return c.grupo === g; }); if (!cs.length) return "";
       return '<div class="grupo"><p class="grupo__tit">' + g + '</p><ul>' + cs.map(function (c) {
@@ -314,16 +413,17 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
   /* ---------------- galería ---------------- */
   function galeria() {
     actual = null; dibujarNav(); document.title = "Componentes Profertil";
-    $("centro").innerHTML = '<div class="gal"><h1>Componentes</h1><p>Lo que vamos armando para el sitio, en vivo. Textos, números y fotos de ejemplo.</p><div class="grilla">' +
+    $("centro").innerHTML = '<div class="gal"><h1 id="galTit">' + (filtro ? 'Componentes · ' + esc(filtro) : 'Componentes') + '</h1><p>Lo que vamos armando para el sitio, en vivo. Textos, números y fotos de ejemplo.</p><div class="grilla">' +
       ordenados().map(function (c) {
-        return '<a class="tar" href="#' + c.id + '"><div class="tar__vista"><iframe tabindex="-1" loading="lazy" aria-hidden="true" title="" data-mini="' + c.id + '"></iframe></div>' +
+        return '<a class="tar" href="#' + c.id + '" data-grupo="' + esc(c.grupo) + '"' + (filtro && c.grupo !== filtro ? ' hidden' : '') + '><div class="tar__vista"><iframe tabindex="-1" loading="lazy" aria-hidden="true" title="" data-mini="' + c.id + '"></iframe></div>' +
           '<div><b>' + esc(c.nombre) + '</b><span>' + esc(c.grupo) + (c.variantes ? ' · ' + c.variantes.length + ' variantes' : '') + '</span></div></a>';
       }).join("") + '</div></div>';
     scrollTo(0, 0);
     // Miniaturas en vivo: el iframe se dibuja a 1280 × 800 y se achica para cubrir la tarjeta.
     document.querySelectorAll("[data-mini]").forEach(function (fr) {
       // Las piezas chicas (controles, avisos) se dibujan más angostas para que se vean de cerca.
-      var c = porId(fr.dataset.mini), caja = fr.parentNode, ancho = c.mini || 1280, alto = Math.round(ancho * .625);
+      // En el teléfono se dibujan a 720 como máximo: a 1280 quedaban ilegibles en una tarjeta de 360.
+      var c = porId(fr.dataset.mini), caja = fr.parentNode, ancho = Math.min(c.mini || 1280, matchMedia("(max-width: 760px)").matches ? 720 : 1e4), alto = Math.round(ancho * .625);
       fr.style.width = ancho + "px"; fr.style.height = alto + "px";
       var ajustar = function () { fr.style.setProperty("--esc", Math.max(caja.clientWidth / ancho, caja.clientHeight / alto)); };
       new ResizeObserver(ajustar).observe(caja); ajustar();
@@ -349,7 +449,7 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
     var filas = (c.controles || []).filter(function (k) { return k !== "---"; }).map(function (k) {
       var donde = k.aplica ? (k.aplica.var || k.aplica.attr || "texto") : "estructura";
       var def = typeof k.def === "boolean" ? (k.def ? "sí" : "no") : k.def + (k.unidad && k.unidad !== "%" ? " " + k.unidad : k.unidad || "");
-      return '<tr><td>' + esc(k.etiqueta.replace(/ \(.+\)$/, "")) + '</td><td><code>' + esc(donde) + '</code></td><td><code>' + esc(def) + '</code></td><td>' + esc(k.desc || "") + '</td></tr>';
+      return '<tr><td>' + esc(k.etiqueta.replace(/ \(.+\)$/, "")) + '</td><td><code>' + esc(donde) + '</code></td><td><code>' + esc(def) + '</code></td><td>' + esc((k.desc || "") + (k.solo ? " Solo en: " + k.solo.join(", ") + "." : "")) + '</td></tr>';
     });
     if (c.variantes) filas.unshift('<tr><td>Variante</td><td><code>data-variante</code></td><td><code>' + c.variantes[0][0] + '</code></td><td>' + c.variantes.map(function (v) { return v[0]; }).join(", ") + '</td></tr>');
     return '<table class="tabla"><thead><tr><th>Ajuste</th><th>Dónde</th><th>Por defecto</th><th>Qué hace</th></tr></thead><tbody>' + filas.join("") + '</tbody></table>';
@@ -369,6 +469,10 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
     if (k.tipo === "interr") return '<div class="ctl"><span class="et" id="e-' + k.id + '">' + et + '</span><button type="button" class="interr" role="switch" aria-checked="' + v + '" aria-labelledby="e-' + k.id + '" data-k="' + k.id + '"></button></div>';
     return "";
   }
+  // Solo los ajustes que hacen algo en la variante elegida.
+  function ajustesHTML() {
+    return actual.controles.filter(function (k) { return k !== "---" && (!k.solo || k.solo.indexOf(estado.variante) >= 0); }).map(control).join("");
+  }
   function descVariante() { var v = actual.variantes.filter(function (x) { return x[0] === estado.variante; })[0]; return v && v[2] ? esc(v[2]) : ""; }
 
   function abrir(c) {
@@ -378,7 +482,7 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
       '<h1>' + esc(c.nombre) + '</h1><p class="bajada">' + esc(c.bajada) + '</p></div>';
     if (c.variantes) h += '<section><div class="tabsv" role="group" aria-label="Variantes">' + c.variantes.map(function (v) {
       return '<button type="button" data-var="' + v[0] + '" aria-pressed="' + (v[0] === estado.variante) + '">' + esc(v[1]) + '</button>'; }).join("") + '</div><p id="vdesc">' + descVariante() + '</p></section>';
-    if (!pag && c.controles && c.controles.length) h += '<section><h2>Ajustes</h2><div class="ajustes" id="ajustes">' + c.controles.filter(function (k) { return k !== "---"; }).map(control).join("") + '</div></section>';
+    if (!pag && c.controles && c.controles.length) h += '<section><h2>Ajustes</h2><div class="ajustes" id="ajustes">' + ajustesHTML() + '</div></section>';
     if (!pag) h += '<section><div class="codigo__cab"><h2>Código</h2><div class="codigo__der"><div class="tabsc" id="tabs" role="group" aria-label="Lenguaje"></div><button type="button" class="btn" id="copiar">Copiar</button></div></div><pre id="pre" tabindex="0"></pre></section>';
     if (c.claves && c.claves.length) h += '<section><h2>Cómo se comporta</h2><ul class="claves">' + c.claves.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join("") + '</ul></section>';
     if (!pag) h += '<details><summary>Referencia técnica' + ico("abre") + '</summary><div class="ref">' + referencia(c) +
@@ -428,6 +532,7 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
       estado.variante = b.dataset.var;
       document.querySelectorAll("[data-var]").forEach(function (x) { x.setAttribute("aria-pressed", x === b); });
       $("vdesc").innerHTML = descVariante(); dibujar(true); codigo();
+      if ($("ajustes")) { $("ajustes").innerHTML = ajustesHTML(); moverInds(); }
       // La variante queda en la dirección: #componente/variante se puede compartir.
       history.replaceState(null, "", "#" + actual.id + (estado.variante !== actual.variantes[0][0] ? "/" + estado.variante : ""));
       return;
@@ -438,7 +543,7 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
       b.innerHTML = ico(vista === "desktop" ? "mobile" : "desktop"); b.setAttribute("aria-label", t); b.title = t; return;
     }
     if (b.id === "repetir") { dibujar(true); return; }
-    if (b.id === "completa") { var pv = $("previa"); if (document.fullscreenElement) document.exitFullscreen(); else if (pv.requestFullscreen) pv.requestFullscreen(); return; }
+    if (b.id === "completa") { pantallaCompleta(); return; }
     if (b.closest("#tabs")) { tab = b.dataset.t; codigo(); return; }
     if (b.id === "copiar") {
       var txt = $("pre").textContent, ok = function () { b.textContent = "Copiado"; $("aviso").textContent = "Código copiado"; setTimeout(function () { b.textContent = "Copiar"; }, 1500); };
@@ -467,10 +572,43 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
     if (el.type === "range" && c && !c.aplica) cambio(k, parseFloat(el.value));
   });
 
+  /* ---------------- pantalla completa ----------------
+     Con la API cuando existe (desktop, iPad). En iPhone Safari solo la da para video: ahí la previa
+     pasa a ocupar la pantalla con position: fixed (.pleno) y el mismo botón la cierra. */
+  function enCompleta() { return !!(document.fullscreenElement || document.webkitFullscreenElement) || !!document.querySelector(".previa.pleno"); }
+  function marcarCompleta() {
+    var b = $("completa"); if (!b) return; var si = enCompleta(), t = si ? "Salir de pantalla completa" : "Pantalla completa";
+    b.innerHTML = ico(si ? "salir" : "completa"); b.setAttribute("aria-label", t); b.title = t;
+  }
+  function pleno(si) {
+    var pv = $("previa"); if (!pv) return;
+    pv.classList.toggle("pleno", si); document.documentElement.classList.toggle("con-pleno", si); marcarCompleta();
+  }
+  function pantallaCompleta() {
+    var pv = $("previa"), d = document;
+    if (d.fullscreenElement || d.webkitFullscreenElement) { (d.exitFullscreen || d.webkitExitFullscreen).call(d); return; }
+    if (pv.classList.contains("pleno")) { pleno(false); return; }
+    var pedir = pv.requestFullscreen || pv.webkitRequestFullscreen;
+    if (pedir && (d.fullscreenEnabled || d.webkitFullscreenEnabled)) {
+      try { var r = pedir.call(pv); if (r && r.catch) r.catch(function () { pleno(true); }); } catch (e) { pleno(true); }
+    } else pleno(true);
+  }
+  document.addEventListener("fullscreenchange", marcarCompleta);
+  document.addEventListener("webkitfullscreenchange", marcarCompleta);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && document.querySelector(".previa.pleno")) pleno(false); });
+
   // El indicador del Selector va al botón elegido (igual que en Novedades).
   function moverInd(seg, animar) {
     var ind = seg.querySelector(".seg-ind"), b = seg.querySelector('button[aria-pressed="true"]');
     if (!ind || !b || !b.offsetWidth) return;
+    // Si las opciones no entran a su ancho natural, la cápsula se desliza de costado (.ancho).
+    seg.classList.remove("ancho");
+    var nat = 6; seg.querySelectorAll("button").forEach(function (x) { nat += x.scrollWidth; });
+    if (nat > seg.clientWidth + 1) {
+      seg.classList.add("ancho");
+      var izq = b.offsetLeft - 3, der = b.offsetLeft + b.offsetWidth + 3 - seg.clientWidth;
+      if (seg.scrollLeft > izq) seg.scrollLeft = izq; else if (seg.scrollLeft < der) seg.scrollLeft = der;
+    }
     if (!animar) ind.classList.add("quieto");
     ind.style.width = b.offsetWidth + "px"; ind.style.transform = "translateX(" + b.offsetLeft + "px)";
     if (!animar) { void ind.offsetWidth; ind.classList.remove("quieto"); }
@@ -485,8 +623,111 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
     if (c !== actual) abrir(c);
     if (p[1] && c.variantes && c.variantes.some(function (v) { return v[0] === p[1]; }) && estado.variante !== p[1]) { var b = document.querySelector('[data-var="' + p[1] + '"]'); if (b) b.click(); }
   }
-  addEventListener("hashchange", ruta);
-  ruta();
+  addEventListener("hashchange", function () { abrirDock(false); if (enCompleta() && !document.fullscreenElement) pleno(false); ruta(); });
+
+  /* ---------------- dock (mobile) ----------------
+     Mismo comportamiento que el dock de filtros de Novedades: el panel anima su alto en px (medido),
+     y al terminar queda en auto con scroll (.listo). Elegir una categoría filtra la lista del panel
+     y, en la galería, también las tarjetas. */
+  var filtro = "", dock = $("dock"), dkBody = $("dkBody"), tListo;
+  // Anterior y siguiente recorren siempre todos los componentes, en el orden de la galería (la categoría solo filtra la lista).
+  function secuencia() { return ordenados(); }
+  function dibujarDock() {
+    var o = ordenados(), lista = filtro ? o.filter(function (c) { return c.grupo === filtro; }) : o;
+    $("dkCats").innerHTML = '<button type="button" class="lbl lbl-todas" data-grupo="" aria-pressed="' + !filtro + '">Todas</button>' +
+      GRUPOS.filter(function (g) { return L.some(function (c) { return c.grupo === g; }); }).map(function (g) {
+        return '<button type="button" class="lbl" data-grupo="' + esc(g) + '" aria-pressed="' + (filtro === g) + '">' + esc(g) + '</button>'; }).join("");
+    $("dkLista").innerHTML = lista.map(function (c) {
+      return '<li><a class="dk-item" href="#' + c.id + '"' + (actual === c ? ' aria-current="page"' : '') + '><span>' + esc(c.nombre) + '</span><small>' + esc(c.grupo) + '</small></a></li>'; }).join("");
+    var sq = secuencia(), i = actual ? sq.indexOf(actual) : -1;
+    dock.dataset.modo = actual ? "ficha" : "galeria";
+    $("dkTxt").textContent = actual ? actual.nombre : (filtro || "Componentes");
+    $("dkN").textContent = actual ? (i + 1) + " / " + sq.length : lista.length;
+    $("dkPrev").disabled = !(i > 0);
+  }
+  function abrirDock(si) {
+    if (!dock.classList.contains("open") && !si) return;
+    clearTimeout(tListo);
+    var desde = dkBody.offsetHeight;
+    dock.style.transition = dkBody.style.transition = "none";
+    dock.classList.remove("listo"); dock.classList.toggle("open", si); dkBody.style.height = "";
+    var hasta = si ? (dock.classList.add("listo"), dkBody.offsetHeight) : 0;
+    dock.classList.remove("listo"); dock.classList.toggle("open", !si); dkBody.style.height = desde + "px";
+    void dock.offsetWidth;
+    dock.style.transition = dkBody.style.transition = "";
+    dock.classList.toggle("open", si); dkBody.style.height = hasta + "px";
+    $("dkToggle").setAttribute("aria-expanded", String(si));
+    var dur = parseFloat(getComputedStyle(document.documentElement).getPropertyValue(si ? "--f-abrir" : "--f-cerrar")) || 500;
+    tListo = setTimeout(terminarDock, dur + 60);
+    if (si) { var a = dkBody.querySelector('[aria-current="page"]'); if (a) setTimeout(function () { a.scrollIntoView({ block: "nearest" }); }, dur + 80); }
+  }
+  function terminarDock() { clearTimeout(tListo); dkBody.style.height = ""; if (dock.classList.contains("open")) dock.classList.add("listo"); }
+  dkBody.addEventListener("transitionend", function (e) { if (e.target === dkBody && e.propertyName === "height") terminarDock(); });
+  $("dkToggle").addEventListener("click", function () { abrirDock(!dock.classList.contains("open")); });
+  $("dkPrev").addEventListener("click", function () { var sq = secuencia(), i = sq.indexOf(actual); if (i > 0) location.hash = sq[i - 1].id; });
+  $("dkCats").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-grupo]"); if (!b) return;
+    var g = b.dataset.grupo; filtro = filtro === g ? "" : g;
+    // Cambia el alto del panel: se anima desde el actual hasta el nuevo.
+    var desde = dkBody.offsetHeight; dibujarDock();
+    if (dock.classList.contains("listo")) {
+      var hasta = dkBody.scrollHeight; dock.classList.remove("listo"); dkBody.style.height = desde + "px"; void dkBody.offsetHeight;
+      dkBody.style.height = Math.min(hasta, dock.parentNode.clientHeight) + "px";
+      clearTimeout(tListo); tListo = setTimeout(terminarDock, 660);
+    }
+    if (!actual) {
+      document.querySelectorAll(".tar").forEach(function (t) { t.hidden = !!filtro && t.dataset.grupo !== filtro; });
+      if ($("galTit")) $("galTit").textContent = filtro ? "Componentes · " + filtro : "Componentes";
+    }
+  });
+  document.addEventListener("pointerdown", function (e) { if (dock.classList.contains("open") && !dock.contains(e.target) && !ancla.contains(e.target)) abrirDock(false); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") abrirDock(false); });
+
+  /* ---------------- ancla (mobile) ----------------
+     El Ancla del Master (como en Novedades): resortes con los tokens Web/Resorte/Ancla*. En una ficha la
+     flecha apunta a la derecha y lleva al siguiente; en la galería apunta abajo y baja una pantalla, y
+     pasada una pantalla gira hacia arriba y vuelve al principio. El giro es lo único que rebota. */
+  var ancla = $("ancla"), flecha = ancla.querySelector("svg"), movil = matchMedia("(max-width: 760px)"), quieto = matchMedia("(prefers-reduced-motion: reduce)");
+  var raizCss = getComputedStyle(document.documentElement);
+  function tk(n, d) { var v = parseFloat(raizCss.getPropertyValue("--" + n)); return isNaN(v) ? d : v; }
+  function R(x, k, c) { return { x: x, v: 0, t: x, k: k, c: c }; }
+  var M = { s: R(0, tk("ancla-aparecer-k", 220), tk("ancla-aparecer-c", 29.7)), q: R(1, tk("ancla-apretar-k", 600), tk("ancla-apretar-c", 49)), r: R(90, tk("ancla-giro-k", 150), tk("ancla-giro-c", 13.5)) };
+  var APRETAR = tk("ancla-apretar", .92), BAJAR = tk("ancla-bajar", .8), CAMBIO = tk("ancla-cambio", .6);
+  function siguiente() { var sq = secuencia(), i = sq.indexOf(actual); return i >= 0 ? sq[i + 1] : null; }
+  function objetivos() {
+    var sube = !actual && scrollY > innerHeight * CAMBIO;
+    M.s.t = !movil.matches || enCompleta() ? 0 : actual ? (siguiente() ? 1 : 0) : (document.documentElement.scrollHeight > innerHeight * 1.2 ? 1 : 0);
+    M.r.t = actual ? 0 : sube ? -90 : 90;
+    var t = actual ? (siguiente() ? "Siguiente: " + siguiente().nombre : "") : sube ? "Volver arriba" : "Bajar";
+    ancla.setAttribute("aria-label", t); ancla.tabIndex = M.s.t ? 0 : -1;
+  }
+  function paso(s, dt) { var ac = -s.k * (s.x - s.t) - s.c * s.v; s.v += ac * dt; s.x += s.v * dt; }
+  var tAntes = 0, andando = false;
+  function anim(now) {
+    var dt = Math.min(.05, (now - tAntes) / 1000); tAntes = now; objetivos();
+    var quietos = true;
+    for (var k in M) {
+      if (quieto.matches) { M[k].x = M[k].t; M[k].v = 0; continue; }
+      var n = Math.ceil(dt / .004); for (var j = 0; j < n; j++) paso(M[k], dt / n);
+      if (Math.abs(M[k].x - M[k].t) > .001 || Math.abs(M[k].v) > .001) quietos = false; else { M[k].x = M[k].t; M[k].v = 0; }
+    }
+    ancla.style.transform = "scale(" + (Math.max(0, M.s.x) * M.q.x).toFixed(4) + ")";
+    flecha.style.transform = "rotate(" + M.r.x.toFixed(2) + "deg)";
+    if (quietos) andando = false; else requestAnimationFrame(anim);
+  }
+  function mover() { if (!andando && movil.matches) { andando = true; tAntes = performance.now(); requestAnimationFrame(anim); } }
+  addEventListener("scroll", mover, { passive: true }); addEventListener("resize", mover); addEventListener("hashchange", mover);
+  if (movil.addEventListener) movil.addEventListener("change", mover);
+  ancla.addEventListener("pointerdown", function () { M.q.t = APRETAR; mover(); });
+  ["pointerup", "pointercancel", "pointerleave"].forEach(function (ev) { ancla.addEventListener(ev, function () { M.q.t = 1; mover(); }); });
+  ancla.addEventListener("click", function () {
+    abrirDock(false);
+    if (actual) { var s = siguiente(); if (s) location.hash = s.id; return; }
+    var suave = quieto.matches ? "auto" : "smooth";
+    if (scrollY > innerHeight * CAMBIO) scrollTo({ top: 0, behavior: suave }); else scrollBy({ top: Math.round(innerHeight * BAJAR), behavior: suave });
+  });
+
+  ruta(); mover();
 })();
 </script>
 </body>

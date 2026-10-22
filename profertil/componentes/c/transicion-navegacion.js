@@ -19,10 +19,10 @@
     claves: ["Dos tramos de la misma duración: tapar y destapar; la página cambia en el medio.", "Mientras corre una transición no se puede disparar otra.", "La forma calcula su tamaño para cubrir la esquina más lejana al dedo.", "Curva fuerte por defecto (la de los filtros de Novedades): arranca lenta y frena suave."],
     accesibilidad: "Con movimiento reducido la página cambia directo, sin paño ni forma. El menú marca la página actual con aria-current.",
     controles: [
-      { id: "color", tipo: "seg", etiqueta: "Color", def: "azul", aplica: { attr: "data-color" }, opciones: [["azul", "Azul"], ["verde", "Verde"], ["amarillo", "Amarillo"], ["terra", "Terra"]], desc: "Color del paño o de la forma." },
+      { id: "color", tipo: "seg", etiqueta: "Color", solo: ["persiana", "forma"], def: "azul", aplica: { attr: "data-color" }, opciones: [["azul", "Azul"], ["verde", "Verde"], ["amarillo", "Amarillo"], ["terra", "Terra"]], desc: "Color del paño o de la forma." },
       { id: "dur", tipo: "rango", etiqueta: "Duración de cada tramo", unidad: "ms", min: 300, max: 1400, paso: 20, def: 700, aplica: { var: "--dur", unidad: "ms" }, desc: "Duración de cada tramo." },
       { id: "curva", tipo: "seg", etiqueta: "Curva", def: "fuerte", aplica: { attr: "data-curva" }, opciones: [["base", "Base"], ["fuerte", "Fuerte (filtros)"]], desc: "Curva base del Master o la de los filtros." },
-      { id: "forma", tipo: "select", etiqueta: "Forma (Forma que crece)", def: "flor", opciones: Object.keys(FORMAS).map(function (k) { return [k, k.charAt(0).toUpperCase() + k.slice(1)]; }), desc: "Forma que crece." }
+      { id: "forma", tipo: "select", etiqueta: "Forma", solo: ["forma"], def: "flor", opciones: Object.keys(FORMAS).map(function (k) { return [k, k.charAt(0).toUpperCase() + k.slice(1)]; }), desc: "Forma que crece." }
     ],
     css: function () {
       return [
