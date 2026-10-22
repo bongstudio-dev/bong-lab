@@ -46,6 +46,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
+<meta name="theme-color" content="#E9E7D6">
 <title>Componentes Profertil</title>
 <meta name="description" content="Librería de componentes de la web de Profertil: galería en vivo y ficha técnica de cada uno.">
 <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
@@ -57,149 +58,161 @@
 :root {
   color-scheme: light;
   --bg: #E9E7D6; --card: #FFFEEF; --ink: #0A1E4A; --ink-2: #44506E; --ink-3: #737D96;
-  --azul: #003DA5; --line: rgba(10, 30, 74, .1); --chip: rgba(10, 30, 74, .06);
+  --azul: #003DA5; --line: rgba(10, 30, 74, .1); --suave: rgba(10, 30, 74, .055);
   --f-display: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
   --f-body: "DM Sans", "Helvetica Neue", Arial, sans-serif;
   --f-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   --ease: cubic-bezier(.22, 1, .36, 1);
-  --lado: 188px;
+  --r: 10px;      /* controles y código */
+  --r-l: 16px;    /* vistas previas */
 }
 *, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; }
-body { background: var(--bg); color: var(--ink); font: 400 14px/1.45 var(--f-body); -webkit-font-smoothing: antialiased; }
+body { background: var(--bg); color: var(--ink); font: 400 13.5px/1.5 var(--f-body); -webkit-font-smoothing: antialiased; }
 button, input, select { font: inherit; color: inherit; }
 button { cursor: pointer; }
 :focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; }
-.ico { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+::selection { background: var(--azul); color: var(--card); }
+html { scrollbar-color: rgba(10, 30, 74, .25) transparent; }
+.tabla, .ctl small { font-variant-numeric: tabular-nums; }
+.ico { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 
-/* ---------- Sidebar ---------- */
-.app { display: grid; grid-template-columns: var(--lado) minmax(0, 1fr); min-height: 100vh; }
+/* ---------- Sidebar (sin cambios) ---------- */
+.app { display: grid; grid-template-columns: 188px minmax(0, 1fr); min-height: 100vh; }
 .lado { position: sticky; top: 0; height: 100vh; overflow: auto; padding: 18px 14px 24px; border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 20px; }
 .lado__volver { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--ink-3); text-decoration: none; }
 .lado__volver .ico { width: 14px; height: 14px; stroke-width: 2; }
 .lado__volver:hover { color: var(--azul); }
-.lado__tit { margin: 0; border: 0; background: none; padding: 0; text-align: left; font: 600 15px/1.1 var(--f-display); letter-spacing: -.02em; }
+.lado__tit { display: block; color: inherit; text-decoration: none; margin: 0; border: 0; background: none; padding: 0; text-align: left; font: 600 15px/1.1 var(--f-display); letter-spacing: -.02em; }
 .lado__tit small { display: block; margin-top: 4px; font: 400 11px/1.3 var(--f-body); letter-spacing: 0; color: var(--ink-3); }
 .lado nav { display: flex; flex-direction: column; gap: 16px; }
-.grupo h2 { margin: 0 0 5px; font: 500 10px/1 var(--f-body); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.grupo__tit { margin: 0 0 5px; font: 500 10px/1 var(--f-body); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
 .grupo ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
-.item { display: flex; justify-content: space-between; align-items: center; gap: 6px; width: calc(100% + 12px); margin: 0 -6px; padding: 5px 6px; border: 0; border-radius: 7px; background: none; text-align: left; font-size: 12px; line-height: 1.25; color: var(--ink-2); transition: background .2s var(--ease), color .2s var(--ease); }
-.item:hover { background: var(--chip); color: var(--ink); }
-.item[aria-current="true"] { background: var(--azul); color: #fff; }
+.item { text-decoration: none; display: flex; justify-content: space-between; align-items: center; gap: 6px; width: calc(100% + 12px); margin: 0 -6px; padding: 5px 6px; border: 0; border-radius: 7px; background: none; text-align: left; font-size: 12px; line-height: 1.25; color: var(--ink-2); transition: background .2s var(--ease), color .2s var(--ease); }
+.item:hover { background: var(--suave); color: var(--ink); }
+.item[aria-current="page"] { background: var(--azul); color: #fff; }
 .item .n { font-size: 10px; opacity: .55; font-variant-numeric: tabular-nums; }
 
 .centro { min-width: 0; }
 
 /* ---------- Galería ---------- */
-.gal { padding: 28px 24px 64px; }
-.gal__cab { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
-.gal__cab h1 { margin: 0; font: 600 clamp(28px, 3.2vw, 40px)/1 var(--f-display); letter-spacing: -.03em; }
-.gal__cab p { margin: 8px 0 0; max-width: 60ch; color: var(--ink-2); font-size: 13.5px; }
-.gal__cab span { font-size: 12px; color: var(--ink-3); }
-.grilla { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); grid-auto-rows: 300px; gap: 10px; }
-.tar { position: relative; grid-column: span 2; border: 0; padding: 0; border-radius: 22px; overflow: hidden; background: var(--card); text-align: left; box-shadow: 0 0 0 1px var(--line); transition: transform .35s var(--ease), box-shadow .35s var(--ease); }
-.tar--ancha { grid-column: span 4; } .tar--media { grid-column: span 3; }
-.tar:hover { transform: translateY(-3px); box-shadow: 0 0 0 1px var(--line), 0 22px 40px -26px rgba(10, 30, 74, .5); }
-.tar__vista { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.gal { padding: 40px 32px 72px; max-width: 1400px; }
+.gal h1 { margin: 0 0 6px; font: 600 28px/1.1 var(--f-display); letter-spacing: -.025em; }
+.gal > p { margin: 0 0 32px; max-width: 56ch; color: var(--ink-2); }
+.grilla { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px 20px; }
+.tar { color: inherit; text-decoration: none; display: flex; flex-direction: column; gap: 10px; border: 0; padding: 0; background: none; text-align: left; }
+.tar__vista { position: relative; aspect-ratio: 16 / 10; overflow: hidden; border-radius: var(--r-l); background: var(--bg); box-shadow: 0 0 0 1px var(--line); pointer-events: none; transition: box-shadow .15s var(--ease); }
+.tar:hover .tar__vista { box-shadow: 0 0 0 1px rgba(10, 30, 74, .28); }
 .tar__vista iframe { position: absolute; left: 50%; top: 50%; width: 1280px; height: 800px; border: 0; transform-origin: 50% 50%; transform: translate(-50%, -50%) scale(var(--esc, .3)); background: var(--bg); }
-.tar__pie { position: absolute; left: 10px; right: 10px; bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.tar__pie b, .tar__pie i { display: inline-flex; align-items: center; height: 28px; padding: 0 11px; border-radius: 999px; background: rgba(255, 254, 239, .9); backdrop-filter: blur(10px); font: 500 12.5px/1 var(--f-body); font-style: normal; box-shadow: 0 1px 2px rgba(10, 30, 74, .08); }
-.tar__pie i { color: var(--ink-3); font-size: 11px; }
+.tar b { font: 500 14px/1.2 var(--f-body); }
+.tar span { display: block; margin-top: 2px; font-size: 12px; color: var(--ink-3); }
 
-/* ---------- Ficha del componente ---------- */
-.ficha { display: grid; grid-template-columns: minmax(340px, .82fr) minmax(0, 1.18fr); gap: 20px; padding: 16px 16px 16px 24px; }
-.doc { min-width: 0; padding: 12px 0 48px; display: flex; flex-direction: column; gap: 30px; }
-.migas { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-3); }
-.migas button { border: 0; background: none; padding: 0; color: inherit; }
-.migas button:hover { color: var(--azul); }
-.migas .ico { width: 13px; height: 13px; }
-.doc h1 { margin: 14px 0 10px; font: 600 clamp(30px, 3.4vw, 44px)/1 var(--f-display); letter-spacing: -.03em; }
-.doc .bajada { margin: 0; max-width: 54ch; font-size: 15px; color: var(--ink-2); }
-.doc h2 { margin: 0 0 12px; font: 500 10.5px/1 var(--f-body); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
-.vars { display: grid; gap: 6px; }
-.var { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 12px; align-items: baseline; width: 100%; padding: 10px 12px; border: 0; border-radius: 12px; background: transparent; text-align: left; box-shadow: inset 0 0 0 1px var(--line); transition: background .2s var(--ease), box-shadow .2s var(--ease); }
-.var:hover { background: var(--chip); }
-.var[aria-pressed="true"] { background: var(--card); box-shadow: inset 0 0 0 1.5px var(--azul); }
-.var b { font: 500 14px/1.2 var(--f-display); }
-.var span { grid-column: 2; font-size: 12.5px; color: var(--ink-2); }
-.var em { font-style: normal; font-size: 11px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
-.ajustes { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px 18px; padding: 16px; border-radius: 16px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); }
-.ctl { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.ctl > label, .ctl > .et { display: flex; justify-content: space-between; gap: 8px; font-size: 11.5px; color: var(--ink-2); }
-.ctl .val { font-variant-numeric: tabular-nums; color: var(--ink-3); white-space: nowrap; }
-.seg { display: flex; flex-wrap: wrap; gap: 4px; }
-.seg button { flex: 1 1 auto; min-height: 28px; padding: 0 10px; border: 0; border-radius: 999px; background: var(--chip); font-size: 12px; color: var(--ink-2); white-space: nowrap; transition: background .2s var(--ease), color .2s var(--ease); }
-.seg button:hover { background: rgba(10, 30, 74, .11); }
-.seg button[aria-pressed="true"] { background: var(--azul); color: #fff; }
-input[type="range"] { width: 100%; accent-color: var(--azul); margin: 0; }
-input[type="text"], select { width: 100%; height: 30px; padding: 0 10px; border: 0; border-radius: 8px; background: var(--chip); font-size: 12.5px; }
-.interr { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 11.5px; color: var(--ink-2); }
-.interr button { position: relative; flex: none; width: 36px; height: 20px; border: 0; border-radius: 999px; background: rgba(10, 30, 74, .18); transition: background .2s var(--ease); }
-.interr button::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform .25s var(--ease); }
-.interr button[aria-pressed="true"] { background: var(--azul); }
-.interr button[aria-pressed="true"]::after { transform: translateX(16px); }
-.codigo { border-radius: 16px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); overflow: hidden; }
-.codigo__barra { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 8px 8px 10px; border-bottom: 1px solid var(--line); }
-.codigo__barra .seg button { flex: none; min-height: 26px; }
-.btn { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 0 14px; border: 0; border-radius: 999px; background: var(--azul); color: #fff; font-size: 12.5px; white-space: nowrap; text-decoration: none; transition: transform .15s var(--ease); }
+/* ---------- Ficha ---------- */
+.ficha { display: grid; grid-template-columns: minmax(320px, 400px) minmax(0, 1fr); gap: 32px; padding: 16px 16px 16px 32px; }
+.doc { min-width: 0; padding: 24px 0 56px; display: flex; flex-direction: column; gap: 32px; }
+.migas { text-decoration: none; border: 0; background: none; padding: 0; font-size: 12px; color: var(--ink-3); }
+.migas:hover { color: var(--ink); }
+.doc h1 { margin: 8px 0 8px; font: 600 28px/1.1 var(--f-display); letter-spacing: -.025em; }
+.doc .bajada { margin: 0; color: var(--ink-2); }
+.doc h2 { margin: 0 0 12px; font: 500 13px/1.2 var(--f-body); color: var(--ink); }
+
+/* Variantes: pestañas de texto, una sola vez. */
+.tabsv { display: flex; gap: 18px; border-bottom: 1px solid var(--line); }
+.tabsv button { position: relative; padding: 0 0 10px; border: 0; background: none; color: var(--ink-3); font-size: 13.5px; transition: color .15s var(--ease); }
+.tabsv button:hover { color: var(--ink); }
+.tabsv button[aria-pressed="true"] { color: var(--ink); }
+.tabsv button[aria-pressed="true"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1.5px; background: var(--ink); }
+.tabsv + p { margin: 12px 0 0; color: var(--ink-2); }
+
+/* Ajustes: filas simples, sin caja. */
+.ajustes { display: flex; flex-direction: column; }
+.ctl { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); align-items: center; gap: 12px; min-height: 44px; padding: 6px 0; border-top: 1px solid var(--line); }
+.ctl:last-child { border-bottom: 1px solid var(--line); }
+/* Con cuatro opciones o más, el control va debajo del rótulo para que no se corten. */
+.ctl:has(.seg button:nth-child(4)) { grid-template-columns: 1fr; gap: 8px; padding: 10px 0; }
+.ctl > .et { font-size: 12.5px; color: var(--ink-2); }
+.ctl > .et small { display: block; font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.seg { display: flex; gap: 2px; padding: 2px; border-radius: var(--r); background: var(--suave); }
+.seg button { flex: 1 1 0; min-width: 0; height: 28px; padding: 0 6px; border: 0; border-radius: 8px; background: none; font-size: 12px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: background .15s var(--ease), color .15s var(--ease); }
+.seg button:hover { color: var(--ink); }
+.seg button[aria-pressed="true"] { background: var(--card); color: var(--ink); box-shadow: 0 1px 2px rgba(10, 30, 74, .12); }
+input[type="range"] { width: 100%; accent-color: var(--ink); margin: 0; }
+input[type="text"], select { width: 100%; height: 32px; padding: 0 10px; border: 0; border-radius: var(--r); background: var(--suave); font-size: 12.5px; }
+.interr { justify-self: end; position: relative; width: 34px; height: 20px; border: 0; border-radius: 999px; background: rgba(10, 30, 74, .18); transition: background .15s var(--ease); }
+.interr::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform .2s var(--ease); }
+.interr[aria-checked="true"] { background: var(--ink); }
+.interr[aria-checked="true"]::after { transform: translateX(14px); }
+
+/* Código: una sola acción principal, Copiar. */
+.codigo__cab { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.codigo__cab h2 { margin: 0; }
+.codigo__der { display: flex; align-items: center; gap: 14px; }
+.tabsc { display: flex; gap: 12px; }
+.tabsc button { border: 0; background: none; padding: 0; font: 400 12px/1 var(--f-mono); color: var(--ink-3); }
+.tabsc button[aria-pressed="true"] { color: var(--ink); }
+.btn { height: 30px; padding: 0 14px; border: 0; border-radius: var(--r); background: var(--azul); color: #fff; font-size: 12.5px; transition: transform .15s var(--ease); }
 .btn:active { transform: scale(.97); }
-.codigo pre { margin: 0; padding: 14px; max-height: 380px; overflow: auto; font: 400 11.5px/1.6 var(--f-mono); tab-size: 2; }
-.tabla { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-.tabla th { padding: 0 10px 8px 0; text-align: left; font: 500 10.5px/1 var(--f-body); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
-.tabla td { padding: 10px 10px 10px 0; border-top: 1px solid var(--line); vertical-align: top; }
-.tabla code { font: 400 11.5px/1.4 var(--f-mono); color: var(--azul); }
-.tabla td:last-child { color: var(--ink-2); }
-.lista { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
-.lista li { position: relative; padding-left: 16px; font-size: 13.5px; color: var(--ink-2); max-width: 60ch; }
-.lista li::before { content: ""; position: absolute; left: 0; top: .62em; width: 6px; height: 6px; border-radius: 50%; background: var(--azul); }
-.deps { display: flex; flex-wrap: wrap; gap: 6px; }
-.deps span { display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 999px; background: var(--chip); font: 400 11.5px/1 var(--f-mono); }
-.vecinos { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-top: 8px; }
-.vecinos button { display: flex; flex-direction: column; gap: 4px; padding: 14px; border: 0; border-radius: 14px; background: transparent; text-align: left; box-shadow: inset 0 0 0 1px var(--line); }
-.vecinos button:hover { background: var(--chip); }
-.vecinos small { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
-.vecinos b { font: 500 15px/1.2 var(--f-display); }
-.vecinos .sig { text-align: right; align-items: flex-end; }
+pre { margin: 0; padding: 14px; max-height: 340px; overflow: auto; border-radius: var(--r); background: var(--card); box-shadow: inset 0 0 0 1px var(--line); font: 400 11.5px/1.6 var(--f-mono); tab-size: 2; }
 
-/* Vista previa: grande, pegada a la derecha. */
-.previa { position: sticky; top: 16px; height: calc(100vh - 32px); border-radius: 22px; overflow: hidden; background: var(--bg); box-shadow: 0 0 0 1px var(--line), 0 24px 60px -40px rgba(10, 30, 74, .5); display: grid; place-items: center; }
-.previa__marco { width: 100%; height: 100%; transition: width .45s var(--ease), height .45s var(--ease), border-radius .45s var(--ease); }
-.previa[data-vista="mobile"] { background: #DCD9C6; }
-.previa[data-vista="mobile"] .previa__marco { width: 390px; height: min(820px, calc(100% - 96px)); border-radius: 28px; overflow: hidden; box-shadow: 0 0 0 1px var(--line), 0 30px 60px -30px rgba(10, 30, 74, .55); }
+.claves { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; color: var(--ink-2); }
+
+/* Referencia técnica: cerrada por defecto. */
+details { border-top: 1px solid var(--line); padding-top: 14px; }
+summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; font-weight: 500; font-size: 13px; }
+summary::-webkit-details-marker { display: none; }
+summary .ico { transition: transform .2s var(--ease); }
+details[open] summary .ico { transform: rotate(90deg); }
+.ref { display: flex; flex-direction: column; gap: 20px; padding-top: 16px; }
+.ref p { margin: 0; color: var(--ink-2); }
+.ref h3 { margin: 0 0 6px; font: 500 12px/1.2 var(--f-body); color: var(--ink-3); }
+.tabla { width: 100%; border-collapse: collapse; font-size: 12px; }
+.tabla th { padding: 0 8px 6px 0; text-align: left; font-weight: 400; color: var(--ink-3); }
+.tabla td { padding: 8px 8px 8px 0; border-top: 1px solid var(--line); vertical-align: top; color: var(--ink-2); }
+.tabla td:first-child { color: var(--ink); }
+.tabla code { font: 400 11px/1.4 var(--f-mono); color: var(--ink); }
+
+.vecinos { display: flex; justify-content: space-between; gap: 12px; }
+.vecinos a { text-decoration: none; display: inline-flex; align-items: center; gap: 6px; border: 0; background: none; padding: 0; font-size: 12.5px; color: var(--ink-3); }
+.vecinos a:hover { color: var(--ink); }
+
+/* Vista previa. */
+.previa { position: sticky; top: 16px; height: calc(100vh - 32px); border-radius: var(--r-l); overflow: hidden; background: var(--bg); box-shadow: 0 0 0 1px var(--line); display: grid; place-items: center; }
+.previa__marco { width: 100%; height: 100%; transition: width .4s var(--ease), height .4s var(--ease); }
+.previa[data-vista="mobile"] { background: #E2DFCC; }
+.previa[data-vista="mobile"] .previa__marco { width: 390px; height: min(820px, calc(100% - 72px)); border-radius: 24px; overflow: hidden; box-shadow: 0 0 0 1px var(--line); }
 .previa iframe { display: block; width: 100%; height: 100%; border: 0; background: var(--bg); }
-.vidrio { position: absolute; z-index: 2; display: flex; gap: 2px; padding: 4px; border-radius: 999px; background: rgba(255, 254, 239, .82); backdrop-filter: blur(14px); box-shadow: 0 0 0 1px rgba(10, 30, 74, .08), 0 8px 24px -14px rgba(10, 30, 74, .45); }
-.herr { top: 12px; right: 12px; }
-.herr button, .herr a { display: grid; place-items: center; width: 32px; height: 32px; border: 0; border-radius: 999px; background: none; color: var(--ink); transition: background .2s var(--ease); }
-.herr button:hover, .herr a:hover { background: var(--chip); }
-.herr button[aria-pressed="true"] { background: var(--azul); color: #fff; }
-.chips { left: 12px; bottom: 12px; max-width: calc(100% - 24px); overflow-x: auto; }
-.chips button { height: 30px; padding: 0 12px; border: 0; border-radius: 999px; background: none; font-size: 12px; color: var(--ink-2); white-space: nowrap; }
-.chips button:hover { background: var(--chip); }
-.chips button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.herr { position: absolute; top: 10px; right: 10px; z-index: 2; display: flex; gap: 2px; padding: 2px; border-radius: var(--r); background: rgba(255, 254, 239, .9); box-shadow: 0 0 0 1px var(--line); }
+.herr button { display: grid; place-items: center; width: 30px; height: 30px; border: 0; border-radius: 8px; background: none; color: var(--ink-2); transition: background .15s var(--ease), color .15s var(--ease); }
+.herr button:hover { background: var(--suave); color: var(--ink); }
 .previa:fullscreen { border-radius: 0; height: 100vh; }
+.saltar { position: absolute; left: 12px; top: -48px; z-index: 10; padding: 8px 12px; border-radius: var(--r); background: var(--ink); color: var(--card); text-decoration: none; }
+.saltar:focus { top: 12px; }
+.oculto { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; } }
 
 @media (max-width: 1100px) {
-  .grilla { grid-template-columns: repeat(4, minmax(0, 1fr)); } .tar--ancha { grid-column: span 4; } .tar--media { grid-column: span 2; }
-  .ficha { grid-template-columns: 1fr; } .previa { position: relative; top: 0; height: 70vh; order: -1; }
+  .grilla { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ficha { grid-template-columns: 1fr; padding: 16px; } .previa { position: relative; top: 0; height: 68vh; order: -1; } .doc { padding-top: 0; }
 }
 @media (max-width: 760px) {
   .app { grid-template-columns: 1fr; }
-  .lado { position: static; height: auto; flex-direction: row; flex-wrap: wrap; gap: 10px 16px; border-right: 0; border-bottom: 1px solid var(--line); padding: 12px 14px; }
-  .lado nav { flex-direction: row; overflow-x: auto; gap: 14px; width: 100%; }
-  .grupo { flex: none; } .grupo ul { flex-direction: row; } .item { width: auto; margin: 0; }
-  .grilla { grid-template-columns: 1fr; grid-auto-rows: 240px; } .tar, .tar--ancha, .tar--media { grid-column: auto; }
-  .gal, .ficha { padding: 14px; }
+  .lado { position: static; height: auto; gap: 12px; border-right: 0; border-bottom: 1px solid var(--line); padding: 14px 16px; }
+  .lado nav { flex-direction: row; overflow-x: auto; gap: 16px; }
+  .grupo { flex: none; } .grupo ul { flex-direction: row; gap: 4px; } .item { width: auto; margin: 0; white-space: nowrap; }
+  .grilla { grid-template-columns: 1fr; } .gal { padding: 24px 16px 48px; }
 }
 </style>
 </head>
 <body>
+<a class="saltar" href="#" onclick="event.preventDefault(); document.getElementById('centro').focus()">Saltar al contenido</a>
+<p class="oculto" role="status" aria-live="polite" id="aviso"></p>
 <div class="app">
   <aside class="lado">
     <a class="lado__volver" href="../../"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 12H7M11 8l-4 4 4 4"/></svg>Bong Lab</a>
-    <button type="button" class="lado__tit" data-ir="">Componentes<small>Profertil · web</small></button>
+    <a class="lado__tit" href="#">Componentes<small>Profertil · web</small></a>
     <nav id="nav" aria-label="Componentes"></nav>
   </aside>
-  <main class="centro" id="centro"></main>
+  <main class="centro" id="centro" tabindex="-1"></main>
 </div>
 
 <script src="formas.js"></script>
@@ -239,9 +252,9 @@ var GRUPOS = ["Datos", "Navegación", "Listas", "Scroll", "Transiciones", "Medio
     mobile: '<path d="M8 3h8a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM11 18h2"/>',
     repetir: '<path d="M4 12a8 8 0 1 0 2.3-5.7M4 4v4h4"/>',
     completa: '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
-    afuera: '<path d="M8 16l8-8M10 8h6v6"/>',
     izq: '<path d="M17 12H7M11 8l-4 4 4 4"/>',
-    der: '<path d="M7 12h10M13 8l4 4-4 4"/>'
+    der: '<path d="M7 12h10M13 8l4 4-4 4"/>',
+    abre: '<path d="M10 7l5 5-5 5"/>'
   };
   function ico(n) { return '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">' + ICO[n] + '</svg>'; }
   function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
@@ -268,7 +281,7 @@ var GRUPOS = ["Datos", "Navegación", "Listas", "Scroll", "Transiciones", "Medio
     return '<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">' +
       '<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">' +
       '<link rel="stylesheet" href="../animadores-texto/animadores.css">' +
-      '<style>*,*::before,*::after{box-sizing:border-box}html,body{margin:0}body{background:#E9E7D6;color:#0A1E4A;font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}' +
+      '<style>*,*::before,*::after{box-sizing:border-box}html,body{margin:0}body{background:#E9E7D6;color:#0A1E4A;font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}::selection{background:#003DA5;color:#FFFEEF}' +
       (auto ? 'body{min-height:100vh;display:flex;flex-direction:column;justify-content:' + (c.sangrado ? 'flex-end' : 'center') + ';' + (c.sangrado ? '' : 'padding:clamp(20px,5vw,56px)') + '}body>*{width:100%}' : '') +
       (mini ? 'html{scrollbar-width:none}html::-webkit-scrollbar{display:none}' : '') + '</style>' +
       '<style>' + c.css(s) + '</style></head><body>' + (c.previo || '') + htmlFinal(c, s) +
@@ -284,9 +297,9 @@ var GRUPOS = ["Datos", "Navegación", "Listas", "Scroll", "Transiciones", "Medio
   function dibujarNav() {
     $("nav").innerHTML = GRUPOS.map(function (g) {
       var cs = L.filter(function (c) { return c.grupo === g; }); if (!cs.length) return "";
-      return '<div class="grupo"><h2>' + g + '</h2><ul>' + cs.map(function (c) {
-        return '<li><button type="button" class="item" data-ir="' + c.id + '" aria-current="' + (actual === c) + '"><span>' + esc(c.nombre) + '</span>' +
-          (c.variantes ? '<span class="n">' + c.variantes.length + '</span>' : '') + '</button></li>';
+      return '<div class="grupo"><p class="grupo__tit">' + g + '</p><ul>' + cs.map(function (c) {
+        return '<li><a class="item" href="#' + c.id + '"' + (actual === c ? ' aria-current="page"' : '') + '><span>' + esc(c.nombre) + '</span>' +
+          (c.variantes ? '<span class="n" aria-label="' + c.variantes.length + ' variantes">' + c.variantes.length + '</span>' : '') + '</a></li>';
       }).join("") + '</ul></div>';
     }).join("");
   }
@@ -294,18 +307,16 @@ var GRUPOS = ["Datos", "Navegación", "Listas", "Scroll", "Transiciones", "Medio
   /* ---------------- galería ---------------- */
   function galeria() {
     actual = null; dibujarNav(); document.title = "Componentes Profertil";
-    var cs = ordenados();
-    $("centro").innerHTML = '<div class="gal"><div class="gal__cab"><div><h1>Componentes</h1><p>Lo que vamos armando para el sitio de Profertil, en vivo. Cada uno tiene su ficha con variantes, ajustes, código y cómo se comporta. Textos, números y fotos de ejemplo.</p></div><span>' + cs.length + ' piezas</span></div>' +
-      '<div class="grilla">' + cs.map(function (c) {
-        return '<button type="button" class="tar' + (c.tamano ? ' tar--' + c.tamano : '') + '" data-ir="' + c.id + '" aria-label="' + esc(c.nombre) + '">' +
-          '<div class="tar__vista"><iframe tabindex="-1" loading="lazy" title="' + esc(c.nombre) + '" data-mini="' + c.id + '"></iframe></div>' +
-          '<div class="tar__pie"><b>' + esc(c.nombre) + '</b><i>' + (c.variantes ? c.variantes.length + ' variantes' : 'Página') + '</i></div></button>';
+    $("centro").innerHTML = '<div class="gal"><h1>Componentes</h1><p>Lo que vamos armando para el sitio, en vivo. Textos, números y fotos de ejemplo.</p><div class="grilla">' +
+      ordenados().map(function (c) {
+        return '<a class="tar" href="#' + c.id + '"><div class="tar__vista"><iframe tabindex="-1" loading="lazy" aria-hidden="true" title="" data-mini="' + c.id + '"></iframe></div>' +
+          '<div><b>' + esc(c.nombre) + '</b><span>' + esc(c.grupo) + (c.variantes ? ' · ' + c.variantes.length + ' variantes' : '') + '</span></div></a>';
       }).join("") + '</div></div>';
     scrollTo(0, 0);
-    // Miniaturas en vivo: el iframe se dibuja a 1280 de ancho y se achica al tamaño de la tarjeta.
+    // Miniaturas en vivo: el iframe se dibuja a 1280 × 800 y se achica para cubrir la tarjeta.
     document.querySelectorAll("[data-mini]").forEach(function (fr) {
       var c = porId(fr.dataset.mini), caja = fr.parentNode;
-      var ajustar = function () { var esc = Math.max(caja.clientWidth / 1280, caja.clientHeight / 800); fr.style.setProperty("--esc", esc); };
+      var ajustar = function () { fr.style.setProperty("--esc", Math.max(caja.clientWidth / 1280, caja.clientHeight / 800)); };
       new ResizeObserver(ajustar).observe(caja); ajustar();
       cargar(fr, c, inicial(c), function () {
         if (typeof c.alto === "number" && c.previa) try {
@@ -318,68 +329,58 @@ var GRUPOS = ["Datos", "Navegación", "Listas", "Scroll", "Transiciones", "Medio
 
   /* ---------------- ficha ---------------- */
   function dependencias(c) {
-    var d = ["Familjen Grotesk", "DM Sans"], src = c.tipo === "pagina" ? "" : c.html(inicial(c)) + (c.js ? c.js(inicial(c)) : "");
-    if (/data-anim=/.test(src)) d.push("animadores.css", "animadores.js");
-    if (/<svg viewBox="0 0 \d/.test(src) || /data:image\/svg/.test(src)) d.push("Formas del sistema (inline)");
-    if (/\.webp/.test(src)) d.push("Fotos de demo");
-    if (c.js) d.push("JS sin librerías");
-    return d.concat(c.dependencias || []);
+    var s = inicial(c), src = c.html(s) + (c.js ? c.js(s) : ""), d = ["Familjen Grotesk", "DM Sans"];
+    if (/data-anim=/.test(src)) d.push("animadores.css y animadores.js");
+    if (/data:image\/svg|viewBox="0 0 \d/.test(src)) d.push("formas del sistema en línea");
+    if (/\.webp/.test(src)) d.push("fotos de demo");
+    if (c.js) d.push("JS propio, sin librerías");
+    return d.concat(c.dependencias || []).join(", ") + ".";
   }
-
-  function tablaReferencia(c) {
+  function referencia(c) {
     var filas = (c.controles || []).filter(function (k) { return k !== "---"; }).map(function (k) {
-      var donde = k.aplica ? (k.aplica.var ? k.aplica.var : k.aplica.attr ? k.aplica.attr : "texto") : "estructura";
+      var donde = k.aplica ? (k.aplica.var || k.aplica.attr || "texto") : "estructura";
       var def = typeof k.def === "boolean" ? (k.def ? "sí" : "no") : k.def + (k.unidad && k.unidad !== "%" ? " " + k.unidad : k.unidad || "");
       return '<tr><td>' + esc(k.etiqueta.replace(/ \(.+\)$/, "")) + '</td><td><code>' + esc(donde) + '</code></td><td><code>' + esc(def) + '</code></td><td>' + esc(k.desc || "") + '</td></tr>';
     });
-    if (c.variantes) filas.unshift('<tr><td>Variante</td><td><code>data-variante</code></td><td><code>' + c.variantes[0][0] + '</code></td><td>' + c.variantes.map(function (v) { return v[0]; }).join(" · ") + '</td></tr>');
+    if (c.variantes) filas.unshift('<tr><td>Variante</td><td><code>data-variante</code></td><td><code>' + c.variantes[0][0] + '</code></td><td>' + c.variantes.map(function (v) { return v[0]; }).join(", ") + '</td></tr>');
     return '<table class="tabla"><thead><tr><th>Ajuste</th><th>Dónde</th><th>Por defecto</th><th>Qué hace</th></tr></thead><tbody>' + filas.join("") + '</tbody></table>';
   }
-
-  function ajustesHTML(c) {
-    return (c.controles || []).map(function (k) {
-      if (k === "---") return "";
-      var v = estado[k.id];
-      if (k.tipo === "seg") return '<div class="ctl"><div class="et">' + esc(k.etiqueta) + '</div><div class="seg" data-k="' + k.id + '">' + k.opciones.map(function (o) {
-        return '<button type="button" data-val="' + o[0] + '" aria-pressed="' + (String(v) === String(o[0])) + '">' + esc(o[1]) + '</button>'; }).join("") + '</div></div>';
-      if (k.tipo === "select") return '<div class="ctl"><label for="t-' + k.id + '"><span>' + esc(k.etiqueta) + '</span></label><select id="t-' + k.id + '" data-k="' + k.id + '">' + k.opciones.map(function (o) {
-        return '<option value="' + o[0] + '"' + (String(v) === String(o[0]) ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join("") + '</select></div>';
-      if (k.tipo === "rango") return '<div class="ctl"><label for="t-' + k.id + '"><span>' + esc(k.etiqueta) + '</span><span class="val" id="v-' + k.id + '">' + v + ' ' + (k.unidad || '') + '</span></label><input type="range" id="t-' + k.id + '" data-k="' + k.id + '" min="' + k.min + '" max="' + k.max + '" step="' + (k.paso || 1) + '" value="' + v + '"></div>';
-      if (k.tipo === "texto") return '<div class="ctl"><label for="t-' + k.id + '"><span>' + esc(k.etiqueta) + '</span></label><input type="text" id="t-' + k.id + '" data-k="' + k.id + '" value="' + esc(v) + '"></div>';
-      if (k.tipo === "interr") return '<div class="interr"><span>' + esc(k.etiqueta) + '</span><button type="button" data-k="' + k.id + '" aria-pressed="' + v + '" aria-label="' + esc(k.etiqueta) + '"></button></div>';
-      return "";
-    }).join("");
+  function control(k) {
+    var v = estado[k.id], et = esc(k.etiqueta.replace(/ \(.+\)$/, ""));
+    if (k.tipo === "rango") return '<div class="ctl"><label class="et" for="t-' + k.id + '">' + et + '<small id="v-' + k.id + '">' + v + ' ' + (k.unidad || '') + '</small></label><input type="range" id="t-' + k.id + '" data-k="' + k.id + '" min="' + k.min + '" max="' + k.max + '" step="' + (k.paso || 1) + '" value="' + v + '"></div>';
+    if (k.tipo === "seg") return '<div class="ctl"><span class="et" id="e-' + k.id + '">' + et + '</span><div class="seg" role="group" aria-labelledby="e-' + k.id + '" data-k="' + k.id + '">' + k.opciones.map(function (o) {
+      return '<button type="button" data-val="' + o[0] + '" aria-pressed="' + (String(v) === String(o[0])) + '">' + esc(o[1]) + '</button>'; }).join("") + '</div></div>';
+    if (k.tipo === "select") return '<div class="ctl"><label class="et" for="t-' + k.id + '">' + et + '</label><select id="t-' + k.id + '" data-k="' + k.id + '">' + k.opciones.map(function (o) {
+      return '<option value="' + o[0] + '"' + (String(v) === String(o[0]) ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join("") + '</select></div>';
+    if (k.tipo === "texto") return '<div class="ctl"><label class="et" for="t-' + k.id + '">' + et + '</label><input type="text" id="t-' + k.id + '" data-k="' + k.id + '" value="' + esc(v) + '"></div>';
+    if (k.tipo === "interr") return '<div class="ctl"><span class="et" id="e-' + k.id + '">' + et + '</span><button type="button" class="interr" role="switch" aria-checked="' + v + '" aria-labelledby="e-' + k.id + '" data-k="' + k.id + '"></button></div>';
+    return "";
   }
+  function descVariante() { var v = actual.variantes.filter(function (x) { return x[0] === estado.variante; })[0]; return v && v[2] ? esc(v[2]) : ""; }
 
   function abrir(c) {
     actual = c; estado = inicial(c); dibujarNav(); document.title = c.nombre + " · Componentes Profertil";
     var pag = c.tipo === "pagina", o = ordenados(), i = o.indexOf(c), ant = o[i - 1], sig = o[i + 1];
-    var h = '<div class="ficha"><div class="doc">' +
-      '<div><div class="migas"><button type="button" data-ir="">Componentes</button>' + ico("der") + '<span>' + esc(c.grupo) + '</span></div>' +
+    var h = '<div class="ficha"><div class="doc"><div><a class="migas" href="#">Componentes · ' + esc(c.grupo) + '</a>' +
       '<h1>' + esc(c.nombre) + '</h1><p class="bajada">' + esc(c.bajada) + '</p></div>';
-    if (c.variantes) h += '<section><h2>Variantes</h2><div class="vars" id="vars">' + c.variantes.map(function (v, j) {
-      return '<button type="button" class="var" data-val="' + v[0] + '" aria-pressed="' + (v[0] === estado.variante) + '"><em>0' + (j + 1) + '</em><b>' + esc(v[1]) + '</b>' + (v[2] ? '<span>' + esc(v[2]) + '</span>' : '') + '</button>';
-    }).join("") + '</div></section>';
-    if (!pag && c.controles && c.controles.length) h += '<section><h2>Ajustes</h2><div class="ajustes" id="ajustes">' + ajustesHTML(c) + '</div></section>';
-    if (!pag) h += '<section><h2>Uso</h2><div class="codigo"><div class="codigo__barra"><div class="seg" id="tabs"></div><button type="button" class="btn" id="copiar">Copiar</button></div><pre id="pre" tabindex="0"></pre></div></section>';
-    if (c.claves && c.claves.length) h += '<section><h2>Claves del comportamiento</h2><ul class="lista">' + c.claves.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join("") + '</ul></section>';
-    if (!pag && c.controles) h += '<section><h2>Referencia</h2>' + tablaReferencia(c) + '</section>';
-    if (!pag) h += '<section><h2>Dependencias</h2><div class="deps">' + dependencias(c).map(function (d) { return '<span>' + esc(d) + '</span>'; }).join("") + '</div></section>';
-    if (c.accesibilidad) h += '<section><h2>Accesibilidad</h2><p class="bajada" style="font-size:13.5px">' + esc(c.accesibilidad) + '</p></section>';
-    if (c.nota) h += '<section><h2>Para tener en cuenta</h2><p class="bajada" style="font-size:13.5px">' + esc(c.nota) + '</p></section>';
-    h += '<div class="vecinos">' + (ant ? '<button type="button" data-ir="' + ant.id + '"><small>Anterior</small><b>' + esc(ant.nombre) + '</b></button>' : '<span></span>') +
-      (sig ? '<button type="button" class="sig" data-ir="' + sig.id + '"><small>Siguiente</small><b>' + esc(sig.nombre) + '</b></button>' : '') + '</div>';
-    h += '</div>' +
+    if (c.variantes) h += '<section><div class="tabsv" role="group" aria-label="Variantes">' + c.variantes.map(function (v) {
+      return '<button type="button" data-var="' + v[0] + '" aria-pressed="' + (v[0] === estado.variante) + '">' + esc(v[1]) + '</button>'; }).join("") + '</div><p id="vdesc">' + descVariante() + '</p></section>';
+    if (!pag && c.controles && c.controles.length) h += '<section><h2>Ajustes</h2><div class="ajustes" id="ajustes">' + c.controles.filter(function (k) { return k !== "---"; }).map(control).join("") + '</div></section>';
+    if (!pag) h += '<section><div class="codigo__cab"><h2>Código</h2><div class="codigo__der"><div class="tabsc" id="tabs" role="group" aria-label="Lenguaje"></div><button type="button" class="btn" id="copiar">Copiar</button></div></div><pre id="pre" tabindex="0"></pre></section>';
+    if (c.claves && c.claves.length) h += '<section><h2>Cómo se comporta</h2><ul class="claves">' + c.claves.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join("") + '</ul></section>';
+    if (!pag) h += '<details><summary>Referencia técnica' + ico("abre") + '</summary><div class="ref">' + referencia(c) +
+      '<div><h3>Dependencias</h3><p>' + esc(dependencias(c)) + '</p></div>' +
+      (c.accesibilidad ? '<div><h3>Accesibilidad</h3><p>' + esc(c.accesibilidad) + '</p></div>' : '') +
+      (c.nota ? '<div><h3>Para tener en cuenta</h3><p>' + esc(c.nota) + '</p></div>' : '') + '</div></details>';
+    else if (c.nota) h += '<p class="bajada">' + esc(c.nota) + '</p>';
+    h += '<nav class="vecinos" aria-label="Otros componentes">' + (ant ? '<a href="#' + ant.id + '">' + ico("izq") + esc(ant.nombre) + '</a>' : '<span></span>') +
+      (sig ? '<a href="#' + sig.id + '">' + esc(sig.nombre) + ico("der") + '</a>' : '') + '</nav></div>' +
       '<div class="previa" id="previa" data-vista="' + vista + '"><div class="previa__marco"><iframe id="ifr" title="Vista previa de ' + esc(c.nombre) + '"></iframe></div>' +
-      '<div class="vidrio herr" role="toolbar" aria-label="Vista previa">' +
-        '<button type="button" id="vDesk" aria-pressed="' + (vista === "desktop") + '" aria-label="Desktop" title="Desktop">' + ico("desktop") + '</button>' +
-        '<button type="button" id="vMob" aria-pressed="' + (vista === "mobile") + '" aria-label="Mobile" title="Mobile">' + ico("mobile") + '</button>' +
+      '<div class="herr" role="toolbar" aria-label="Vista previa">' +
+        '<button type="button" id="vista" aria-label="' + (vista === "desktop" ? "Ver en mobile" : "Ver en desktop") + '" title="' + (vista === "desktop" ? "Ver en mobile" : "Ver en desktop") + '">' + ico(vista === "desktop" ? "mobile" : "desktop") + '</button>' +
         '<button type="button" id="repetir" aria-label="Repetir" title="Repetir">' + ico("repetir") + '</button>' +
         '<button type="button" id="completa" aria-label="Pantalla completa" title="Pantalla completa">' + ico("completa") + '</button>' +
-        '<button type="button" id="afuera" aria-label="Abrir en otra pestaña" title="Abrir en otra pestaña">' + ico("afuera") + '</button>' +
-      '</div>' +
-      (c.variantes ? '<div class="vidrio chips" id="chips">' + c.variantes.map(function (v) { return '<button type="button" data-val="' + v[0] + '" aria-pressed="' + (v[0] === estado.variante) + '">' + esc(v[1]) + '</button>'; }).join("") + '</div>' : '') +
-      '</div></div>';
+      '</div></div></div>';
     $("centro").innerHTML = h; scrollTo(0, 0);
     iframe = $("ifr"); dibujar(true); codigo();
   }
@@ -398,11 +399,6 @@ var GRUPOS = ["Datos", "Navegación", "Listas", "Scroll", "Transiciones", "Medio
   }
   function ctrl(id) { return (actual.controles || []).filter(function (k) { return k.id === id; })[0]; }
   function cambio(id, v) { estado[id] = v; var k = ctrl(id); if (!(k && aplicar(k))) dibujar(false); codigo(); }
-  function elegirVariante(v) {
-    estado.variante = v;
-    document.querySelectorAll("#vars .var, #chips button").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.val === v); });
-    dibujar(true); codigo();
-  }
   function codigo() {
     if (!actual || actual.tipo === "pagina" || !$("pre")) return;
     var p = { html: "<!-- " + actual.nombre + " · Profertil -->\n" + htmlFinal(actual, estado), css: actual.css(estado) };
@@ -414,32 +410,34 @@ var GRUPOS = ["Datos", "Navegación", "Listas", "Scroll", "Transiciones", "Medio
 
   /* ---------------- eventos ---------------- */
   document.addEventListener("click", function (e) {
-    var ir = e.target.closest("[data-ir]");
-    if (ir && !e.target.closest(".previa")) { location.hash = ir.dataset.ir; return; }
     var b = e.target.closest("button"); if (!b) return;
-    if (b.closest("#vars") || b.closest("#chips")) { elegirVariante(b.dataset.val); return; }
-    if (b.id === "vDesk" || b.id === "vMob") {
-      vista = b.id === "vDesk" ? "desktop" : "mobile"; $("previa").dataset.vista = vista;
-      $("vDesk").setAttribute("aria-pressed", vista === "desktop"); $("vMob").setAttribute("aria-pressed", vista === "mobile"); return;
+    if (b.dataset.var) {
+      estado.variante = b.dataset.var;
+      document.querySelectorAll("[data-var]").forEach(function (x) { x.setAttribute("aria-pressed", x === b); });
+      $("vdesc").innerHTML = descVariante(); dibujar(true); codigo();
+      // La variante queda en la dirección: #componente/variante se puede compartir.
+      history.replaceState(null, "", "#" + actual.id + (estado.variante !== actual.variantes[0][0] ? "/" + estado.variante : ""));
+      return;
+    }
+    if (b.id === "vista") {
+      vista = vista === "desktop" ? "mobile" : "desktop"; $("previa").dataset.vista = vista;
+      var t = vista === "desktop" ? "Ver en mobile" : "Ver en desktop";
+      b.innerHTML = ico(vista === "desktop" ? "mobile" : "desktop"); b.setAttribute("aria-label", t); b.title = t; return;
     }
     if (b.id === "repetir") { dibujar(true); return; }
-    if (b.id === "completa") { var p = $("previa"); if (document.fullscreenElement) document.exitFullscreen(); else if (p.requestFullscreen) p.requestFullscreen(); return; }
-    if (b.id === "afuera") {
-      var url = actual.tipo === "pagina" ? actual.src : URL.createObjectURL(new Blob([documento(actual, estado).replace('<head>', '<head><base href="' + location.href.replace(/#.*$/, "") + '">')], { type: "text/html" }));
-      window.open(url, "_blank"); return;
-    }
+    if (b.id === "completa") { var pv = $("previa"); if (document.fullscreenElement) document.exitFullscreen(); else if (pv.requestFullscreen) pv.requestFullscreen(); return; }
     if (b.closest("#tabs")) { tab = b.dataset.t; codigo(); return; }
     if (b.id === "copiar") {
-      var t = $("pre").textContent, ok = function () { b.textContent = "Copiado"; setTimeout(function () { b.textContent = "Copiar"; }, 1500); };
-      var falla = function () { var a = document.createElement("textarea"); a.value = t; document.body.appendChild(a); a.select(); try { document.execCommand("copy"); ok(); } catch (x) {} a.remove(); };
-      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, falla); else falla();
+      var txt = $("pre").textContent, ok = function () { b.textContent = "Copiado"; $("aviso").textContent = "Código copiado"; setTimeout(function () { b.textContent = "Copiar"; }, 1500); };
+      var falla = function () { var a = document.createElement("textarea"); a.value = txt; document.body.appendChild(a); a.select(); try { document.execCommand("copy"); ok(); } catch (x) {} a.remove(); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, falla); else falla();
       return;
     }
     var seg = b.closest("#ajustes .seg"), k = b.dataset.k || (seg && seg.dataset.k); if (!k) return;
     if (seg) {
       seg.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", x === b); });
       var c = ctrl(k), val = b.dataset.val; if (c && typeof c.def === "number") val = parseFloat(val); cambio(k, val);
-    } else if (b.closest(".interr")) { var on = b.getAttribute("aria-pressed") !== "true"; b.setAttribute("aria-pressed", on); cambio(k, on); }
+    } else if (b.classList.contains("interr")) { var on = b.getAttribute("aria-checked") !== "true"; b.setAttribute("aria-checked", on); cambio(k, on); }
   });
   document.addEventListener("input", function (e) {
     var el = e.target, k = el.dataset && el.dataset.k; if (!k || !el.closest("#ajustes")) return;
@@ -452,7 +450,12 @@ var GRUPOS = ["Datos", "Navegación", "Listas", "Scroll", "Transiciones", "Medio
     if (el.type === "range" && c && !c.aplica) cambio(k, parseFloat(el.value));
   });
 
-  function ruta() { var c = porId(decodeURIComponent(location.hash.slice(1))); if (c) abrir(c); else galeria(); }
+  function ruta() {
+    var p = decodeURIComponent(location.hash.slice(1)).split("/"), c = porId(p[0]);
+    if (!c) { galeria(); return; }
+    if (c !== actual) abrir(c);
+    if (p[1] && c.variantes && c.variantes.some(function (v) { return v[0] === p[1]; }) && estado.variante !== p[1]) { var b = document.querySelector('[data-var="' + p[1] + '"]'); if (b) b.click(); }
+  }
   addEventListener("hashchange", ruta);
   ruta();
 })();
