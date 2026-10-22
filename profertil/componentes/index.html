@@ -153,7 +153,7 @@ input[type="text"], select { width: 100%; height: 32px; padding: 0 10px; border:
 .tabsc { display: flex; gap: 12px; }
 .tabsc button { border: 0; background: none; padding: 0; font: 400 12px/1 var(--f-mono); color: var(--ink-3); }
 .tabsc button[aria-pressed="true"] { color: var(--ink); }
-.btn { height: 30px; padding: 0 14px; border: 0; border-radius: var(--r); background: var(--azul); color: #fff; font-size: 12.5px; transition: transform .15s var(--ease); }
+.btn { height: 30px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--azul); color: #fff; font-size: 12.5px; transition: transform .15s var(--ease); }
 .btn:active { transform: scale(.97); }
 pre { margin: 0; padding: 14px; max-height: 340px; overflow: auto; border-radius: var(--r); background: var(--card); box-shadow: inset 0 0 0 1px var(--line); font: 400 11.5px/1.6 var(--f-mono); tab-size: 2; }
 
@@ -239,6 +239,7 @@ details[open] summary .ico { transform: rotate(90deg); }
 window.Libreria = { lista: [], sumar: function (c) { this.lista.push(c); } };
 var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll", "Transiciones", "Medios", "Texto", "Páginas"];
 </script>
+<script src="c/sistema.js"></script>
 <script src="c/cifras.js"></script>
 <script src="c/pie.js"></script>
 <script src="c/boton-fijo.js"></script>

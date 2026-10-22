@@ -3,8 +3,9 @@
   var COLORES = { azul: "#003DA5", verde: "#2D8035", amarillo: "#EABA2C", terra: "#8A4818" };
   var CURVAS = { base: "cubic-bezier(.22, 1, .36, 1)", fuerte: "cubic-bezier(.67, 0, .24, .99)" };
   var PAGINAS = [
-    ["inicio", "Inicio", "Damos vida a la tierra", "Nutrientes para el campo argentino, desde Bahía Blanca.", 1],
-    ["productos", "Productos", "Un nutriente para cada cultivo", "Urea granulada y soluciones con recomendación por zona.", 2],
+    ["inicio", "Home", "Damos vida a la tierra", "Nutrientes para el campo argentino, desde Bahía Blanca.", 1],
+    ["empresa", "Empresa", "Una planta, una comunidad", "Quiénes somos y cómo trabajamos en Bahía Blanca.", 4],
+    ["productos", "Productos y Servicios", "Un nutriente para cada cultivo", "Urea granulada y soluciones con recomendación por zona.", 2],
     ["novedades", "Novedades", "Lo último de Profertil", "Noticias de la planta, la comunidad y el campo.", 3]
   ];
 
@@ -27,19 +28,15 @@
         ".tp { --dur: 700ms; --f-d: \"Familjen Grotesk\", \"Helvetica Neue\", Arial, sans-serif; font: 400 16px/1.5 \"DM Sans\", \"Helvetica Neue\", Arial, sans-serif; color: #0A1E4A; min-height: 100vh; }",
         Object.keys(COLORES).map(function (k) { return '.tp[data-color="' + k + '"] { --color: ' + COLORES[k] + '; }'; }).join("\n"),
         Object.keys(CURVAS).map(function (k) { return '.tp[data-curva="' + k + '"] { --curva: ' + CURVAS[k] + '; }'; }).join("\n"),
-        ".tp__barra { position: fixed; z-index: 5; inset: 12px 12px auto; display: flex; justify-content: space-between; align-items: center; height: 56px; padding: 0 10px 0 18px; border-radius: 999px; background: rgba(0, 61, 165, .94); color: #FFFEEF; }",
-        ".tp__barra svg { display: block; height: 30px; width: auto; }",
-        ".tp__barra nav { display: flex; gap: 4px; }",
-        ".tp__barra button { height: 38px; padding: 0 16px; border: 0; border-radius: 999px; background: none; color: inherit; font: inherit; font-size: 14px; cursor: pointer; transition: background .25s; }",
-        ".tp__barra button:hover { background: rgba(255, 254, 239, .14); }",
-        ".tp__barra button[aria-current=\"page\"] { background: #FFFEEF; color: #003DA5; }",
+        "/* La barra es la del sistema (Web/Barra navegación). */",
+        SIS.barraCSS,
         ".tp__pagina { min-height: 100vh; padding: 140px clamp(20px, 6vw, 96px) 64px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; align-items: end; }",
         ".tp__pagina h1 { margin: 0 0 16px; font: 500 clamp(40px, 6.4vw, 96px)/.98 var(--f-d); letter-spacing: -.04em; }",
         ".tp__pagina p { margin: 0; max-width: 36ch; font-size: 18px; color: #44506E; }",
         ".tp__pagina img { width: 100%; aspect-ratio: 4 / 5; max-height: 62vh; object-fit: cover; border-radius: 26px; }",
         "",
         "/* Persiana con logo: el paño sube, el logo aparece en el medio, cambia la página y el paño sigue de largo. */",
-        ".tp__velo { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; background: var(--color); color: #FFFEEF; pointer-events: none; transform: translateY(100%); }",
+        ".tp__velo { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; background: var(--color); color: #FFFEEF; pointer-events: none; transform: translateY(100%); }",
         ".tp[data-color=\"amarillo\"] .tp__velo { color: #003DA5; }",
         ".tp__velo svg { width: min(28vw, 180px); height: auto; opacity: 0; transform: translateY(14px); }",
         ".tp__velo.entra { transition: transform var(--dur) var(--curva); transform: none; }",
@@ -48,7 +45,7 @@
         ".tp__velo.sale svg { opacity: 1; transform: none; }",
         "",
         "/* Forma que crece: la forma sale del punto donde se tocó y cubre la pantalla. */",
-        ".tp__forma { position: fixed; z-index: 10; left: 0; top: 0; width: 120px; height: 120px; margin: -60px 0 0 -60px; color: var(--color); pointer-events: none; transform: translate(var(--x), var(--y)) scale(0.01); opacity: 0; }",
+        ".tp__forma { position: fixed; z-index: 60; left: 0; top: 0; width: 120px; height: 120px; margin: -60px 0 0 -60px; color: var(--color); pointer-events: none; transform: translate(var(--x), var(--y)) scale(0.01); opacity: 0; }",
         ".tp__forma svg { display: block; width: 100%; height: 100%; }",
         ".tp__forma.entra { opacity: 1; transform: translate(var(--x), var(--y)) scale(var(--s)) rotate(20deg); transition: transform var(--dur) var(--curva); }",
         ".tp__forma.sale { opacity: 0; transform: translate(var(--x), var(--y)) scale(var(--s)) rotate(20deg); transition: opacity calc(var(--dur) * .7) ease; }",
@@ -60,14 +57,13 @@
         "@keyframes tp-entra { from { opacity: 0; transform: translateY(40px); } }",
         ".tp__pagina.entra { animation: tp-entra var(--dur) var(--curva) both; }",
         "",
-        "@media (max-width: 760px) { .tp__pagina { grid-template-columns: 1fr; padding-top: 110px; } .tp__barra button { padding: 0 10px; font-size: 13px; } .tp__barra svg { height: 24px; } }",
+        "@media (max-width: 760px) { .tp__pagina { grid-template-columns: 1fr; padding-top: 110px; } }",
         "@media (prefers-reduced-motion: reduce) { .tp__velo, .tp__forma { display: none; } ::view-transition-old(root), ::view-transition-new(root) { animation: none; } }"
       ].join("\n");
     },
     html: function (s) {
-      var logo = LOGO_BLANCO.replace('<svg', '<svg aria-label="Profertil"');
       var h = '<div class="tp" data-c="transicion-pagina">\n' +
-        '  <header class="tp__barra">' + logo + '<nav>' + PAGINAS.map(function (p, i) { return '<button type="button" data-ir="' + p[0] + '"' + (i ? '' : ' aria-current="page"') + '>' + p[1] + '</button>'; }).join("") + '</nav></header>\n' +
+        '  ' + SIS.barra(PAGINAS.map(function (p) { return [p[0], p[1]]; }), PAGINAS[0][0]) + '\n' +
         '  <main class="tp__pagina" id="tp-pagina"></main>\n';
       if (s.variante === "persiana") h += '  <div class="tp__velo" aria-hidden="true">' + LOGO_BLANCO + '</div>\n';
       if (s.variante === "forma") h += '  <div class="tp__forma" aria-hidden="true">' + formaSVG(s.forma) + '</div>\n';
@@ -112,7 +108,7 @@
         "    } else { poner(id); pagina.classList.remove('entra'); void pagina.offsetWidth; pagina.classList.add('entra'); }",
         "    ocupado = false;",
         "  }",
-        "  raiz.querySelector('.tp__barra nav').addEventListener('click', function (e) {",
+        "  raiz.querySelector('.nav .menu').addEventListener('click', function (e) {",
         "    var b = e.target.closest('[data-ir]'); if (b && !b.hasAttribute('aria-current')) ir(b.dataset.ir, e);",
         "  });",
         "  poner('inicio');",

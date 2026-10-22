@@ -7,6 +7,8 @@
     ["Innovación", "Buscamos mejores formas de nutrir los suelos, con datos, ensayos y trabajo conjunto con los productores."],
     ["Sustentabilidad", "Medimos y reducimos nuestro impacto, y lo contamos con datos verificables cada año."]
   ];
+  // 41 rayitas por costado: con la montañita, se leen como una regla viva.
+  var RAYAS = new Array(42).join("<i></i>");
   var ACENTOS = { azul: "#003DA5", verde: "#2D8035", naranja: "#E57F19", tinta: "#0A1E4A" };
 
   Libreria.sumar({
@@ -15,7 +17,7 @@
     nota: "Scrolleá dentro del escenario. Los valores y sus textos son de ejemplo.",
     variantes: [["palabras", "Palabras fijas", "La sección queda quieta; el scroll enciende una palabra por vez y cambia el texto del costado."], ["filas", "Filas que se abren", "Filas numeradas: la que cruza el centro se enciende y abre su texto."], ["columna", "Índice al costado", "Índice chico fijo a la izquierda con una marca; a la derecha, un bloque largo por valor."]],
     tamano: "ancha", previa: .28,
-    claves: ["Siempre hay una sola activa; las demás quedan al 15% de opacidad.", "La marca de posición (regla, barra o índice) dice cuánto falta de la lista.", "Palabras fijas reparte el tramo en partes iguales: 70vh de scroll por valor.", "En Filas e Índice, la activa es la que cruza la mitad de la pantalla.", "En el índice, tocar un nombre lleva a su bloque."],
+    claves: ["Siempre hay una sola activa; las demás quedan al 15% de opacidad.", "La marca de posición dice cuánto falta de la lista: en Palabras fijas es una montañita en las reglas de los costados, que avanza con el scroll.", "Palabras fijas reparte el tramo en partes iguales: 70vh de scroll por valor.", "En Filas e Índice, la activa es la que cruza la mitad de la pantalla.", "En el índice, tocar un nombre lleva a su bloque."],
     accesibilidad: "Es una lista ordenada con su texto real; la activa se marca solo con opacidad. Con movimiento reducido no hay transiciones.",
     controles: [
       { id: "acento", tipo: "seg", etiqueta: "Color activo", def: "tinta", aplica: { attr: "data-acento" }, opciones: [["tinta", "Tinta"], ["azul", "Azul"], ["verde", "Verde"], ["naranja", "Naranja"]], desc: "Color de la palabra activa y de la marca." },
@@ -41,10 +43,11 @@
         ".lv__textos { position: relative; min-height: 8em; }",
         ".lv__textos p { position: absolute; inset: 0 auto auto 0; margin: 0; max-width: 34ch; font-size: 17px; opacity: 0; transform: translateY(12px); transition: opacity .45s var(--curva), transform .6s var(--curva); }",
         ".lv__textos p.activa { opacity: 1; transform: none; }",
-        "/* La regla: rayitas a los dos costados y una marca que baja con el scroll. */",
-        ".lv__regla { position: absolute; top: 12vh; bottom: 12vh; width: 14px; background: repeating-linear-gradient(to bottom, rgba(10, 30, 74, .28) 0 1px, transparent 1px 9px); }",
-        ".lv__regla--izq { left: clamp(14px, 2.4vw, 32px); } .lv__regla--der { right: clamp(14px, 2.4vw, 32px); }",
-        ".lv__regla::after { content: \"\"; position: absolute; left: -4px; width: 22px; height: 2px; top: calc(var(--p, 0) * 100%); background: var(--acento); transition: top .12s linear; }",
+        "/* La regla: rayitas a los dos costados que crecen como una montañita alrededor de la posición actual. */",
+        ".lv__regla { position: absolute; top: 12vh; bottom: 12vh; width: 26px; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none; }",
+        ".lv__regla--izq { left: clamp(14px, 2.4vw, 32px); align-items: flex-start; } .lv__regla--der { right: clamp(14px, 2.4vw, 32px); align-items: flex-end; }",
+        ".lv__regla i { display: block; width: 26px; height: 1.5px; background: var(--acento); transform: scaleX(calc(.26 + var(--g, 0) * .74)); opacity: calc(.24 + var(--g, 0) * .76); }",
+        ".lv__regla--izq i { transform-origin: left center; } .lv__regla--der i { transform-origin: right center; }",
         "",
         "/* Filas que se abren: cada valor es una fila; la que cruza el centro se abre. */",
         ".lv__filas { position: relative; list-style: none; margin: 0; padding: 0 clamp(20px, 5vw, 64px) 0 clamp(48px, 8vw, 120px); }",
@@ -85,7 +88,7 @@
       var v = s.variante, h = '<section class="lv" data-c="lista-valores">\n  <div class="lv__intro"><h2>Lo que nos guía todos los días</h2></div>\n';
       if (v === "palabras") {
         h += '  <div class="lv__pin" style="height: ' + (VALORES.length * 70 + 100) + 'vh">\n    <div class="lv__pin-in">\n' +
-          '      <span class="lv__regla lv__regla--izq" aria-hidden="true"></span><span class="lv__regla lv__regla--der" aria-hidden="true"></span>\n' +
+          '      <span class="lv__regla lv__regla--izq" aria-hidden="true">' + RAYAS + '</span><span class="lv__regla lv__regla--der" aria-hidden="true">' + RAYAS + '</span>\n' +
           '      <ol>' + VALORES.map(function (x, i) { return '<li class="lv__palabra' + (i ? '' : ' activa') + '">' + x[0] + '</li>'; }).join("") + '</ol>\n' +
           '      <div class="lv__textos">' + VALORES.map(function (x, i) { return '<p' + (i ? '' : ' class="activa"') + '>' + x[1] + '</p>'; }).join("") + '</div>\n' +
           '    </div>\n  </div>\n';
@@ -110,9 +113,12 @@
         "  if (pin) {",
         "    // Palabras fijas: el avance dentro de la sección decide qué palabra se enciende.",
         "    var pals = [].slice.call(pin.querySelectorAll('.lv__palabra')), txts = [].slice.call(pin.querySelectorAll('.lv__textos p')), ultimo = -1;",
+        "    var reglas = [].slice.call(pin.querySelectorAll('.lv__regla')).map(function (r) { return [].slice.call(r.children); });",
         "    var tic = function () {",
         "      var r = pin.getBoundingClientRect(), p = Math.min(1, Math.max(0, -r.top / (r.height - innerHeight)));",
         "      pin.style.setProperty('--p', p.toFixed(4));",
+        "      // Montañita: cada rayita crece según qué tan cerca está de la posición actual (campana de ancho 2,6 rayitas).",
+        "      reglas.forEach(function (rs) { var pos = p * (rs.length - 1); rs.forEach(function (r, k) { var d = (k - pos) / 2.6; r.style.setProperty('--g', Math.exp(-d * d).toFixed(3)); }); });",
         "      var i = Math.min(pals.length - 1, Math.floor(p * pals.length));",
         "      if (i !== ultimo) { ultimo = i; marcar(pals, i); marcar(txts, i); }",
         "    };",
