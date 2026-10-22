@@ -29,11 +29,11 @@
     css: function () {
       return [
         ".sf { --intensidad: 80; --oscuro: 40; --radio: 26px; --curva: cubic-bezier(.22, 1, .36, 1); --f-d: \"Familjen Grotesk\", \"Helvetica Neue\", Arial, sans-serif;",
-        "  font: 400 16px/1.5 \"DM Sans\", \"Helvetica Neue\", Arial, sans-serif; color: #FFFEEF; }",
+        "  font: 400 16px/1.5 \"DM Sans\", \"Helvetica Neue\", Arial, sans-serif; color: var(--tiza); }",
         SIS.etiquetaCSS,
-        ".sf__intro, .sf__fin { padding: 22vh clamp(20px, 5vw, 64px); color: #0A1E4A; }",
+        ".sf__intro, .sf__fin { padding: 22vh clamp(20px, 5vw, 64px); color: var(--ink); }",
         ".sf__intro h2, .sf__fin h2 { margin: 0; font: 500 clamp(28px, 4vw, 52px)/1.04 var(--f-d); letter-spacing: -.03em; max-width: 16ch; }",
-        ".sf__panel { overflow: hidden; background: #0A1E4A; }",
+        ".sf__panel { overflow: hidden; background: var(--ink); }",
         ".sf__media { position: absolute; inset: 0; overflow: hidden; }",
         "/* La imagen es más alta que su panel en la misma medida en que se corre: así nunca queda una franja vacía. */",
         ".sf__media img { position: absolute; left: 0; top: calc(var(--intensidad) * -.5%); width: 100%; height: calc(100% + var(--intensidad) * 1%); object-fit: cover; transform: translate3d(0, var(--y, 0px), 0); will-change: transform; }",

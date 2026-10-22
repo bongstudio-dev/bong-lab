@@ -15,10 +15,10 @@
     accesibilidad: "Es un link real con su texto; la flecha va con aria-hidden. No hay animación que respetar: el movimiento es el del scroll.",
     css: function () {
       return [
-        ".bf { --alto: 48px; --curva: cubic-bezier(.22, 1, .36, 1); font: 400 16px/1.5 \"DM Sans\", \"Helvetica Neue\", Arial, sans-serif; color: #0A1E4A; }",
+        ".bf { --alto: 48px; --curva: cubic-bezier(.22, 1, .36, 1); font: 400 16px/1.5 \"DM Sans\", \"Helvetica Neue\", Arial, sans-serif; color: var(--ink); }",
         ".bf h2 { margin: 0; font: 500 clamp(32px, 4.4vw, 60px)/1 \"Familjen Grotesk\", \"Helvetica Neue\", Arial, sans-serif; letter-spacing: -.035em; max-width: 14ch; }",
         ".bf__sec { padding: 18vh clamp(20px, 6vw, 96px); }",
-        ".bf__sec p { margin: 18px 0 0; max-width: 42ch; color: #44506E; }",
+        ".bf__sec p { margin: 18px 0 0; max-width: 42ch; color: var(--ink-2); }",
         "",
         "/* La foto ocupa todo el ancho; el botón va pegado al centro de la pantalla mientras ella pasa. */",
         ".bf__foto { position: relative; display: flex; justify-content: center; }",
@@ -27,8 +27,8 @@
         ".bf-boton { position: sticky; top: calc(50% - var(--alto) / 2); z-index: 2; align-self: flex-start; margin: calc(50vh - var(--alto) / 2) 0;",
         "  display: inline-flex; align-items: center; gap: 10px; height: var(--alto); padding: 0 22px 0 24px; border-radius: 999px;",
         "  font: 500 calc(var(--alto) * .333)/1 \"Familjen Grotesk\", \"Helvetica Neue\", Arial, sans-serif; text-decoration: none; white-space: nowrap; transition: background 200ms ease, color 200ms ease; }",
-        ".bf[data-color=\"tiza\"] .bf-boton { background: #FFFEEF; color: #003DA5; }",
-        ".bf[data-color=\"azul\"] .bf-boton { background: #003DA5; color: #FFFEEF; }",
+        ".bf[data-color=\"tiza\"] .bf-boton { background: var(--tiza); color: var(--azul); }",
+        ".bf[data-color=\"azul\"] .bf-boton { background: var(--azul); color: var(--tiza); }",
         ".bf-boton svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 260ms var(--curva); }",
         "@media (hover: hover) and (pointer: fine) { .bf[data-color=\"tiza\"] .bf-boton:hover { background: #fff; } .bf-boton:hover svg { transform: translateX(3px); } }"
       ].join("\n");

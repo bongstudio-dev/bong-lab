@@ -2,10 +2,10 @@
 (function () {
   // 04 · Paleta del Master: Dominante, Complementario, Tercero, Tinta, Tinta tercero, y el texto sobre el Dominante.
   var PALETAS = {
-    azul:     { dom: "#003DA5", comp: "#4086FF", ter: "#2D8035", tinta: "#003DA5", tinter: "#FFFEEF", sobre: "#FFFEEF" },
-    verde:    { dom: "#2D8035", comp: "#5EB53A", ter: "#EABA2C", tinta: "#2D8035", tinter: "#2D8035", sobre: "#FFFEEF" },
-    amarillo: { dom: "#EABA2C", comp: "#E57F19", ter: "#2D8035", tinta: "#E57F19", tinter: "#FFFEEF", sobre: "#003DA5" },
-    naranja:  { dom: "#E57F19", comp: "#8A4818", ter: "#EABA2C", tinta: "#E57F19", tinter: "#E57F19", sobre: "#FFFEEF" }
+    azul:     { dom: "var(--azul)", comp: "var(--celeste)", ter: "var(--verde)", tinta: "var(--azul)", tinter: "var(--tiza)", sobre: "var(--tiza)" },
+    verde:    { dom: "var(--verde)", comp: "var(--verde-claro)", ter: "var(--amarillo)", tinta: "var(--verde)", tinter: "var(--verde)", sobre: "var(--tiza)" },
+    amarillo: { dom: "var(--amarillo)", comp: "var(--naranja)", ter: "var(--verde)", tinta: "var(--naranja)", tinter: "var(--tiza)", sobre: "var(--azul)" },
+    naranja:  { dom: "var(--naranja)", comp: "var(--terra)", ter: "var(--amarillo)", tinta: "var(--naranja)", tinter: "var(--naranja)", sobre: "var(--tiza)" }
   };
   var DATOS = [
     ["Producción", "128", "miles de toneladas por año"],
@@ -40,7 +40,7 @@
       return [
         ".cifras {",
         "  --num: 64px; --pastilla: 27px; --radio: 26px; --aire: 16px; --cols: 4;",
-        "  --card: #FFFEEF; --linea: rgba(10, 30, 74, .1); --texto-2: #44506E;",
+        "  --card: var(--tiza); --linea: rgba(10, 30, 74, .1); --texto-2: var(--ink-2);",
         "  container-type: inline-size; max-width: 1160px; margin: 0 auto;",
         "  font-family: \"DM Sans\", \"Helvetica Neue\", Arial, sans-serif;",
         "}",
@@ -48,7 +48,7 @@
           var p = PALETAS[k];
           return '.cifras[data-paleta="' + k + '"] { --c-dom: ' + p.dom + '; --c-comp: ' + p.comp + '; --c-ter: ' + p.ter + '; --c-tinta: ' + p.tinta + '; --c-tinta-ter: ' + p.tinter + '; --c-sobre: ' + p.sobre + '; }';
         }).join("\n"),
-        '.cifras[data-comb="secundaria"] { --c-dato: var(--c-comp); --c-dato-tinta: #FFFEEF; }',
+        '.cifras[data-comb="secundaria"] { --c-dato: var(--c-comp); --c-dato-tinta: var(--tiza); }',
         '.cifras[data-comb="terciaria"] { --c-dato: var(--c-ter); --c-dato-tinta: var(--c-tinta-ter); }',
         ".cifras__lista { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: var(--aire); }",
         ".cifras__lista > .cifra:nth-child(n + 5) { display: none; }",

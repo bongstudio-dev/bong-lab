@@ -7,7 +7,7 @@
     ["Contacto", ["Escribinos", "Trabajá con nosotros", "Proveedores", "Visitas a planta"]]
   ];
   // Fondos de color permitidos (Color y texto del Master) y el texto que va encima.
-  var FONDOS = { azul: ["#003DA5", "#FFFEEF"], verde: ["#2D8035", "#FFFEEF"], terra: ["#8A4818", "#FFFEEF"], amarillo: ["#EABA2C", "#003DA5"] };
+  var FONDOS = { azul: ["var(--azul)", "var(--tiza)"], verde: ["var(--verde)", "var(--tiza)"], terra: ["var(--terra)", "var(--tiza)"], amarillo: ["var(--amarillo)", "var(--azul)"] };
 
   Libreria.sumar({
     id: "footer", nombre: "Pie de página", grupo: "Navegación", alto: "auto", sangrado: true,
@@ -20,7 +20,7 @@
     tamano: "media",
     claves: ["La línea ética va siempre en el pie, destacada, con su propio llamado.", "Los fondos de color son solo los del Master (azul, verde, terra, amarillo); sobre amarillo el texto va en azul.", "El logo va siempre completo: no se recorta ni se separa el símbolo de la palabra.", "Las columnas repiten el menú principal: si cambia la arquitectura, cambia el pie.", "Con trigo y Vida para nuestra tierra tienen parallax: el trigo y la foto se mueven a otra velocidad que la página mientras el pie entra en pantalla."],
     accesibilidad: "Es un <footer> con listas de links reales. El trigo es decorativo (aria-hidden); la frase con foto es texto real, legible por lectores y buscadores. Con movimiento reducido no hay parallax.",
-    previo: '<div style="height:80vh;display:grid;place-items:center;color:#737D96;font-size:13px">Final de la página</div>',
+    previo: '<div style="height:80vh;display:grid;place-items:center;color:var(--ink-3);font-size:13px">Final de la página</div>',
     controles: [
       { id: "fondo", tipo: "seg", etiqueta: "Fondo (Institucional y Vida)", def: "azul", aplica: { attr: "data-fondo" }, opciones: [["azul", "Azul"], ["verde", "Verde"], ["terra", "Terra"], ["amarillo", "Amarillo"]], desc: "Color de fondo y tinta que va encima." },
       { id: "par", tipo: "rango", etiqueta: "Parallax (Con trigo y Vida)", unidad: "%", min: 0, max: 40, def: 22, aplica: { var: "--par" }, desc: "Cuánto se corre el trigo o la foto mientras entra el pie." },
@@ -45,7 +45,7 @@
         ".pie__etica { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding: 18px 22px; border-radius: 18px; background: color-mix(in srgb, currentColor 9%, transparent); }",
         ".pie__etica b { font: 500 20px/1.1 var(--f-d); letter-spacing: -.02em; }",
         ".pie__etica span { display: block; margin-top: 4px; font-size: 13px; opacity: .75; }",
-        ".pie__pill { display: inline-flex; align-items: center; height: 44px; padding: 0 20px; border-radius: 999px; background: var(--pie-tinta, #003DA5); color: var(--pie-fondo, #FFFEEF) !important; opacity: 1 !important; font-weight: 500; text-decoration: none !important; }",
+        ".pie__pill { display: inline-flex; align-items: center; height: 44px; padding: 0 20px; border-radius: 999px; background: var(--pie-tinta, var(--azul)); color: var(--pie-fondo, var(--tiza)) !important; opacity: 1 !important; font-weight: 500; text-decoration: none !important; }",
         ".pie__legal { display: flex; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; padding-top: 20px; border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent); font-size: 12px; opacity: .8; }",
         ".pie__legal nav { display: flex; gap: 18px; flex-wrap: wrap; }",
         "",
@@ -56,16 +56,16 @@
         '.pie[data-variante="institucional"] .pie__cab p { margin: 12px 0 0; max-width: 34ch; font: 500 22px/1.15 var(--f-d); letter-spacing: -.02em; }',
         "",
         "/* Con trigo: el trigo del sistema en amarillo pleno ocupa la izquierda y sube más lento. El contenido va a la derecha. */",
-        '.pie[data-variante="trigo"] { background: #FFFEEF; color: #0A1E4A; --pie-tinta: #003DA5; --pie-fondo: #FFFEEF; }',
-        '.pie__trigo { position: absolute; left: clamp(-80px, -4vw, -24px); bottom: -8%; height: 112%; aspect-ratio: ' + FORMAS.trigo.vb.split(" ")[2] + ' / ' + FORMAS.trigo.vb.split(" ")[3] + '; color: #EABA2C; pointer-events: none;',
+        '.pie[data-variante="trigo"] { background: var(--tiza); color: var(--ink); --pie-tinta: var(--azul); --pie-fondo: var(--tiza); }',
+        '.pie__trigo { position: absolute; left: clamp(-80px, -4vw, -24px); bottom: -8%; height: 112%; aspect-ratio: ' + FORMAS.trigo.vb.split(" ")[2] + ' / ' + FORMAS.trigo.vb.split(" ")[3] + '; color: var(--amarillo); pointer-events: none;',
         "  transform: translate3d(0, calc((1 - var(--p)) * var(--par) * 1%), 0); will-change: transform; }",
         '.pie__trigo svg { display: block; width: 100%; height: 100%; }',
         '.pie[data-variante="trigo"] .pie__in { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 2fr); column-gap: 48px; }',
         '.pie[data-variante="trigo"] .pie__der { grid-column: 2; display: grid; gap: 36px; }',
         '.pie[data-variante="trigo"] .pie__cab { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; }',
-        '.pie[data-variante="trigo"] .pie__logo { color: #003DA5; }',
-        '.pie[data-variante="trigo"] .pie__cab p { margin: 12px 0 0; max-width: 28ch; font: 500 20px/1.2 var(--f-d); letter-spacing: -.02em; color: #003DA5; }',
-        '.pie[data-variante="trigo"] .pie__etica { background: #E9E7D6; }',
+        '.pie[data-variante="trigo"] .pie__logo { color: var(--azul); }',
+        '.pie[data-variante="trigo"] .pie__cab p { margin: 12px 0 0; max-width: 28ch; font: 500 20px/1.2 var(--f-d); letter-spacing: -.02em; color: var(--azul); }',
+        '.pie[data-variante="trigo"] .pie__etica { background: var(--bg); }',
         "",
         "/* Vida para nuestra tierra: logo centrado, links en una fila y la frase a todo el ancho; la foto se ve por adentro de las letras. */",
         '.pie[data-variante="vida"] { background: var(--pie-fondo); color: var(--pie-tinta); text-align: center; }',

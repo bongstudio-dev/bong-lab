@@ -1,0 +1,84 @@
+/* Tokens del sistema web de Profertil. GENERADO por fuente/generar-tokens.py: no editar a mano.
+   Origen: Figma Master broRXp9etWG4y2IjFyCC3V (01 · Primitivas, 04 · Paleta, 06 · Web). */
+:root {
+  /* 01 · Primitivas y 06 · Web (tokens.json) */
+  --azul: #003DA5;  /* Marca/Azul */
+  --celeste: #4086FF;  /* Marca/Celeste */
+  --verde: #2D8035;  /* Marca/Verde */
+  --verde-claro: #5EB53A;  /* Marca/Verde Claro */
+  --amarillo: #EABA2C;  /* Marca/Amarillo */
+  --naranja: #E57F19;  /* Marca/Naranja */
+  --terra: #8A4818;  /* Marca/Terra */
+  --tiza: #FFFEEF;  /* Observados/Crema */
+  --color-blanco: #FFFFFF;  /* Neutro/Blanco */
+  --color-negro: #000000;  /* Neutro/Negro */
+  --color-gris-slogan: #676668;  /* Neutro/Gris Slogan */
+  --color-verde-oscuro: #154B1A;  /* Observados/Verde Oscuro */
+  --color-gris: #D9D9D9;  /* Observados/Gris */
+  --bg: #E9E7D6;  /* Web/Fondo */
+  --card: #FFFEEF;  /* Web/Superficie */
+  --ink: #0A1E4A;  /* Web/Tinta */
+  --ink-2: #44506E;  /* Web/Tinta secundaria */
+  --ink-3: #737D96;  /* Web/Tinta terciaria */
+  --barra: rgba(0, 61, 165, 0.94);  /* Web/Barra */
+  --line: rgba(10, 30, 74, 0.1);  /* Web/Línea */
+  --glass: rgba(255, 254, 239, 0.78);  /* Web/Vidrio */
+  --etq-s: 22px;  /* Web/Etiqueta/S */
+  --etq-m: 27px;  /* Web/Etiqueta/M */
+  --etq-l: 32px;  /* Web/Etiqueta/L */
+  --btn-s: 40px;  /* Web/Botón/S */
+  --btn-m: 44px;  /* Web/Botón/M */
+  --btn-l: 48px;  /* Web/Botón/L */
+  --f-abrir: 600ms;  /* Web/Movimiento/Filtros abrir */
+  --f-cerrar: 460ms;  /* Web/Movimiento/Filtros cerrar */
+  --f-fundido: 360ms;  /* Web/Movimiento/Filtros fundido */
+  --f-fundido-retraso: 160ms;  /* Web/Movimiento/Filtros fundido retraso */
+  --f-flecha: 460ms;  /* Web/Movimiento/Filtros flecha */
+  --f-chica: 280ms;  /* Web/Movimiento/Compacto */
+  --t-buscador: 420ms;  /* Web/Movimiento/Buscador */
+  --t-vista: 420ms;  /* Web/Movimiento/Vista */
+  --carrusel-dura: 7000ms;  /* Web/Movimiento/Carrusel duración */
+  --carrusel-pase: 700ms;  /* Web/Movimiento/Carrusel pase */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);  /* Web/Movimiento/Curva base */
+  --f-curva: cubic-bezier(0.67, 0, 0.24, 0.99);  /* Web/Movimiento/Curva filtros */
+  --curva-vista: cubic-bezier(0.67, 0, 0.24, 0.99);  /* Web/Movimiento/Curva vista */
+  --f-chica-curva: cubic-bezier(0.32, 0.72, 0, 1);  /* Web/Movimiento/Curva compacto */
+  --carrusel-curva: cubic-bezier(0.65, 0, 0.25, 1);  /* Web/Movimiento/Curva carrusel */
+  --ancla-gap: 5px;  /* Web/Ancla/Separación */
+  --ancla-giro-k: 150;  /* Web/Resorte/Ancla giro rigidez */
+  --ancla-giro-c: 13.5;  /* Web/Resorte/Ancla giro amortiguación */
+  --ancla-aparecer-k: 220;  /* Web/Resorte/Ancla aparecer rigidez */
+  --ancla-aparecer-c: 29.7;  /* Web/Resorte/Ancla aparecer amortiguación */
+  --ancla-apretar-k: 600;  /* Web/Resorte/Ancla apretar rigidez */
+  --ancla-apretar-c: 49;  /* Web/Resorte/Ancla apretar amortiguación */
+  --ancla-apretar: 0.92;  /* Web/Proporción/Ancla apretar */
+  --ancla-bajar: 0.8;  /* Web/Proporción/Ancla bajar */
+  --ancla-cambio: 0.6;  /* Web/Proporción/Ancla cambio */
+  /* 06 · Web: semánticos */
+  --titulo: var(--azul);  /* Web/Título */
+  --activo: var(--ink);  /* Web/Activo */
+  --sobre-color: var(--tiza);  /* Web/Texto sobre color */
+  --chip-fondo: color-mix(in srgb, var(--azul) 16%, #fff);  /* Web/Chip fondo */
+  --chip-texto: var(--azul);  /* Web/Chip texto */
+  --chip-activo: var(--azul);  /* Web/Chip activo */
+  --borde-vidrio: rgba(255, 255, 255, 0.92);  /* Web/Borde vidrio */
+  --foto-fondo: rgba(255, 254, 239, 0.14);  /* Web/Sobre foto/Fondo */
+  --foto-boton: rgba(255, 254, 239, 0.16);  /* Web/Sobre foto/Botón */
+  --foto-borde: rgba(255, 254, 239, 0.22);  /* Web/Sobre foto/Borde */
+  --foto-texto: rgba(255, 254, 239, 0.9);  /* Web/Sobre foto/Texto */
+  /* 04 · Paleta: familias (fondo, forma o complementario, tinta) */
+  --fam-azul: var(--azul); --fam-azul-comp: var(--celeste); --fam-azul-tinta: var(--azul);
+  --fam-verde: var(--verde); --fam-verde-comp: var(--verde-claro); --fam-verde-tinta: var(--verde);
+  --fam-amarillo: var(--amarillo); --fam-amarillo-comp: var(--naranja); --fam-amarillo-tinta: var(--naranja);
+  --fam-naranja: var(--naranja); --fam-naranja-comp: var(--terra); --fam-naranja-tinta: var(--naranja);
+  /* Categorías de Novedades: color de la pastilla (--cat-x), de la forma del badge (--cat-x-forma) y del texto de la etiqueta (--cat-x-tinta) */
+  --cat-institucional: var(--azul); --cat-institucional-forma: var(--celeste); --cat-institucional-tinta: var(--azul);
+  --cat-comercial: var(--naranja); --cat-comercial-forma: var(--terra); --cat-comercial-tinta: var(--naranja);
+  --cat-somos: var(--verde-claro); --cat-somos-forma: var(--verde); --cat-somos-tinta: var(--verde);
+  --cat-tecnico: var(--verde); --cat-tecnico-forma: var(--verde-claro); --cat-tecnico-tinta: var(--verde);
+  --cat-aviso: var(--amarillo); --cat-aviso-forma: var(--naranja); --cat-aviso-tinta: var(--naranja);
+  --cat-financiera: var(--celeste); --cat-financiera-forma: var(--azul); --cat-financiera-tinta: var(--azul);
+  /* Tipografía */
+  --f-display: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "DM Sans", "Helvetica Neue", Arial, sans-serif;
+}

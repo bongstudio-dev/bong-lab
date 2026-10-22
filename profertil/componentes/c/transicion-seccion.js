@@ -1,6 +1,6 @@
 /* Transiciones de sección: cómo se pasa de un bloque al siguiente con el scroll. */
 (function () {
-  var COLORES = { azul: "#003DA5", verde: "#2D8035", amarillo: "#EABA2C", terra: "#8A4818" };
+  var COLORES = { azul: "var(--azul)", verde: "var(--verde)", amarillo: "var(--amarillo)", terra: "var(--terra)" };
 
   Libreria.sumar({
     id: "transicion-seccion", nombre: "Transiciones de sección", grupo: "Transiciones", alto: 680,
@@ -18,19 +18,19 @@
     ],
     css: function (s) {
       return [
-        ".ts { --radio: 32px; --curva: cubic-bezier(.22, 1, .36, 1); --f-d: \"Familjen Grotesk\", \"Helvetica Neue\", Arial, sans-serif; font: 400 16px/1.5 \"DM Sans\", \"Helvetica Neue\", Arial, sans-serif; color: #0A1E4A; }",
+        ".ts { --radio: 32px; --curva: cubic-bezier(.22, 1, .36, 1); --f-d: \"Familjen Grotesk\", \"Helvetica Neue\", Arial, sans-serif; font: 400 16px/1.5 \"DM Sans\", \"Helvetica Neue\", Arial, sans-serif; color: var(--ink); }",
         Object.keys(COLORES).map(function (k) { return '.ts[data-color="' + k + '"] { --cortina: ' + COLORES[k] + '; }'; }).join("\n"),
         ".ts h2 { margin: 0; font: 500 clamp(36px, 6vw, 88px)/1 var(--f-d); letter-spacing: -.04em; max-width: 12ch; }",
         ".ts p { margin: 16px 0 0; max-width: 40ch; font-size: 17px; }",
         ".ts__a, .ts__b { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; padding: 0 clamp(20px, 6vw, 96px); }",
-        ".ts__a { background: #E9E7D6; }",
-        ".ts__b { color: #FFFEEF; }",
+        ".ts__a { background: var(--bg); }",
+        ".ts__b { color: var(--tiza); }",
         ".ts__b img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; }",
         ".ts__b::before { content: \"\"; position: absolute; inset: 0; z-index: -1; background: linear-gradient(to top, rgba(10, 30, 74, .55), transparent 70%); }",
         ".ts__b > :not(img) { position: relative; }",
         ".ts__tramo { position: relative; }",
         ".ts__fijo { position: sticky; top: 0; height: 100vh; overflow: hidden; isolation: isolate; }",
-        ".ts__sigue { padding: 18vh clamp(20px, 6vw, 96px); background: #FFFEEF; }",
+        ".ts__sigue { padding: 18vh clamp(20px, 6vw, 96px); background: var(--tiza); }",
         "",
         "/* Por una forma: la sección siguiente aparece adentro de una forma oficial que crece hasta cubrir todo. */",
         ".ts__mascara { position: absolute; inset: 0; isolation: isolate;",

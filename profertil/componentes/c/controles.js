@@ -2,11 +2,12 @@
    Salen de dos páginas ya aprobadas: Novedades (Master, ◈ Componentes UI) y la herramienta
    de Arquitectura. El código es el de esas páginas, ordenado para usarse solo. */
 (function () {
-  var T = "--tiza: #FFFEEF; --tinta: #0A1E4A; --tinta-2: #44506E; --azul: #003DA5; --linea: rgba(10, 30, 74, .1);" +
-    " --f-d: \"Familjen Grotesk\", \"Helvetica Neue\", Arial, sans-serif; --f-b: \"DM Sans\", \"Helvetica Neue\", Arial, sans-serif;";
+  // Alias cortos de los tokens del sistema (tokens.css): cada control los usa con estos nombres.
+  var T = "--tinta: var(--ink); --tinta-2: var(--ink-2); --linea: var(--line); --f-d: var(--f-display); --f-b: var(--f-body);";
   // El JS de cada control se escribe como función real y se copia tal cual.
   function fuente(fn) { return "(" + fn.toString() + ")();"; }
-  var CAT = [["Institucional", "#003DA5"], ["Comercial", "#E57F19"], ["Somos Profertil", "#5EB53A"], ["Artículo técnico", "#2D8035"], ["Aviso a la comunidad", "#EABA2C"], ["Gacetilla financiera", "#4086FF"]];
+  // Las categorías de Novedades con su color de familia (tokens.css: --cat-*).
+  var CAT = [["Institucional", "institucional"], ["Comercial", "comercial"], ["Somos Profertil", "somos"], ["Artículo técnico", "tecnico"], ["Aviso a la comunidad", "aviso"], ["Gacetilla financiera", "financiera"]];
   var ANIOS = [["2026", 12], ["2025", 12], ["2024", 10], ["2023", 7], ["2022", 14], ["2021", 40]];
 
   /* ------------------------------------------------------------------ Selector */
@@ -75,39 +76,45 @@
   /* ------------------------------------------------------------------ Pastilla de filtro */
   Libreria.sumar({
     id: "pastilla-filtro", nombre: "Pastilla de filtro", grupo: "Controles", alto: "auto", mini: 560,
-    bajada: "Las pastillas de los filtros: una categoría por vez, o varios años con su cantidad.",
-    variantes: [["categoria", "Categoría", "Una sola por vez. El color sale de la familia de la categoría; Todas sin elegir es transparente."], ["anio", "Año con cantidad", "Se pueden elegir varios. El número dice cuántas notas cumplen los otros filtros."]],
-    controles: [
-      { id: "h", tipo: "rango", etiqueta: "Alto", unidad: "px", min: 22, max: 40, def: 32, aplica: { var: "--h", unidad: "px" }, desc: "El radio, el texto y el aire escalan con el alto (22 en las tarjetas, 32 en el panel)." }
+    bajada: "Las pastillas de los filtros, como en el Master y en Novedades: la de categoría y el chip de año con su cantidad.",
+    variantes: [
+      ["categoria", "Categoría", "Web/Pastilla filtro: redonda, rellena con el color de la familia y texto tiza. La elegida va en tinta. Todas sin elegir es transparente. Una por vez."],
+      ["anio", "Año con cantidad", "Web/Chip año: radio 32% del alto, azul tenue con texto azul; el elegido, azul con texto tiza. Se pueden elegir varios."]
     ],
-    claves: ["Sin elegir: el color de la categoría al 16% sobre blanco, con el texto en el color pleno.", "Elegida: el color pleno con el texto en tiza.", "Radio 32% del alto: es una pastilla de filtro, no un botón redondo.", "En Categoría se elige una por vez; en Año, varias."],
-    accesibilidad: "Botones con aria-pressed. El número va como texto real después del año.",
+    claves: ["Categoría: alto 30, radio 15 (la mitad del alto), Familjen Grotesk Regular 14, 14 de aire a cada lado.", "Categoría elegida: Web/Activo (tinta) con Texto sobre color (tiza), sin aro. Hover: el color de la familia con 14% de tinta.", "Año: alto 32, radio 32% del alto, DM Sans Medium 16; Web/Chip fondo, Web/Chip texto y Web/Chip activo.", "El número del año dice cuántas notas cumplen los otros filtros.", "Todos los colores salen de tokens.css: no hay ningún color suelto."],
+    accesibilidad: "Botones con aria-pressed dentro de un grupo con nombre. El número va como texto real después del año.",
     css: function () {
       return [
-        ".pastillas { " + T + " --h: 32px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 620px; margin: 0 auto; }",
-        ".sub { display: inline-flex; align-items: center; gap: 6px; flex: none; height: var(--h); padding: 0 calc(var(--h) * .42); border: 0; border-radius: calc(var(--h) * .32);",
-        "  background: color-mix(in srgb, var(--c) 16%, #fff); color: var(--c); font: 500 calc(var(--h) * .5)/1 var(--f-b); white-space: nowrap; cursor: pointer; transition: background 160ms ease, color 160ms ease; }",
-        "@media (hover: hover) and (pointer: fine) { .sub:hover { background: color-mix(in srgb, var(--c) 28%, #fff); } }",
-        ".sub[aria-pressed=\"true\"] { background: var(--c); color: var(--tiza); }",
-        ".sub.todas { --c: var(--tinta); background: transparent; }",
-        ".sub.todas[aria-pressed=\"true\"] { background: var(--tinta); }",
-        ".sub .n { font-weight: 400; opacity: .7; font-variant-numeric: tabular-nums; }",
-        ".sub-anio { --c: var(--azul); font-variant-numeric: tabular-nums; }"
+        ".pastillas { " + T + " display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; max-width: 640px; margin: 0 auto; }",
+        "/* Web/Pastilla filtro (Novedades: .lbl) */",
+        ".lbl { --h: 30px; display: inline-flex; align-items: center; flex: none; height: var(--h); padding: 0 calc(var(--h) * .48); border: 0; border-radius: 999px;",
+        "  background: var(--pc, var(--azul)); color: var(--sobre-color); font: 400 calc(var(--h) * .47)/1 var(--f-display); white-space: nowrap; cursor: pointer;",
+        "  transition: background 240ms var(--ease), color 240ms var(--ease); }",
+        "@media (hover: hover) and (pointer: fine) { .lbl:hover { background: color-mix(in srgb, var(--pc, var(--azul)) 86%, var(--ink)); } }",
+        ".lbl[aria-pressed=\"true\"] { background: var(--activo); color: var(--sobre-color); }",
+        ".lbl-todas { background: transparent; color: var(--ink); }",
+        "@media (hover: hover) and (pointer: fine) { .lbl-todas:hover { background: var(--line); } }",
+        "/* Web/Chip año (Novedades: .sub-anio en el panel) */",
+        ".sub-anio { --h: 32px; display: inline-flex; align-items: center; gap: 6px; flex: none; height: var(--h); padding: 0 calc(var(--h) * .42); border: 0; border-radius: calc(var(--h) * .32);",
+        "  background: var(--chip-fondo); color: var(--chip-texto); font: 500 calc(var(--h) * .5)/1 var(--f-body); font-variant-numeric: tabular-nums; white-space: nowrap; cursor: pointer; transition: background 160ms ease, color 160ms ease; }",
+        "@media (hover: hover) and (pointer: fine) { .sub-anio:hover { background: color-mix(in srgb, var(--azul) 28%, #fff); } }",
+        ".sub-anio[aria-pressed=\"true\"] { background: var(--chip-activo); color: var(--sobre-color); }",
+        ".sub-anio .n { font-weight: 400; opacity: .7; }"
       ].join("\n");
     },
     html: function (s) {
       var b;
-      if (s.variante === "anio") b = ANIOS.map(function (a, i) { return '  <button type="button" class="sub sub-anio" aria-pressed="' + (i === 1) + '">' + a[0] + ' <b class="n">' + a[1] + '</b></button>'; });
-      else b = ['  <button type="button" class="sub todas" aria-pressed="false">Todas</button>'].concat(CAT.map(function (c, i) { return '  <button type="button" class="sub" style="--c: ' + c[1] + '" aria-pressed="' + (i === 0) + '">' + c[0] + '</button>'; }));
+      if (s.variante === "anio") b = ANIOS.map(function (a, i) { return '  <button type="button" class="sub-anio" aria-pressed="' + (i === 1) + '">' + a[0] + ' <b class="n">' + a[1] + '</b></button>'; });
+      else b = ['  <button type="button" class="lbl lbl-todas" aria-pressed="false">Todas</button>'].concat(CAT.map(function (c, i) { return '  <button type="button" class="lbl" style="--pc: var(--cat-' + c[1] + ')" aria-pressed="' + (i === 0) + '">' + c[0] + '</button>'; }));
       return '<div class="pastillas" data-c="pastilla-filtro" role="group" aria-label="' + (s.variante === "anio" ? 'Años' : 'Categoría') + '">\n' + b.join("\n") + '\n</div>';
     },
     js: function (s) {
       return "var VARIOS = " + (s.variante === "anio") + ";\n" + fuente(function () {
         var caja = document.querySelector(".pastillas");
         caja.addEventListener("click", function (e) {
-          var b = e.target.closest(".sub"); if (!b) return;
+          var b = e.target.closest("button"); if (!b) return;
           if (VARIOS) { b.setAttribute("aria-pressed", String(b.getAttribute("aria-pressed") !== "true")); return; }
-          caja.querySelectorAll(".sub").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+          caja.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
         });
       });
     }
@@ -126,9 +133,9 @@
     css: function () {
       return [
         ".interruptor { " + T + " display: flex; justify-content: center; font-family: var(--f-b); }",
-        ".tg { position: relative; flex: none; width: 56px; height: 32px; padding: 0; border: 0; border-radius: 16px; background: #D9D9D9; cursor: pointer; transition: background 200ms ease; }",
+        ".tg { position: relative; flex: none; width: 56px; height: 32px; padding: 0; border: 0; border-radius: 16px; background: var(--color-gris); cursor: pointer; transition: background 200ms ease; }",
         ".tg::after { content: \"\"; position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(10, 30, 74, .2); transition: transform 240ms cubic-bezier(.22, 1, .36, 1); }",
-        ".tg[aria-checked=\"true\"] { background: #2D8035; }",
+        ".tg[aria-checked=\"true\"] { background: var(--verde); }",
         ".tg[aria-checked=\"true\"]::after { transform: translateX(24px); }",
         ".fila-tg { display: flex; align-items: center; justify-content: space-between; gap: 24px; width: min(420px, 100%); padding: 18px 18px 18px 20px; border: 0; border-radius: 16px; background: #fff; text-align: left; cursor: pointer; font: inherit; color: var(--tinta); }",
         ".fila-tg b { display: block; font-weight: 500; }",
@@ -153,7 +160,7 @@
   });
 
   /* ------------------------------------------------------------------ Desplegable de pastillas */
-  var TIPOS = [["pagina", "Página", "#003DA5"], ["plantilla", "Plantilla", "#2D8035"], ["seccion", "Sección", "#4086FF"], ["registros", "Registros", "#E57F19"], ["arte", "Arte", "#8A4818"]];
+  var TIPOS = [["pagina", "Página", "var(--azul)"], ["plantilla", "Plantilla", "var(--verde)"], ["seccion", "Sección", "var(--celeste)"], ["registros", "Registros", "var(--naranja)"], ["arte", "Arte", "var(--terra)"]];
   Libreria.sumar({
     id: "desplegable", nombre: "Desplegable de pastillas", grupo: "Controles", alto: "auto", mini: 560,
     bajada: "Un select hecho con pastillas: la elegida con su flecha, y al tocarla se abre el resto en un contenedor gris.",
@@ -183,7 +190,7 @@
     html: function () {
       var chev = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
       return '<div class="desplegable" data-c="desplegable">\n  <span id="et-tipo" hidden>Tipo</span>\n  <div class="psel" data-value="pagina">\n' +
-        '    <button type="button" class="psel-b" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="et-tipo"><span class="pl" style="--c: #003DA5">Página' + chev + '</span></button>\n' +
+        '    <button type="button" class="psel-b" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="et-tipo"><span class="pl" style="--c: var(--azul)">Página' + chev + '</span></button>\n' +
         '    <div class="psel-m" role="listbox" aria-labelledby="et-tipo" hidden>' + TIPOS.map(function (t, i) {
           return '<button type="button" role="option" data-v="' + t[0] + '" aria-selected="' + (i === 0) + '"><span class="pl" style="--c: ' + t[2] + '">' + t[1] + '</span></button>'; }).join("") + '</div>\n  </div>\n</div>';
     },
@@ -269,71 +276,6 @@
     }
   });
 
-  /* ------------------------------------------------------------------ Buscador */
-  Libreria.sumar({
-    id: "buscador", nombre: "Buscador", grupo: "Navegación", alto: "auto", mini: 720,
-    bajada: "Una lupa en un círculo de vidrio que se abre hacia la izquierda en un campo con el conteo de resultados.",
-    controles: [
-      { id: "ancho", tipo: "rango", etiqueta: "Ancho abierto", unidad: "px", min: 280, max: 560, paso: 10, def: 480, aplica: { var: "--ancho", unidad: "px" }, desc: "480 en desktop; en mobile, el ancho disponible." },
-      { id: "t", tipo: "rango", etiqueta: "Duración", unidad: "ms", min: 200, max: 800, paso: 20, def: 420, aplica: { var: "--t", unidad: "ms" }, desc: "Web/Movimiento/Buscador." }
-    ],
-    claves: ["Cerrado: lupa de 48 en vidrio sobre la barra azul.", "Abierto: campo tiza hacia la izquierda y, en el lugar de la lupa, un círculo igual con la X: se cierra donde se abrió.", "La X cierra y borra la búsqueda, igual que Escape.", "El conteo dice cuántos resultados coinciden mientras se escribe.", "El atajo / abre el buscador desde cualquier lugar."],
-    accesibilidad: "Campo type=\"search\" con su label; lupa y X con aria-label. El conteo va en aria-live.",
-    css: function () {
-      return [
-        ".buscador { " + T + " --ancho: 480px; --t: 420ms; --ease: cubic-bezier(.22, 1, .36, 1); position: relative; height: 80px; display: flex; align-items: center; padding: 0 16px; border-radius: 999px; background: rgba(0, 61, 165, .94); font-family: var(--f-b); }",
-        ".busca { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; width: 48px; height: 48px; border-radius: 999px; overflow: hidden;",
-        "  background: rgba(255, 254, 239, .16); border: 1px solid rgba(255, 254, 239, .24); backdrop-filter: blur(14px);",
-        "  transition: width var(--t) var(--ease), right var(--t) var(--ease), background 220ms ease, border-color 220ms ease; }",
-        ".busca.open { right: 72px; width: min(var(--ancho), calc(100% - 104px)); background: var(--tiza); border-color: #fff; box-shadow: 0 12px 28px -16px rgba(10, 30, 74, .4); }",
-        ".lupa { width: 46px; height: 46px; flex: none; border: 0; border-radius: 999px; background: transparent; color: var(--tiza); cursor: pointer; display: grid; place-items: center; }",
-        ".busca.open .lupa { color: var(--azul); }",
-        ".lupa svg, .busca-x svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }",
-        ".busca input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font: 400 1.04rem/1 var(--f-d); color: var(--tinta); padding: 0 4px; opacity: 0; transition: opacity 200ms ease; }",
-        ".busca.open input { opacity: 1; }",
-        ".busca input::-webkit-search-cancel-button { display: none; }",
-        ".q-count { flex: none; margin-right: 5px; padding: 6px 10px; border-radius: 999px; background: #fff; color: var(--tinta-2); font-size: .8rem; font-variant-numeric: tabular-nums; }",
-        ".busca:not(.open) .q-count { display: none; }",
-        ".busca-x { position: absolute; right: 16px; top: 50%; width: 48px; height: 48px; border-radius: 999px; border: 1px solid rgba(255, 254, 239, .24); background: rgba(255, 254, 239, .16); color: var(--tiza); display: grid; place-items: center; cursor: pointer;",
-        "  opacity: 0; visibility: hidden; transform: translateY(-50%) scale(.8); transition: opacity 200ms ease, transform var(--t) var(--ease), visibility 0s linear var(--t); }",
-        ".buscador.buscando .busca-x { opacity: 1; visibility: visible; transform: translateY(-50%); transition: opacity 220ms ease 120ms, transform var(--t) var(--ease), background 200ms ease; }",
-        "@media (hover: hover) and (pointer: fine) { .busca-x:hover { background: var(--tiza); color: var(--azul); } }",
-        ".oculto { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }"
-      ].join("\n");
-    },
-    html: function () {
-      return '<div class="buscador" data-c="buscador">\n  <div class="busca">\n' +
-        '    <button type="button" class="lupa" aria-label="Buscar" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></button>\n' +
-        '    <label class="oculto" for="q">Buscar</label><input id="q" type="search" placeholder="Buscá: trigo, becas…" autocomplete="off" tabindex="-1">\n' +
-        '    <span class="q-count" aria-live="polite">471</span>\n  </div>\n' +
-        '  <button type="button" class="busca-x" aria-label="Cerrar y borrar la búsqueda" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>\n</div>';
-    },
-    js: function () {
-      return fuente(function () {
-        var raiz = document.querySelector(".buscador"), caja = raiz.querySelector(".busca"), lupa = caja.querySelector(".lupa");
-        var q = caja.querySelector("input"), cuenta = caja.querySelector(".q-count"), x = raiz.querySelector(".busca-x");
-        // Resultados de ejemplo: en el sitio, el conteo sale del listado real.
-        var TOTAL = 471, PALABRAS = { trigo: 20, maiz: 31, becas: 9, planta: 64, urea: 47 };
-        function abrir(si) {
-          caja.classList.toggle("open", si); raiz.classList.toggle("buscando", si);
-          lupa.setAttribute("aria-expanded", String(si)); q.tabIndex = x.tabIndex = si ? 0 : -1;
-          if (si) setTimeout(function () { q.focus(); }, 60); else { q.value = ""; contar(); lupa.focus(); }
-        }
-        function contar() {
-          var v = q.value.trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
-          cuenta.textContent = !v ? TOTAL : (PALABRAS[v] != null ? PALABRAS[v] : Math.max(0, 12 - v.length * 2));
-        }
-        lupa.addEventListener("click", function () { if (!caja.classList.contains("open")) abrir(true); });
-        x.addEventListener("click", function () { abrir(false); });
-        q.addEventListener("input", contar);
-        document.addEventListener("keydown", function (e) {
-          if (e.key === "Escape" && caja.classList.contains("open")) abrir(false);
-          if (e.key === "/" && document.activeElement !== q) { e.preventDefault(); abrir(true); }
-        });
-      });
-    }
-  });
-
   /* ------------------------------------------------------------------ Confirmación */
   Libreria.sumar({
     id: "confirmacion", nombre: "Confirmación", grupo: "Avisos", alto: "auto", mini: 640,
@@ -351,9 +293,9 @@
         "dialog p { margin: 0 0 18px; color: var(--tinta-2); line-height: 1.45; }",
         ".fila-dlg { display: flex; justify-content: flex-end; gap: 8px; }",
         ".btn { height: 40px; padding: 0 16px; border-radius: 13px; border: 1px solid var(--linea); background: var(--tiza); color: var(--tinta); font: 500 .92rem/1 var(--f-b); cursor: pointer; transition: background 220ms ease; }",
-        ".btn:active { background: #E9E7D6; }",
+        ".btn:active { background: var(--bg); }",
         ".btn.prim { background: var(--azul); border-color: var(--azul); color: var(--tiza); }",
-        ".btn.alerta { background: #E57F19; border-color: #E57F19; color: var(--tiza); }"
+        ".btn.alerta { background: var(--naranja); border-color: var(--naranja); color: var(--tiza); }"
       ].join("\n");
     },
     html: function (s) {
@@ -434,11 +376,11 @@
         ".estado-guardado { " + T + " display: grid; place-items: center; height: 96px; border-radius: 999px; background: rgba(0, 61, 165, .94); font-family: var(--f-b); }",
         ".eg { height: 40px; display: inline-flex; align-items: center; gap: 8px; padding: 0 16px; border-radius: 999px; font-size: .84rem; font-weight: 500;",
         "  background: rgba(255, 254, 239, .16); border: 1px solid rgba(255, 254, 239, .24); color: var(--tiza); backdrop-filter: blur(14px); }",
-        ".eg .punto { width: 8px; height: 8px; border-radius: 50%; background: #5EB53A; transition: background .2s ease; }",
+        ".eg .punto { width: 8px; height: 8px; border-radius: 50%; background: var(--verde-claro); transition: background .2s ease; }",
         ".eg [data-e] { display: none; }",
         ESTADOS.map(function (x) { return '[data-estado="' + x[0] + '"] .eg [data-e="' + x[0] + '"] { display: inline; }'; }).join("\n"),
-        '[data-estado="guardando"] .punto, [data-estado="singuardar"] .punto { background: #EABA2C; }',
-        '[data-estado="error"] .punto { background: #E57F19; }',
+        '[data-estado="guardando"] .punto, [data-estado="singuardar"] .punto { background: var(--amarillo); }',
+        '[data-estado="error"] .punto { background: var(--naranja); }',
         '[data-estado="lectura"] .punto { background: rgba(255, 254, 239, .55); }'
       ].join("\n");
     },

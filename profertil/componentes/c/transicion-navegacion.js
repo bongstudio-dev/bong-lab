@@ -1,12 +1,13 @@
 /* Transiciones de página: qué pasa entre que se toca un link y aparece la página nueva. */
 (function () {
-  var COLORES = { azul: "#003DA5", verde: "#2D8035", amarillo: "#EABA2C", terra: "#8A4818" };
+  var COLORES = { azul: "var(--azul)", verde: "var(--verde)", amarillo: "var(--amarillo)", terra: "var(--terra)" };
   var CURVAS = { base: "cubic-bezier(.22, 1, .36, 1)", fuerte: "cubic-bezier(.67, 0, .24, .99)" };
   var PAGINAS = [
-    ["inicio", "Home", "Damos vida a la tierra", "Nutrientes para el campo argentino, desde Bahía Blanca.", 1],
-    ["empresa", "Empresa", "Una planta, una comunidad", "Quiénes somos y cómo trabajamos en Bahía Blanca.", 4],
-    ["productos", "Productos y Servicios", "Un nutriente para cada cultivo", "Urea granulada y soluciones con recomendación por zona.", 2],
-    ["novedades", "Novedades", "Lo último de Profertil", "Noticias de la planta, la comunidad y el campo.", 3]
+    // Cada página de muestra lleva solo el nombre de su sección del menú: nada de frases inventadas.
+    ["inicio", "Home", "Home", "", 1],
+    ["empresa", "Empresa", "Empresa", "", 4],
+    ["productos", "Productos y Servicios", "Productos y Servicios", "", 2],
+    ["novedades", "Novedades", "Novedades", "", 3]
   ];
 
   Libreria.sumar({
@@ -25,19 +26,19 @@
     ],
     css: function () {
       return [
-        ".tp { --dur: 700ms; --f-d: \"Familjen Grotesk\", \"Helvetica Neue\", Arial, sans-serif; font: 400 16px/1.5 \"DM Sans\", \"Helvetica Neue\", Arial, sans-serif; color: #0A1E4A; min-height: 100vh; }",
+        ".tp { --dur: 700ms; --f-d: \"Familjen Grotesk\", \"Helvetica Neue\", Arial, sans-serif; font: 400 16px/1.5 \"DM Sans\", \"Helvetica Neue\", Arial, sans-serif; color: var(--ink); min-height: 100vh; }",
         Object.keys(COLORES).map(function (k) { return '.tp[data-color="' + k + '"] { --color: ' + COLORES[k] + '; }'; }).join("\n"),
         Object.keys(CURVAS).map(function (k) { return '.tp[data-curva="' + k + '"] { --curva: ' + CURVAS[k] + '; }'; }).join("\n"),
         "/* La barra es la del sistema (Web/Barra navegación). */",
         SIS.barraCSS,
         ".tp__pagina { min-height: 100vh; padding: 140px clamp(20px, 6vw, 96px) 64px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; align-items: end; }",
         ".tp__pagina h1 { margin: 0 0 16px; font: 500 clamp(40px, 6.4vw, 96px)/.98 var(--f-d); letter-spacing: -.04em; }",
-        ".tp__pagina p { margin: 0; max-width: 36ch; font-size: 18px; color: #44506E; }",
+        ".tp__pagina p { margin: 0; max-width: 36ch; font-size: 18px; color: var(--ink-2); }",
         ".tp__pagina img { width: 100%; aspect-ratio: 4 / 5; max-height: 62vh; object-fit: cover; border-radius: 26px; }",
         "",
         "/* Persiana con logo: el paño sube, el logo aparece en el medio, cambia la página y el paño sigue de largo. */",
-        ".tp__velo { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; background: var(--color); color: #FFFEEF; pointer-events: none; transform: translateY(100%); }",
-        ".tp[data-color=\"amarillo\"] .tp__velo { color: #003DA5; }",
+        ".tp__velo { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; background: var(--color); color: var(--tiza); pointer-events: none; transform: translateY(100%); }",
+        ".tp[data-color=\"amarillo\"] .tp__velo { color: var(--azul); }",
         ".tp__velo svg { width: min(28vw, 180px); height: auto; opacity: 0; transform: translateY(14px); }",
         ".tp__velo.entra { transition: transform var(--dur) var(--curva); transform: none; }",
         ".tp__velo.entra svg { transition: opacity calc(var(--dur) * .6) var(--curva) calc(var(--dur) * .45), transform calc(var(--dur) * .8) var(--curva) calc(var(--dur) * .45); opacity: 1; transform: none; }",
@@ -68,7 +69,7 @@
       if (s.variante === "persiana") h += '  <div class="tp__velo" aria-hidden="true">' + LOGO_BLANCO + '</div>\n';
       if (s.variante === "forma") h += '  <div class="tp__forma" aria-hidden="true">' + formaSVG(s.forma) + '</div>\n';
       h += '  <template id="tp-paginas">' + PAGINAS.map(function (p) {
-        return '<section data-p="' + p[0] + '"><div><h1>' + p[2] + '</h1><p>' + p[3] + '</p></div><img src="../novedades/fotos/demo-' + p[4] + '.webp" alt=""></section>';
+        return '<section data-p="' + p[0] + '"><div><h1>' + p[2] + '</h1>' + (p[3] ? '<p>' + p[3] + '</p>' : '') + '</div><img src="../novedades/fotos/demo-' + p[4] + '.webp" alt=""></section>';
       }).join("") + '</template>\n';
       return h + '</div>';
     },

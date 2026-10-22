@@ -9,7 +9,7 @@
   ];
   // 41 rayitas por costado: con la montañita, se leen como una regla viva.
   var RAYAS = new Array(42).join("<i></i>");
-  var ACENTOS = { azul: "#003DA5", verde: "#2D8035", naranja: "#E57F19", tinta: "#0A1E4A" };
+  var ACENTOS = { azul: "var(--azul)", verde: "var(--verde)", naranja: "var(--naranja)", tinta: "var(--ink)" };
 
   Libreria.sumar({
     id: "lista-valores", nombre: "Lista de valores", grupo: "Listas", alto: 680,
@@ -28,7 +28,7 @@
     css: function () {
       return [
         ".lv { --tam: 96px; --apagado: .15; --curva: cubic-bezier(.22, 1, .36, 1); --f-d: \"Familjen Grotesk\", \"Helvetica Neue\", Arial, sans-serif;",
-        "  font: 400 16px/1.5 \"DM Sans\", \"Helvetica Neue\", Arial, sans-serif; color: #0A1E4A; }",
+        "  font: 400 16px/1.5 \"DM Sans\", \"Helvetica Neue\", Arial, sans-serif; color: var(--ink); }",
         Object.keys(ACENTOS).map(function (k) { return '.lv[data-acento="' + k + '"] { --acento: ' + ACENTOS[k] + '; }'; }).join("\n"),
         ".lv__intro, .lv__fin { padding: 18vh clamp(20px, 5vw, 64px); }",
         ".lv__intro h2, .lv__fin h2 { margin: 0; font: 500 clamp(28px, 4vw, 48px)/1.05 var(--f-d); letter-spacing: -.03em; max-width: 18ch; }",
@@ -53,10 +53,10 @@
         ".lv__filas { position: relative; list-style: none; margin: 0; padding: 0 clamp(20px, 5vw, 64px) 0 clamp(48px, 8vw, 120px); }",
         ".lv__fila { display: grid; grid-template-columns: 3.2em minmax(0, 1fr); column-gap: 16px; padding: 22px 0; border-top: 1px solid rgba(10, 30, 74, .12); }",
         ".lv__fila:last-child { border-bottom: 1px solid rgba(10, 30, 74, .12); }",
-        ".lv__num { padding-top: .6em; font-size: 13px; color: #737D96; font-variant-numeric: tabular-nums; }",
+        ".lv__num { padding-top: .6em; font-size: 13px; color: var(--ink-3); font-variant-numeric: tabular-nums; }",
         ".lv__fila .lv__palabra { font-size: min(calc(var(--tam) * .78), 7vw); }",
         ".lv__abre { grid-column: 2; display: grid; grid-template-rows: 0fr; transition: grid-template-rows .6s var(--curva); }",
-        ".lv__abre > p { overflow: hidden; margin: 0; max-width: 46ch; font-size: 17px; color: #44506E; opacity: 0; transition: opacity .4s var(--curva); }",
+        ".lv__abre > p { overflow: hidden; margin: 0; max-width: 46ch; font-size: 17px; color: var(--ink-2); opacity: 0; transition: opacity .4s var(--curva); }",
         ".lv__fila.activa .lv__abre { grid-template-rows: 1fr; }",
         ".lv__fila.activa .lv__abre > p { opacity: 1; padding-top: 12px; transition-delay: .1s; }",
         ".lv__barra { position: absolute; left: clamp(20px, 3.4vw, 48px); top: 0; bottom: 0; width: 2px; background: rgba(10, 30, 74, .1); }",
@@ -71,14 +71,14 @@
         ".lv__marca { position: absolute; left: 0; top: 0; width: 3px; height: 1.6em; border-radius: 3px; background: var(--acento); font-size: 17px; transform: translateY(calc(var(--i, 0) * (100% + 4px))); transition: transform .55s var(--curva); }",
         ".lv__bloque { min-height: 90vh; display: flex; flex-direction: column; justify-content: center; gap: 18px; padding: 10vh 0; }",
         ".lv__bloque .lv__palabra { opacity: 1; }",
-        ".lv__bloque p { margin: 0; max-width: 44ch; font-size: 18px; color: #44506E; }",
+        ".lv__bloque p { margin: 0; max-width: 44ch; font-size: 18px; color: var(--ink-2); }",
         ".lv__bloque img { width: 100%; max-width: 640px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 26px; }",
         "",
         "@media (max-width: 760px) {",
         "  .lv { --tam: 56px !important; }",
         "  .lv__pin-in { grid-template-columns: 1fr; align-content: center; gap: 24px; padding: 0 40px; }",
         "  .lv__textos { min-height: 7.5em; }",
-        "  .lv__dos { grid-template-columns: 1fr; } .lv__indice { position: sticky; top: 0; height: auto; z-index: 2; padding: 12px 0; background: #E9E7D6; }",
+        "  .lv__dos { grid-template-columns: 1fr; } .lv__indice { position: sticky; top: 0; height: auto; z-index: 2; padding: 12px 0; background: var(--bg); }",
         "  .lv__indice ol { grid-auto-flow: column; overflow-x: auto; gap: 16px; padding: 0 0 6px; } .lv__marca { display: none; }",
         "}",
         "@media (prefers-reduced-motion: reduce) { .lv * { transition-duration: .01ms !important; } }"

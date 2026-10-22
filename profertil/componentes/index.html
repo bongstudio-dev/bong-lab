@@ -53,14 +53,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
 <style>
-/* Tokens del sistema web de Profertil (Figma Master, colecciones 01 y 06). */
+/* Los colores, tipografías y movimientos salen de tokens.css (generado desde el Master). Acá solo lo propio de la librería. */
 :root {
   color-scheme: light;
-  --bg: #E9E7D6; --card: #FFFEEF; --ink: #0A1E4A; --ink-2: #44506E; --ink-3: #737D96;
-  --azul: #003DA5; --line: rgba(10, 30, 74, .1); --suave: rgba(10, 30, 74, .055);
-  --f-display: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
-  --f-body: "DM Sans", "Helvetica Neue", Arial, sans-serif;
+  --suave: rgba(10, 30, 74, .055);
   --f-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   --ease: cubic-bezier(.22, 1, .36, 1);
   --r: 10px;      /* controles y código */
@@ -286,7 +284,7 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
     var js = c.js ? c.js(s) : "", auto = c.alto === "auto";
     return '<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">' +
       '<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">' +
-      '<link rel="stylesheet" href="../animadores-texto/animadores.css">' +
+      '<link rel="stylesheet" href="tokens.css"><link rel="stylesheet" href="../animadores-texto/animadores.css">' +
       '<style>*,*::before,*::after{box-sizing:border-box}html,body{margin:0}body{background:#E9E7D6;color:#0A1E4A;font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}::selection{background:#003DA5;color:#FFFEEF}' +
       (auto ? 'body{min-height:100vh;display:flex;flex-direction:column;justify-content:' + (c.sangrado ? 'flex-end' : 'center') + ';' + (c.sangrado ? '' : 'padding:clamp(20px,5vw,56px)') + '}body>*{width:100%}' : '') +
       (mini ? 'html{scrollbar-width:none}html::-webkit-scrollbar{display:none}' : '') + '</style>' +
@@ -337,7 +335,7 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
 
   /* ---------------- ficha ---------------- */
   function dependencias(c) {
-    var s = inicial(c), src = c.html(s) + (c.js ? c.js(s) : ""), d = ["Familjen Grotesk", "DM Sans"];
+    var s = inicial(c), src = c.html(s) + (c.js ? c.js(s) : ""), d = ["tokens.css", "Familjen Grotesk", "DM Sans"];
     if (/data-anim=/.test(src)) d.push("animadores.css y animadores.js");
     if (/data:image\/svg|viewBox="0 0 \d/.test(src)) d.push("formas del sistema en línea");
     if (/\.webp/.test(src)) d.push("fotos de demo");
