@@ -12,12 +12,15 @@
     id: "scroll-fotos", nombre: "Fotos a pantalla completa", grupo: "Scroll", alto: 680,
     bajada: "Fotos a todo el ancho que se mueven con el scroll, con el texto que entra por líneas.",
     nota: "Scrolleá dentro del escenario. Fotos y textos de ejemplo.",
-    variantes: [["apiladas", "Apiladas"], ["expande", "Se expande"], ["parallax", "Parallax"]],
+    variantes: [["apiladas", "Apiladas", "La sección queda fija y cada foto sube y tapa a la anterior, que baja un poco."], ["expande", "Se expande", "La foto arranca como tarjeta con aire y radio y crece hasta el borde."], ["parallax", "Parallax", "Las fotos pasan con el scroll normal y la imagen va más lenta que la página."]],
+    tamano: "ancha", previa: .22,
+    claves: ["Cada foto ocupa la pantalla entera; el texto va abajo a la izquierda con la pastilla de categoría.", "El texto entra por líneas (cortadas a mano) cuando el panel ya ocupa casi toda la pantalla.", "La imagen es más alta que su panel: ese sobrante es el recorrido del parallax.", "Todo se calcula en un solo requestAnimationFrame por scroll y solo mueve transform y clip-path."],
+    accesibilidad: "Con movimiento reducido las fotos quedan quietas y el texto aparece sin animar. Las fotos de demo no llevan texto alternativo: en el sitio lo necesitan.",
     controles: [
-      { id: "intensidad", tipo: "rango", etiqueta: "Intensidad del parallax", unidad: "%", min: 0, max: 40, def: 20, aplica: { var: "--intensidad" } },
-      { id: "oscuro", tipo: "rango", etiqueta: "Oscurecido de la foto", unidad: "%", min: 0, max: 70, def: 35, aplica: { var: "--oscuro" } },
-      { id: "radio", tipo: "rango", etiqueta: "Radio en reposo", unidad: "px", min: 0, max: 48, def: 26, aplica: { var: "--radio", unidad: "px" } },
-      { id: "etiqueta", tipo: "interr", etiqueta: "Pastilla con la categoría", def: true, aplica: { attr: "data-etiqueta" } }
+      { id: "intensidad", tipo: "rango", etiqueta: "Intensidad del parallax", unidad: "%", min: 0, max: 40, def: 20, aplica: { var: "--intensidad" }, desc: "Cuánto se corre la imagen dentro de su panel." },
+      { id: "oscuro", tipo: "rango", etiqueta: "Oscurecido de la foto", unidad: "%", min: 0, max: 70, def: 35, aplica: { var: "--oscuro" }, desc: "Degradé de abajo para que el texto se lea." },
+      { id: "radio", tipo: "rango", etiqueta: "Radio en reposo", unidad: "px", min: 0, max: 48, def: 26, aplica: { var: "--radio", unidad: "px" }, desc: "Radio de la tarjeta antes de expandirse (Se expande)." },
+      { id: "etiqueta", tipo: "interr", etiqueta: "Pastilla con la categoría", def: true, aplica: { attr: "data-etiqueta" }, desc: "Pastilla tiza arriba del título." }
     ],
     css: function () {
       return [

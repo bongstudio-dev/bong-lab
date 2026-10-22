@@ -13,12 +13,15 @@
     id: "boton-fijo", nombre: "Botón fijo", grupo: "Navegación", alto: 680,
     bajada: "Un llamado a la acción que acompaña el scroll y cambia según la sección.",
     nota: "Scrolleá dentro del escenario para verlo andar.",
-    variantes: [["centro", "Centrado entre secciones"], ["abajo", "Pastilla abajo"], ["esquina", "Esquina que se abre"]],
+    variantes: [["centro", "Centrado entre secciones", "Queda pegado al centro de la pantalla mientras pasa su tramo, entre una sección y la otra. Solo CSS."], ["abajo", "Pastilla abajo", "Fija abajo al centro: aparece al dejar el hero, se va al llegar al final."], ["esquina", "Esquina que se abre", "Un círculo con flecha abajo a la derecha que se abre en pastilla en la sección de equipo."]],
+    tamano: "media", previa: .3,
+    claves: ["El texto cambia según la sección que cruza la mitad de la pantalla: el que sale sube y el que entra viene de abajo.", "Nunca tapa el hero ni el pie: aparece después del primero y se va antes del segundo.", "Alturas de la escala Web/Botón del Master: 40, 44 y 48.", "Centrado entre secciones usa position: sticky, sin JS."],
+    accesibilidad: "Es un link real con su texto; las versiones viejas del texto quedan ocultas a la vista pero el link conserva un nombre. Con movimiento reducido los cambios son instantáneos.",
     controles: [
-      { id: "color", tipo: "seg", etiqueta: "Color", def: "azul", aplica: { attr: "data-color" }, opciones: [["azul", "Azul"], ["verde", "Verde"], ["tiza", "Tiza"], ["negro", "Tinta"]] },
-      { id: "alto", tipo: "seg", etiqueta: "Tamaño (Web/Botón S · M · L)", def: 44, aplica: { var: "--alto", unidad: "px" }, opciones: [[40, "S 40"], [44, "M 44"], [48, "L 48"]] },
-      { id: "borde", tipo: "rango", etiqueta: "Distancia al borde", unidad: "px", min: 12, max: 64, def: 24, aplica: { var: "--borde", unidad: "px" } },
-      { id: "cambia", tipo: "interr", etiqueta: "El texto cambia con la sección", def: true }
+      { id: "color", tipo: "seg", etiqueta: "Color", def: "azul", aplica: { attr: "data-color" }, opciones: [["azul", "Azul"], ["verde", "Verde"], ["tiza", "Tiza"], ["negro", "Tinta"]], desc: "Fondo y texto del botón." },
+      { id: "alto", tipo: "seg", etiqueta: "Tamaño (Web/Botón S · M · L)", def: 44, aplica: { var: "--alto", unidad: "px" }, opciones: [[40, "S 40"], [44, "M 44"], [48, "L 48"]], desc: "Alto del botón; el texto escala con él." },
+      { id: "borde", tipo: "rango", etiqueta: "Distancia al borde", unidad: "px", min: 12, max: 64, def: 24, aplica: { var: "--borde", unidad: "px" }, desc: "Distancia al borde de la pantalla (Pastilla y Esquina)." },
+      { id: "cambia", tipo: "interr", etiqueta: "El texto cambia con la sección", def: true, desc: "Cada sección declara su llamado en data-boton." }
     ],
     css: function () {
       return [

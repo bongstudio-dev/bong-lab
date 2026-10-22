@@ -6,12 +6,15 @@
     id: "transicion-seccion", nombre: "Transiciones de sección", grupo: "Transiciones", alto: 680,
     bajada: "El paso de una sección a la otra: por una forma del sistema, con una cortina de color o apilando.",
     nota: "Scrolleá dentro del escenario. La máscara con forma sale de las pruebas de máscaras del Lab, resuelta solo con CSS.",
-    variantes: [["forma", "Por una forma"], ["cortina", "Cortina de color"], ["apila", "Se apila"]],
+    variantes: [["forma", "Por una forma", "La sección siguiente aparece adentro de una forma oficial que crece hasta cubrir todo."], ["cortina", "Cortina de color", "Un paño del color de la paleta sube, tapa y se retira destapando la siguiente."], ["apila", "Se apila", "La siguiente sube con las esquinas redondeadas y la anterior se achica y oscurece atrás."]],
+    tamano: "media", previa: .32,
+    claves: ["La transición está atada al scroll: si se vuelve para atrás, vuelve.", "La máscara es una forma del sistema como mask-image de CSS (sin WebGL), centrada.", "La forma crece con una curva lenta al principio para que se lea su silueta antes de cubrir.", "El texto de la sección nueva entra recién cuando la forma ya cubrió todo."],
+    accesibilidad: "Con movimiento reducido no hay máscara: la sección siguiente aparece entera.",
     controles: [
-      { id: "forma", tipo: "select", etiqueta: "Forma (Por una forma)", def: "flor", opciones: Object.keys(FORMAS).map(function (k) { return [k, k.charAt(0).toUpperCase() + k.slice(1)]; }) },
-      { id: "color", tipo: "seg", etiqueta: "Color (Cortina)", def: "azul", aplica: { attr: "data-color" }, opciones: [["azul", "Azul"], ["verde", "Verde"], ["amarillo", "Amarillo"], ["terra", "Terra"]] },
-      { id: "radio", tipo: "rango", etiqueta: "Radio (Se apila)", unidad: "px", min: 0, max: 64, def: 32, aplica: { var: "--radio", unidad: "px" } },
-      { id: "tramo", tipo: "rango", etiqueta: "Largo del tramo", unidad: "vh", min: 120, max: 320, paso: 10, def: 200 }
+      { id: "forma", tipo: "select", etiqueta: "Forma (Por una forma)", def: "flor", opciones: Object.keys(FORMAS).map(function (k) { return [k, k.charAt(0).toUpperCase() + k.slice(1)]; }), desc: "Forma oficial de la máscara." },
+      { id: "color", tipo: "seg", etiqueta: "Color (Cortina)", def: "azul", aplica: { attr: "data-color" }, opciones: [["azul", "Azul"], ["verde", "Verde"], ["amarillo", "Amarillo"], ["terra", "Terra"]], desc: "Color del paño." },
+      { id: "radio", tipo: "rango", etiqueta: "Radio (Se apila)", unidad: "px", min: 0, max: 64, def: 32, aplica: { var: "--radio", unidad: "px" }, desc: "Radio de las esquinas de la sección que sube." },
+      { id: "tramo", tipo: "rango", etiqueta: "Largo del tramo", unidad: "vh", min: 120, max: 320, paso: 10, def: 200, desc: "Cuánto scroll dura la transición." }
     ],
     css: function (s) {
       return [

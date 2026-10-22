@@ -13,12 +13,15 @@
     id: "lista-valores", nombre: "Lista de valores", grupo: "Listas", alto: 680,
     bajada: "Palabras grandes en lista: la activa se enciende, al costado su texto y una marca que dice dónde estás.",
     nota: "Scrolleá dentro del escenario. Los valores y sus textos son de ejemplo.",
-    variantes: [["palabras", "Palabras fijas"], ["filas", "Filas que se abren"], ["columna", "Índice al costado"]],
+    variantes: [["palabras", "Palabras fijas", "La sección queda quieta; el scroll enciende una palabra por vez y cambia el texto del costado."], ["filas", "Filas que se abren", "Filas numeradas: la que cruza el centro se enciende y abre su texto."], ["columna", "Índice al costado", "Índice chico fijo a la izquierda con una marca; a la derecha, un bloque largo por valor."]],
+    tamano: "ancha", previa: .28,
+    claves: ["Siempre hay una sola activa; las demás quedan al 15% de opacidad.", "La marca de posición (regla, barra o índice) dice cuánto falta de la lista.", "Palabras fijas reparte el tramo en partes iguales: 70vh de scroll por valor.", "En Filas e Índice, la activa es la que cruza la mitad de la pantalla.", "En el índice, tocar un nombre lleva a su bloque."],
+    accesibilidad: "Es una lista ordenada con su texto real; la activa se marca solo con opacidad. Con movimiento reducido no hay transiciones.",
     controles: [
-      { id: "acento", tipo: "seg", etiqueta: "Color activo", def: "tinta", aplica: { attr: "data-acento" }, opciones: [["tinta", "Tinta"], ["azul", "Azul"], ["verde", "Verde"], ["naranja", "Naranja"]] },
-      { id: "tam", tipo: "rango", etiqueta: "Tamaño de la palabra", unidad: "px", min: 40, max: 160, def: 96, aplica: { var: "--tam", unidad: "px" } },
-      { id: "apagado", tipo: "rango", etiqueta: "Opacidad de las apagadas", unidad: "", min: 0.05, max: 0.5, paso: 0.01, def: 0.15, aplica: { var: "--apagado" } },
-      { id: "regla", tipo: "interr", etiqueta: "Indicador de posición", def: true, aplica: { attr: "data-regla" } }
+      { id: "acento", tipo: "seg", etiqueta: "Color activo", def: "tinta", aplica: { attr: "data-acento" }, opciones: [["tinta", "Tinta"], ["azul", "Azul"], ["verde", "Verde"], ["naranja", "Naranja"]], desc: "Color de la palabra activa y de la marca." },
+      { id: "tam", tipo: "rango", etiqueta: "Tamaño de la palabra", unidad: "px", min: 40, max: 160, def: 96, aplica: { var: "--tam", unidad: "px" }, desc: "Cuerpo de la palabra (tope: 8,4% del ancho)." },
+      { id: "apagado", tipo: "rango", etiqueta: "Opacidad de las apagadas", unidad: "", min: 0.05, max: 0.5, paso: 0.01, def: 0.15, aplica: { var: "--apagado" }, desc: "Opacidad de las palabras que no están activas." },
+      { id: "regla", tipo: "interr", etiqueta: "Indicador de posición", def: true, aplica: { attr: "data-regla" }, desc: "Muestra la regla, la barra o la marca del índice." }
     ],
     css: function () {
       return [

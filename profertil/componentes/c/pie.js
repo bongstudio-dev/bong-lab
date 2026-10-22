@@ -12,15 +12,18 @@
   Libreria.sumar({
     id: "footer", nombre: "Pie de página", grupo: "Navegación", alto: "auto", sangrado: true,
     bajada: "El cierre de todas las páginas: navegación, línea ética y datos legales.",
-    variantes: [["institucional", "Institucional"], ["forma", "Con forma"], ["firma", "Logo de firma"]],
+    variantes: [["institucional", "Institucional", "Fondo de color, logo y bajada arriba, cuatro columnas y legales."], ["forma", "Con forma", "Fondo tiza y una forma oficial grande que asoma detrás de los links."], ["firma", "Logo de firma", "Links en una fila y la palabra PROFERTIL a todo el ancho como cierre."]],
+    tamano: "media",
+    claves: ["La línea ética va siempre en el pie, destacada, con su propio llamado.", "Los fondos de color son solo los que permite el Master (azul, verde, terra, amarillo); sobre amarillo el texto va en azul.", "Las columnas repiten el menú principal: si cambia la arquitectura, cambia el pie.", "El radio de arriba separa el pie del contenido como una pieza aparte."],
+    accesibilidad: "Es un <footer> con listas de links reales. El logo de firma lleva aria-label con el nombre de la marca.",
     previo: '<div style="height:46vh;display:grid;place-items:center;color:#737D96;font-size:13px">Final de la página</div>',
     controles: [
-      { id: "fondo", tipo: "seg", etiqueta: "Fondo (Institucional y Logo de firma)", def: "azul", aplica: { attr: "data-fondo" }, opciones: [["azul", "Azul"], ["verde", "Verde"], ["terra", "Terra"], ["amarillo", "Amarillo"]] },
-      { id: "forma", tipo: "select", etiqueta: "Forma (Con forma)", def: "flor", opciones: Object.keys(FORMAS).map(function (k) { return [k, k.charAt(0).toUpperCase() + k.slice(1)]; }) },
+      { id: "fondo", tipo: "seg", etiqueta: "Fondo (Institucional y Logo de firma)", def: "azul", aplica: { attr: "data-fondo" }, opciones: [["azul", "Azul"], ["verde", "Verde"], ["terra", "Terra"], ["amarillo", "Amarillo"]], desc: "Color de fondo y tinta que va encima." },
+      { id: "forma", tipo: "select", etiqueta: "Forma (Con forma)", def: "flor", opciones: Object.keys(FORMAS).map(function (k) { return [k, k.charAt(0).toUpperCase() + k.slice(1)]; }), desc: "Forma oficial que asoma detrás." },
       "---",
-      { id: "radio", tipo: "rango", etiqueta: "Radio de arriba", unidad: "px", min: 0, max: 56, def: 26, aplica: { var: "--radio", unidad: "px" } },
-      { id: "logo", tipo: "rango", etiqueta: "Logo", unidad: "px", min: 80, max: 260, def: 150, aplica: { var: "--logo", unidad: "px" } },
-      { id: "etica", tipo: "interr", etiqueta: "Destacar la línea ética", def: true }
+      { id: "radio", tipo: "rango", etiqueta: "Radio de arriba", unidad: "px", min: 0, max: 56, def: 26, aplica: { var: "--radio", unidad: "px" }, desc: "Radio de las esquinas de arriba." },
+      { id: "logo", tipo: "rango", etiqueta: "Logo", unidad: "px", min: 80, max: 260, def: 150, aplica: { var: "--logo", unidad: "px" }, desc: "Ancho del logo (Institucional y Con forma)." },
+      { id: "etica", tipo: "interr", etiqueta: "Destacar la línea ética", def: true, desc: "Bloque destacado con el llamado a denunciar." }
     ],
     css: function () {
       return [
