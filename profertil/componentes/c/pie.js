@@ -52,7 +52,7 @@
 
     function arrancar() {
       var M = Matter; M.Common.setDecomp(window.decomp);
-      var T = plantillas(), engine = M.Engine.create({ enableSleeping: true, positionIterations: 12, velocityIterations: 8 }), mundo = engine.world;
+      var T = plantillas(), engine = M.Engine.create({ enableSleeping: true, positionIterations: 8, velocityIterations: 6 }), mundo = engine.world;
       var W = 0, H = 0, lado = 0, paredes = [], cuerpos = [], cola = [], dpr = Math.min(2, devicePixelRatio || 1);
 
       function medir() {
@@ -64,7 +64,11 @@
         paredes = [M.Bodies.rectangle(W / 2, H + g / 2, W + 2 * g, g, o), M.Bodies.rectangle(-g / 2, H / 2 - H, g, H * 4, o),
           M.Bodies.rectangle(W + g / 2, H / 2 - H, g, H * 4, o), M.Bodies.rectangle(W / 2, -lado * 5 - g / 2, W + 2 * g, g, o)];
         M.Composite.add(mundo, paredes);
-        cuerpos.forEach(function (b) { if (b.position.x > W - 10 || b.position.y > H - 10) { M.Sleeping.set(b, false); M.Body.setPosition(b, { x: Math.min(b.position.x, W - lado / 2), y: Math.min(b.position.y, H - lado / 2) }); } });
+        // Las que quedaron afuera o cruzando una pared no se empujan adentro (quedarían encimadas): salen y vuelven a caer en un lugar libre.
+        for (var i = cuerpos.length - 1; i >= 0; i--) {
+          var c = cuerpos[i];
+          if (c !== agarrada && (c.bounds.max.x > W || c.bounds.min.x < 0 || c.bounds.max.y > H)) { M.Composite.remove(mundo, c); cuerpos.splice(i, 1); cola.push(1); }
+        }
       }
 
       // Contorno simplificado (Douglas-Peucker) para no partir en cien piezas lo que se dibuja con diez.
@@ -79,7 +83,7 @@
       function piezas(c) {
         // Contorno cerrado: se parte en el punto más lejano del primero y se simplifica cada mitad.
         var k = 0, m = 0; c.forEach(function (p, i) { var d = Math.hypot(p.x - c[0].x, p.y - c[0].y); if (d > m) { m = d; k = i; } });
-        var q = simplificar(c.slice(0, k + 1), .6).slice(0, -1).concat(simplificar(c.slice(k).concat([c[0]]), .6).slice(0, -1));
+        var q = simplificar(c.slice(0, k + 1), 1.2).slice(0, -1).concat(simplificar(c.slice(k).concat([c[0]]), 1.2).slice(0, -1));
         if (q.length < 3) q = c;
         var P = q.map(function (p) { return [p.x, p.y]; }), D = window.decomp, out = [];
         try { D.makeCCW(P); D.removeCollinearPoints(P, .02); D.removeDuplicatePoints(P, .01); if (P.length > 2 && D.isSimple(P)) out = D.quickDecomp(P); } catch (e) { out = []; }
@@ -179,7 +183,10 @@
           }
           resto -= dt;
         }
-        dibujar(); requestAnimationFrame(cuadro);
+        dibujar();
+        // Si ya no cae nada, nadie arrastra y todas duermen, el ciclo se apaga: sin costo con la pila quieta.
+        if (!agarre && !cola.length && cuerpos.every(function (b) { return b.isSleeping; })) { corre = false; return; }
+        requestAnimationFrame(cuadro);
       }
       function seguir() { if (!corre && visible) { corre = true; ultimo = performance.now(); requestAnimationFrame(cuadro); } }
 
@@ -192,7 +199,8 @@
         if (visible && !empezo && es[0].intersectionRatio >= .3) { empezo = true; for (var i = 0; i < n; i++) cola.push(1); }
         seguir();
       }, { threshold: [0, .3] }).observe(pie);
-      var tR; new ResizeObserver(function () { clearTimeout(tR); tR = setTimeout(function () { medir(); dibujar(); }, 120); }).observe(pie);
+      // Al cambiar el tamaño el lienzo se mide en el acto (si espera, el navegador lo estira) y las formas se despiertan para reacomodarse.
+      new ResizeObserver(function () { medir(); cuerpos.forEach(function (b) { M.Sleeping.set(b, false); }); dibujar(); seguir(); }).observe(pie);
     }
   }
 
@@ -215,8 +223,8 @@
       { id: "filtro", tipo: "rango", etiqueta: "Filtro negro", solo: ["vida"], unidad: "%", min: 0, max: 70, def: 26, aplica: { var: "--filtro" }, desc: "Negro parejo sobre toda la foto para que el texto en tiza se lea. Sin degradado." },
       { id: "frase", tipo: "rango", etiqueta: "Frase", solo: ["vida"], unidad: "px", min: 32, max: 200, def: 140, aplica: { var: "--frase", unidad: "px" }, desc: "Cuerpo de Vida para nuestra tierra. En pantallas chicas no pasa del 14% del ancho." },
       { id: "par", tipo: "rango", etiqueta: "Parallax", solo: ["trigo", "vida"], unidad: "%", min: 0, max: 40, def: 22, aplica: { var: "--par" }, desc: "Cuánto se corre el trigo o el video mientras entra el pie. En Vida, solo el video." },
-      { id: "cantidad", tipo: "rango", etiqueta: "Cantidad", solo: ["formas"], unidad: "formas", min: 8, max: 160, def: 44, desc: "Cuántas formas caen en un pie de 1440 × 900. En otros tamaños se ajusta al área, para que llenen lo mismo." },
-      { id: "tamano", tipo: "rango", etiqueta: "Tamaño", solo: ["formas"], unidad: "px", min: 48, max: 280, def: 130, desc: "Lado de cada forma. En pantallas chicas no pasa del 30% del ancho." },
+      { id: "cantidad", tipo: "rango", etiqueta: "Cantidad", solo: ["formas"], unidad: "formas", min: 6, max: 120, def: 28, desc: "Cuántas formas caen en un pie de 1440 × 900. En otros tamaños se ajusta al área, para que llenen lo mismo." },
+      { id: "tamano", tipo: "rango", etiqueta: "Tamaño", solo: ["formas"], unidad: "px", min: 48, max: 280, def: 160, desc: "Lado de cada forma. En pantallas chicas no pasa del 30% del ancho." },
       "---",
       { id: "radio", tipo: "rango", etiqueta: "Radio de arriba", unidad: "px", min: 0, max: 56, def: 26, aplica: { var: "--radio", unidad: "px" }, desc: "Radio de las esquinas de arriba." },
       { id: "logo", tipo: "rango", etiqueta: "Logo", unidad: "px", min: 80, max: 260, def: 150, aplica: { var: "--logo", unidad: "px" }, desc: "Ancho del logo completo." },
@@ -286,7 +294,11 @@
         '.pf-pie[data-variante="formas"] { --pie-tinta: var(--azul); --pie-fondo: var(--tiza); min-height: 100vh; min-height: 100svh; background: var(--tiza); color: var(--azul); }',
         '.pf-pie[data-variante="formas"] .pf-pie__in { display: grid; gap: 28px; max-width: none; }',
         '.pf-pie[data-variante="formas"] .pf-pie__cols { flex: 1; max-width: 760px; }',
-        '.pf-pie[data-variante="formas"] .pf-pie__etica { max-width: 760px; width: 100%; margin-left: auto; }',
+        "/* Línea ética más chica que en las otras variantes: acá el protagonismo es de las formas. */",
+        '.pf-pie[data-variante="formas"] .pf-pie__etica { width: fit-content; max-width: 100%; margin-left: auto; gap: 10px 18px; padding: 10px 10px 10px 18px; border-radius: 14px; }',
+        '.pf-pie[data-variante="formas"] .pf-pie__etica b { font-size: var(--texto-destacado); }',
+        '.pf-pie[data-variante="formas"] .pf-pie__etica span { margin-top: 2px; font-size: var(--texto-mini); }',
+        '.pf-pie[data-variante="formas"] .pf-pie__etica .pf-pie__pill { height: 36px; padding: 0 16px; font-size: var(--texto-chico); }',
         "/* Los legales van pegados abajo, por encima de las formas. */",
         '.pf-pie[data-variante="formas"] .pf-pie__legal { position: absolute; z-index: 3; left: clamp(20px, 4vw, 48px); right: clamp(20px, 4vw, 48px); bottom: 20px; padding-top: 0; border-top: 0; opacity: 1; }',
         '.pf-pie__fisica { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; pointer-events: none; }',
