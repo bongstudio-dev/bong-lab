@@ -38,7 +38,7 @@
     html: function (s) {
       return '<div class="pf-bf" data-c="boton-fijo">\n' +
         '  <section class="pf-bf__sec"><h2>Hecho por personas</h2><p>Trabajamos en planta y en oficinas, con oficios muy distintos. Buscamos gente que quiera crecer con nosotros.</p></section>\n' +
-        '  <section class="pf-bf__foto" style="--h: ' + s.tramo + 'vh; height: var(--h)">\n    <img src="../novedades/fotos/demo-2.webp" alt="">\n' +
+        '  <section class="pf-bf__foto" style="--h: ' + s.tramo + 'vh; height: var(--h)">\n    <img src="media/equipo.jpg" alt="Tres personas del equipo de Profertil conversan frente a una computadora">\n' +
         '    <a class="pf-bf-boton" href="#">Sumate a nuestro equipo' + FLECHA + '</a>\n  </section>\n' +
         '  <section class="pf-bf__sec"><h2>Sigue el resto de la página</h2></section>\n</div>';
     }
