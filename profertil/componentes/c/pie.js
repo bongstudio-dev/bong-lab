@@ -15,17 +15,17 @@
     variantes: [
       ["institucional", "Institucional", "La base: fondo de color, logo y bajada arriba, cuatro columnas, línea ética y legales."],
       ["trigo", "Con trigo", "Fondo tiza y el trigo del sistema en amarillo pleno, a la izquierda, que sube más lento que la página."],
-      ["vida", "Vida para nuestra tierra", "Alto de pantalla completa con la foto de fondo y un filtro negro parejo. La frase va abajo a la izquierda, a tamaño de título, y nace desde el borde con el scroll."]
+      ["vida", "Vida para nuestra tierra", "Alto de pantalla completa con un video de campo en loop de fondo y un filtro negro parejo. La frase va abajo a la izquierda, a tamaño de título, y nace desde el borde con el scroll."]
     ],
     tamano: "media",
     claves: ["La línea ética va siempre en el pie, destacada, con su propio llamado.", "Los fondos de color son solo los del Master (azul, verde, terra, amarillo); sobre amarillo el texto va en azul.", "El logo va siempre completo: no se recorta ni se separa el símbolo de la palabra.", "Las columnas repiten el menú principal: si cambia la arquitectura, cambia el pie.", "Con trigo y Vida para nuestra tierra tienen parallax: el trigo y la foto se mueven a otra velocidad que la página mientras el pie entra en pantalla.", "Vida para nuestra tierra ocupa una pantalla entera. La frase va alineada a la izquierda junto a la línea ética, y cada línea sube desde el borde de abajo atada al scroll, una después de la otra.", "Nunca degradados sobre la foto (ni de color ni de tinta). Si hace falta contraste, un filtro negro parejo."],
-    accesibilidad: "Es un <footer> con listas de links reales. El trigo es decorativo (aria-hidden); la frase con foto es texto real, legible por lectores y buscadores. Con movimiento reducido no hay parallax.",
+    accesibilidad: "Es un <footer> con listas de links reales. El trigo es decorativo (aria-hidden); el video es decorativo, mudo y sin controles; la frase es texto real, legible por lectores y buscadores. Con movimiento reducido no hay parallax y el video queda quieto en el primer cuadro.",
     previo: '<div style="height:80vh;display:grid;place-items:center;color:var(--ink-3);font-size:var(--texto-chico)">Final de la página</div>',
     controles: [
       { id: "fondo", tipo: "seg", etiqueta: "Fondo", solo: ["institucional"], def: "azul", aplica: { attr: "data-fondo" }, opciones: [["azul", "Azul"], ["verde", "Verde"], ["terra", "Terra"], ["amarillo", "Amarillo"]], desc: "Color de fondo y tinta que va encima." },
       { id: "filtro", tipo: "rango", etiqueta: "Filtro negro", solo: ["vida"], unidad: "%", min: 0, max: 70, def: 35, aplica: { var: "--filtro" }, desc: "Negro parejo sobre toda la foto para que el texto en tiza se lea. Sin degradado." },
       { id: "frase", tipo: "rango", etiqueta: "Frase", solo: ["vida"], unidad: "px", min: 32, max: 140, def: 72, aplica: { var: "--frase", unidad: "px" }, desc: "Cuerpo de Vida para nuestra tierra. En pantallas chicas no pasa del 14% del ancho." },
-      { id: "par", tipo: "rango", etiqueta: "Parallax", solo: ["trigo", "vida"], unidad: "%", min: 0, max: 40, def: 22, aplica: { var: "--par" }, desc: "Cuánto se corre el trigo o la foto mientras entra el pie; en Vida, también cuánto sube la frase." },
+      { id: "par", tipo: "rango", etiqueta: "Parallax", solo: ["trigo", "vida"], unidad: "%", min: 0, max: 40, def: 22, aplica: { var: "--par" }, desc: "Cuánto se corre el trigo o el video mientras entra el pie; en Vida, también cuánto sube la frase." },
       "---",
       { id: "radio", tipo: "rango", etiqueta: "Radio de arriba", unidad: "px", min: 0, max: 56, def: 26, aplica: { var: "--radio", unidad: "px" }, desc: "Radio de las esquinas de arriba." },
       { id: "logo", tipo: "rango", etiqueta: "Logo", unidad: "px", min: 80, max: 260, def: 150, aplica: { var: "--logo", unidad: "px" }, desc: "Ancho del logo completo." },
@@ -75,7 +75,7 @@
         '  overflow: clip; display: flex; flex-direction: column; min-height: 100vh; min-height: 100svh; color: var(--tiza); background: #000; isolation: isolate; }',
         '.pf-pie__foto { position: absolute; inset: 0; z-index: -1; overflow: hidden; }',
         "/* La foto es más alta que el pie y llega a su lugar cuando el pie terminó de entrar (--p = 1). */",
-        '.pf-pie__foto img { position: absolute; left: 0; top: 0; width: 100%; height: calc(100% + var(--par) * 2%); object-fit: cover; transform: translate3d(0, calc((var(--p) - 1) * var(--par) * 1%), 0); will-change: transform; }',
+        '.pf-pie__foto img, .pf-pie__foto video { display: block; position: absolute; left: 0; top: 0; width: 100%; height: calc(100% + var(--par) * 2%); object-fit: cover; transform: translate3d(0, calc((var(--p) - 1) * var(--par) * 1%), 0); will-change: transform; }',
         "/* Contraste: un filtro negro parejo. Nunca degradados sobre la foto. */",
         '.pf-pie__foto::after { content: ""; position: absolute; inset: 0; background: rgb(0 0 0 / calc(var(--filtro) * 1%)); }',
         '.pf-pie[data-variante="vida"] .pf-pie__in { flex: 1; display: flex; flex-direction: column; gap: 28px; width: 100%; max-width: none; }',
@@ -113,7 +113,7 @@
       var cab = '  <div class="pf-pie__cab"><div><a class="pf-pie__logo" href="#" aria-label="Profertil">' + logo + '</a><p>Nutrientes para el campo argentino, desde Bahía Blanca.</p></div><a class="pf-pie__pill" href="#">Contacto</a></div>\n';
       var h = '<footer class="pf-pie" data-c="footer">\n';
       if (v === "trigo") h += '<div class="pf-pie__trigo" aria-hidden="true">' + formaSVG("trigo") + '</div>\n';
-      if (v === "vida") h += '<div class="pf-pie__foto" aria-hidden="true"><img src="../novedades/fotos/demo-1.webp" alt=""></div>\n';
+      if (v === "vida") h += '<div class="pf-pie__foto" aria-hidden="true"><video autoplay muted loop playsinline preload="metadata" poster="media/pie-campo.jpg"><source src="media/pie-campo.mp4" type="video/mp4"></video></div>\n';
       h += '<div class="pf-pie__in">\n';
       if (v === "institucional") h += cab + cols + etica + legal;
       if (v === "trigo") h += ' <div class="pf-pie__der">\n' + cab + cols + etica + legal + ' </div>\n';
@@ -126,7 +126,13 @@
       return "(" + function () {
         // El pie avisa cuánto entró en pantalla (--p de 0 a 1): con eso se mueven el trigo, la foto y la frase.
         var pie = document.querySelector(".pf-pie"), pedido = false;
-        if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        // El video corre solo mientras el pie está en pantalla; con movimiento reducido queda quieto.
+        var vid = pie.querySelector(".pf-pie__foto video"), quieto = matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (vid) {
+          if (quieto) { vid.removeAttribute("autoplay"); vid.pause(); }
+          else if ("IntersectionObserver" in window) new IntersectionObserver(function (e) { if (e[0].isIntersecting) vid.play().catch(function () {}); else vid.pause(); }).observe(pie);
+        }
+        if (quieto) return;
         function tic() {
           pedido = false;
           var r = pie.getBoundingClientRect(), p = Math.min(1, Math.max(0, (innerHeight - r.top) / r.height));
