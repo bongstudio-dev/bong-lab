@@ -63,6 +63,7 @@
   --ease: cubic-bezier(.22, 1, .36, 1);
   --r: 10px;      /* controles y código */
   --r-l: 16px;    /* vistas previas */
+  --shadow: 0 1px 2px rgba(10, 30, 74, .06), 0 12px 28px -16px rgba(10, 30, 74, .28); /* la de las tarjetas de Novedades */
 }
 *, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; }
@@ -88,24 +89,85 @@ html { scrollbar-color: rgba(10, 30, 74, .25) transparent; }
 .grupo ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
 .item { text-decoration: none; display: flex; justify-content: space-between; align-items: center; gap: 6px; width: calc(100% + 12px); margin: 0 -6px; padding: 5px 6px; border: 0; border-radius: 7px; background: none; text-align: left; font-size: 12px; line-height: 1.25; color: var(--ink-2); transition: background .2s var(--ease), color .2s var(--ease); }
 .item:hover { background: var(--suave); color: var(--ink); }
-.item[aria-current="page"] { background: var(--azul); color: #fff; }
-.item .n { font-size: 10px; opacity: .55; font-variant-numeric: tabular-nums; }
+/* El elegido no se pinta: lo marca el punto azul, que viaja de un ítem al otro. */
+.item[aria-current="page"] { color: var(--ink); font-weight: 500; }
+.item[aria-current="page"]:hover { background: none; }
+.item .n { font-size: 10px; opacity: .55; font-weight: 400; font-variant-numeric: tabular-nums; }
+.lado nav { position: relative; }
+.todos { list-style: none; margin: 0 0 -4px; padding: 0; }
+/* El punto: uno solo para toda la lista. La curva es un resorte (--punto-curva, la calcula el JS). */
+.punto { position: absolute; top: 0; left: 0; z-index: 1; width: 6px; height: 6px; border-radius: 50%; background: var(--azul); pointer-events: none;
+  transition: transform var(--punto-dura, 560ms) var(--punto-curva, cubic-bezier(.32, .72, 0, 1)); }
+.punto.quieto { transition: none; }
 
 .centro { min-width: 0; }
 
+/* ---------- Pastilla filtro (Web/Pastilla filtro del Master) ----------
+   Rellena en azul, la elegida en tinta; "Todas" sin elegir va transparente con línea. */
+.lbl { --h: 30px; display: inline-flex; align-items: center; flex: none; height: var(--h); padding: 0 calc(var(--h) * .48); border: 0; border-radius: 999px; background: var(--azul); color: var(--sobre-color); font: 400 calc(var(--h) * .47)/1 var(--f-display); white-space: nowrap; transition: background 240ms var(--ease), color 240ms var(--ease), box-shadow 240ms var(--ease), transform .15s var(--ease); text-box: trim-both cap alphabetic; }
+@media (hover: hover) and (pointer: fine) { .lbl:hover { background: color-mix(in srgb, var(--azul) 86%, var(--ink)); } .lbl-todas:hover { background: var(--line); } }
+.lbl:active { transform: scale(.96); }
+.lbl[aria-pressed="true"], .lbl[aria-pressed="true"]:hover { background: var(--activo); color: var(--sobre-color); box-shadow: none; }
+.lbl-todas { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+
 /* ---------- Galería ---------- */
-.gal { padding: 40px 32px 72px; }
-.gal h1 { margin: 0 0 6px; font: 600 28px/1.1 var(--f-display); letter-spacing: -.025em; }
-.gal > p { margin: 0 0 32px; max-width: 56ch; color: var(--ink-2); }
-/* Tantas columnas como entren: en pantallas anchas la grilla llega hasta el borde derecho. */
-.grilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 32px 20px; }
-.tar { color: inherit; text-decoration: none; display: flex; flex-direction: column; gap: 10px; border: 0; padding: 0; background: none; text-align: left; }
-.tar[hidden] { display: none; }
-.tar__vista { position: relative; aspect-ratio: 16 / 10; overflow: hidden; border-radius: var(--r-l); background: var(--bg); box-shadow: 0 0 0 1px var(--line); pointer-events: none; transition: box-shadow .15s var(--ease); }
-.tar:hover .tar__vista { box-shadow: 0 0 0 1px rgba(10, 30, 74, .28); }
+.gal { padding: 28px 32px 72px; }
+.gal__cab { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
+.gal h1 { margin: 0; font: 600 24px/1.1 var(--f-display); letter-spacing: -.025em; }
+.gal__cab p { margin: 0; color: var(--ink-3); }
+.pills { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 7px; margin: 0 -32px; padding: 18px 32px 18px; background: var(--bg); }
+/* Masonry como el de Novedades: columnas parejas y cada tarjeta cae en la más corta.
+   Las tarjetas se ubican con translate (el JS calcula x e y): al filtrar se deslizan a su lugar nuevo
+   sin moverse en el DOM, así las miniaturas en vivo no se recargan. */
+.mas { position: relative; }
+.mas.quieta .tar { transition: none; }
+.tar {
+  position: absolute; top: 0; left: 0; translate: var(--x, 0) var(--y, 0);
+  display: grid; color: inherit; text-decoration: none; text-align: left;
+  background: var(--card); border-radius: 26px; box-shadow: var(--shadow); container-type: inline-size;
+  transition: translate 620ms var(--f-chica-curva), opacity 280ms ease, transform 320ms var(--ease), box-shadow 320ms var(--ease);
+}
+@media (hover: hover) and (pointer: fine) { .tar:hover { transform: translateY(-3px); box-shadow: 0 1px 2px rgba(10, 30, 74, .06), 0 18px 34px -16px rgba(10, 30, 74, .34); } }
+.tar:active { transform: scale(.985); transition-duration: 620ms, 280ms, 120ms, 320ms; }
+.tar.fuera { opacity: 0; pointer-events: none; visibility: hidden; transition: translate 620ms var(--f-chica-curva), opacity 200ms ease, visibility 0s linear 200ms; }
+.tar__vista { position: relative; margin: 8px 8px 0; overflow: hidden; border-radius: 19px; background: var(--bg); pointer-events: none; transition: opacity .2s ease; }
+/* La tarjeta que se abrió en el panel queda vacía: la vista previa "es" ella. */
+.tar.origen .tar__vista { opacity: 0; transition: none; }
 .tar__vista iframe { position: absolute; left: 50%; top: 50%; width: 1280px; height: 800px; border: 0; transform-origin: 50% 50%; transform: translate(-50%, -50%) scale(var(--esc, .3)); background: var(--bg); }
-.tar b { font: 500 14px/1.2 var(--f-body); }
-.tar span { display: block; margin-top: 2px; font-size: 12px; color: var(--ink-3); }
+.tar__meta { padding: 12px 18px 18px; display: grid; gap: 6px; min-width: 0; }
+.when { margin: 0; font-size: 12px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.when b { font-weight: 500; color: var(--ink-2); }
+.ttl { margin: 0; font: 500 17px/1.2 var(--f-display); letter-spacing: -.015em; color: var(--titulo); }
+@container (min-width: 420px) { .tar__meta { padding: 14px 22px 22px; } .ttl { font-size: 19px; } }
+
+/* ---------- Panel (desktop) ----------
+   Al abrir un componente la galería queda atrás, desenfocada. A la derecha de la sidebar sale el panel
+   con la ficha (nace del borde, como si la sidebar se estirara) y la vista previa crece desde la tarjeta. */
+:root { --lado: 188px; --panel: 380px; }
+.capa { position: fixed; inset: 0; z-index: 30; pointer-events: none; }
+.capa[hidden] { display: none; }
+.velo { position: absolute; inset: 0 0 0 var(--lado); pointer-events: auto; background: color-mix(in srgb, var(--bg) 62%, transparent); backdrop-filter: blur(18px) saturate(1.1); -webkit-backdrop-filter: blur(18px) saturate(1.1); }
+.panel { position: absolute; top: 0; bottom: 0; left: var(--lado); width: var(--panel); pointer-events: auto; display: flex; flex-direction: column; background: var(--bg); border-right: 1px solid var(--line); }
+.pbar { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 60px; padding: 0 20px 0 24px; }
+.pcerrar { display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 50%; background: var(--azul); color: var(--tiza); transition: transform .15s var(--ease), background .2s var(--ease); }
+@media (hover: hover) and (pointer: fine) { .pcerrar:hover { background: color-mix(in srgb, var(--azul) 86%, var(--ink)); } }
+.pcerrar:active, .pnav button:active { transform: scale(.92); }
+.pcerrar svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
+.pnav { display: flex; align-items: center; gap: 6px; }
+.pn { margin-right: 6px; font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.pnav button { display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 50%; background: var(--line); color: var(--ink); transition: transform .15s var(--ease), background .2s var(--ease), opacity .2s ease; }
+@media (hover: hover) and (pointer: fine) { .pnav button:hover { background: rgba(10, 30, 74, .16); } }
+.pnav button:disabled { opacity: .35; pointer-events: none; }
+.pnav .ico { width: 15px; height: 15px; stroke-width: 2; }
+.pdoc { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; padding: 0 24px; scrollbar-width: thin; }
+.pdoc .doc { padding: 12px 0 48px; }
+.pdoc .doc h1 { font-size: 24px; }
+.ojo { margin: 0; font-size: 12px; color: var(--ink-3); }
+.escena { position: absolute; top: 0; bottom: 0; right: 0; left: calc(var(--lado) + var(--panel)); padding: 16px; pointer-events: none; }
+.escena .previa { position: relative; top: 0; height: 100%; pointer-events: auto; }
+html { scrollbar-gutter: stable; }
+html.con-panel { overflow: hidden; }
+@media (max-width: 1099px) { :root { --panel: 340px; } .capa { --lado: 0px; } }
 
 /* ---------- Ficha ---------- */
 .ficha { display: grid; grid-template-columns: minmax(320px, 400px) minmax(0, 1fr); gap: 32px; padding: 16px 16px 16px 32px; }
@@ -227,10 +289,6 @@ html.con-pleno { overflow: hidden; }
   .dk-in { padding: 16px 14px 10px; display: grid; gap: 10px; }
   .dk-label { margin: 0; font: 500 11px/1 var(--f-body); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
   .dk-cats { display: flex; flex-wrap: wrap; gap: 7px; padding: 3px 0 8px; }
-  /* Web/Pastilla filtro: rellena (azul), la elegida en tinta; "Todas" sin elegir es transparente. */
-  .lbl { --h: 30px; display: inline-flex; align-items: center; flex: none; height: var(--h); padding: 0 calc(var(--h) * .48); border: 0; border-radius: 999px; background: var(--azul); color: var(--sobre-color); font: 400 calc(var(--h) * .47)/1 var(--f-display); white-space: nowrap; transition: background 240ms var(--ease), color 240ms var(--ease); text-box: trim-both cap alphabetic; }
-  .lbl[aria-pressed="true"] { background: var(--activo); color: var(--sobre-color); }
-  .lbl-todas { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
   .dk-lista { list-style: none; margin: 0; padding: 0; display: grid; }
   .dk-item { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 11px 2px; border-top: 1px solid var(--line); color: var(--ink); text-decoration: none; font: 500 15px/1.2 var(--f-display); letter-spacing: -.01em; }
   .dk-item small { flex: none; font: 400 12px/1 var(--f-body); letter-spacing: 0; color: var(--ink-3); }
@@ -270,6 +328,13 @@ html.con-pleno { overflow: hidden; }
   .lado nav { display: none; }
   body { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
   .gal { padding: 24px 16px 32px; }
+  .gal__cab { margin-bottom: 18px; }
+  .pills { display: none; } /* en el teléfono las categorías están en el dock */
+  .tar { border-radius: 20px; }
+  .tar__vista { margin: 6px 6px 0; border-radius: 15px; }
+  .tar__meta { padding: 9px 12px 13px; gap: 4px; }
+  .when { font-size: 11px; }
+  .ttl { font-size: 15px; }
   .ficha { padding: 12px 16px 16px; gap: 24px; }
   .previa { height: 64vh; height: 64svh; }
   .doc { gap: 28px; padding-bottom: 24px; }
@@ -312,6 +377,20 @@ html.con-pleno { overflow: hidden; }
     <button type="button" class="dk-toggle" id="dkToggle" aria-expanded="false" aria-controls="dkBody"><span class="dk-txt" id="dkTxt">Componentes</span><span class="dk-der"><span class="dk-n" id="dkN"></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg></span></button>
   </div>
 </section>
+<div class="capa" id="capa" hidden>
+  <div class="velo" id="velo"></div>
+  <section class="panel" id="panel" role="dialog" aria-modal="false" aria-labelledby="fichaTit">
+    <div class="pbar" id="pbar">
+      <button type="button" class="pcerrar" id="pCerrar" aria-label="Cerrar" title="Cerrar (Esc)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <div class="pnav"><span class="pn" id="pN"></span>
+        <button type="button" id="pAnt" aria-label="Componente anterior" title="Anterior (←)"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 12H7M11 8l-4 4 4 4"/></svg></button>
+        <button type="button" id="pSig" aria-label="Componente siguiente" title="Siguiente (→)"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12h10M13 8l4 4-4 4"/></svg></button>
+      </div>
+    </div>
+    <div class="pdoc" id="pdoc"></div>
+  </section>
+  <div class="escena" id="escena"></div>
+</div>
 <button type="button" class="ancla" id="ancla" aria-label="Componente siguiente" tabindex="-1"><span class="ancla-cuerpo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
 
 <script src="formas.js"></script>
@@ -398,32 +477,79 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
     if (c.tipo === "pagina") fr.src = c.src; else fr.srcdoc = documento(c, s, mini);
   }
 
-  /* ---------------- sidebar ---------------- */
-  function dibujarNav() {
-    dibujarDock();
-    $("nav").innerHTML = GRUPOS.map(function (g) {
-      var cs = L.filter(function (c) { return c.grupo === g; }); if (!cs.length) return "";
-      return '<div class="grupo"><p class="grupo__tit">' + g + '</p><ul>' + cs.map(function (c) {
-        return '<li><a class="item" href="#' + c.id + '"' + (actual === c ? ' aria-current="page"' : '') + '><span>' + esc(c.nombre) + '</span>' +
-          (c.variantes ? '<span class="n" aria-label="' + c.variantes.length + ' variantes">' + c.variantes.length + '</span>' : '') + '</a></li>';
-      }).join("") + '</ul></div>';
-    }).join("");
+  /* ---------------- sidebar ----------------
+     La lista se arma una vez. Elegir un ítem solo cambia aria-current y mueve el punto. */
+  var nav = $("nav"), punto;
+  function construirNav() {
+    nav.innerHTML = '<span class="punto" id="punto" aria-hidden="true"></span>' +
+      '<ul class="todos"><li><a class="item" href="#" data-id=""><span class="item__t">Todos</span><span class="n">' + L.length + '</span></a></li></ul>' +
+      GRUPOS.map(function (g) {
+        var cs = L.filter(function (c) { return c.grupo === g; }); if (!cs.length) return "";
+        return '<div class="grupo"><p class="grupo__tit">' + g + '</p><ul>' + cs.map(function (c) {
+          return '<li><a class="item" href="#' + c.id + '" data-id="' + c.id + '"><span class="item__t">' + esc(c.nombre) + '</span>' +
+            (c.variantes ? '<span class="n" aria-label="' + c.variantes.length + ' variantes">' + c.variantes.length + '</span>' : '') + '</a></li>';
+        }).join("") + '</ul></div>';
+      }).join("");
+    punto = $("punto");
   }
+  function marcarNav(animar) {
+    var id = actual ? actual.id : "";
+    nav.querySelectorAll(".item").forEach(function (a) { if (a.dataset.id === id) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+    moverPunto(animar);
+    var a = nav.querySelector('.item[aria-current]'), lado = nav.parentNode;
+    if (a && animar) { var r = a.getBoundingClientRect(), l = lado.getBoundingClientRect(); if (r.top < l.top + 40 || r.bottom > l.bottom - 20) a.scrollIntoView({ block: "center", behavior: quieto.matches ? "auto" : "smooth" }); }
+  }
+  // El punto se para justo después del nombre, centrado en la línea.
+  function moverPunto(animar) {
+    var t = nav.querySelector('.item[aria-current] .item__t'); if (!t || !t.offsetWidth) return;
+    var n = nav.getBoundingClientRect(), r = t.getBoundingClientRect();
+    var x = Math.round(r.right - n.left + 7), y = Math.round(r.top - n.top + r.height / 2 - 3);
+    if (!animar) punto.classList.add("quieto");
+    punto.style.transform = "translate(" + x + "px, " + y + "px)";
+    if (!animar) { void punto.offsetWidth; punto.classList.remove("quieto"); }
+  }
+  // Curva del punto: un resorte apenas subamortiguado (pasa un poquito y vuelve), muestreado como linear().
+  (function () {
+    if (!CSS.supports || !CSS.supports("transition-timing-function", "linear(0, 1)")) return;
+    var k = 230, c = 25, x = 0, v = 0, dt = 1 / 1000, pts = [], t = 0;
+    while (t < 2) {
+      for (var i = 0; i < 16; i++) { v += (-k * (x - 1) - c * v) * dt; x += v * dt; t += dt; }
+      pts.push(x.toFixed(4));
+      if (Math.abs(x - 1) < .0015 && Math.abs(v) < .02) break;
+    }
+    pts[pts.length - 1] = "1";
+    var raiz = document.documentElement.style;
+    raiz.setProperty("--punto-curva", "linear(0, " + pts.join(", ") + ")");
+    raiz.setProperty("--punto-dura", Math.round(t * 1000) + "ms");
+  })();
 
-  /* ---------------- galería ---------------- */
+  /* ---------------- galería ----------------
+     Se arma una sola vez: abrir y cerrar el panel no la toca (las miniaturas siguen andando y el scroll queda donde estaba). */
+  var galeriaLista = false, masRO = null, masAncho = 0;
+  // Proporción de cada tarjeta: es lo que hace al masonry. Anchas apaisadas, páginas verticales, piezas chicas cuadradas.
+  function proporcion(c) { return c.tamano === "ancha" ? 4 / 3 : (c.tamano === "media" || typeof c.alto === "number") ? 4 / 5 : 1; }
+  function pillsHTML() {
+    return '<button type="button" class="lbl lbl-todas" data-grupo="" aria-pressed="' + !filtro + '">Todas</button>' +
+      GRUPOS.filter(function (g) { return L.some(function (c) { return c.grupo === g; }); }).map(function (g) {
+        return '<button type="button" class="lbl" data-grupo="' + esc(g) + '" aria-pressed="' + (filtro === g) + '">' + esc(g) + '</button>'; }).join("");
+  }
   function galeria() {
-    actual = null; dibujarNav(); document.title = "Componentes Profertil";
-    $("centro").innerHTML = '<div class="gal"><h1 id="galTit">' + (filtro ? 'Componentes · ' + esc(filtro) : 'Componentes') + '</h1><p>Lo que vamos armando para el sitio, en vivo. Textos, números y fotos de ejemplo.</p><div class="grilla">' +
+    galeriaLista = true; actual = null; marcarNav(true); dibujarDock(); document.title = "Componentes Profertil";
+    $("centro").innerHTML = '<div class="gal"><header class="gal__cab"><h1 id="galTit">' + (filtro && movil.matches ? 'Componentes · ' + esc(filtro) : 'Componentes') + '</h1><p>Lo que vamos armando para el sitio, en vivo.</p></header>' +
+      '<div class="pills" id="pills" role="group" aria-label="Categoría">' + pillsHTML() + '</div><div class="mas quieta" id="mas">' +
       ordenados().map(function (c) {
-        return '<a class="tar" href="#' + c.id + '" data-grupo="' + esc(c.grupo) + '"' + (filtro && c.grupo !== filtro ? ' hidden' : '') + '><div class="tar__vista"><iframe tabindex="-1" loading="lazy" aria-hidden="true" title="" data-mini="' + c.id + '"></iframe></div>' +
-          '<div><b>' + esc(c.nombre) + '</b><span>' + esc(c.grupo) + (c.variantes ? ' · ' + c.variantes.length + ' variantes' : '') + '</span></div></a>';
+        var fuera = filtro && c.grupo !== filtro;
+        return '<a class="tar' + (fuera ? ' fuera' : '') + '" href="#' + c.id + '" data-id="' + c.id + '" data-grupo="' + esc(c.grupo) + '"' + (fuera ? ' data-oculta="1"' : '') + '>' +
+          '<div class="tar__vista" style="aspect-ratio: ' + proporcion(c).toFixed(4) + '"><iframe tabindex="-1" loading="lazy" aria-hidden="true" title="" data-mini="' + c.id + '"></iframe></div>' +
+          '<div class="tar__meta"><p class="when"><b>' + esc(c.grupo) + '</b>' + (c.variantes ? ' · ' + c.variantes.length + ' variantes' : '') + '</p><p class="ttl">' + esc(c.nombre) + '</p></div></a>';
       }).join("") + '</div></div>';
     scrollTo(0, 0);
-    // Miniaturas en vivo: el iframe se dibuja a 1280 × 800 y se achica para cubrir la tarjeta.
+    // Miniaturas en vivo: el iframe se dibuja con la proporción de la tarjeta y se achica hasta su ancho.
     document.querySelectorAll("[data-mini]").forEach(function (fr) {
-      // Las piezas chicas (controles, avisos) se dibujan más angostas para que se vean de cerca.
-      // En el teléfono se dibujan a 720 como máximo: a 1280 quedaban ilegibles en una tarjeta de 360.
-      var c = porId(fr.dataset.mini), caja = fr.parentNode, ancho = Math.min(c.mini || 1280, matchMedia("(max-width: 760px)").matches ? 720 : 1e4), alto = Math.round(ancho * .625);
+      // Las piezas chicas (controles, avisos) se dibujan más angostas para que se vean de cerca; las verticales, a 1024.
+      // En el teléfono se dibujan a 720 como máximo: a 1280 quedaban ilegibles en una tarjeta de 170.
+      var c = porId(fr.dataset.mini), caja = fr.parentNode, p = proporcion(c);
+      var ancho = Math.min(c.mini ? Math.round(c.mini * (p === 1 ? .8 : 1)) : p < 1 ? 1024 : 1280, movil.matches ? 720 : 1e4), alto = Math.round(ancho / p);
       fr.style.width = ancho + "px"; fr.style.height = alto + "px";
       var ajustar = function () { fr.style.setProperty("--esc", Math.max(caja.clientWidth / ancho, caja.clientHeight / alto)); };
       new ResizeObserver(ajustar).observe(caja); ajustar();
@@ -434,6 +560,49 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
         } catch (e) {}
       }, true);
     });
+    var mas = $("mas"); masAncho = 0;
+    if (masRO) masRO.disconnect();
+    masRO = new ResizeObserver(function () { if (mas.clientWidth !== masAncho) acomodar(false); });
+    masRO.observe(mas); acomodar(false);
+    document.fonts && document.fonts.ready.then(function () { if ($("mas") === mas) acomodar(false); });
+  }
+  function columnas(w) { return w < 360 ? 1 : w < 960 ? 2 : w < 1360 ? 3 : 4; }
+  // Masonry: cada tarjeta visible va a la columna más corta. Con animar, las que se quedan se deslizan a su lugar.
+  function acomodar(animar, entran) {
+    var mas = $("mas"); if (!mas) return;
+    var W = mas.clientWidth; masAncho = W;
+    var n = columnas(W), g = movil.matches ? 10 : 16, cw = (W - g * (n - 1)) / n, hs = [];
+    for (var i = 0; i < n; i++) hs.push(0);
+    if (!animar) mas.classList.add("quieta");
+    var vis = [].filter.call(mas.children, function (t) { return !t.dataset.oculta; });
+    [].forEach.call(mas.children, function (t) { t.style.width = cw + "px"; });
+    vis.forEach(function (t) {
+      var h = t.offsetHeight, k = 0;
+      for (var j = 1; j < n; j++) if (hs[j] < hs[k] - 1) k = j;
+      t.style.setProperty("--x", Math.round(k * (cw + g)) + "px"); t.style.setProperty("--y", Math.round(hs[k]) + "px");
+      hs[k] += h + g;
+    });
+    mas.style.height = Math.max(0, Math.max.apply(null, hs) - g) + "px";
+    if (!animar) { void mas.offsetWidth; mas.classList.remove("quieta"); }
+    // Las que vuelven aparecen ya en su lugar nuevo (no viajan desde donde estaban).
+    if (entran && entran.length) { void mas.offsetWidth; entran.forEach(function (t) { t.style.transition = ""; t.classList.remove("fuera"); }); }
+  }
+  function filtrar(g) {
+    filtro = g;
+    document.querySelectorAll("#pills .lbl").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.grupo === g)); });
+    if ($("galTit")) $("galTit").textContent = g && movil.matches ? "Componentes · " + g : "Componentes";
+    var entran = [];
+    document.querySelectorAll("#mas .tar").forEach(function (t) {
+      var fuera = !!g && t.dataset.grupo !== g;
+      if (!fuera && t.dataset.oculta) { entran.push(t); t.style.transition = "none"; }
+      else if (fuera) t.classList.add("fuera");
+      t.dataset.oculta = fuera ? "1" : "";
+      if (!fuera) t.removeAttribute("data-oculta");
+    });
+    acomodar(!quieto.matches, entran);
+    // Si la grilla quedó más arriba de donde estaba el scroll, volver a las pastillas.
+    var p = $("pills"); if (p && !movil.matches) { var top = Math.round($("mas").getBoundingClientRect().top + scrollY - p.offsetHeight); if (scrollY > top) scrollTo({ top: top, behavior: quieto.matches ? "auto" : "smooth" }); }
+    dibujarDock();
   }
 
   /* ---------------- ficha ---------------- */
@@ -475,11 +644,12 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
   }
   function descVariante() { var v = actual.variantes.filter(function (x) { return x[0] === estado.variante; })[0]; return v && v[2] ? esc(v[2]) : ""; }
 
-  function abrir(c) {
-    actual = c; estado = inicial(c); dibujarNav(); document.title = c.nombre + " · Componentes Profertil";
+  // La ficha en dos partes: la documentación y la vista previa. En el teléfono van juntas como página;
+  // en desktop la documentación va al panel y la vista previa a la escena.
+  function fichaPartes(c, enPanel) {
     var pag = c.tipo === "pagina", o = ordenados(), i = o.indexOf(c), ant = o[i - 1], sig = o[i + 1];
-    var h = '<div class="ficha"><div class="doc"><div><a class="migas" href="#">Componentes · ' + esc(c.grupo) + '</a>' +
-      '<h1>' + esc(c.nombre) + '</h1><p class="bajada">' + esc(c.bajada) + '</p></div>';
+    var h = '<div class="doc"><div>' + (enPanel ? '<p class="ojo">' + esc(c.grupo) + (c.variantes ? ' · ' + c.variantes.length + ' variantes' : '') + '</p>' : '<a class="migas" href="#">Componentes · ' + esc(c.grupo) + '</a>') +
+      '<h1 id="fichaTit">' + esc(c.nombre) + '</h1><p class="bajada">' + esc(c.bajada) + '</p></div>';
     if (c.variantes) h += '<section><div class="tabsv" role="group" aria-label="Variantes">' + c.variantes.map(function (v) {
       return '<button type="button" data-var="' + v[0] + '" aria-pressed="' + (v[0] === estado.variante) + '">' + esc(v[1]) + '</button>'; }).join("") + '</div><p id="vdesc">' + descVariante() + '</p></section>';
     if (!pag && c.controles && c.controles.length) h += '<section><h2>Ajustes</h2><div class="ajustes" id="ajustes">' + ajustesHTML() + '</div></section>';
@@ -490,17 +660,123 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
       (c.accesibilidad ? '<div><h3>Accesibilidad</h3><p>' + esc(c.accesibilidad) + '</p></div>' : '') +
       (c.nota ? '<div><h3>Para tener en cuenta</h3><p>' + esc(c.nota) + '</p></div>' : '') + '</div></details>';
     else if (c.nota) h += '<p class="bajada">' + esc(c.nota) + '</p>';
-    h += '<nav class="vecinos" aria-label="Otros componentes">' + (ant ? '<a href="#' + ant.id + '">' + ico("izq") + esc(ant.nombre) + '</a>' : '<span></span>') +
-      (sig ? '<a href="#' + sig.id + '">' + esc(sig.nombre) + ico("der") + '</a>' : '') + '</nav></div>' +
-      '<div class="previa" id="previa" data-vista="' + vista + '"><div class="previa__marco"><iframe id="ifr" title="Vista previa de ' + esc(c.nombre) + '"></iframe></div>' +
+    if (!enPanel) h += '<nav class="vecinos" aria-label="Otros componentes">' + (ant ? '<a href="#' + ant.id + '">' + ico("izq") + esc(ant.nombre) + '</a>' : '<span></span>') +
+      (sig ? '<a href="#' + sig.id + '">' + esc(sig.nombre) + ico("der") + '</a>' : '') + '</nav>';
+    h += '</div>';
+    var pv = '<div class="previa" id="previa" data-vista="' + vista + '"><div class="previa__marco"><iframe id="ifr" title="Vista previa de ' + esc(c.nombre) + '"></iframe></div>' +
       '<div class="herr" role="toolbar" aria-label="Vista previa">' +
         '<button type="button" id="vista" aria-label="' + (vista === "desktop" ? "Ver en mobile" : "Ver en desktop") + '" title="' + (vista === "desktop" ? "Ver en mobile" : "Ver en desktop") + '">' + ico(vista === "desktop" ? "mobile" : "desktop") + '</button>' +
         '<button type="button" id="repetir" aria-label="Repetir" title="Repetir">' + ico("repetir") + '</button>' +
         '<button type="button" id="completa" aria-label="Pantalla completa" title="Pantalla completa">' + ico("completa") + '</button>' +
-      '</div></div></div>';
-    $("centro").innerHTML = h; scrollTo(0, 0);
-    iframe = $("ifr"); dibujar(true); codigo(); moverInds();
+      '</div></div>';
+    return { doc: h, previa: pv };
   }
+  function preparar(c) { actual = c; estado = inicial(c); marcarNav(true); dibujarDock(); document.title = c.nombre + " · Componentes Profertil"; }
+  function arrancarFicha() { iframe = $("ifr"); dibujar(true); codigo(); moverInds(); }
+
+  // Teléfono: la ficha es una página.
+  function abrirPagina(c) {
+    preparar(c); galeriaLista = false; if (masRO) masRO.disconnect();
+    var p = fichaPartes(c, false);
+    $("centro").innerHTML = '<div class="ficha">' + p.doc + p.previa + '</div>'; scrollTo(0, 0);
+    arrancarFicha();
+  }
+
+  /* ---------------- panel (desktop) ----------------
+     Abrir: la galería se desenfoca, el panel sale del borde de la sidebar y la vista previa crece desde la
+     tarjeta (FLIP: arranca con la forma y el lugar de la tarjeta y se estira hasta su lugar). Cerrar hace lo
+     mismo al revés y vuelve a la tarjeta. Anterior y siguiente cambian el contenido sin cerrar. */
+  var capa = $("capa"), panel = $("panel"), pdoc = $("pdoc"), escena = $("escena"), velo = $("velo");
+  var CURVA = "cubic-bezier(.32, .72, 0, 1)", cierre = null;
+  function panelAbierto() { return !capa.hidden && !cierre; }
+  function tarjetaDe(c) { return c ? document.querySelector('.tar[data-id="' + c.id + '"]') : null; }
+  // La tarjeta sirve de origen si se ve en pantalla.
+  function origen(c) {
+    var t = tarjetaDe(c); if (!t || t.dataset.oculta) return null;
+    var r = t.querySelector(".tar__vista").getBoundingClientRect();
+    return r.bottom > 0 && r.top < innerHeight && r.width ? { t: t, r: r } : null;
+  }
+  function soltarOrigen() { document.querySelectorAll(".tar.origen").forEach(function (t) { t.classList.remove("origen"); }); }
+  function flip(pv, desde, volver, dur) {
+    var f = pv.getBoundingClientRect(), s = Math.max(desde.width / f.width, desde.height / f.height);
+    var iw = (f.width - desde.width / s) / 2, ih = (f.height - desde.height / s) / 2;
+    var dx = desde.left - f.left - s * iw, dy = desde.top - f.top - s * ih;
+    var a = { transformOrigin: "0 0", transform: "translate(" + dx + "px, " + dy + "px) scale(" + s + ")", clipPath: "inset(" + ih + "px " + iw + "px round " + (19 / s) + "px)" };
+    var b = { transformOrigin: "0 0", transform: "none", clipPath: "inset(0px 0px round 16px)" };
+    return pv.animate(volver ? [b, a] : [a, b], { duration: dur, easing: volver ? "cubic-bezier(.4, 0, .1, 1)" : CURVA, fill: volver ? "forwards" : "none" });
+  }
+  function marcarPbar() {
+    var sq = vecinosLista(), i = sq.indexOf(actual);
+    $("pN").textContent = (i + 1) + " / " + sq.length;
+    $("pAnt").disabled = i <= 0; $("pSig").disabled = i >= sq.length - 1;
+  }
+  // Anterior y siguiente recorren lo que se ve en la galería (si hay categoría elegida, solo esa).
+  function vecinosLista() {
+    var o = ordenados(), f = filtro ? o.filter(function (c) { return c.grupo === filtro; }) : o;
+    return actual && f.indexOf(actual) < 0 ? o : f;
+  }
+  function terminarCierre() { if (cierre) { var f = cierre; cierre = null; f(); } }
+  function abrirPanel(c) {
+    terminarCierre(); preparar(c);
+    var p = fichaPartes(c, true);
+    pdoc.innerHTML = p.doc; pdoc.scrollTop = 0; escena.innerHTML = p.previa;
+    capa.hidden = false; document.documentElement.classList.add("con-panel"); marcarPbar();
+    arrancarFicha();
+    if (quieto.matches) return;
+    velo.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 380, easing: "ease" });
+    panel.animate([{ clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)" }], { duration: 560, easing: CURVA });
+    [$("pbar"), pdoc].forEach(function (el, k) { el.animate([{ opacity: 0, transform: "translateX(-28px)" }, { opacity: 1, transform: "none" }], { duration: 560, delay: 60 + k * 40, easing: CURVA, fill: "backwards" }); });
+    var pv = $("previa"), o = origen(c);
+    if (o) { o.t.classList.add("origen"); flip(pv, o.r, false, 620); }
+    else pv.animate([{ opacity: 0, transform: "scale(.96)" }, { opacity: 1, transform: "none" }], { duration: 460, easing: CURVA });
+    pv.querySelector(".herr").animate([{ opacity: 0 }, { opacity: 1 }], { duration: 240, delay: 420, fill: "backwards" });
+  }
+  function cambiarPanel(c, dir) {
+    soltarOrigen(); preparar(c);
+    var p = fichaPartes(c, true);
+    pdoc.innerHTML = p.doc; pdoc.scrollTop = 0; escena.innerHTML = p.previa; marcarPbar();
+    arrancarFicha();
+    var o = origen(c); if (o) o.t.classList.add("origen");
+    if (quieto.matches) return;
+    pdoc.animate([{ opacity: 0, transform: "translateX(" + (dir || 0) * 18 + "px)" + (dir ? "" : " translateY(8px)") }, { opacity: 1, transform: "none" }], { duration: 380, easing: CURVA });
+    $("previa").animate([{ opacity: 0, transform: "translateX(" + (dir || 0) * 24 + "px)" }, { opacity: 1, transform: "none" }], { duration: 420, easing: CURVA });
+  }
+  function cerrarPanel(ya) {
+    if (capa.hidden) return;
+    terminarCierre();
+    var c = actual; actual = null; marcarNav(true); dibujarDock(); document.title = "Componentes Profertil";
+    var fin = function () {
+      capa.hidden = true; document.documentElement.classList.remove("con-panel");
+      [velo, panel, $("pbar"), pdoc].forEach(function (el) { el.getAnimations().forEach(function (a) { a.cancel(); }); });
+      pdoc.innerHTML = ""; escena.innerHTML = ""; iframe = null; soltarOrigen();
+    };
+    if (ya || quieto.matches) { fin(); return; }
+    cierre = fin;
+    var pv = $("previa"), o = origen(c), sale = { duration: 380, easing: "cubic-bezier(.4, 0, .1, 1)", fill: "forwards" };
+    velo.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 380, easing: "ease", fill: "forwards" });
+    panel.animate([{ clipPath: "inset(0 0% 0 0)" }, { clipPath: "inset(0 100% 0 0)" }], sale);
+    pdoc.animate([{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateX(-20px)" }], sale);
+    $("pbar").animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, fill: "forwards" });
+    pv.querySelector(".herr").animate([{ opacity: 1 }, { opacity: 0 }], { duration: 120, fill: "forwards" });
+    var a = o ? flip(pv, o.r, true, 460) : pv.animate([{ opacity: 1 }, { opacity: 0, transform: "scale(.97)" }], { duration: 260, easing: "ease", fill: "forwards" });
+    a.onfinish = function () { if (cierre === fin) terminarCierre(); };
+  }
+  $("pCerrar").addEventListener("click", function () { location.hash = ""; });
+  velo.addEventListener("click", function () { location.hash = ""; });
+  function irVecino(d) {
+    var sq = vecinosLista(), i = sq.indexOf(actual), s = sq[i + d]; if (!s) return;
+    dirPanel = d; location.hash = s.id;
+  }
+  var dirPanel = 0;
+  $("pAnt").addEventListener("click", function () { irVecino(-1); });
+  $("pSig").addEventListener("click", function () { irVecino(1); });
+  document.addEventListener("keydown", function (e) {
+    if (!panelAbierto() || enCompleta() || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.target.closest && e.target.closest("input, select, textarea, [contenteditable]")) return;
+    if (e.key === "Escape") location.hash = "";
+    else if (e.key === "ArrowLeft") irVecino(-1);
+    else if (e.key === "ArrowRight") irVecino(1);
+  });
 
   function dibujar(nuevo) {
     var sy = 0; try { sy = nuevo ? 0 : iframe.contentWindow.scrollY; } catch (e) {}
@@ -617,10 +893,19 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
   addEventListener("resize", moverInds);
   document.fonts && document.fonts.ready.then(moverInds);
 
+  // Desktop: la galería queda siempre abajo y el componente se abre en el panel.
+  // Teléfono: galería y ficha son dos páginas.
   function ruta() {
-    var p = decodeURIComponent(location.hash.slice(1)).split("/"), c = porId(p[0]);
-    if (!c) { galeria(); return; }
-    if (c !== actual) abrir(c);
+    var p = decodeURIComponent(location.hash.slice(1)).split("/"), c = porId(p[0]), dir = dirPanel; dirPanel = 0;
+    if (movil.matches) {
+      cerrarPanel(true);
+      if (!c) { if (!galeriaLista || actual) galeria(); return; }
+      if (c !== actual || galeriaLista) abrirPagina(c);
+    } else {
+      if (!galeriaLista) galeria();
+      if (!c) { cerrarPanel(); return; }
+      if (!panelAbierto()) abrirPanel(c); else if (c !== actual) cambiarPanel(c, dir);
+    }
     if (p[1] && c.variantes && c.variantes.some(function (v) { return v[0] === p[1]; }) && estado.variante !== p[1]) { var b = document.querySelector('[data-var="' + p[1] + '"]'); if (b) b.click(); }
   }
   addEventListener("hashchange", function () { abrirDock(false); if (enCompleta() && !document.fullscreenElement) pleno(false); ruta(); });
@@ -667,18 +952,20 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
   $("dkPrev").addEventListener("click", function () { var sq = secuencia(), i = sq.indexOf(actual); if (i > 0) location.hash = sq[i - 1].id; });
   $("dkCats").addEventListener("click", function (e) {
     var b = e.target.closest("[data-grupo]"); if (!b) return;
-    var g = b.dataset.grupo; filtro = filtro === g ? "" : g;
+    var g = b.dataset.grupo, nuevo = filtro === g ? "" : g;
     // Cambia el alto del panel: se anima desde el actual hasta el nuevo.
-    var desde = dkBody.offsetHeight; dibujarDock();
+    var desde = dkBody.offsetHeight;
+    if ($("mas")) filtrar(nuevo); else { filtro = nuevo; dibujarDock(); }
     if (dock.classList.contains("listo")) {
       var hasta = dkBody.scrollHeight; dock.classList.remove("listo"); dkBody.style.height = desde + "px"; void dkBody.offsetHeight;
       dkBody.style.height = Math.min(hasta, dock.parentNode.clientHeight) + "px";
       clearTimeout(tListo); tListo = setTimeout(terminarDock, 660);
     }
-    if (!actual) {
-      document.querySelectorAll(".tar").forEach(function (t) { t.hidden = !!filtro && t.dataset.grupo !== filtro; });
-      if ($("galTit")) $("galTit").textContent = filtro ? "Componentes · " + filtro : "Componentes";
-    }
+  });
+  // Las pastillas de arriba de la galería (desktop).
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("#pills .lbl"); if (!b || b.dataset.grupo === filtro) return;
+    filtrar(b.dataset.grupo);
   });
   document.addEventListener("pointerdown", function (e) { if (dock.classList.contains("open") && !dock.contains(e.target) && !ancla.contains(e.target)) abrirDock(false); });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") abrirDock(false); });
@@ -727,7 +1014,12 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
     if (scrollY > innerHeight * CAMBIO) scrollTo({ top: 0, behavior: suave }); else scrollBy({ top: Math.round(innerHeight * BAJAR), behavior: suave });
   });
 
-  ruta(); mover();
+  // Al cruzar el corte de mobile se rearma todo con el modo que corresponde.
+  if (movil.addEventListener) movil.addEventListener("change", function () { cerrarPanel(true); galeriaLista = false; actual = null; ruta(); });
+  addEventListener("resize", function () { moverPunto(false); });
+  document.fonts && document.fonts.ready.then(function () { moverPunto(false); });
+
+  construirNav(); ruta(); marcarNav(false); mover();
 })();
 </script>
 </body>
