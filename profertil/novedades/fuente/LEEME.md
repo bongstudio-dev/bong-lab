@@ -73,7 +73,7 @@ de `tokens.json`.
 Para cambiar un valor:
 
 1. Cambiarlo en la variable de Figma (o crear una nueva con su code syntax WEB).
-2. Correr `exportar-tokens.figma.js` sobre el archivo (Claude lo corre con
+2. Correr `exportar-tokens.figma.js` sobre el archivo (se corre con
    `use_figma`; tambien sirve la consola de un plugin de desarrollo) y guardar
    lo que devuelve en `tokens.json`, en `tokens`.
 3. Regenerar con `build.py`.

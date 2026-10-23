@@ -13,7 +13,7 @@
     bajada: "Fotos a todo el ancho que se mueven con el scroll, con la etiqueta y el texto arriba, que entran por líneas.",
     nota: "Scrolleá dentro del escenario. Fotos y textos de ejemplo.",
     variantes: [
-      ["paginas", "Como páginas", "La sección queda fija y las fotos pasan hacia arriba como páginas; cada imagen va más lenta que su panel. La de la referencia."],
+      ["paginas", "Como páginas", "La sección queda fija y las fotos pasan hacia arriba como páginas; cada imagen va más lenta que su panel."],
       ["apiladas", "Apiladas", "Cada foto sube como una tarjeta y tapa a la anterior, que se achica y se oscurece. El texto va adentro de cada tarjeta, arriba, y viaja con ella."],
       ["expande", "Se expande", "La foto arranca como tarjeta con aire y radio y crece hasta el borde. Al irse vuelve a achicarse y se oscurece mientras sube la siguiente."]
     ],
@@ -134,7 +134,7 @@
           exps.forEach(function (x) {
             // y: cuánto se scrolleó dentro del tramo; queda fija de 0 a fin.
             var r = x.getBoundingClientRect(), y = -r.top, fin = r.height - H;
-            // Entra: crece desde que su borde de arriba pasa el 35% de la pantalla, en 0,6 pantallas (antes 0,8 y recién arriba de todo).
+            // Entra: crece desde que su borde de arriba pasa el 35% de la pantalla, en 0,6 pantallas.
             var e = suave(lim((y + H * .35) / (H * .6)));
             // Sale: en las últimas 0,6 pantallas fijas vuelve a la mitad de la tarjeta, se achica y se oscurece.
             var o = suave(lim((y - (fin - H * .6)) / (H * .6)));

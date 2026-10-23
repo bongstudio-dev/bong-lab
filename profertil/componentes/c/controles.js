@@ -131,7 +131,7 @@
     controles: [
       { id: "h", tipo: "rango", etiqueta: "Alto de la pastilla", unidad: "px", min: 24, max: 40, def: 30, aplica: { var: "--h", unidad: "px" }, desc: "Alto de la elegida y de las opciones." }
     ],
-    claves: ["Reemplaza al select nativo: Marcos lo pidió así porque el nativo desconecta.", "Se comporta como un select: tiene value y dispara change.", "Se cierra al elegir, con Escape o tocando afuera; las flechas del teclado recorren las opciones.", "La elegida lleva un aro de tinta dentro del contenedor."],
+    claves: ["Reemplaza al select del navegador para que el control hable el mismo lenguaje que el resto del sistema.", "Se comporta como un select: tiene value y dispara change.", "Se cierra al elegir, con Escape o tocando afuera; las flechas del teclado recorren las opciones.", "La elegida lleva un aro de tinta dentro del contenedor."],
     accesibilidad: "Botón con aria-haspopup=\"listbox\" y aria-expanded; las opciones son role=\"option\" con aria-selected.",
     css: function () {
       return [
@@ -240,7 +240,7 @@
     id: "confirmacion", nombre: "Confirmación", grupo: "Avisos", alto: "auto", mini: 640, base: ["boton"],
     bajada: "El modal propio para confirmar una acción, en lugar del confirm() del navegador.",
     variantes: [["alerta", "Alerta", "Para lo que borra o no tiene vuelta: el botón va en naranja."], ["principal", "Principal", "Para lo que crea o cambia: el botón va en azul."]],
-    claves: ["Nunca confirm() nativo: Marcos pidió el propio porque el nativo desconecta.", "El título dice la acción; el texto dice qué pasa y si se puede deshacer.", "El foco arranca en Cancelar.", "Escape o tocar afuera cancela."],
+    claves: ["Reemplaza al confirm() del navegador para que la confirmación hable el mismo lenguaje que el resto del sistema.", "El título dice la acción; el texto dice qué pasa y si se puede deshacer.", "El foco arranca en Cancelar.", "Escape o tocar afuera cancela."],
     accesibilidad: "Es un <dialog> abierto con showModal(): atrapa el foco y el lector lo anuncia con su título.",
     css: function () {
       return [

@@ -1,5 +1,5 @@
 // Exporta los tokens web del Figma Master (broRXp9etWG4y2IjFyCC3V) a JSON.
-// Se corre en el archivo con la Plugin API (use_figma de Claude, o la consola
+// Se corre en el archivo con la Plugin API (use_figma del MCP de Figma, o la consola
 // de un plugin de desarrollo). Toma las variables de 01 · Primitivas y 06 · Web
 // que tienen code syntax WEB del tipo var(--nombre), resuelve los alias y
 // devuelve { nombre: { valor, figma } }. Lo que devuelve va a tokens.json.
