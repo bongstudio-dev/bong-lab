@@ -1,4 +1,4 @@
-/* Pie de página: tres variantes. */
+/* Pie de página: tres variantes y dos experimentos. */
 (function () {
   var COLUMNAS = [
     ["Empresa", ["Quiénes somos", "Planta Bahía Blanca", "Sustentabilidad", "Compliance"]],
@@ -204,18 +204,114 @@
     }
   }
 
+  /* Flores (experimento, sobre Floral Studies de heystudio): una banda de mosaicos al pie. Cada mosaico es una flor
+     de tres formas del Master encimadas sobre un fondo de color; cada tanto cambia y las capas entran con un resorte,
+     de afuera hacia adentro. Al pasar el puntero (o tocar) un mosaico, cambia en el acto. O = { tamano, ritmo }. */
+  function FLORES(O) {
+    var pie = document.querySelector(".pf-pie"), banda = pie.querySelector(".pf-pie__flores"), lienzo = banda.querySelector("canvas"), ctx = lienzo.getContext("2d");
+    var quieto = matchMedia("(prefers-reduced-motion: reduce)").matches, css = getComputedStyle(document.documentElement);
+    var PALETA = ["--azul", "--celeste", "--verde", "--verde-claro", "--amarillo", "--naranja", "--terra"].map(function (v) { return css.getPropertyValue(v).trim(); });
+    var TIZA = css.getPropertyValue("--tiza").trim();
+    // Cada forma centrada en su caja y llevada a un cuadrado de lado 1. El círculo es la pieza base del sistema (sol, urea, círculos).
+    var T = {};
+    Object.keys(FORMAS).forEach(function (n) {
+      var f = FORMAS[n], vb = f.vb.split(" ").map(Number), lado = Math.max(vb[2], vb[3]), m = new DOMMatrix().scale(1 / lado).translate(-vb[2] / 2, -vb[3] / 2), c = new Path2D();
+      f.d.replace(/ d="([^"]+)"/g, function (_, d) { c.addPath(new Path2D(d), m); });
+      T[n] = { camino: c, regla: /evenodd/.test(f.d) ? "evenodd" : "nonzero" };
+    });
+    var circ = new Path2D(); circ.arc(0, 0, .5, 0, Math.PI * 2); T.circulo = { camino: circ, regla: "nonzero" };
+    // Afuera van las que llenan el mosaico; en el medio y el centro, las compactas (las finas se pierden chicas).
+    var AFUERA = ["flor", "estrella", "circulos", "sol", "plantas", "capas", "urea", "escudo", "hoja", "trigo", "c", "circulo", "casco", "industria", "lupa", "grafico", "barras"];
+    var MEDIO = ["estrella", "flor", "circulo", "sol", "urea", "escudo", "hoja", "trigo", "capas", "plantas"];
+    var CENTRO = ["circulo", "estrella", "flor", "sol", "circulo", "urea", "hoja"];
+    var ESCALA = [.94, .56, .3], ENTRA = [.55, .2, 0], RETRASO = [0, 90, 190], DURA = 900;
+
+    function azar(a) { return a[Math.floor(Math.random() * a.length)]; }
+    function otro(a, evitar) { var l = a.filter(function (x) { return evitar.indexOf(x) < 0; }); return azar(l.length ? l : a); }
+    // Resorte con un poco de rebote, como en el video.
+    function resorte(p) { return p >= 1 ? 1 : 1 - Math.exp(-6 * p) * Math.cos(9 * p); }
+
+    var W = 0, H = 0, lado = 0, ancho = 0, alto = 0, cols = 0, filas = 0, mos = [], dpr = Math.min(2, devicePixelRatio || 1);
+    function fondoVecino(i) {
+      var c = i % cols, f = Math.floor(i / cols), v = [];
+      [[c - 1, f], [c + 1, f], [c, f - 1], [c, f + 1]].forEach(function (q) { var m = q[0] >= 0 && q[0] < cols && q[1] >= 0 && q[1] < filas && mos[q[1] * cols + q[0]]; if (m) v.push(m.fondo); });
+      return v;
+    }
+    function nueva(i, t) {
+      var m = mos[i], antes = m ? [m.fondo, m.capas[0].color] : [];
+      var fondo = otro(PALETA, fondoVecino(i).concat(antes)), conTiza = PALETA.concat([TIZA, TIZA]);
+      var a = otro(conTiza, [fondo]), b = otro(conTiza, [a, fondo]), c = otro(conTiza, [b]);
+      var fa = otro(AFUERA, m ? [m.capas[0].forma] : []), fb = otro(MEDIO, [fa]), fc = otro(CENTRO, [fb]);
+      var giro = (Math.random() < .5 ? -1 : 1) * (.25 + Math.random() * .35);
+      mos[i] = { fondo: fondo, t: t, prox: t + O.ritmo * (.75 + Math.random() * .6), capas: [
+        { forma: fa, color: a, giro: giro }, { forma: fb, color: b, giro: -giro * 1.4 }, { forma: fc, color: c, giro: giro * 2 }] };
+    }
+
+    function medir() {
+      var r = banda.getBoundingClientRect(); W = r.width; H = r.height;
+      // Columnas y filas justas para llenar la banda: el mosaico queda casi cuadrado y la flor se mide por su lado más corto.
+      cols = Math.max(2, Math.round(W / O.tamano)); ancho = W / cols; filas = Math.max(1, Math.round(H / ancho)); alto = H / filas; lado = Math.min(ancho, alto);
+      lienzo.width = Math.round(W * dpr); lienzo.height = Math.round(H * dpr); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      var ahora = performance.now(), viejo = mos; mos = [];
+      for (var i = 0; i < cols * filas; i++) { mos[i] = viejo[i]; if (!mos[i]) { nueva(i, quieto ? -1e9 : ahora + Math.random() * O.ritmo); } }
+      mos.length = cols * filas;
+    }
+
+    function dibujar(t) {
+      ctx.clearRect(0, 0, W, H);
+      mos.forEach(function (m, i) {
+        var x = (i % cols) * ancho, y = Math.floor(i / cols) * alto;
+        ctx.save(); ctx.beginPath(); ctx.rect(x, y, ancho + .5, alto + .5); ctx.clip();
+        ctx.fillStyle = m.fondo; ctx.fillRect(x, y, ancho + 1, alto + 1);
+        ctx.translate(x + ancho / 2, y + alto / 2);
+        m.capas.forEach(function (c, k) {
+          var p = Math.max(0, (t - m.t - RETRASO[k]) / DURA), e = resorte(p), s = ESCALA[k] * lado * (ENTRA[k] + (1 - ENTRA[k]) * e);
+          // Después de entrar, la flor respira apenas.
+          s *= 1 + .025 * Math.sin((t - m.t) / 700 + k);
+          if (s <= 0) return;
+          ctx.save(); ctx.rotate(c.giro * (1 - e)); ctx.scale(s, s); ctx.fillStyle = c.color; ctx.fill(T[c.forma].camino, T[c.forma].regla); ctx.restore();
+        });
+        ctx.restore();
+      });
+    }
+
+    var visible = false, corre = false;
+    function cuadro(t) {
+      if (!visible) { corre = false; return; }
+      mos.forEach(function (m, i) { if (t >= m.prox) nueva(i, t); });
+      dibujar(t); requestAnimationFrame(cuadro);
+    }
+    function seguir() { if (!corre && visible && !quieto) { corre = true; requestAnimationFrame(cuadro); } }
+
+    // Pasar el puntero o tocar un mosaico lo cambia (no más de una vez cada medio segundo).
+    function tocar(e) {
+      var r = lienzo.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+      if (y < 0 || x < 0 || x >= W || y >= H) return;
+      var i = Math.floor(y / alto) * cols + Math.floor(x / ancho), m = mos[i], t = performance.now();
+      if (!m || t - Math.max(m.t, 0) < 500) return;
+      nueva(i, quieto ? -1e9 : t); if (quieto) dibujar(t);
+    }
+    lienzo.addEventListener("pointermove", function (e) { if (e.pointerType === "mouse") tocar(e); });
+    lienzo.addEventListener("pointerdown", tocar);
+
+    medir(); dibujar(performance.now());
+    new IntersectionObserver(function (es) { visible = es[0].isIntersecting; seguir(); }).observe(banda);
+    new ResizeObserver(function () { medir(); dibujar(performance.now()); }).observe(banda);
+  }
+
   Libreria.sumar({
     id: "footer", nombre: "Pie de página", grupo: "Navegación", alto: "auto", sangrado: true,
-    bajada: "El cierre de todas las páginas: navegación, línea ética y datos legales. Tres variantes, de la más sobria a la más osada, y una cuarta experimental.",
+    bajada: "El cierre de todas las páginas: navegación, línea ética y datos legales. Tres variantes, de la más sobria a la más osada, y dos experimentales.",
     variantes: [
       ["institucional", "Institucional", "La base: fondo de color, logo y bajada arriba, cuatro columnas, línea ética y legales."],
       ["trigo", "Con trigo", "Fondo tiza y el trigo del sistema en amarillo pleno, a la izquierda, que sube más lento que la página."],
       ["vida", "Vida para nuestra tierra", "Alto de pantalla completa con un video de campo en loop de fondo y un filtro negro parejo. La frase va abajo a la izquierda, a tamaño de título, y entra con el animador Ventana."],
-      ["formas", "Formas que caen", "Experimento. Alto de pantalla completa en marfil: arriba logo, links y línea ética; abajo caen las formas del sistema con física, se apilan hasta la mitad y se pueden agarrar y tirar."]
+      ["formas", "Formas que caen", "Experimento. Alto de pantalla completa en marfil: arriba logo, links y línea ética; abajo caen las formas del sistema con física, se apilan hasta la mitad y se pueden agarrar y tirar."],
+      ["flores", "Flores", "Experimento. Alto de pantalla completa en marfil: arriba logo, links y línea ética; abajo una banda de mosaicos, cada uno una flor de tres formas del Master en los colores de marca. Cambian solas, con un resorte, y al pasar el puntero o tocar."]
     ],
     tamano: "media",
-    claves: ["La línea ética va siempre en el pie, destacada, con su propio llamado.", "Los fondos de color son solo los del Master (azul, verde, terra, amarillo); sobre amarillo el texto va en azul.", "El logo va siempre completo: no se recorta ni se separa el símbolo de la palabra.", "Las columnas repiten el menú principal: si cambia la arquitectura, cambia el pie.", "Con trigo y Vida para nuestra tierra tienen parallax: el trigo y la foto se mueven a otra velocidad que la página mientras el pie entra en pantalla.", "Vida para nuestra tierra ocupa una pantalla entera. La frase va alineada a la izquierda junto a la línea ética, y entra con el animador Ventana, palabra por palabra.", "Nunca degradados sobre la foto (ni de color ni de tinta). Si hace falta contraste, un filtro negro parejo.", "Formas que caen es un experimento: las 18 formas del Master en los 7 colores de marca, sin dos del mismo color tocándose (si se tocan, la que se mueve cambia de color). Arrancan a caer cuando el pie entra en pantalla."],
-    accesibilidad: "Es un <footer> con listas de links reales. El trigo es decorativo (aria-hidden); el video es decorativo, mudo y sin controles; la frase es texto real, legible por lectores y buscadores. Con movimiento reducido no hay parallax y el video queda quieto en el primer cuadro. En Formas que caen el lienzo es decorativo (aria-hidden) y deja pasar los clics a los links; con movimiento reducido las formas aparecen ya apiladas.",
+    claves: ["La línea ética va siempre en el pie, destacada, con su propio llamado.", "Los fondos de color son solo los del Master (azul, verde, terra, amarillo); sobre amarillo el texto va en azul.", "El logo va siempre completo: no se recorta ni se separa el símbolo de la palabra.", "Las columnas repiten el menú principal: si cambia la arquitectura, cambia el pie.", "Con trigo y Vida para nuestra tierra tienen parallax: el trigo y la foto se mueven a otra velocidad que la página mientras el pie entra en pantalla.", "Vida para nuestra tierra ocupa una pantalla entera. La frase va alineada a la izquierda junto a la línea ética, y entra con el animador Ventana, palabra por palabra.", "Nunca degradados sobre la foto (ni de color ni de tinta). Si hace falta contraste, un filtro negro parejo.", "Formas que caen es un experimento: las 18 formas del Master en los 7 colores de marca, sin dos del mismo color tocándose (si se tocan, la que se mueve cambia de color). Arrancan a caer cuando el pie entra en pantalla.", "Flores es un experimento: cada mosaico encima tres formas del Master (afuera, medio y centro) sobre un fondo de los 7 colores de marca; dos capas seguidas nunca tienen el mismo color, ni dos fondos vecinos. Las capas entran de afuera hacia adentro con un resorte."],
+    accesibilidad: "Es un <footer> con listas de links reales. El trigo es decorativo (aria-hidden); el video es decorativo, mudo y sin controles; la frase es texto real, legible por lectores y buscadores. Con movimiento reducido no hay parallax y el video queda quieto en el primer cuadro. En Formas que caen el lienzo es decorativo (aria-hidden) y deja pasar los clics a los links; con movimiento reducido las formas aparecen ya apiladas. En Flores el lienzo también es decorativo; con movimiento reducido las flores quedan quietas y solo cambian al tocarlas, sin animación.",
     dependencias: ["en Formas que caen, Matter.js 0.20 y poly-decomp 0.3 desde CDN, y formas.js"],
     previo: '<div style="height:80vh;display:grid;place-items:center;color:var(--ink-3);font-size:var(--texto-chico)">Final de la página</div>',
     controles: [
@@ -225,6 +321,8 @@
       { id: "par", tipo: "rango", etiqueta: "Parallax", solo: ["trigo", "vida"], unidad: "%", min: 0, max: 40, def: 22, aplica: { var: "--par" }, desc: "Cuánto se corre el trigo o el video mientras entra el pie. En Vida, solo el video." },
       { id: "cantidad", tipo: "rango", etiqueta: "Cantidad", solo: ["formas"], unidad: "formas", min: 6, max: 120, def: 28, desc: "Cuántas formas caen en un pie de 1440 × 900. En otros tamaños se ajusta al área, para que llenen lo mismo." },
       { id: "tamano", tipo: "rango", etiqueta: "Tamaño", solo: ["formas"], unidad: "px", min: 48, max: 280, def: 160, desc: "Lado de cada forma. En pantallas chicas no pasa del 30% del ancho." },
+      { id: "mosaico", tipo: "rango", etiqueta: "Mosaico", solo: ["flores"], unidad: "px", min: 100, max: 480, def: 240, desc: "Lado aproximado de cada mosaico. Se ajusta para que entren justos en el ancho y en el alto de la banda, que llena todo lo que queda debajo del contenido." },
+      { id: "ritmo", tipo: "rango", etiqueta: "Ritmo", solo: ["flores"], unidad: "ms", min: 500, max: 4000, paso: 100, def: 1300, desc: "Cada cuánto cambia cada flor, en promedio. Cada mosaico va a su tiempo." },
       "---",
       { id: "radio", tipo: "rango", etiqueta: "Radio de arriba", unidad: "px", min: 0, max: 56, def: 26, aplica: { var: "--radio", unidad: "px" }, desc: "Radio de las esquinas de arriba." },
       { id: "logo", tipo: "rango", etiqueta: "Logo", unidad: "px", min: 80, max: 260, def: 150, aplica: { var: "--logo", unidad: "px" }, desc: "Ancho del logo completo." },
@@ -304,8 +402,19 @@
         '.pf-pie__fisica { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; pointer-events: none; }',
         '.pf-pie.pf-agarra, .pf-pie.pf-agarra * { cursor: grabbing !important; user-select: none; }',
         "",
+        "/* Flores (experimento): marfil, el contenido arriba y la banda de mosaicos llena lo que queda hasta abajo. */",
+        '.pf-pie[data-variante="flores"] { --pie-tinta: var(--azul); --pie-fondo: var(--tiza); display: flex; flex-direction: column; min-height: 100vh; min-height: 100svh; background: var(--tiza); color: var(--azul); }',
+        '.pf-pie[data-variante="flores"] .pf-pie__in { display: grid; gap: 28px; width: 100%; max-width: none; }',
+        '.pf-pie[data-variante="flores"] .pf-pie__cols { flex: 1; max-width: 760px; }',
+        '.pf-pie[data-variante="flores"] .pf-pie__etica { width: fit-content; max-width: 100%; margin-left: auto; gap: 10px 18px; padding: 10px 10px 10px 18px; border-radius: 14px; }',
+        '.pf-pie[data-variante="flores"] .pf-pie__etica b { font-size: var(--texto-destacado); }',
+        '.pf-pie[data-variante="flores"] .pf-pie__etica span { margin-top: 2px; font-size: var(--texto-mini); }',
+        '.pf-pie[data-variante="flores"] .pf-pie__etica .pf-pie__pill { height: 36px; padding: 0 16px; font-size: var(--texto-chico); }',
+        '.pf-pie__flores { position: relative; flex: 1; min-height: 200px; }',
+        '.pf-pie__flores canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }',
+        "",
         "@media (max-width: 760px) {",
-        "  .pf-pie__cols, .pf-pie[data-variante=\"vida\"] .pf-pie__cols { grid-template-columns: repeat(2, minmax(0, 1fr)); flex-basis: 100%; }",
+        "  .pf-pie__cols, .pf-pie[data-variante] .pf-pie__cols { grid-template-columns: repeat(2, minmax(0, 1fr)); flex-basis: 100%; }",
         "  .pf-pie[data-variante=\"vida\"] .pf-pie__in { gap: 22px; }",
         "  .pf-pie[data-variante=\"trigo\"] .pf-pie__in { grid-template-columns: 1fr; } .pf-pie[data-variante=\"trigo\"] .pf-pie__der { grid-column: 1; padding-top: 34vw; }",
         "  .pf-pie__trigo { height: auto; width: 46vw; left: auto; right: -6vw; bottom: auto; top: -3vw; }",
@@ -332,12 +441,15 @@
       if (v === "vida") h += '  <div class="pf-pie__arriba">\n  <a class="pf-pie__logo" href="#" aria-label="Profertil">' + logo + '</a>\n' + cols + '  </div>\n' +
         '  <div class="pf-pie__abajo">\n  <p class="pf-pie__vida" data-anim="ventana">Vida para nuestra tierra</p>\n' + etica + '  </div>\n' + legal;
       if (v === "formas") h += '  <div class="pf-pie__arriba">\n  <a class="pf-pie__logo" href="#" aria-label="Profertil">' + logo + '</a>\n' + cols + '  </div>\n' + etica;
+      if (v === "flores") h += '  <div class="pf-pie__arriba">\n  <a class="pf-pie__logo" href="#" aria-label="Profertil">' + logo + '</a>\n' + cols + '  </div>\n' + etica + legal;
       h += '</div>\n';
+      if (v === "flores") h += '<div class="pf-pie__flores" aria-hidden="true"><canvas></canvas></div>\n';
       if (v === "formas") h += '<canvas class="pf-pie__fisica" aria-hidden="true"></canvas>\n' + legal;
       return h + '</footer>';
     },
     js: function (s) {
       if (s.variante === "institucional") return "";
+      if (s.variante === "flores") return "(" + FLORES.toString() + ")(" + JSON.stringify({ tamano: +s.mosaico, ritmo: +s.ritmo }) + ");";
       if (s.variante === "formas") return "(" + FISICA.toString() + ")(" + JSON.stringify({ cantidad: +s.cantidad, tamano: +s.tamano }) + ");";
       return "(" + function () {
         // El pie avisa cuánto entró en pantalla (--p de 0 a 1): con eso se mueven el trigo, la foto y la frase.
