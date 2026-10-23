@@ -1,9 +1,8 @@
 /* Controles, botones y avisos del sistema web de Profertil.
    Salen de dos páginas ya aprobadas: Novedades (Master, ◈ Componentes UI) y la herramienta
-   de Arquitectura. El código es el de esas páginas, ordenado para usarse solo. */
+   de Arquitectura. Las piezas que se repiten (Selector, Pastilla, Chip, Interruptor, Botón, Botón sobre color)
+   viven en base.css: acá cada componente suma solo lo propio. Todo con prefijo pf- y valores de tokens.css. */
 (function () {
-  // Alias cortos de los tokens del sistema (tokens.css): cada control los usa con estos nombres.
-  var T = "--tinta: var(--ink); --tinta-2: var(--ink-2); --linea: var(--line); --f-d: var(--f-display); --f-b: var(--f-body);";
   // El JS de cada control se escribe como función real y se copia tal cual.
   function fuente(fn) { return "(" + fn.toString() + ")();"; }
   // Las categorías de Novedades con su color de familia (tokens.css: --cat-*).
@@ -17,65 +16,58 @@
     grande: '<svg viewBox="0 0 15 15" aria-hidden="true"><rect x="1" y="1" width="13" height="13" rx="2.5"/></svg>'
   };
   Libreria.sumar({
-    id: "selector", nombre: "Selector", grupo: "Controles", alto: "auto", mini: 560,
+    id: "selector", nombre: "Selector", grupo: "Controles", alto: "auto", mini: 560, base: ["selector"],
     bajada: "Opciones de una sola elección en una cápsula, con un indicador marfil que se desliza a la elegida.",
     variantes: [["texto", "Texto", "Orden de la grilla en Novedades: más recientes o más antiguas."], ["iconos", "Íconos", "Tamaño de las tarjetas: chico, medio y grande. En mobile no hay chico."]],
     controles: [
-      { id: "t", tipo: "rango", etiqueta: "Duración del deslizamiento", unidad: "ms", min: 160, max: 800, paso: 20, def: 420, aplica: { var: "--t", unidad: "ms" }, desc: "Web/Movimiento/Vista del Master." }
+      { id: "t", tipo: "rango", etiqueta: "Duración del deslizamiento", unidad: "ms", min: 160, max: 800, paso: 20, def: 420, aplica: { var: "--pf-t", unidad: "ms" }, desc: "Web/Movimiento/Vista del Master (--t-vista)." }
     ],
     claves: ["Siempre hay una opción elegida; el indicador se ubica sobre ella con JS (ancho y posición del botón).", "Al cambiar, el indicador se desliza en 420 ms con la curva de la vista: cubic-bezier(.67, 0, .24, .99).", "La elegida va en azul y en 500; las demás en tinta secundaria.", "Al cargar, el indicador aparece en su lugar sin animarse."],
     accesibilidad: "Botones reales con aria-pressed dentro de un grupo con nombre. Con movimiento reducido el indicador salta sin deslizarse.",
     css: function () {
       return [
-        ".selector { " + T + " --t: 420ms; --curva: cubic-bezier(.67, 0, .24, .99); display: flex; justify-content: center; font-family: var(--f-b); }",
-        ".seg { position: relative; isolation: isolate; display: inline-flex; padding: 3px; border-radius: 999px; background: var(--linea); }",
-        ".seg-ind { position: absolute; z-index: -1; top: 3px; left: 0; bottom: 3px; width: 0; border-radius: 999px; background: var(--tiza);",
-        "  box-shadow: 0 1px 3px rgba(10, 30, 74, .12); pointer-events: none; transition: transform var(--t) var(--curva), width var(--t) var(--curva); }",
-        ".seg-ind.quieto { transition: none; }",
-        ".seg button { border: 0; background: transparent; cursor: pointer; padding: 6px 13px; border-radius: 999px; font: inherit; font-size: .86rem; color: var(--tinta-2); transition: color 240ms ease; }",
-        ".seg button[aria-pressed=\"true\"] { color: var(--azul); font-weight: 500; }",
-        ".seg.iconos button { display: grid; place-items: center; padding: 6px 11px; }",
-        ".seg.iconos svg { width: 15px; height: 15px; fill: currentColor; }",
-        "@media (max-width: 640px) { .seg.iconos [data-v=\"chico\"] { display: none; } }",
-        "@media (prefers-reduced-motion: reduce) { .seg-ind { transition: none; } }"
+        ".pf-selector-muestra { display: flex; justify-content: center; }",
+        "@media (max-width: 640px) { .pf-selector--iconos [data-v=\"chico\"] { display: none; } }"
       ].join("\n");
     },
     html: function (s) {
-      var op = s.variante === "iconos"
+      var ic = s.variante === "iconos";
+      var op = ic
         ? [["chico", IC_VISTA.chico, "Tarjetas chicas"], ["medio", IC_VISTA.medio, "Tarjetas medianas"], ["grande", IC_VISTA.grande, "Tarjetas grandes"]]
         : [["recientes", "Más recientes"], ["antiguas", "Más antiguas"]];
-      var elegida = s.variante === "iconos" ? "medio" : "recientes";
-      return '<div class="selector" data-c="selector">\n  <div class="seg' + (s.variante === "iconos" ? ' iconos' : '') + '" role="group" aria-label="' + (s.variante === "iconos" ? 'Tamaño de las tarjetas' : 'Orden') + '">\n    <span class="seg-ind" aria-hidden="true"></span>\n' +
+      var elegida = ic ? "medio" : "recientes";
+      return '<div class="pf-selector-muestra" data-c="selector">\n  <div class="pf-selector' + (ic ? ' pf-selector--iconos' : '') + '" role="group" aria-label="' + (ic ? 'Tamaño de las tarjetas' : 'Orden') + '">\n    <span class="pf-selector__ind" aria-hidden="true"></span>\n' +
         op.map(function (o) { return '    <button type="button" data-v="' + o[0] + '" aria-pressed="' + (o[0] === elegida) + '"' + (o[2] ? ' aria-label="' + o[2] + '"' : '') + '>' + o[1] + '</button>'; }).join("\n") + '\n  </div>\n</div>';
     },
     js: function () {
       return fuente(function () {
         // Lleva el indicador al botón elegido; sin animar la primera vez.
-        function mover(seg, animar) {
-          var ind = seg.querySelector(".seg-ind"), b = seg.querySelector('button[aria-pressed="true"]');
+        function mover(sel, animar) {
+          var ind = sel.querySelector(".pf-selector__ind"), b = sel.querySelector('button[aria-pressed="true"]');
           if (!b || !b.offsetWidth) return;
-          if (!animar) ind.classList.add("quieto");
+          if (!animar) ind.classList.add("pf-quieto");
           ind.style.width = b.offsetWidth + "px";
           ind.style.transform = "translateX(" + b.offsetLeft + "px)";
-          if (!animar) { void ind.offsetWidth; ind.classList.remove("quieto"); }
+          if (!animar) { void ind.offsetWidth; ind.classList.remove("pf-quieto"); }
         }
-        document.querySelectorAll(".seg").forEach(function (seg) {
-          mover(seg, false);
-          seg.addEventListener("click", function (e) {
+        var todos = function () { return document.querySelectorAll(".pf-selector"); };
+        todos().forEach(function (sel) {
+          mover(sel, false);
+          sel.addEventListener("click", function (e) {
             var b = e.target.closest("button"); if (!b) return;
-            seg.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
-            mover(seg, true);
+            sel.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+            mover(sel, true);
           });
         });
-        addEventListener("resize", function () { document.querySelectorAll(".seg").forEach(function (s) { mover(s, false); }); });
-        document.fonts && document.fonts.ready.then(function () { document.querySelectorAll(".seg").forEach(function (s) { mover(s, false); }); });
+        addEventListener("resize", function () { todos().forEach(function (s) { mover(s, false); }); });
+        document.fonts && document.fonts.ready.then(function () { todos().forEach(function (s) { mover(s, false); }); });
       });
     }
   });
 
   /* ------------------------------------------------------------------ Pastilla de filtro */
   Libreria.sumar({
-    id: "pastilla-filtro", nombre: "Pastilla de filtro", grupo: "Controles", alto: "auto", mini: 560,
+    id: "pastilla-filtro", nombre: "Pastilla de filtro", grupo: "Controles", alto: "auto", mini: 560, base: ["pastilla", "chip"],
     bajada: "Las pastillas de los filtros, como en el Master y en Novedades: la de categoría y el chip de año con su cantidad.",
     variantes: [
       ["categoria", "Categoría", "Web/Pastilla filtro: redonda, rellena con el color de la familia y texto tiza. La elegida va en tinta. Todas sin elegir es transparente. Una por vez."],
@@ -84,33 +76,17 @@
     claves: ["Categoría: alto 30, radio 15 (la mitad del alto), Familjen Grotesk Regular 14, 14 de aire a cada lado.", "Categoría elegida: Web/Activo (tinta) con Texto sobre color (tiza), sin aro. Hover: el color de la familia con 14% de tinta.", "Año: alto 32, radio 32% del alto, DM Sans Medium 16; Web/Chip fondo, Web/Chip texto y Web/Chip activo.", "El número del año dice cuántas notas cumplen los otros filtros.", "Todos los colores salen de tokens.css: no hay ningún color suelto."],
     accesibilidad: "Botones con aria-pressed dentro de un grupo con nombre. El número va como texto real después del año.",
     css: function () {
-      return [
-        ".pastillas { " + T + " display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; max-width: 640px; margin: 0 auto; }",
-        "/* Web/Pastilla filtro (Novedades: .lbl) */",
-        ".lbl { --h: 30px; display: inline-flex; align-items: center; flex: none; height: var(--h); padding: 0 calc(var(--h) * .48); border: 0; border-radius: 999px;",
-        "  background: var(--pc, var(--azul)); color: var(--sobre-color); font: 400 calc(var(--h) * .47)/1 var(--f-display); white-space: nowrap; cursor: pointer;",
-        "  transition: background 240ms var(--ease), color 240ms var(--ease);  text-box: trim-both cap alphabetic; }",
-        "@media (hover: hover) and (pointer: fine) { .lbl:hover { background: color-mix(in srgb, var(--pc, var(--azul)) 86%, var(--ink)); } }",
-        ".lbl[aria-pressed=\"true\"] { background: var(--activo); color: var(--sobre-color); }",
-        ".lbl-todas { background: transparent; color: var(--ink); }",
-        "@media (hover: hover) and (pointer: fine) { .lbl-todas:hover { background: var(--line); } }",
-        "/* Web/Chip año (Novedades: .sub-anio en el panel) */",
-        ".sub-anio { --h: 32px; display: inline-flex; align-items: center; gap: 6px; flex: none; height: var(--h); padding: 0 calc(var(--h) * .42); border: 0; border-radius: calc(var(--h) * .32);",
-        "  background: var(--chip-fondo); color: var(--chip-texto); font: 500 calc(var(--h) * .5)/1 var(--f-body); font-variant-numeric: tabular-nums; white-space: nowrap; cursor: pointer; transition: background 160ms ease, color 160ms ease;  text-box: trim-both cap alphabetic; }",
-        "@media (hover: hover) and (pointer: fine) { .sub-anio:hover { background: color-mix(in srgb, var(--azul) 28%, #fff); } }",
-        ".sub-anio[aria-pressed=\"true\"] { background: var(--chip-activo); color: var(--sobre-color); }",
-        ".sub-anio .n { font-weight: 400; opacity: .7; }"
-      ].join("\n");
+      return ".pf-pastillas { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; max-width: 640px; margin: 0 auto; }";
     },
     html: function (s) {
       var b;
-      if (s.variante === "anio") b = ANIOS.map(function (a, i) { return '  <button type="button" class="sub-anio" aria-pressed="' + (i === 1) + '">' + a[0] + ' <b class="n">' + a[1] + '</b></button>'; });
-      else b = ['  <button type="button" class="lbl lbl-todas" aria-pressed="false">Todas</button>'].concat(CAT.map(function (c, i) { return '  <button type="button" class="lbl" style="--pc: var(--cat-' + c[1] + ')" aria-pressed="' + (i === 0) + '">' + c[0] + '</button>'; }));
-      return '<div class="pastillas" data-c="pastilla-filtro" role="group" aria-label="' + (s.variante === "anio" ? 'Años' : 'Categoría') + '">\n' + b.join("\n") + '\n</div>';
+      if (s.variante === "anio") b = ANIOS.map(function (a, i) { return '  <button type="button" class="pf-chip" aria-pressed="' + (i === 1) + '">' + a[0] + ' <b class="pf-chip__n">' + a[1] + '</b></button>'; });
+      else b = ['  <button type="button" class="pf-pastilla pf-pastilla--todas" aria-pressed="false">Todas</button>'].concat(CAT.map(function (c, i) { return '  <button type="button" class="pf-pastilla" style="--pc: var(--cat-' + c[1] + ')" aria-pressed="' + (i === 0) + '">' + c[0] + '</button>'; }));
+      return '<div class="pf-pastillas" data-c="pastilla-filtro" role="group" aria-label="' + (s.variante === "anio" ? 'Años' : 'Categoría') + '">\n' + b.join("\n") + '\n</div>';
     },
     js: function (s) {
       return "var VARIOS = " + (s.variante === "anio") + ";\n" + fuente(function () {
-        var caja = document.querySelector(".pastillas");
+        var caja = document.querySelector(".pf-pastillas");
         caja.addEventListener("click", function (e) {
           var b = e.target.closest("button"); if (!b) return;
           if (VARIOS) { b.setAttribute("aria-pressed", String(b.getAttribute("aria-pressed") !== "true")); return; }
@@ -122,7 +98,7 @@
 
   /* ------------------------------------------------------------------ Interruptor */
   Libreria.sumar({
-    id: "interruptor", nombre: "Interruptor", grupo: "Controles", alto: "auto", mini: 560,
+    id: "interruptor", nombre: "Interruptor", grupo: "Controles", alto: "auto", mini: 560, base: ["interruptor"],
     bajada: "Prendido o apagado, solo o en una fila con su texto. Es UI/Toggle del Master.",
     variantes: [["solo", "Solo", "El interruptor suelto, para barras y paneles."], ["fila", "Fila con texto", "Título, descripción y el interruptor a la derecha (UI/Fila toggle)."]],
     controles: [
@@ -130,27 +106,15 @@
     ],
     claves: ["56 × 32, píldora de radio 16, perilla de 26 con 3 de aire.", "Prendido en verde de marca, apagado en gris.", "Toda la fila es el control: se toca el texto o el interruptor."],
     accesibilidad: "Botón con role=\"switch\" y aria-checked; el texto de la fila es su nombre.",
-    css: function () {
-      return [
-        ".interruptor { " + T + " display: flex; justify-content: center; font-family: var(--f-b); }",
-        ".tg { position: relative; flex: none; width: 56px; height: 32px; padding: 0; border: 0; border-radius: 16px; background: var(--color-gris); cursor: pointer; transition: background 200ms ease; }",
-        ".tg::after { content: \"\"; position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(10, 30, 74, .2); transition: transform 240ms cubic-bezier(.22, 1, .36, 1); }",
-        ".tg[aria-checked=\"true\"] { background: var(--verde); }",
-        ".tg[aria-checked=\"true\"]::after { transform: translateX(24px); }",
-        ".fila-tg { display: flex; align-items: center; justify-content: space-between; gap: 24px; width: min(420px, 100%); padding: 18px 18px 18px 20px; border: 0; border-radius: 16px; background: #fff; text-align: left; cursor: pointer; font: inherit; color: var(--tinta); }",
-        ".fila-tg b { display: block; font-weight: 500; }",
-        ".fila-tg span { display: block; font-size: 13px; color: var(--tinta-2); }",
-        "@media (prefers-reduced-motion: reduce) { .tg, .tg::after { transition: none; } }"
-      ].join("\n");
-    },
+    css: function () { return ".pf-interruptor-muestra { display: flex; justify-content: center; }"; },
     html: function (s) {
-      if (s.variante === "fila") return '<div class="interruptor" data-c="interruptor">\n  <button type="button" class="fila-tg" role="switch" aria-checked="' + s.on + '"><span><b>Avisos por mail</b><span>Te escribimos cuando hay una novedad.</span></span><span class="tg" aria-hidden="true"></span></button>\n</div>';
-      return '<div class="interruptor" data-c="interruptor">\n  <button type="button" class="tg" role="switch" aria-checked="' + s.on + '" aria-label="Avisos por mail"></button>\n</div>';
+      if (s.variante === "fila") return '<div class="pf-interruptor-muestra" data-c="interruptor">\n  <button type="button" class="pf-fila-interruptor" role="switch" aria-checked="' + s.on + '"><span><b>Avisos por mail</b><span>Te escribimos cuando hay una novedad.</span></span><span class="pf-interruptor" aria-hidden="true"></span></button>\n</div>';
+      return '<div class="pf-interruptor-muestra" data-c="interruptor">\n  <button type="button" class="pf-interruptor" role="switch" aria-checked="' + s.on + '" aria-label="Avisos por mail"></button>\n</div>';
     },
     js: function () {
       return fuente(function () {
         document.querySelectorAll('[role="switch"]').forEach(function (b) {
-          var tg = b.classList.contains("tg") ? b : b.querySelector(".tg");
+          var tg = b.classList.contains("pf-interruptor") ? b : b.querySelector(".pf-interruptor");
           var pintar = function () { if (tg !== b) tg.setAttribute("aria-checked", b.getAttribute("aria-checked")); };
           pintar();
           b.addEventListener("click", function () { b.setAttribute("aria-checked", String(b.getAttribute("aria-checked") !== "true")); pintar(); });
@@ -171,39 +135,40 @@
     accesibilidad: "Botón con aria-haspopup=\"listbox\" y aria-expanded; las opciones son role=\"option\" con aria-selected.",
     css: function () {
       return [
-        ".desplegable { " + T + " --h: 30px; --ease: cubic-bezier(.22, 1, .36, 1); display: flex; justify-content: center; align-items: flex-start; min-height: 180px; font-family: var(--f-b); }",
-        ".pl { display: inline-flex; align-items: center; flex: none; height: var(--h); padding: 0 calc(var(--h) * .47); border-radius: 999px; background: var(--c); color: var(--tiza); font: 400 calc(var(--h) * .47)/1 var(--f-d); white-space: nowrap;  text-box: trim-both cap alphabetic; }",
-        ".psel { position: relative; }",
-        ".psel-b { display: inline-flex; border: 0; background: none; padding: 0; border-radius: 999px; cursor: pointer; }",
-        ".psel-b .pl { gap: 5px; padding-right: calc(var(--h) * .3); }",
-        ".psel-b svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; margin-top: 2px; transition: transform 300ms var(--ease); }",
-        ".psel-b[aria-expanded=\"true\"] svg { transform: rotate(180deg); }",
-        ".psel-m { position: absolute; top: calc(100% + 6px); left: 0; z-index: 20; display: flex; flex-wrap: wrap; gap: 6px; width: max-content; max-width: 300px; padding: 8px; background: #E4E5DE; border-radius: 20px; box-shadow: 0 24px 60px -24px rgba(10, 30, 74, .5); animation: psel-in 240ms var(--ease); }",
-        ".psel-m[hidden] { display: none; }",
-        ".psel-m button { border: 0; background: none; padding: 0; border-radius: 999px; cursor: pointer; transition: transform 180ms var(--ease); }",
-        ".psel-m [aria-selected=\"true\"] .pl { box-shadow: 0 0 0 2px #E4E5DE, 0 0 0 4px var(--tinta); }",
-        "@media (hover: hover) and (pointer: fine) { .psel-m button:hover { transform: translateY(-1px); } }",
-        "@keyframes psel-in { from { opacity: 0; transform: translateY(-6px); } }",
-        "@media (prefers-reduced-motion: reduce) { .psel-m { animation: none; } }"
+        ".pf-desplegable-muestra { --h: 30px; display: flex; justify-content: center; align-items: flex-start; min-height: 180px; font-family: var(--f-body); }",
+        "/* El gris del contenedor: tinta al 11% sobre tiza. */",
+        ".pf-desplegable { --pf-contenedor: color-mix(in srgb, var(--ink) 11%, var(--tiza)); position: relative; }",
+        ".pf-desplegable__pastilla { display: inline-flex; align-items: center; flex: none; height: var(--h); padding: 0 calc(var(--h) * .47); border-radius: 999px; background: var(--c); color: var(--tiza); font: 400 calc(var(--h) * .47)/1 var(--f-display); white-space: nowrap; text-box: trim-both cap alphabetic; }",
+        ".pf-desplegable__boton { display: inline-flex; border: 0; background: none; padding: 0; border-radius: 999px; cursor: pointer; }",
+        ".pf-desplegable__boton .pf-desplegable__pastilla { gap: 5px; padding-right: calc(var(--h) * .3); }",
+        ".pf-desplegable__boton svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; margin-top: 2px; transition: transform 300ms var(--ease); }",
+        ".pf-desplegable__boton[aria-expanded=\"true\"] svg { transform: rotate(180deg); }",
+        ".pf-desplegable__menu { position: absolute; top: calc(100% + 6px); left: 0; z-index: 20; display: flex; flex-wrap: wrap; gap: 6px; width: max-content; max-width: 300px; padding: 8px; background: var(--pf-contenedor); border-radius: 20px; box-shadow: var(--sombra-flotante); animation: pf-desplegable-entra 240ms var(--ease); }",
+        ".pf-desplegable__menu[hidden] { display: none; }",
+        ".pf-desplegable__menu button { border: 0; background: none; padding: 0; border-radius: 999px; cursor: pointer; transition: transform 180ms var(--ease); }",
+        ".pf-desplegable__menu [aria-selected=\"true\"] .pf-desplegable__pastilla { box-shadow: 0 0 0 2px var(--pf-contenedor), 0 0 0 4px var(--ink); }",
+        "@media (hover: hover) and (pointer: fine) { .pf-desplegable__menu button:hover { transform: translateY(-1px); } }",
+        "@keyframes pf-desplegable-entra { from { opacity: 0; transform: translateY(-6px); } }",
+        "@media (prefers-reduced-motion: reduce) { .pf-desplegable__menu { animation: none; } }"
       ].join("\n");
     },
     html: function () {
       var chev = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
-      return '<div class="desplegable" data-c="desplegable">\n  <span id="et-tipo" hidden>Tipo</span>\n  <div class="psel" data-value="pagina">\n' +
-        '    <button type="button" class="psel-b" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="et-tipo"><span class="pl" style="--c: var(--azul)">Página' + chev + '</span></button>\n' +
-        '    <div class="psel-m" role="listbox" aria-labelledby="et-tipo" hidden>' + TIPOS.map(function (t, i) {
-          return '<button type="button" role="option" data-v="' + t[0] + '" aria-selected="' + (i === 0) + '"><span class="pl" style="--c: ' + t[2] + '">' + t[1] + '</span></button>'; }).join("") + '</div>\n  </div>\n</div>';
+      return '<div class="pf-desplegable-muestra" data-c="desplegable">\n  <span id="pf-desplegable-et" hidden>Tipo</span>\n  <div class="pf-desplegable" data-value="pagina">\n' +
+        '    <button type="button" class="pf-desplegable__boton" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="pf-desplegable-et"><span class="pf-desplegable__pastilla" style="--c: var(--azul)">Página' + chev + '</span></button>\n' +
+        '    <div class="pf-desplegable__menu" role="listbox" aria-labelledby="pf-desplegable-et" hidden>' + TIPOS.map(function (t, i) {
+          return '<button type="button" role="option" data-v="' + t[0] + '" aria-selected="' + (i === 0) + '"><span class="pf-desplegable__pastilla" style="--c: ' + t[2] + '">' + t[1] + '</span></button>'; }).join("") + '</div>\n  </div>\n</div>';
     },
     js: function () {
       return fuente(function () {
-        document.querySelectorAll(".psel").forEach(function (x) {
-          var b = x.querySelector(".psel-b"), m = x.querySelector(".psel-m");
+        document.querySelectorAll(".pf-desplegable").forEach(function (x) {
+          var b = x.querySelector(".pf-desplegable__boton"), m = x.querySelector(".pf-desplegable__menu");
           function abrir(si) { b.setAttribute("aria-expanded", String(si)); m.hidden = !si; if (si) m.querySelector('[aria-selected="true"]').focus(); }
           b.addEventListener("click", function () { abrir(m.hidden); });
           m.addEventListener("click", function (e) {
             var o = e.target.closest("[data-v]"); if (!o) return;
             m.querySelectorAll("[data-v]").forEach(function (y) { y.setAttribute("aria-selected", String(y === o)); });
-            var pl = o.querySelector(".pl"), cab = b.querySelector(".pl");
+            var pl = o.querySelector(".pf-desplegable__pastilla"), cab = b.querySelector(".pf-desplegable__pastilla");
             cab.style.setProperty("--c", pl.style.getPropertyValue("--c")); cab.firstChild.textContent = pl.textContent;
             x.dataset.value = o.dataset.v; abrir(false); b.focus(); x.dispatchEvent(new Event("change", { bubbles: true }));
           });
@@ -221,37 +186,32 @@
   /* ------------------------------------------------------------------ Botón sobre color */
   var FLECHA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
   Libreria.sumar({
-    id: "boton-nota", nombre: "Botón sobre color", grupo: "Controles", alto: "auto", mini: 560,
+    id: "boton-nota", nombre: "Botón sobre color", grupo: "Controles", alto: "auto", mini: 560, base: ["boton-color"],
     bajada: "Píldora tiza con texto azul y flecha, para llamados sobre color o foto. Es Web/Botón nota del Master.",
     variantes: [["azul", "Sobre azul", "Sobre el azul de marca, como en los headers."], ["foto", "Sobre foto", "Sobre una foto con degradé, como en las destacadas de Novedades."]],
     controles: [
       { id: "alto", tipo: "seg", etiqueta: "Tamaño", def: 48, aplica: { var: "--alto", unidad: "px" }, opciones: [[48, "L 48"], [44, "M 44"]], desc: "L en desktop, M en mobile (Web/Botón del Master)." },
-      { id: "txt", tipo: "texto", etiqueta: "Texto", def: "Leer la nota", aplica: { texto: ".cta__txt" }, desc: "El llamado: un verbo y lo que se abre." }
+      { id: "txt", tipo: "texto", etiqueta: "Texto", def: "Leer la nota", aplica: { texto: ".pf-boton-color__txt" }, desc: "El llamado: un verbo y lo que se abre." }
     ],
     claves: ["Distinto de UI/Botón: este va sobre color o foto, nunca sobre tiza.", "Hover: el fondo pasa a blanco y la flecha avanza 3 px.", "Texto en Familjen Grotesk 500; la flecha es la del sistema."],
     accesibilidad: "Es un <a> o un <button> con su texto; la flecha va con aria-hidden.",
     css: function () {
       return [
-        ".boton-nota { " + T + " --alto: 48px; display: grid; place-items: center; min-height: 260px; border-radius: 26px; overflow: hidden; position: relative; }",
-        ".boton-nota[data-variante=\"azul\"] { background: var(--azul); }",
-        ".boton-nota[data-variante=\"foto\"] { background: url(../novedades/fotos/demo-1.webp) center / cover; }",
-        ".boton-nota[data-variante=\"foto\"]::before { content: \"\"; position: absolute; inset: 0; background: linear-gradient(to top, rgba(10, 30, 74, .6), transparent); }",
-        ".cta { position: relative; display: inline-flex; align-items: center; gap: 10px; height: var(--alto); padding: 0 22px 0 24px; border: 0; border-radius: 999px; background: var(--tiza); color: var(--azul);",
-        "  font: 500 calc(var(--alto) * .333)/1 var(--f-d); text-decoration: none; cursor: pointer; transition: background 200ms ease;  text-box: trim-both cap alphabetic; }",
-        ".cta svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 260ms cubic-bezier(.22, 1, .36, 1); }",
-        "@media (hover: hover) and (pointer: fine) { .cta:hover { background: #fff; } .cta:hover svg { transform: translateX(3px); } }",
-        ".cta:active { background: #fff; }"
+        ".pf-boton-nota { display: grid; place-items: center; min-height: 260px; border-radius: var(--radio-tarjeta); overflow: hidden; position: relative; }",
+        ".pf-boton-nota[data-variante=\"azul\"] { background: var(--azul); }",
+        ".pf-boton-nota[data-variante=\"foto\"] { background: url(../novedades/fotos/demo-1.webp) center / cover; }",
+        ".pf-boton-nota[data-variante=\"foto\"]::before { content: \"\"; position: absolute; inset: 0; background: linear-gradient(to top, color-mix(in srgb, var(--ink) 60%, transparent), transparent); }"
       ].join("\n");
     },
-    html: function (s) { return '<div class="boton-nota" data-c="boton-nota">\n  <a class="cta" href="#"><span class="cta__txt">' + s.txt + '</span>' + FLECHA + '</a>\n</div>'; }
+    html: function (s) { return '<div class="pf-boton-nota" data-c="boton-nota">\n  <a class="pf-boton-color" href="#"><span class="pf-boton-color__txt">' + s.txt + '</span>' + FLECHA + '</a>\n</div>'; }
   });
 
   /* ------------------------------------------------------------------ Grupo de herramientas */
   var HERR = [
-    ["Expandir todo", '<path class="l" d="M8 4h8M8 20h8M12 7v10M9 14l3 3 3-3M9 10l3-3 3 3"/>'],
-    ["Plegar todo", '<path class="l" d="M8 4h8M8 20h8M12 4v6M12 14v6M9 7l3 3 3-3M9 17l3-3 3 3"/>'],
-    ["Deshacer", '<path class="l" d="M9 7L5 11l4 4M5 11h9a5 5 0 0 1 0 10h-2"/>'],
-    ["Exportar", '<path class="l" d="M12 4v11M8 11l4 4 4-4M5 19h14"/>']
+    ["Expandir todo", '<path d="M8 4h8M8 20h8M12 7v10M9 14l3 3 3-3M9 10l3-3 3 3"/>'],
+    ["Plegar todo", '<path d="M8 4h8M8 20h8M12 4v6M12 14v6M9 7l3 3 3-3M9 17l3-3 3 3"/>'],
+    ["Deshacer", '<path d="M9 7L5 11l4 4M5 11h9a5 5 0 0 1 0 10h-2"/>'],
+    ["Exportar", '<path d="M12 4v11M8 11l4 4 4-4M5 19h14"/>']
   ];
   Libreria.sumar({
     id: "herramientas", nombre: "Grupo de herramientas", grupo: "Controles", alto: "auto", mini: 560,
@@ -260,66 +220,60 @@
     accesibilidad: "Cada botón lleva aria-label y title con su acción; el grupo es role=\"toolbar\".",
     css: function () {
       return [
-        ".herramientas { " + T + " display: flex; justify-content: center; }",
-        ".grp { display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--linea); }",
-        ".ib { width: 32px; height: 30px; border: 0; border-radius: 999px; background: transparent; color: var(--tinta-2); display: grid; place-items: center; padding: 0; cursor: pointer; transition: background 180ms ease, color 180ms ease, box-shadow 180ms ease; }",
-        ".ib svg { width: 16px; height: 16px; }",
-        ".ib svg .l { fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }",
-        "@media (hover: hover) and (pointer: fine) { .ib:hover:not(:disabled) { background: var(--tiza); color: var(--azul); box-shadow: 0 1px 3px rgba(10, 30, 74, .12); } }",
-        ".ib:active:not(:disabled) { background: var(--tiza); color: var(--azul); }",
-        ".ib:disabled { opacity: .35; cursor: default; }"
+        ".pf-herramientas { display: flex; justify-content: center; }",
+        ".pf-herramientas__grupo { display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--line); }",
+        ".pf-herramientas__boton { width: 32px; height: 30px; border: 0; border-radius: 999px; background: transparent; color: var(--ink-2); display: grid; place-items: center; padding: 0; cursor: pointer; transition: background 180ms ease, color 180ms ease, box-shadow 180ms ease; }",
+        ".pf-herramientas__boton svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }",
+        "@media (hover: hover) and (pointer: fine) { .pf-herramientas__boton:hover:not(:disabled) { background: var(--tiza); color: var(--azul); box-shadow: var(--sombra-control); } }",
+        ".pf-herramientas__boton:active:not(:disabled) { background: var(--tiza); color: var(--azul); }",
+        ".pf-herramientas__boton:disabled { opacity: .35; cursor: default; }"
       ].join("\n");
     },
     html: function () {
-      return '<div class="herramientas" data-c="herramientas">\n  <div class="grp" role="toolbar" aria-label="Herramientas">\n' + HERR.map(function (h, i) {
-        return '    <button type="button" class="ib" aria-label="' + h[0] + '" title="' + h[0] + '"' + (i === 2 ? ' disabled' : '') + '><svg viewBox="0 0 24 24" aria-hidden="true">' + h[1] + '</svg></button>'; }).join("\n") + '\n  </div>\n</div>';
+      return '<div class="pf-herramientas" data-c="herramientas">\n  <div class="pf-herramientas__grupo" role="toolbar" aria-label="Herramientas">\n' + HERR.map(function (h, i) {
+        return '    <button type="button" class="pf-herramientas__boton" aria-label="' + h[0] + '" title="' + h[0] + '"' + (i === 2 ? ' disabled' : '') + '><svg viewBox="0 0 24 24" aria-hidden="true">' + h[1] + '</svg></button>'; }).join("\n") + '\n  </div>\n</div>';
     }
   });
 
   /* ------------------------------------------------------------------ Confirmación */
   Libreria.sumar({
-    id: "confirmacion", nombre: "Confirmación", grupo: "Avisos", alto: "auto", mini: 640,
+    id: "confirmacion", nombre: "Confirmación", grupo: "Avisos", alto: "auto", mini: 640, base: ["boton"],
     bajada: "El modal propio para confirmar una acción, en lugar del confirm() del navegador.",
     variantes: [["alerta", "Alerta", "Para lo que borra o no tiene vuelta: el botón va en naranja."], ["principal", "Principal", "Para lo que crea o cambia: el botón va en azul."]],
     claves: ["Nunca confirm() nativo: Marcos pidió el propio porque el nativo desconecta.", "El título dice la acción; el texto dice qué pasa y si se puede deshacer.", "El foco arranca en Cancelar.", "Escape o tocar afuera cancela."],
     accesibilidad: "Es un <dialog> abierto con showModal(): atrapa el foco y el lector lo anuncia con su título.",
     css: function () {
       return [
-        ".confirmacion { " + T + " display: grid; place-items: center; min-height: 280px; font-family: var(--f-b); }",
-        ".confirmacion > button { height: 40px; padding: 0 18px; border: 1px solid var(--linea); border-radius: 13px; background: var(--tiza); color: var(--tinta); font: 500 .92rem/1 var(--f-b); cursor: pointer; display: inline-flex; align-items: center; text-box: trim-both cap alphabetic; }",
-        "dialog { border: 0; border-radius: 26px; background: var(--tiza); color: var(--tinta); padding: 26px; max-width: 460px; width: 92vw; box-shadow: 0 30px 80px -30px rgba(10, 30, 74, .6); font-family: var(--f-b); }",
-        "dialog::backdrop { background: rgba(10, 30, 74, .5); }",
-        "dialog h2 { margin: 0 0 6px; font: 500 1.4rem/1.15 var(--f-d); letter-spacing: -.02em; color: var(--azul); }",
-        "dialog p { margin: 0 0 18px; color: var(--tinta-2); line-height: 1.45; }",
-        ".fila-dlg { display: flex; justify-content: flex-end; gap: 8px; }",
-        ".btn { height: 40px; padding: 0 16px; border-radius: 13px; border: 1px solid var(--linea); background: var(--tiza); color: var(--tinta); font: 500 .92rem/1 var(--f-b); cursor: pointer; transition: background 220ms ease; display: inline-flex; align-items: center; text-box: trim-both cap alphabetic; }",
-        ".btn:active { background: var(--bg); }",
-        ".btn.prim { background: var(--azul); border-color: var(--azul); color: var(--tiza); }",
-        ".btn.alerta { background: var(--naranja); border-color: var(--naranja); color: var(--tiza); }"
+        ".pf-confirmacion { display: grid; place-items: center; min-height: 280px; font-family: var(--f-body); }",
+        ".pf-dialogo { border: 0; border-radius: var(--radio-tarjeta); background: var(--tiza); color: var(--ink); padding: 26px; max-width: 460px; width: 92vw; box-shadow: 0 30px 80px -30px color-mix(in srgb, var(--ink) 60%, transparent); font: 400 var(--texto-cuerpo)/1.45 var(--f-body); }",
+        ".pf-dialogo::backdrop { background: color-mix(in srgb, var(--ink) 50%, transparent); }",
+        ".pf-dialogo__tit { margin: 0 0 6px; font: 500 var(--texto-subtitulo)/1.15 var(--f-display); letter-spacing: -.02em; color: var(--titulo); }",
+        ".pf-dialogo__txt { margin: 0 0 18px; color: var(--ink-2); }",
+        ".pf-dialogo__acciones { display: flex; justify-content: flex-end; gap: 8px; }"
       ].join("\n");
     },
     html: function (s) {
       var a = s.variante === "alerta";
-      return '<div class="confirmacion" data-c="confirmacion">\n  <button type="button" id="abrir">' + (a ? 'Borrar el mapa' : 'Duplicar el mapa') + '</button>\n' +
-        '  <dialog id="dlg" aria-labelledby="dlgTit">\n    <h2 id="dlgTit">' + (a ? '¿Borrar este mapa?' : '¿Duplicar este mapa?') + '</h2>\n' +
-        '    <p>' + (a ? 'Se archiva con la fecha de hoy y se puede recuperar a mano. Nadie más lo va a ver en la lista.' : 'Se crea una copia que podés editar. El original queda como está.') + '</p>\n' +
-        '    <div class="fila-dlg"><button type="button" class="btn" id="no">Cancelar</button><button type="button" class="btn ' + (a ? 'alerta' : 'prim') + '" id="si">' + (a ? 'Borrar' : 'Duplicar') + '</button></div>\n  </dialog>\n</div>';
+      return '<div class="pf-confirmacion" data-c="confirmacion">\n  <button type="button" class="pf-boton" id="pf-dlg-abrir">' + (a ? 'Borrar el mapa' : 'Duplicar el mapa') + '</button>\n' +
+        '  <dialog class="pf-dialogo" id="pf-dlg" aria-labelledby="pf-dlg-tit">\n    <h2 class="pf-dialogo__tit" id="pf-dlg-tit">' + (a ? '¿Borrar este mapa?' : '¿Duplicar este mapa?') + '</h2>\n' +
+        '    <p class="pf-dialogo__txt">' + (a ? 'Se archiva con la fecha de hoy y se puede recuperar a mano. Nadie más lo va a ver en la lista.' : 'Se crea una copia que podés editar. El original queda como está.') + '</p>\n' +
+        '    <div class="pf-dialogo__acciones"><button type="button" class="pf-boton" id="pf-dlg-no">Cancelar</button><button type="button" class="pf-boton ' + (a ? 'pf-boton--alerta' : 'pf-boton--principal') + '" id="pf-dlg-si">' + (a ? 'Borrar' : 'Duplicar') + '</button></div>\n  </dialog>\n</div>';
     },
     js: function () {
       return fuente(function () {
-        var d = document.getElementById("dlg");
+        var d = document.getElementById("pf-dlg"), si = document.getElementById("pf-dlg-si"), no = document.getElementById("pf-dlg-no");
         // Devuelve una promesa: true si se confirmó.
         function confirmar() {
           return new Promise(function (res) {
-            var fin = function (ok) { document.getElementById("si").onclick = document.getElementById("no").onclick = d.onclose = null; if (d.open) d.close(); res(ok); };
-            document.getElementById("si").onclick = function () { fin(true); };
-            document.getElementById("no").onclick = function () { fin(false); };
+            var fin = function (ok) { si.onclick = no.onclick = d.onclose = null; if (d.open) d.close(); res(ok); };
+            si.onclick = function () { fin(true); };
+            no.onclick = function () { fin(false); };
             d.onclose = function () { fin(false); };
             d.addEventListener("click", function (e) { if (e.target === d) fin(false); }, { once: true });
-            d.showModal(); document.getElementById("no").focus();
+            d.showModal(); no.focus();
           });
         }
-        document.getElementById("abrir").addEventListener("click", function () { confirmar(); });
+        document.getElementById("pf-dlg-abrir").addEventListener("click", function () { confirmar(); });
         confirmar();
       });
     }
@@ -327,7 +281,7 @@
 
   /* ------------------------------------------------------------------ Aviso */
   Libreria.sumar({
-    id: "aviso", nombre: "Aviso", grupo: "Avisos", alto: "auto", mini: 640,
+    id: "aviso", nombre: "Aviso", grupo: "Avisos", alto: "auto", mini: 640, base: ["boton"],
     bajada: "Un mensaje corto abajo al centro que se va solo, con una acción opcional para deshacer.",
     variantes: [["texto", "Solo texto", "Confirma que algo pasó: Guardado, Copiado."], ["accion", "Con acción", "Ofrece deshacer lo que se acaba de hacer."]],
     controles: [
@@ -337,25 +291,23 @@
     accesibilidad: "Va en role=\"status\" con aria-live=\"polite\": el lector lo lee sin interrumpir.",
     css: function () {
       return [
-        ".aviso { " + T + " --ease: cubic-bezier(.22, 1, .36, 1); position: relative; display: grid; place-items: center; min-height: 260px; font-family: var(--f-b); }",
-        ".aviso > button { height: 40px; padding: 0 18px; border: 1px solid var(--linea); border-radius: 13px; background: var(--tiza); color: var(--tinta); font: 500 .92rem/1 var(--f-b); cursor: pointer; display: inline-flex; align-items: center; text-box: trim-both cap alphabetic; }",
-        ".toast { position: fixed; left: 50%; bottom: 32px; transform: translateX(-50%) translateY(20px); opacity: 0; pointer-events: none; display: flex; align-items: center; gap: 10px;",
-        "  background: var(--tinta); color: var(--tiza); padding: 12px 18px; border-radius: 16px; font-size: .92rem; max-width: 92vw; box-shadow: 0 12px 28px -16px rgba(10, 30, 74, .5); transition: opacity .25s var(--ease), transform .25s var(--ease); }",
-        ".toast.on { opacity: 1; transform: translateX(-50%); pointer-events: auto; }",
-        ".toast .btn { height: 32px; padding: 0 14px; border: 0; border-radius: 13px; background: var(--tiza); color: var(--tinta); font: 500 .86rem/1 var(--f-b); cursor: pointer; display: inline-flex; align-items: center; text-box: trim-both cap alphabetic; }",
-        "@media (prefers-reduced-motion: reduce) { .toast { transition: opacity .2s linear; transform: translateX(-50%); } }"
+        ".pf-aviso { position: relative; display: grid; place-items: center; min-height: 260px; font-family: var(--f-body); }",
+        ".pf-aviso__caja { position: fixed; left: 50%; bottom: 32px; transform: translateX(-50%) translateY(20px); opacity: 0; pointer-events: none; display: flex; align-items: center; gap: 10px;",
+        "  background: var(--ink); color: var(--tiza); padding: 12px 18px; border-radius: var(--radio-aviso); font-size: var(--texto-chico); max-width: 92vw; box-shadow: 0 12px 28px -16px color-mix(in srgb, var(--ink) 50%, transparent); transition: opacity .25s var(--ease), transform .25s var(--ease); }",
+        ".pf-aviso__caja.pf-visible { opacity: 1; transform: translateX(-50%); pointer-events: auto; }",
+        "@media (prefers-reduced-motion: reduce) { .pf-aviso__caja { transition: opacity .2s linear; transform: translateX(-50%); } }"
       ].join("\n");
     },
     html: function (s) {
-      return '<div class="aviso" data-c="aviso">\n  <button type="button" id="mostrar">' + (s.variante === "accion" ? 'Borrar la fila' : 'Guardar') + '</button>\n' +
-        '  <div class="toast" role="status" aria-live="polite"><span class="toast__txt"></span>' + (s.variante === "accion" ? '<button type="button" class="btn">Deshacer</button>' : '') + '</div>\n</div>';
+      return '<div class="pf-aviso" data-c="aviso">\n  <button type="button" class="pf-boton" id="pf-aviso-mostrar">' + (s.variante === "accion" ? 'Borrar la fila' : 'Guardar') + '</button>\n' +
+        '  <div class="pf-aviso__caja" role="status" aria-live="polite"><span class="pf-aviso__txt"></span>' + (s.variante === "accion" ? '<button type="button" class="pf-boton pf-boton--chico">Deshacer</button>' : '') + '</div>\n</div>';
     },
     js: function (s) {
       return "var DURA = " + s.dura + ", TEXTO = " + JSON.stringify(s.variante === "accion" ? "Se borró la fila." : "Guardado.") + ";\n" + fuente(function () {
-        var t = document.querySelector(".toast"), txt = t.querySelector(".toast__txt"), tt;
-        function aviso(msg) { txt.textContent = msg; t.classList.add("on"); clearTimeout(tt); tt = setTimeout(function () { t.classList.remove("on"); }, DURA); }
-        document.getElementById("mostrar").addEventListener("click", function () { aviso(TEXTO); });
-        var des = t.querySelector(".btn"); if (des) des.addEventListener("click", function () { t.classList.remove("on"); setTimeout(function () { aviso("Volvió la fila."); }, 260); });
+        var t = document.querySelector(".pf-aviso__caja"), txt = t.querySelector(".pf-aviso__txt"), tt;
+        function aviso(msg) { txt.textContent = msg; t.classList.add("pf-visible"); clearTimeout(tt); tt = setTimeout(function () { t.classList.remove("pf-visible"); }, DURA); }
+        document.getElementById("pf-aviso-mostrar").addEventListener("click", function () { aviso(TEXTO); });
+        var des = t.querySelector(".pf-boton"); if (des) des.addEventListener("click", function () { t.classList.remove("pf-visible"); setTimeout(function () { aviso("Volvió la fila."); }, 260); });
         setTimeout(function () { aviso(TEXTO); }, 400);
       });
     }
@@ -373,19 +325,19 @@
     accesibilidad: "role=\"status\": el lector anuncia cada cambio de estado. El color nunca va solo: siempre lo acompaña el texto.",
     css: function () {
       return [
-        ".estado-guardado { " + T + " display: grid; place-items: center; height: 96px; border-radius: 999px; background: rgba(0, 61, 165, .94); font-family: var(--f-b); }",
-        ".eg { height: 40px; display: inline-flex; align-items: center; gap: 8px; padding: 0 16px; border-radius: 999px; font-size: .84rem; font-weight: 500;",
-        "  background: rgba(255, 254, 239, .16); border: 1px solid rgba(255, 254, 239, .24); color: var(--tiza); backdrop-filter: blur(14px);  text-box: trim-both cap alphabetic; }",
-        ".eg .punto { width: 8px; height: 8px; border-radius: 50%; background: var(--verde-claro); transition: background .2s ease; }",
-        ".eg [data-e] { display: none; }",
-        ESTADOS.map(function (x) { return '[data-estado="' + x[0] + '"] .eg [data-e="' + x[0] + '"] { display: inline; }'; }).join("\n"),
-        '[data-estado="guardando"] .punto, [data-estado="singuardar"] .punto { background: var(--amarillo); }',
-        '[data-estado="error"] .punto { background: var(--naranja); }',
-        '[data-estado="lectura"] .punto { background: rgba(255, 254, 239, .55); }'
+        ".pf-estado-guardado { display: grid; place-items: center; height: 96px; border-radius: 999px; background: var(--barra); font-family: var(--f-body); }",
+        ".pf-estado { height: 40px; display: inline-flex; align-items: center; gap: 8px; padding: 0 16px; border-radius: 999px; font-size: var(--texto-chico); font-weight: 500;",
+        "  background: var(--foto-boton); border: 1px solid var(--foto-borde); color: var(--tiza); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); text-box: trim-both cap alphabetic; }",
+        ".pf-estado__punto { width: 8px; height: 8px; border-radius: 50%; background: var(--verde-claro); transition: background .2s ease; }",
+        ".pf-estado [data-e] { display: none; }",
+        ESTADOS.map(function (x) { return '[data-estado="' + x[0] + '"] .pf-estado [data-e="' + x[0] + '"] { display: inline; }'; }).join("\n"),
+        '[data-estado="guardando"] .pf-estado__punto, [data-estado="singuardar"] .pf-estado__punto { background: var(--amarillo); }',
+        '[data-estado="error"] .pf-estado__punto { background: var(--naranja); }',
+        '[data-estado="lectura"] .pf-estado__punto { background: color-mix(in srgb, var(--tiza) 55%, transparent); }'
       ].join("\n");
     },
     html: function () {
-      return '<div class="estado-guardado" data-c="estado-guardado">\n  <span class="eg" role="status"><span class="punto" aria-hidden="true"></span>' +
+      return '<div class="pf-estado-guardado" data-c="estado-guardado">\n  <span class="pf-estado" role="status"><span class="pf-estado__punto" aria-hidden="true"></span>' +
         ESTADOS.map(function (x) { return '<span data-e="' + x[0] + '">' + x[1] + '</span>'; }).join("") + '</span>\n</div>';
     }
   });

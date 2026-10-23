@@ -47,6 +47,29 @@ FUENTES = [
     ("f-body", '"DM Sans", "Helvetica Neue", Arial, sans-serif'),
 ]
 
+# Escala tipográfica web. PROPUESTA (23/10/2026): el Master todavía no tiene variables de texto.
+# Sale de unificar los tamaños que ya usaban los componentes (display 76-96, títulos 48-60, etc.).
+# Cuando se carguen en el Master (06 · Web), pasan a tokens.json y esta lista se borra.
+ESCALA = [
+    ("texto-display", "clamp(36px, 6vw, 88px)", "Títulos de apertura y hero"),
+    ("texto-titulo", "clamp(28px, 4.2vw, 52px)", "Títulos de sección"),
+    ("texto-subtitulo", "22px", "Títulos de tarjeta, columna o diálogo"),
+    ("texto-destacado", "18px", "Bajadas y párrafos destacados"),
+    ("texto-cuerpo", "16px", "Texto corrido"),
+    ("texto-chico", "14px", "Botones, menús, notas y datos"),
+    ("texto-mini", "12px", "Rótulos, legales y eyebrows"),
+]
+# Radios y sombras que repetían todos los componentes (Novedades es la referencia).
+FORMA = [
+    ("radio-tarjeta", "26px", "Tarjetas, paneles y diálogos"),
+    ("radio-media", "19px", "Foto dentro de una tarjeta"),
+    ("radio-control", "13px", "Botones y campos (UI/Botón)"),
+    ("radio-aviso", "16px", "Avisos y filas"),
+    ("sombra-tarjeta", "0 1px 2px rgba(10, 30, 74, 0.06), 0 12px 28px -16px rgba(10, 30, 74, 0.28)", "Tarjeta en reposo"),
+    ("sombra-flotante", "0 24px 60px -24px rgba(10, 30, 74, 0.5)", "Docks, menús y paneles que flotan"),
+    ("sombra-control", "0 1px 3px rgba(10, 30, 74, 0.12)", "Indicador del Selector y botones elevados"),
+]
+
 
 def main():
     datos = json.loads(TOKENS.read_text(encoding="utf-8"))
@@ -71,6 +94,12 @@ def main():
     l.append("  /* Tipografía */")
     for nombre, valor in FUENTES:
         l.append(f"  --{nombre}: {valor};")
+    l.append("  /* Escala tipográfica web: PROPUESTA, todavía no está en el Master */")
+    for nombre, valor, uso in ESCALA:
+        l.append(f"  --{nombre}: {valor};  /* {uso} */")
+    l.append("  /* Radios y sombras */")
+    for nombre, valor, uso in FORMA:
+        l.append(f"  --{nombre}: {valor};  /* {uso} */")
     l.append("}")
     SALIDA.write_text("\n".join(l) + "\n", encoding="utf-8")
     print(f"{SALIDA.name}: {len(datos['tokens']) + len(SEMANTICOS)} tokens, {len(FAMILIAS)} familias, {len(CATEGORIAS)} categorías")

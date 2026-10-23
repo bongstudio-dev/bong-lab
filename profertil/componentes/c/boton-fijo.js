@@ -16,31 +16,31 @@
     accesibilidad: "Es un link real con su texto; la flecha va con aria-hidden. No hay animación que respetar: el movimiento es el del scroll.",
     css: function () {
       return [
-        ".bf { --alto: 48px; --arranque: 40px; --curva: cubic-bezier(.22, 1, .36, 1); font: 400 16px/1.5 \"DM Sans\", \"Helvetica Neue\", Arial, sans-serif; color: var(--ink); }",
-        ".bf h2 { margin: 0; font: 500 clamp(32px, 4.4vw, 60px)/1 \"Familjen Grotesk\", \"Helvetica Neue\", Arial, sans-serif; letter-spacing: -.035em; max-width: 14ch; }",
-        ".bf__sec { padding: 18vh clamp(20px, 6vw, 96px); }",
-        ".bf__sec p { margin: 18px 0 0; max-width: 42ch; color: var(--ink-2); }",
+        ".pf-bf { --alto: 48px; --arranque: 40px; --curva: cubic-bezier(.22, 1, .36, 1); font: 400 var(--texto-cuerpo)/1.5 var(--f-body); color: var(--ink); }",
+        ".pf-bf h2 { margin: 0; font: 500 var(--texto-titulo)/1 var(--f-display); letter-spacing: -.035em; max-width: 14ch; }",
+        ".pf-bf__sec { padding: 18vh clamp(20px, 6vw, 96px); }",
+        ".pf-bf__sec p { margin: 18px 0 0; max-width: 42ch; color: var(--ink-2); }",
         "",
         "/* La foto ocupa todo el ancho; el botón va pegado al centro de la pantalla mientras ella pasa. */",
-        ".bf__foto { position: relative; display: flex; justify-content: center; }",
-        ".bf__foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }",
-        ".bf__foto::before { content: \"\"; position: absolute; inset: 0; z-index: 1; background: rgba(10, 30, 74, .18); }",
+        ".pf-bf__foto { position: relative; display: flex; justify-content: center; }",
+        ".pf-bf__foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }",
+        ".pf-bf__foto::before { content: \"\"; position: absolute; inset: 0; z-index: 1; background: color-mix(in srgb, var(--ink) 18%, transparent); }",
         "/* Nace cerca del borde de arriba de la foto; al llegar al centro de la pantalla se queda quieto y la foto sigue subiendo, hasta que el botón queda en la mitad de la foto. */",
-        ".bf-boton { position: sticky; top: calc(50% - var(--alto) / 2); z-index: 2; align-self: flex-start; margin: var(--arranque, 40px) 0 calc(var(--h) / 2 - var(--alto) / 2);",
+        ".pf-bf-boton { position: sticky; top: calc(50% - var(--alto) / 2); z-index: 2; align-self: flex-start; margin: var(--arranque, 40px) 0 calc(var(--h) / 2 - var(--alto) / 2);",
         "  display: inline-flex; align-items: center; gap: 10px; height: var(--alto); padding: 0 22px 0 24px; border-radius: 999px;",
-        "  font: 500 calc(var(--alto) * .333)/1 \"Familjen Grotesk\", \"Helvetica Neue\", Arial, sans-serif; text-decoration: none; white-space: nowrap; transition: background 200ms ease, color 200ms ease;  text-box: trim-both cap alphabetic; }",
-        ".bf[data-color=\"tiza\"] .bf-boton { background: var(--tiza); color: var(--azul); }",
-        ".bf[data-color=\"azul\"] .bf-boton { background: var(--azul); color: var(--tiza); }",
-        ".bf-boton svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 260ms var(--curva); }",
-        "@media (hover: hover) and (pointer: fine) { .bf[data-color=\"tiza\"] .bf-boton:hover { background: #fff; } .bf-boton:hover svg { transform: translateX(3px); } }"
+        "  font: 500 calc(var(--alto) * .333)/1 var(--f-display); text-decoration: none; white-space: nowrap; transition: background 200ms ease, color 200ms ease;  text-box: trim-both cap alphabetic; }",
+        ".pf-bf[data-color=\"tiza\"] .pf-bf-boton { background: var(--tiza); color: var(--azul); }",
+        ".pf-bf[data-color=\"azul\"] .pf-bf-boton { background: var(--azul); color: var(--tiza); }",
+        ".pf-bf-boton svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 260ms var(--curva); }",
+        "@media (hover: hover) and (pointer: fine) { .pf-bf[data-color=\"tiza\"] .pf-bf-boton:hover { background: #fff; } .pf-bf-boton:hover svg { transform: translateX(3px); } }"
       ].join("\n");
     },
     html: function (s) {
-      return '<div class="bf" data-c="boton-fijo">\n' +
-        '  <section class="bf__sec"><h2>Hecho por personas</h2><p>Trabajamos en planta y en oficinas, con oficios muy distintos. Buscamos gente que quiera crecer con nosotros.</p></section>\n' +
-        '  <section class="bf__foto" style="--h: ' + s.tramo + 'vh; height: var(--h)">\n    <img src="../novedades/fotos/demo-2.webp" alt="">\n' +
-        '    <a class="bf-boton" href="#">Sumate a nuestro equipo' + FLECHA + '</a>\n  </section>\n' +
-        '  <section class="bf__sec"><h2>Sigue el resto de la página</h2></section>\n</div>';
+      return '<div class="pf-bf" data-c="boton-fijo">\n' +
+        '  <section class="pf-bf__sec"><h2>Hecho por personas</h2><p>Trabajamos en planta y en oficinas, con oficios muy distintos. Buscamos gente que quiera crecer con nosotros.</p></section>\n' +
+        '  <section class="pf-bf__foto" style="--h: ' + s.tramo + 'vh; height: var(--h)">\n    <img src="../novedades/fotos/demo-2.webp" alt="">\n' +
+        '    <a class="pf-bf-boton" href="#">Sumate a nuestro equipo' + FLECHA + '</a>\n  </section>\n' +
+        '  <section class="pf-bf__sec"><h2>Sigue el resto de la página</h2></section>\n</div>';
     }
   });
 })();

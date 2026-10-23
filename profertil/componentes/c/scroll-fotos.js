@@ -9,7 +9,7 @@
   ];
 
   Libreria.sumar({
-    id: "scroll-fotos", nombre: "Fotos a pantalla completa", grupo: "Scroll", alto: 680,
+    id: "scroll-fotos", nombre: "Fotos a pantalla completa", grupo: "Scroll", alto: 680, base: ["etiqueta"],
     bajada: "Fotos a todo el ancho que se mueven con el scroll, con la etiqueta y el texto arriba, que entran por líneas.",
     nota: "Scrolleá dentro del escenario. Fotos y textos de ejemplo.",
     variantes: [
@@ -28,83 +28,82 @@
     ],
     css: function () {
       return [
-        ".sf { --intensidad: 80; --oscuro: 40; --radio: 26px; --curva: cubic-bezier(.22, 1, .36, 1); --f-d: \"Familjen Grotesk\", \"Helvetica Neue\", Arial, sans-serif;",
-        "  font: 400 16px/1.5 \"DM Sans\", \"Helvetica Neue\", Arial, sans-serif; color: var(--tiza); }",
-        SIS.etiquetaCSS,
-        ".sf__intro, .sf__fin { padding: 22vh clamp(20px, 5vw, 64px); color: var(--ink); }",
-        ".sf__intro h2, .sf__fin h2 { margin: 0; font: 500 clamp(28px, 4vw, 52px)/1.04 var(--f-d); letter-spacing: -.03em; max-width: 16ch; }",
-        ".sf__panel { overflow: hidden; background: var(--ink); }",
-        ".sf__media { position: absolute; inset: 0; overflow: hidden; }",
+        ".pf-sf { --intensidad: 80; --oscuro: 40; --radio: var(--radio-tarjeta); --curva: cubic-bezier(.22, 1, .36, 1);",
+        "  font: 400 var(--texto-cuerpo)/1.5 var(--f-body); color: var(--tiza); }",
+        ".pf-sf__intro, .pf-sf__fin { padding: 22vh clamp(20px, 5vw, 64px); color: var(--ink); }",
+        ".pf-sf__intro h2, .pf-sf__fin h2 { margin: 0; font: 500 var(--texto-titulo)/1.04 var(--f-display); letter-spacing: -.03em; max-width: 16ch; }",
+        ".pf-sf__panel { overflow: hidden; background: var(--ink); }",
+        ".pf-sf__media { position: absolute; inset: 0; overflow: hidden; }",
         "/* La imagen es más alta que su panel en la misma medida en que se corre: así nunca queda una franja vacía. */",
-        ".sf__media img { position: absolute; left: 0; top: calc(var(--intensidad) * -.5%); width: 100%; height: calc(100% + var(--intensidad) * 1%); object-fit: cover; transform: translate3d(0, var(--y, 0px), 0); will-change: transform; }",
-        ".sf__media::after { content: \"\"; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(10, 30, 74, calc(var(--oscuro) / 100)), rgba(10, 30, 74, calc(var(--oscuro) / 400)) 55%, transparent); }",
+        ".pf-sf__media img { position: absolute; left: 0; top: calc(var(--intensidad) * -.5%); width: 100%; height: calc(100% + var(--intensidad) * 1%); object-fit: cover; transform: translate3d(0, var(--y, 0px), 0); will-change: transform; }",
+        ".pf-sf__media::after { content: \"\"; position: absolute; inset: 0; background: linear-gradient(to bottom, color-mix(in srgb, var(--ink) calc(var(--oscuro) / 100 * 100%), transparent), color-mix(in srgb, var(--ink) calc(var(--oscuro) / 400 * 100%), transparent) 55%, transparent); }",
         "/* El texto queda fijo al medio a la izquierda de la pantalla. */",
-        ".sf__txt { position: absolute; left: clamp(20px, 5vw, 64px); right: clamp(20px, 5vw, 64px); top: 50%; transform: translateY(-50%); display: grid; justify-items: start; gap: 16px; max-width: 760px; }",
+        ".pf-sf__txt { position: absolute; left: clamp(20px, 5vw, 64px); right: clamp(20px, 5vw, 64px); top: 50%; transform: translateY(-50%); display: grid; justify-items: start; gap: 16px; max-width: 760px; }",
         "/* Como páginas y Apiladas: los grupos de texto viven en una capa propia, encima de las fotos, y se reemplazan uno por otro. */",
-        ".sf__textos { position: absolute; inset: 0; z-index: 2; pointer-events: none; }",
-        ".sf__txt.fue .sf__linea > span, .sf__panel.fue .sf__linea > span { transform: translateY(-130%); transition-delay: calc(var(--k, 0) * 40ms); }",
-        ".sf__txt.fue .etq, .sf__panel.fue .etq { opacity: 0; transform: translateY(-8px); }",
+        ".pf-sf__textos { position: absolute; inset: 0; z-index: 2; pointer-events: none; }",
+        ".pf-sf__txt.pf-fue .pf-sf__linea > span, .pf-sf__panel.pf-fue .pf-sf__linea > span { transform: translateY(-130%); transition-delay: calc(var(--k, 0) * 40ms); }",
+        ".pf-sf__txt.pf-fue .pf-etiqueta, .pf-sf__panel.pf-fue .pf-etiqueta { opacity: 0; transform: translateY(-8px); }",
         "/* Fuera de turno, el grupo se oculta del todo cuando termina de salir: así no asoma ningún resto de las letras (descendentes, tildes). */",
-        ".sf__textos .sf__txt { visibility: hidden; transition: visibility 0s linear 1.1s; }",
-        ".sf__textos .sf__txt.en-vista { visibility: visible; transition-delay: 0s; }",
-        ".sf[data-etiqueta=\"false\"] .etq { display: none; }",
-        ".sf__txt h3 { margin: 0; font: 500 clamp(34px, 5.4vw, 76px)/1 var(--f-d); letter-spacing: -.035em; }",
-        ".sf__txt p { margin: 0; max-width: 40ch; font-size: 17px; opacity: .92; }",
+        ".pf-sf__textos .pf-sf__txt { visibility: hidden; transition: visibility 0s linear 1.1s; }",
+        ".pf-sf__textos .pf-sf__txt.pf-en-vista { visibility: visible; transition-delay: 0s; }",
+        ".pf-sf[data-etiqueta=\"false\"] .pf-etiqueta { display: none; }",
+        ".pf-sf__txt h3 { margin: 0; font: 500 var(--texto-display)/1 var(--f-display); letter-spacing: -.035em; }",
+        ".pf-sf__txt p { margin: 0; max-width: 40ch; font-size: var(--texto-destacado); opacity: .92; }",
         "/* La ventana de cada línea deja lugar para tildes y descendentes (padding) sin cambiar el interlineado (margen negativo). */",
-        ".sf__linea { display: block; overflow: clip; padding: .12em 0 .2em; margin: -.12em 0 -.2em; }",
-        ".sf__linea > span { display: block; transform: translateY(130%); transition: transform .9s var(--curva); transition-delay: calc(var(--k, 0) * 70ms); }",
-        ".sf__txt .etq { opacity: 0; transform: translateY(8px); transition: opacity .5s var(--curva), transform .7s var(--curva); }",
-        ".sf .en-vista .sf__linea > span, .sf .en-vista .etq { transform: none; opacity: 1; }",
+        ".pf-sf__linea { display: block; overflow: clip; padding: .12em 0 .2em; margin: -.12em 0 -.2em; }",
+        ".pf-sf__linea > span { display: block; transform: translateY(130%); transition: transform .9s var(--curva); transition-delay: calc(var(--k, 0) * 70ms); }",
+        ".pf-sf__txt .pf-etiqueta { opacity: 0; transform: translateY(8px); transition: opacity .5s var(--curva), transform .7s var(--curva); }",
+        ".pf-sf .pf-en-vista .pf-sf__linea > span, .pf-sf .pf-en-vista .pf-etiqueta { transform: none; opacity: 1; }",
         "",
         "/* Como páginas y Apiladas: la sección queda fija y los paneles se mueven adentro. */",
-        ".sf__fijo { position: relative; }",
-        ".sf__fijo-in { position: sticky; top: 0; height: 100vh; overflow: hidden; }",
-        ".sf__fijo .sf__panel { position: absolute; inset: 0; transform: translate3d(0, var(--t, 100%), 0); will-change: transform; }",
-        ".sf__fijo .sf__panel:first-child { --t: 0%; }",
+        ".pf-sf__fijo { position: relative; }",
+        ".pf-sf__fijo-in { position: sticky; top: 0; height: 100vh; overflow: hidden; }",
+        ".pf-sf__fijo .pf-sf__panel { position: absolute; inset: 0; transform: translate3d(0, var(--t, 100%), 0); will-change: transform; }",
+        ".pf-sf__fijo .pf-sf__panel:first-child { --t: 0%; }",
         "",
         "/* Apiladas: la que sube es una tarjeta con radio arriba que se aplana al llegar; la de abajo se achica y se oscurece. El texto va adentro, arriba. */",
-        ".sf__fijo[data-modo=\"apiladas\"] .sf__panel { transform: translate3d(0, var(--t, 100%), 0) scale(calc(1 - var(--c, 0) * .06)); transform-origin: 50% 0;",
-        "  border-radius: calc((1 - var(--l, 1)) * var(--radio)) calc((1 - var(--l, 1)) * var(--radio)) 0 0; box-shadow: 0 -24px 60px -30px rgba(10, 30, 74, .55); }",
-        ".sf__fijo[data-modo=\"apiladas\"] .sf__panel::after { content: \"\"; position: absolute; inset: 0; z-index: 3; background: var(--ink); opacity: calc(var(--c, 0) * .55); pointer-events: none; }",
-        ".sf__txt--arriba { top: clamp(56px, 11vh, 120px); transform: none; z-index: 2; }",
+        ".pf-sf__fijo[data-modo=\"apiladas\"] .pf-sf__panel { transform: translate3d(0, var(--t, 100%), 0) scale(calc(1 - var(--c, 0) * .06)); transform-origin: 50% 0;",
+        "  border-radius: calc((1 - var(--l, 1)) * var(--radio)) calc((1 - var(--l, 1)) * var(--radio)) 0 0; box-shadow: 0 -24px 60px -30px color-mix(in srgb, var(--ink) 55%, transparent); }",
+        ".pf-sf__fijo[data-modo=\"apiladas\"] .pf-sf__panel::after { content: \"\"; position: absolute; inset: 0; z-index: 3; background: var(--ink); opacity: calc(var(--c, 0) * .55); pointer-events: none; }",
+        ".pf-sf__txt--arriba { top: clamp(56px, 11vh, 120px); transform: none; z-index: 2; }",
         "",
         "/* Se expande: la foto arranca como tarjeta con aire y radio, y crece hasta el borde. */",
         "/* --f es cuánto le falta para el borde: 1 tarjeta, 0 pantalla entera. Entra rápido, se queda y al salir vuelve a la mitad. */",
-        ".sf__exp { position: relative; height: 220vh; }",
-        ".sf__exp-in { position: sticky; top: 0; height: 100vh; }",
-        ".sf__exp .sf__panel { position: relative; width: 100%; height: 100%; transform: scale(calc(1 - var(--o, 0) * .06)); transform-origin: 50% 0;",
+        ".pf-sf__exp { position: relative; height: 220vh; }",
+        ".pf-sf__exp-in { position: sticky; top: 0; height: 100vh; }",
+        ".pf-sf__exp .pf-sf__panel { position: relative; width: 100%; height: 100%; transform: scale(calc(1 - var(--o, 0) * .06)); transform-origin: 50% 0;",
         "  clip-path: inset(calc(var(--f, 1) * 14vh) calc(var(--f, 1) * 16vw) round min(var(--radio), calc(var(--f, 1) * var(--radio) * 3))); }",
-        ".sf__exp .sf__panel::after { content: \"\"; position: absolute; inset: 0; z-index: 3; background: var(--ink); opacity: calc(var(--o, 0) * .5); pointer-events: none; }",
+        ".pf-sf__exp .pf-sf__panel::after { content: \"\"; position: absolute; inset: 0; z-index: 3; background: var(--ink); opacity: calc(var(--o, 0) * .5); pointer-events: none; }",
         "/* La siguiente arranca 60vh antes: sube por encima de la anterior mientras esta se achica. */",
-        ".sf__exp + .sf__exp { margin-top: -60vh; }",
+        ".pf-sf__exp + .pf-sf__exp { margin-top: -60vh; }",
         "",
-        "@media (prefers-reduced-motion: reduce) { .sf__media img, .sf__panel { transform: none !important; } .sf__panel::after { display: none; } .sf__exp .sf__panel { clip-path: none; } .sf__linea > span, .sf__txt .etq { transform: none !important; opacity: 1 !important; transition: none; } }"
+        "@media (prefers-reduced-motion: reduce) { .pf-sf__media img, .pf-sf__panel { transform: none !important; } .pf-sf__panel::after { display: none; } .pf-sf__exp .pf-sf__panel { clip-path: none; } .pf-sf__linea > span, .pf-sf__txt .pf-etiqueta { transform: none !important; opacity: 1 !important; transition: none; } }"
       ].join("\n");
     },
     html: function (s) {
       var v = s.variante;
-      function lineas(t) { return t.split(" | ").map(function (l, k) { return '<span class="sf__linea"><span style="--k:' + k + '">' + l + '</span></span>'; }).join(""); }
+      function lineas(t) { return t.split(" | ").map(function (l, k) { return '<span class="pf-sf__linea"><span style="--k:' + k + '">' + l + '</span></span>'; }).join(""); }
       function panel(p, arriba) {
-        return '<article class="sf__panel">\n        <div class="sf__media"><img src="../novedades/fotos/demo-' + p[3] + '.webp" alt=""></div>\n' +
-          '        <div class="sf__txt' + (arriba ? ' sf__txt--arriba' : '') + '">' + SIS.etiqueta(p[0]) + '<h3>' + lineas(p[1]) + '</h3><p>' + lineas(p[2]) + '</p></div>\n      </article>';
+        return '<article class="pf-sf__panel">\n        <div class="pf-sf__media"><img src="../novedades/fotos/demo-' + p[3] + '.webp" alt=""></div>\n' +
+          '        <div class="pf-sf__txt' + (arriba ? ' pf-sf__txt--arriba' : '') + '">' + SIS.etiqueta(p[0]) + '<h3>' + lineas(p[1]) + '</h3><p>' + lineas(p[2]) + '</p></div>\n      </article>';
       }
-      var h = '<section class="sf" data-c="scroll-fotos">\n  <div class="sf__intro"><h2>Lo que hacemos, de cerca</h2></div>\n';
+      var h = '<section class="pf-sf" data-c="scroll-fotos">\n  <div class="pf-sf__intro"><h2>Lo que hacemos, de cerca</h2></div>\n';
       // Como páginas: las fotos van solas y los textos en una capa aparte, fija.
-      function soloFoto(p) { return '<article class="sf__panel">\n        <div class="sf__media"><img src="../novedades/fotos/demo-' + p[3] + '.webp" alt=""></div>\n      </article>'; }
-      function texto(p) { return '<div class="sf__txt">' + SIS.etiqueta(p[0]) + '<h3>' + lineas(p[1]) + '</h3><p>' + lineas(p[2]) + '</p></div>'; }
+      function soloFoto(p) { return '<article class="pf-sf__panel">\n        <div class="pf-sf__media"><img src="../novedades/fotos/demo-' + p[3] + '.webp" alt=""></div>\n      </article>'; }
+      function texto(p) { return '<div class="pf-sf__txt">' + SIS.etiqueta(p[0]) + '<h3>' + lineas(p[1]) + '</h3><p>' + lineas(p[2]) + '</p></div>'; }
       // Como páginas: el texto en una capa fija aparte. Apiladas: el texto adentro de cada tarjeta, arriba.
-      if (v === "paginas") h += '  <div class="sf__fijo" data-modo="paginas" style="height: ' + (PANELES.length * 100) + 'vh">\n    <div class="sf__fijo-in">\n      ' + PANELES.map(soloFoto).join("\n      ") +
-        '\n      <div class="sf__textos">\n        ' + PANELES.map(texto).join("\n        ") + '\n      </div>\n    </div>\n  </div>\n';
-      if (v === "apiladas") h += '  <div class="sf__fijo" data-modo="apiladas" style="height: ' + (PANELES.length * 100) + 'vh">\n    <div class="sf__fijo-in">\n      ' + PANELES.map(function (p) { return panel(p, true); }).join("\n      ") + '\n    </div>\n  </div>\n';
-      if (v === "expande") h += PANELES.map(function (p) { return '  <div class="sf__exp">\n    <div class="sf__exp-in">\n      ' + panel(p) + '\n    </div>\n  </div>\n'; }).join("");
-      return h + '  <div class="sf__fin"><h2>Sigue el resto de la página</h2></div>\n</section>';
+      if (v === "paginas") h += '  <div class="pf-sf__fijo" data-modo="paginas" style="height: ' + (PANELES.length * 100) + 'vh">\n    <div class="pf-sf__fijo-in">\n      ' + PANELES.map(soloFoto).join("\n      ") +
+        '\n      <div class="pf-sf__textos">\n        ' + PANELES.map(texto).join("\n        ") + '\n      </div>\n    </div>\n  </div>\n';
+      if (v === "apiladas") h += '  <div class="pf-sf__fijo" data-modo="apiladas" style="height: ' + (PANELES.length * 100) + 'vh">\n    <div class="pf-sf__fijo-in">\n      ' + PANELES.map(function (p) { return panel(p, true); }).join("\n      ") + '\n    </div>\n  </div>\n';
+      if (v === "expande") h += PANELES.map(function (p) { return '  <div class="pf-sf__exp">\n    <div class="pf-sf__exp-in">\n      ' + panel(p) + '\n    </div>\n  </div>\n'; }).join("");
+      return h + '  <div class="pf-sf__fin"><h2>Sigue el resto de la página</h2></div>\n</section>';
     },
     js: function () {
       return "(" + function () {
-        var raiz = document.querySelector(".sf"), quieto = matchMedia("(prefers-reduced-motion: reduce)").matches;
-        var fijo = raiz.querySelector(".sf__fijo"), exps = [].slice.call(raiz.querySelectorAll(".sf__exp"));
-        var textos = [].slice.call(raiz.querySelectorAll(".sf__textos .sf__txt"));
-        var paneles = [].slice.call(raiz.querySelectorAll(".sf__panel"));
+        var raiz = document.querySelector(".pf-sf"), quieto = matchMedia("(prefers-reduced-motion: reduce)").matches;
+        var fijo = raiz.querySelector(".pf-sf__fijo"), exps = [].slice.call(raiz.querySelectorAll(".pf-sf__exp"));
+        var textos = [].slice.call(raiz.querySelectorAll(".pf-sf__textos .pf-sf__txt"));
+        var paneles = [].slice.call(raiz.querySelectorAll(".pf-sf__panel"));
         function lim(x) { return Math.min(1, Math.max(0, x)); }
         function suave(x) { return 1 - Math.pow(1 - x, 3); }
         function intensidad() { return (parseFloat(getComputedStyle(raiz).getPropertyValue("--intensidad")) || 0) / 100; }
@@ -123,14 +122,14 @@
                 t = d > 0 ? Math.min(1, d) * 100 : 0; y = d > 0 ? -Math.min(1, d) * 30 * k : Math.min(1, -d) * 30 * k;
                 p.style.setProperty("--l", (1 - lim(d)).toFixed(4));
                 p.style.setProperty("--c", lim(-d).toFixed(4));
-                if (!quieto) p.classList.toggle("en-vista", d < .5);
+                if (!quieto) p.classList.toggle("pf-en-vista", d < .5);
               }
               p.style.setProperty("--t", t.toFixed(2) + "%");
-              p.querySelector(".sf__media").style.setProperty("--y", (y * p.offsetHeight / 100).toFixed(1) + "px");
+              p.querySelector(".pf-sf__media").style.setProperty("--y", (y * p.offsetHeight / 100).toFixed(1) + "px");
             });
             // El texto cambia cuando la foto nueva ya ocupa más de la mitad: el que sale se va hacia arriba.
             var activo = Math.round(a);
-            textos.forEach(function (t, i) { t.classList.toggle("en-vista", i === activo); t.classList.toggle("fue", i < activo); });
+            textos.forEach(function (t, i) { t.classList.toggle("pf-en-vista", i === activo); t.classList.toggle("pf-fue", i < activo); });
           }
           exps.forEach(function (x) {
             // y: cuánto se scrolleó dentro del tramo; queda fija de 0 a fin.
@@ -139,16 +138,16 @@
             var e = suave(lim((y + H * .35) / (H * .6)));
             // Sale: en las últimas 0,6 pantallas fijas vuelve a la mitad de la tarjeta, se achica y se oscurece.
             var o = suave(lim((y - (fin - H * .6)) / (H * .6)));
-            var p = x.querySelector(".sf__panel");
+            var p = x.querySelector(".pf-sf__panel");
             p.style.setProperty("--f", Math.max(1 - e, o * .5).toFixed(4));
             p.style.setProperty("--o", o.toFixed(4));
-            p.querySelector(".sf__media").style.setProperty("--y", ((lim((H - r.top) / (r.height + H)) - .5) * 20 * k * p.offsetHeight / 100).toFixed(1) + "px");
-            if (!quieto) { p.classList.toggle("en-vista", e > .7 && o < .3); p.classList.toggle("fue", o >= .3); }
+            p.querySelector(".pf-sf__media").style.setProperty("--y", ((lim((H - r.top) / (r.height + H)) - .5) * 20 * k * p.offsetHeight / 100).toFixed(1) + "px");
+            if (!quieto) { p.classList.toggle("pf-en-vista", e > .7 && o < .3); p.classList.toggle("pf-fue", o >= .3); }
           });
         }
         var pedido = false;
         function pedir() { if (!pedido) { pedido = true; requestAnimationFrame(function () { pedido = false; tic(); }); } }
-        if (quieto) paneles.concat(textos).forEach(function (p) { p.classList.add("en-vista"); });
+        if (quieto) paneles.concat(textos).forEach(function (p) { p.classList.add("pf-en-vista"); });
         addEventListener("scroll", pedir, { passive: true }); addEventListener("resize", pedir); tic();
       }.toString() + ")();";
     }

@@ -1,15 +1,12 @@
-/* Piezas del sistema que usan varios componentes, con el código de Novedades:
-   la Etiqueta (componente Etiqueta del Master, manual p. 64) y la barra de navegación
-   (Web/Barra navegación). Los componentes las insertan en su HTML y su CSS. */
+/* Piezas del sistema que usan varios componentes: la Etiqueta (componente Etiqueta del Master, manual p. 64)
+   y la barra de navegación (Web/Barra navegación). Acá solo se arma su HTML: el CSS vive en base.css
+   (piezas "etiqueta" y "barra") y los colores salen de tokens.css. */
 (function () {
-  // Familias de color de las etiquetas: fondo del badge, forma y texto.
-  var FAM = {
-    azul: { bg: "#003DA5", fo: "#4086FF", tx: "#003DA5" },
-    verde: { bg: "#2D8035", fo: "#5EB53A", tx: "#2D8035" },
-    amarillo: { bg: "#EABA2C", fo: "#E57F19", tx: "#E57F19" },
-    naranja: { bg: "#E57F19", fo: "#8A4818", tx: "#E57F19" }
-  };
-  function fam(n, inv) { var f = FAM[n]; return inv ? { bg: f.fo, fo: f.bg, tx: f.tx } : f; }
+  // Familias de color de las etiquetas (04 · Paleta): fondo del badge, forma y texto. Invertida = fondo y forma cruzados.
+  function fam(n, inv) {
+    var bg = "var(--fam-" + n + ")", fo = "var(--fam-" + n + "-comp)";
+    return { bg: inv ? fo : bg, fo: inv ? bg : fo, tx: "var(--fam-" + n + "-tinta)" };
+  }
   // Las categorías de Novedades, cada una con su forma y su familia.
   var CATEGORIAS = {
     institucional: { nombre: "Institucional", forma: "escudo", f: fam("azul") },
@@ -27,42 +24,18 @@
     /* Etiqueta: badge (forma sobre el color de la familia) + rótulo blanco + dato opcional. */
     etiqueta: function (id, dato) {
       var x = CATEGORIAS[id], f = FORMAS[x.forma];
-      return '<span class="etq" style="--fo: ' + x.f.fo + '; --tx: ' + x.f.tx + '">' +
-        '<svg class="bd" viewBox="0 0 100 100" aria-hidden="true"><g fill="' + x.f.bg + '">' + BADGE + '</g><svg x="21" y="21" width="58" height="58" viewBox="' + f.vb + '" fill="' + x.f.fo + '">' + f.d + '</svg></svg>' +
-        '<span class="lb">' + x.nombre + '</span>' + (dato != null ? '<span class="dt">' + dato + '</span>' : '') + '</span>';
+      return '<span class="pf-etiqueta" style="--fo: ' + x.f.fo + '; --tx: ' + x.f.tx + '">' +
+        '<svg class="pf-etiqueta__badge" viewBox="0 0 100 100" aria-hidden="true"><g style="fill: ' + x.f.bg + '">' + BADGE + '</g><svg x="21" y="21" width="58" height="58" viewBox="' + f.vb + '" style="fill: ' + x.f.fo + '">' + f.d + '</svg></svg>' +
+        '<span class="pf-etiqueta__rotulo">' + x.nombre + '</span>' + (dato != null ? '<span class="pf-etiqueta__dato">' + dato + '</span>' : '') + '</span>';
     },
-    etiquetaCSS: [
-      "/* Etiqueta del sistema (Master, manual p. 64): radio 32% del alto, texto al 48%. S 22 / M 27 / L 32. */",
-      ".etq { --s: 27px; display: inline-flex; align-items: stretch; gap: calc(var(--s) * .06); height: var(--s); flex: none; font-family: \"Familjen Grotesk\", \"Helvetica Neue\", Arial, sans-serif; font-weight: 400; }",
-      ".etq .bd { width: var(--s); height: var(--s); flex: none; display: block; }",
-      ".etq .lb, .etq .dt { display: inline-flex; align-items: center; padding: 0 calc(var(--s) * .36); border-radius: calc(var(--s) * .32); font-size: calc(var(--s) * .48); line-height: 1; white-space: nowrap;  text-box: trim-both cap alphabetic; }",
-      ".etq .lb { background: #fff; color: var(--tx); }",
-      ".etq .dt { background: var(--fo); color: #FFFEEF; font-variant-numeric: tabular-nums; }"
-    ].join("\n"),
-
     /* Barra de navegación (Web/Barra navegación): logo, menú en cápsula de vidrio y lupa. */
     barra: function (items, actual) {
-      return '<header class="top solid"><nav class="nav" aria-label="Sitio">' +
-        '<a class="logo" href="#" aria-label="Profertil">' + LOGO_BLANCO.replace("<svg", '<svg aria-hidden="true"') + '</a>' +
-        '<div class="menu">' + items.map(function (it) {
+      return '<header class="pf-barra"><nav class="pf-barra__nav" aria-label="Sitio">' +
+        '<a class="pf-barra__logo" href="#" aria-label="Profertil">' + LOGO_BLANCO.replace("<svg", '<svg aria-hidden="true"') + '</a>' +
+        '<div class="pf-barra__menu">' + items.map(function (it) {
           return '<button type="button" data-ir="' + it[0] + '"' + (it[0] === actual ? ' aria-current="page"' : '') + '>' + it[1] + '</button>'; }).join("") + '</div>' +
-        '<span class="lupa" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></span>' +
+        '<span class="pf-barra__lupa" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></span>' +
         '</nav></header>';
-    },
-    barraCSS: [
-      "/* Barra de navegación del sistema (Web/Barra navegación, la de Novedades). */",
-      ".top { position: fixed; inset: 0 0 auto; z-index: 50; }",
-      ".top.solid { background: rgba(0, 61, 165, .94); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }",
-      ".nav { position: relative; display: flex; align-items: center; gap: 14px; height: 76px; padding: 0 clamp(16px, 4vw, 48px); }",
-      ".nav .logo { display: block; flex: none; color: #FFFEEF; line-height: 0; }",
-      ".nav .logo svg { width: 74px; height: auto; }",
-      ".nav .menu { display: flex; gap: 2px; margin: 0 auto; padding: 7px; border-radius: 999px; background: rgba(255, 254, 239, .14); border: 1px solid rgba(255, 254, 239, .22); backdrop-filter: blur(14px); }",
-      ".nav .menu button { padding: 7px 14px; border: 0; border-radius: 999px; background: none; font: inherit; font-size: .82rem; white-space: nowrap; color: rgba(255, 254, 239, .9); cursor: pointer; transition: background 200ms ease, color 200ms ease; }",
-      ".nav .menu button[aria-current] { background: #FFFEEF; color: #003DA5; font-weight: 500; }",
-      ".nav .lupa { width: 48px; height: 48px; flex: none; display: grid; place-items: center; border-radius: 999px; background: rgba(255, 254, 239, .16); border: 1px solid rgba(255, 254, 239, .24); color: #FFFEEF; }",
-      ".nav .lupa svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }",
-      "/* Mobile: si los items no entran, la cápsula se desliza de costado en lugar de salirse de la pantalla. */",
-      "@media (max-width: 760px) { .nav { gap: 10px; } .nav .menu { min-width: 0; margin-right: 0; overflow-x: auto; scrollbar-width: none; } .nav .menu::-webkit-scrollbar { display: none; } .nav .menu button { flex: none; padding: 7px 10px; font-size: .76rem; } .nav .logo svg { width: 56px; } .nav .lupa { display: none; } }"
-    ].join("\n")
+    }
   };
 })();

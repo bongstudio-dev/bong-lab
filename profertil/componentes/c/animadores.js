@@ -35,15 +35,15 @@
     dependencias: ["animadores.css", "animadores.js"],
     css: function () {
       return [
-        ".anim { --tam: 64px; display: grid; place-items: center; min-height: 340px; padding: 40px; border-radius: 26px; text-align: center; }",
-        ".anim[data-fondo=\"tiza\"] { background: var(--card); color: var(--ink); }",
-        ".anim[data-fondo=\"azul\"] { background: var(--azul); color: var(--tiza); }",
-        ".anim__t { margin: 0; max-width: 18ch; font: 500 var(--tam)/1.04 var(--f-display); letter-spacing: -.035em; text-wrap: balance; }"
+        ".pf-anim { --tam: 64px; display: grid; place-items: center; min-height: 340px; padding: 40px; border-radius: var(--radio-tarjeta); text-align: center; }",
+        ".pf-anim[data-fondo=\"tiza\"] { background: var(--card); color: var(--ink); }",
+        ".pf-anim[data-fondo=\"azul\"] { background: var(--azul); color: var(--tiza); }",
+        ".pf-anim__t { margin: 0; max-width: 18ch; font: 500 var(--tam)/1.04 var(--f-display); letter-spacing: -.035em; text-wrap: balance; }"
       ].join("\n");
     },
     html: function (s) {
       var f = ficha(s.anim), t = s.txt || f.txt;
-      return '<div class="anim" data-c="animadores">\n  <h2 class="anim__t" data-anim="' + f.id + '"' + (f.palabras ? ' data-palabras="' + f.palabras + '"' : '') + '>' + t + '</h2>\n</div>';
+      return '<div class="pf-anim" data-c="animadores">\n  <h2 class="pf-anim__t" data-anim="' + f.id + '"' + (f.palabras ? ' data-palabras="' + f.palabras + '"' : '') + '>' + t + '</h2>\n</div>';
     }
   });
 })();

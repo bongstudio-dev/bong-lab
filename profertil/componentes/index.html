@@ -54,6 +54,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="base.css">
 <style>
 /* Los colores, tipografías y movimientos salen de tokens.css (generado desde el Master). Acá solo lo propio de la librería. */
 :root {
@@ -102,13 +103,7 @@ html { scrollbar-color: rgba(10, 30, 74, .25) transparent; }
 
 .centro { min-width: 0; }
 
-/* ---------- Pastilla filtro (Web/Pastilla filtro del Master) ----------
-   Rellena en azul, la elegida en tinta; "Todas" sin elegir va transparente con línea. */
-.lbl { --h: 30px; display: inline-flex; align-items: center; flex: none; height: var(--h); padding: 0 calc(var(--h) * .48); border: 0; border-radius: 999px; background: var(--azul); color: var(--sobre-color); font: 400 calc(var(--h) * .47)/1 var(--f-display); white-space: nowrap; transition: background 240ms var(--ease), color 240ms var(--ease), box-shadow 240ms var(--ease), transform .15s var(--ease); text-box: trim-both cap alphabetic; }
-@media (hover: hover) and (pointer: fine) { .lbl:hover { background: color-mix(in srgb, var(--azul) 86%, var(--ink)); } .lbl-todas:hover { background: var(--line); } }
-.lbl:active { transform: scale(.96); }
-.lbl[aria-pressed="true"], .lbl[aria-pressed="true"]:hover { background: var(--activo); color: var(--sobre-color); box-shadow: none; }
-.lbl-todas { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+/* Pastilla filtro, Selector e Interruptor: los de base.css (los mismos que usan los componentes). */
 
 /* ---------- Galería ---------- */
 .gal { padding: 28px 32px 72px; }
@@ -193,27 +188,15 @@ html.con-panel { overflow: hidden; }
 .ctl--desc { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 10px 0; }
 .ctl__desc { margin: 0; font-size: 12px; color: var(--ink-3); }
 /* Con tres opciones o más, el control va debajo del rótulo para que no se corten.
-   (El primer hijo del .seg es el indicador: la tercera opción es el cuarto hijo.) */
-.ctl:has(.seg button:nth-child(4)) { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 10px 0; }
+   (El primer hijo del Selector es el indicador: la tercera opción es el cuarto hijo.) */
+.ctl:has(.pf-selector button:nth-child(4)) { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 10px 0; }
 .ctl > .et { font-size: 12.5px; color: var(--ink-2); }
 .ctl > .et small { display: block; font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
-/* El Selector del sistema (Web/Selector del Master): cápsula de línea, indicador marfil que se desliza. */
-.seg { position: relative; isolation: isolate; display: flex; min-width: 0; padding: 3px; border-radius: 999px; background: var(--line); }
-/* Si las opciones no entran (cinco en mobile), la cápsula se desliza de costado en vez de cortarlas. */
-.seg.ancho { overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain; }
-.seg.ancho::-webkit-scrollbar { display: none; }
-.seg.ancho button { flex: 1 0 auto; text-overflow: clip; }
-.seg-ind { position: absolute; z-index: -1; top: 3px; left: 0; bottom: 3px; width: 0; border-radius: 999px; background: var(--card); box-shadow: 0 1px 3px rgba(10, 30, 74, .12); pointer-events: none; transition: transform 420ms cubic-bezier(.67, 0, .24, .99), width 420ms cubic-bezier(.67, 0, .24, .99); }
-.seg-ind.quieto { transition: none; }
-.seg button { flex: 1 1 0; min-width: 0; height: 28px; padding: 0 8px; border: 0; border-radius: 999px; background: transparent; font-size: 12px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 240ms ease; display: inline-flex; align-items: center; justify-content: center; text-box: trim-both cap alphabetic; }
-.seg button[aria-pressed="true"] { color: var(--azul); font-weight: 500; }
+/* En los ajustes el Selector ocupa todo el ancho (pf-selector--ancho). */
+.ajustes .pf-selector { min-width: 0; }
 input[type="range"] { width: 100%; accent-color: var(--ink); margin: 0; }
 input[type="text"], select { width: 100%; height: 32px; padding: 0 10px; border: 0; border-radius: var(--r); background: var(--suave); font-size: 12.5px; }
-/* El interruptor del sistema (UI/Toggle del Master): 56 × 32, perilla de 26, verde prendido. */
-.interr { justify-self: end; position: relative; width: 56px; height: 32px; padding: 0; border: 0; border-radius: 16px; background: #D9D9D9; transition: background 200ms ease; }
-.interr::after { content: ""; position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(10, 30, 74, .2); transition: transform 240ms var(--ease); }
-.interr[aria-checked="true"] { background: #2D8035; }
-.interr[aria-checked="true"]::after { transform: translateX(24px); }
+.ctl > .pf-interruptor { justify-self: end; }
 
 /* Código: una sola acción principal, Copiar. */
 .codigo__cab { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
@@ -344,7 +327,6 @@ html.con-pleno { overflow: hidden; }
   .herr button { width: 38px; height: 38px; }
   .ctl { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 10px 0; }
   .ctl > .et small { display: inline; margin-left: 6px; }
-  .seg button { height: 32px; }
   /* 16 px: con menos, Safari de iPhone hace zoom al enfocar el campo y la página queda corrida. */
   input[type="text"], select { height: 40px; font-size: 16px; }
   input[type="range"] { height: 28px; }
@@ -403,6 +385,9 @@ html.con-pleno { overflow: hidden; }
      previa      0 a 1: hasta dónde scrollear la miniatura de la galería
      mini        ancho en px al que se dibuja la miniatura (1280 por defecto; menos = más cerca)
      tamano      "ancha" | "media" | "chica": lugar en la galería
+     base        ["selector", ...]: piezas de base.css que usa (se muestran en la pestaña BASE del código)
+   Reglas del código de cada componente (ver arriba de base.css): toda clase, id y @keyframes empieza
+   con pf-; colores, tamaños de texto, radios y sombras salen de tokens.css (--texto-*, --radio-*, --sombra-*).
      controles   {id, tipo: seg|rango|texto|interr|select, etiqueta, def, desc, aplica, solo}
                  solo: ["variante", ...] = el ajuste se muestra solo en esas variantes (en las otras no hace nada).
                  aplica: {var: "--x", unidad} | {attr: "data-x"} | {texto: "selector"} = en vivo;
@@ -464,7 +449,7 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
     var js = c.js ? c.js(s) : "", auto = c.alto === "auto";
     return '<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">' +
       '<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">' +
-      '<link rel="stylesheet" href="tokens.css"><link rel="stylesheet" href="../animadores-texto/animadores.css">' +
+      '<link rel="stylesheet" href="tokens.css"><link rel="stylesheet" href="base.css"><link rel="stylesheet" href="../animadores-texto/animadores.css">' +
       '<style>*,*::before,*::after{box-sizing:border-box}html,body{margin:0}body{background:#E9E7D6;color:#0A1E4A;font-family:"DM Sans","Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}::selection{background:#003DA5;color:#FFFEEF}' +
       (auto ? 'body{min-height:100vh;display:flex;flex-direction:column;justify-content:' + (c.sangrado ? 'flex-end' : 'center') + ';' + (c.sangrado ? '' : c.pleno ? 'padding:clamp(20px,5vw,56px) 0' : 'padding:clamp(20px,5vw,56px)') + '}body>*{width:100%}' : '') +
       (mini ? 'html{scrollbar-width:none}html::-webkit-scrollbar{display:none}' : '') + '</style>' +
@@ -529,9 +514,9 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
   // Proporción de cada tarjeta: es lo que hace al masonry. Anchas apaisadas, páginas verticales, piezas chicas cuadradas.
   function proporcion(c) { return c.tamano === "ancha" ? 4 / 3 : (c.tamano === "media" || typeof c.alto === "number") ? 4 / 5 : 1; }
   function pillsHTML() {
-    return '<button type="button" class="lbl lbl-todas" data-grupo="" aria-pressed="' + !filtro + '">Todas</button>' +
+    return '<button type="button" class="pf-pastilla pf-pastilla--todas" data-grupo="" aria-pressed="' + !filtro + '">Todas</button>' +
       GRUPOS.filter(function (g) { return L.some(function (c) { return c.grupo === g; }); }).map(function (g) {
-        return '<button type="button" class="lbl" data-grupo="' + esc(g) + '" aria-pressed="' + (filtro === g) + '">' + esc(g) + '</button>'; }).join("");
+        return '<button type="button" class="pf-pastilla" data-grupo="' + esc(g) + '" aria-pressed="' + (filtro === g) + '">' + esc(g) + '</button>'; }).join("");
   }
   function galeria() {
     galeriaLista = true; actual = null; marcarNav(true); dibujarDock(); document.title = "Componentes Profertil";
@@ -589,7 +574,7 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
   }
   function filtrar(g) {
     filtro = g;
-    document.querySelectorAll("#pills .lbl").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.grupo === g)); });
+    document.querySelectorAll("#pills .pf-pastilla").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.grupo === g)); });
     if ($("galTit")) $("galTit").textContent = g && movil.matches ? "Componentes · " + g : "Componentes";
     var entran = [];
     document.querySelectorAll("#mas .tar").forEach(function (t) {
@@ -607,7 +592,7 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
 
   /* ---------------- ficha ---------------- */
   function dependencias(c) {
-    var s = inicial(c), src = c.html(s) + (c.js ? c.js(s) : ""), d = ["tokens.css", "Familjen Grotesk", "DM Sans"];
+    var s = inicial(c), src = c.html(s) + (c.js ? c.js(s) : ""), d = ["tokens.css"].concat(c.base ? ["base.css (" + c.base.join(", ") + ")"] : [], ["Familjen Grotesk", "DM Sans"]);
     if (/data-anim=/.test(src)) d.push("animadores.css y animadores.js");
     if (/data:image\/svg|viewBox="0 0 \d/.test(src)) d.push("formas del sistema en línea");
     if (/\.webp/.test(src)) d.push("fotos de demo");
@@ -626,7 +611,7 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
   function control(k) {
     var v = estado[k.id], et = esc(k.etiqueta.replace(/ \(.+\)$/, ""));
     if (k.tipo === "rango") return '<div class="ctl"><label class="et" for="t-' + k.id + '">' + et + '<small id="v-' + k.id + '">' + v + ' ' + (k.unidad || '') + '</small></label><input type="range" id="t-' + k.id + '" data-k="' + k.id + '" min="' + k.min + '" max="' + k.max + '" step="' + (k.paso || 1) + '" value="' + v + '"></div>';
-    if (k.tipo === "seg") return '<div class="ctl"><span class="et" id="e-' + k.id + '">' + et + '</span><div class="seg" role="group" aria-labelledby="e-' + k.id + '" data-k="' + k.id + '"><span class="seg-ind" aria-hidden="true"></span>' + k.opciones.map(function (o) {
+    if (k.tipo === "seg") return '<div class="ctl"><span class="et" id="e-' + k.id + '">' + et + '</span><div class="pf-selector pf-selector--ancho" role="group" aria-labelledby="e-' + k.id + '" data-k="' + k.id + '"><span class="pf-selector__ind" aria-hidden="true"></span>' + k.opciones.map(function (o) {
       return '<button type="button" data-val="' + o[0] + '" aria-pressed="' + (String(v) === String(o[0])) + '">' + esc(o[1]) + '</button>'; }).join("") + '</div></div>';
     if (k.tipo === "select") {
       var od = k.opciones.filter(function (o) { return String(o[0]) === String(v); })[0];
@@ -635,7 +620,7 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
         (od && od[2] ? '<p class="ctl__desc" id="d-' + k.id + '">' + esc(od[2]) + '</p>' : '') + '</div>';
     }
     if (k.tipo === "texto") return '<div class="ctl"><label class="et" for="t-' + k.id + '">' + et + '</label><input type="text" id="t-' + k.id + '" data-k="' + k.id + '" value="' + esc(v) + '"></div>';
-    if (k.tipo === "interr") return '<div class="ctl"><span class="et" id="e-' + k.id + '">' + et + '</span><button type="button" class="interr" role="switch" aria-checked="' + v + '" aria-labelledby="e-' + k.id + '" data-k="' + k.id + '"></button></div>';
+    if (k.tipo === "interr") return '<div class="ctl"><span class="et" id="e-' + k.id + '">' + et + '</span><button type="button" class="pf-interruptor" role="switch" aria-checked="' + v + '" aria-labelledby="e-' + k.id + '" data-k="' + k.id + '"></button></div>';
     return "";
   }
   // Solo los ajustes que hacen algo en la variante elegida.
@@ -792,10 +777,19 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
   }
   function ctrl(id) { return (actual.controles || []).filter(function (k) { return k.id === id; })[0]; }
   function cambio(id, v) { estado[id] = v; var k = ctrl(id); if (!(k && aplicar(k))) dibujar(false); codigo(); }
+  /* base.css: las piezas compartidas. Se lee una vez y se parte por sus marcas "@pieza nombre"
+     para mostrar en la pestaña BASE solo las que usa el componente (las que declara en base: [...]). */
+  var PIEZAS = {};
+  fetch("base.css").then(function (r) { return r.text(); }).then(function (t) {
+    t.split("/* @pieza ").slice(1).forEach(function (parte) { PIEZAS[parte.split(/\s/)[0]] = "/* " + parte.trim(); });
+    codigo();
+  }).catch(function () {});
   function codigo() {
     if (!actual || actual.tipo === "pagina" || !$("pre")) return;
-    var p = { html: "<!-- " + actual.nombre + " · Profertil -->\n" + htmlFinal(actual, estado), css: actual.css(estado) };
+    var p = { html: "<!-- " + actual.nombre + " · Profertil -->\n" + htmlFinal(actual, estado), css: "/* Necesita tokens.css" + (actual.base ? " y base.css" : "") + ". */\n" + actual.css(estado) };
     if (actual.js) { var j = actual.js(estado); if (j) p.js = j; }
+    if (actual.base && actual.base.length) p.base = "/* De base.css: se carga una sola vez para todo el sitio. Acá, solo las piezas que usa " + actual.nombre + ". */\n\n" +
+      actual.base.map(function (n) { return PIEZAS[n] || "/* @pieza " + n + " */"; }).join("\n\n");
     if (!p[tab]) tab = "html";
     $("tabs").innerHTML = Object.keys(p).map(function (t) { return '<button type="button" data-t="' + t + '" aria-pressed="' + (t === tab) + '">' + t.toUpperCase() + '</button>'; }).join("");
     $("pre").textContent = p[tab].trim();
@@ -827,12 +821,12 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, falla); else falla();
       return;
     }
-    var seg = b.closest("#ajustes .seg"), k = b.dataset.k || (seg && seg.dataset.k); if (!k) return;
+    var seg = b.closest("#ajustes .pf-selector"), k = b.dataset.k || (seg && seg.dataset.k); if (!k) return;
     if (seg) {
       seg.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", x === b); });
       moverInd(seg, true);
       var c = ctrl(k), val = b.dataset.val; if (c && typeof c.def === "number") val = parseFloat(val); cambio(k, val);
-    } else if (b.classList.contains("interr")) { var on = b.getAttribute("aria-checked") !== "true"; b.setAttribute("aria-checked", on); cambio(k, on); }
+    } else if (b.classList.contains("pf-interruptor")) { var on = b.getAttribute("aria-checked") !== "true"; b.setAttribute("aria-checked", on); cambio(k, on); }
   });
   document.addEventListener("input", function (e) {
     var el = e.target, k = el.dataset && el.dataset.k; if (!k || !el.closest("#ajustes")) return;
@@ -875,21 +869,21 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
 
   // El indicador del Selector va al botón elegido (igual que en Novedades).
   function moverInd(seg, animar) {
-    var ind = seg.querySelector(".seg-ind"), b = seg.querySelector('button[aria-pressed="true"]');
+    var ind = seg.querySelector(".pf-selector__ind"), b = seg.querySelector('button[aria-pressed="true"]');
     if (!ind || !b || !b.offsetWidth) return;
     // Si las opciones no entran a su ancho natural, la cápsula se desliza de costado (.ancho).
-    seg.classList.remove("ancho");
+    seg.classList.remove("pf-selector--desborda");
     var nat = 6; seg.querySelectorAll("button").forEach(function (x) { nat += x.scrollWidth; });
     if (nat > seg.clientWidth + 1) {
-      seg.classList.add("ancho");
+      seg.classList.add("pf-selector--desborda");
       var izq = b.offsetLeft - 3, der = b.offsetLeft + b.offsetWidth + 3 - seg.clientWidth;
       if (seg.scrollLeft > izq) seg.scrollLeft = izq; else if (seg.scrollLeft < der) seg.scrollLeft = der;
     }
-    if (!animar) ind.classList.add("quieto");
+    if (!animar) ind.classList.add("pf-quieto");
     ind.style.width = b.offsetWidth + "px"; ind.style.transform = "translateX(" + b.offsetLeft + "px)";
-    if (!animar) { void ind.offsetWidth; ind.classList.remove("quieto"); }
+    if (!animar) { void ind.offsetWidth; ind.classList.remove("pf-quieto"); }
   }
-  function moverInds() { document.querySelectorAll("#ajustes .seg").forEach(function (s) { moverInd(s, false); }); }
+  function moverInds() { document.querySelectorAll("#ajustes .pf-selector").forEach(function (s) { moverInd(s, false); }); }
   addEventListener("resize", moverInds);
   document.fonts && document.fonts.ready.then(moverInds);
 
@@ -919,9 +913,9 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
   function secuencia() { return ordenados(); }
   function dibujarDock() {
     var o = ordenados(), lista = filtro ? o.filter(function (c) { return c.grupo === filtro; }) : o;
-    $("dkCats").innerHTML = '<button type="button" class="lbl lbl-todas" data-grupo="" aria-pressed="' + !filtro + '">Todas</button>' +
+    $("dkCats").innerHTML = '<button type="button" class="pf-pastilla pf-pastilla--todas" data-grupo="" aria-pressed="' + !filtro + '">Todas</button>' +
       GRUPOS.filter(function (g) { return L.some(function (c) { return c.grupo === g; }); }).map(function (g) {
-        return '<button type="button" class="lbl" data-grupo="' + esc(g) + '" aria-pressed="' + (filtro === g) + '">' + esc(g) + '</button>'; }).join("");
+        return '<button type="button" class="pf-pastilla" data-grupo="' + esc(g) + '" aria-pressed="' + (filtro === g) + '">' + esc(g) + '</button>'; }).join("");
     $("dkLista").innerHTML = lista.map(function (c) {
       return '<li><a class="dk-item" href="#' + c.id + '"' + (actual === c ? ' aria-current="page"' : '') + '><span>' + esc(c.nombre) + '</span><small>' + esc(c.grupo) + '</small></a></li>'; }).join("");
     var sq = secuencia(), i = actual ? sq.indexOf(actual) : -1;
@@ -964,7 +958,7 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
   });
   // Las pastillas de arriba de la galería (desktop).
   document.addEventListener("click", function (e) {
-    var b = e.target.closest("#pills .lbl"); if (!b || b.dataset.grupo === filtro) return;
+    var b = e.target.closest("#pills .pf-pastilla"); if (!b || b.dataset.grupo === filtro) return;
     filtrar(b.dataset.grupo);
   });
   document.addEventListener("pointerdown", function (e) { if (dock.classList.contains("open") && !dock.contains(e.target) && !ancla.contains(e.target)) abrirDock(false); });
