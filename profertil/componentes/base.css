@@ -15,7 +15,7 @@
 .pf-selector__ind { position: absolute; z-index: -1; top: 3px; left: 0; bottom: 3px; width: 0; border-radius: 999px; background: var(--tiza); box-shadow: var(--sombra-control); pointer-events: none;
   transition: transform var(--pf-t, var(--t-vista)) var(--curva-vista), width var(--pf-t, var(--t-vista)) var(--curva-vista); }
 .pf-selector__ind.pf-quieto { transition: none; }
-.pf-selector button { display: inline-flex; align-items: center; justify-content: center; min-width: 0; padding: 6px 13px; border: 0; border-radius: 999px; background: transparent; color: var(--ink-2); font: 400 var(--texto-chico)/1.2 var(--f-body); white-space: nowrap; cursor: pointer; transition: color 240ms ease; }
+.pf-selector button { display: inline-flex; align-items: center; justify-content: center; min-width: 0; padding: 6px 13px; border: 0; border-radius: 999px; background: transparent; color: var(--ink-2); font: 400 var(--texto-chico)/1.5 var(--f-body); white-space: nowrap; cursor: pointer; transition: color 240ms ease; }
 .pf-selector button[aria-pressed="true"] { color: var(--azul); font-weight: 500; }
 /* A todo el ancho: las opciones se reparten parejo. */
 .pf-selector--ancho { display: flex; }
@@ -30,14 +30,15 @@
 
 /* @pieza pastilla
    Web/Pastilla filtro: redonda, rellena con el color de la familia (--pc) y texto tiza. La elegida en tinta;
-   "Todas" sin elegir va transparente con línea. Alto 30, texto al 47% del alto, aire al 48%. */
+   "Todas" sin elegir va transparente. Alto 30, texto al 47% del alto, aire al 48%. */
 .pf-pastilla { --h: 30px; display: inline-flex; align-items: center; flex: none; height: var(--h); padding: 0 calc(var(--h) * .48); border: 0; border-radius: 999px;
   background: var(--pc, var(--azul)); color: var(--sobre-color); font: 400 calc(var(--h) * .47)/1 var(--f-display); white-space: nowrap; cursor: pointer;
   transition: background 240ms var(--ease), color 240ms var(--ease), box-shadow 240ms var(--ease), transform .15s var(--ease); text-box: trim-both cap alphabetic; }
 @media (hover: hover) and (pointer: fine) { .pf-pastilla:hover { background: color-mix(in srgb, var(--pc, var(--azul)) 86%, var(--ink)); } .pf-pastilla--todas:hover { background: var(--line); } }
 .pf-pastilla:active { transform: scale(.96); }
 .pf-pastilla[aria-pressed="true"], .pf-pastilla[aria-pressed="true"]:hover { background: var(--activo); color: var(--sobre-color); box-shadow: none; }
-.pf-pastilla--todas { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+.pf-pastilla--todas { background: transparent; color: var(--ink); }
+@media (hover: none) { .pf-pastilla:active { background: color-mix(in srgb, var(--pc, var(--azul)) 86%, var(--ink)); } .pf-pastilla--todas:active { background: var(--line); } }
 
 /* @pieza chip
    Web/Chip año: radio 32% del alto, azul tenue con texto azul; el elegido, azul con texto tiza. Alto 32. */
@@ -47,6 +48,7 @@
 @media (hover: hover) and (pointer: fine) { .pf-chip:hover { background: color-mix(in srgb, var(--azul) 28%, #fff); } }
 .pf-chip[aria-pressed="true"] { background: var(--chip-activo); color: var(--sobre-color); }
 .pf-chip__n { font-weight: 400; opacity: .7; }
+@media (hover: none) { .pf-chip:active { background: color-mix(in srgb, var(--azul) 28%, #fff); } }
 
 /* @pieza interruptor
    UI/Toggle: 56 × 32, perilla de 26 con 3 de aire. Prendido en verde de marca, apagado en gris.
@@ -71,6 +73,17 @@
 .pf-boton--principal:active { background: color-mix(in srgb, var(--azul) 86%, var(--ink)); }
 .pf-boton--alerta:active { background: color-mix(in srgb, var(--naranja) 86%, var(--ink)); }
 .pf-boton--chico { height: 32px; padding: 0 14px; border: 0; }
+/* Verde: la acción que lleva afuera (Ver la nota original, Ver todas las notas). */
+.pf-boton--verde { background: var(--verde); border-color: var(--verde); color: var(--color-blanco); }
+@media (hover: hover) and (pointer: fine) { .pf-boton--verde:hover { background: color-mix(in srgb, var(--verde) 86%, var(--ink)); } }
+.pf-boton--verde:active { background: color-mix(in srgb, var(--verde) 86%, var(--ink)); }
+.pf-boton svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+/* Botón de ícono: 42 × 42, radio 13, fondo de línea (anterior, siguiente, cerrar). */
+.pf-boton-icono { width: 42px; height: 42px; padding: 0; border: 0; border-radius: var(--radio-control); background: var(--line); color: var(--ink); cursor: pointer; display: grid; place-items: center; transition: background 200ms ease; }
+@media (hover: hover) and (pointer: fine) { .pf-boton-icono:hover { background: color-mix(in srgb, var(--ink) 16%, transparent); } }
+.pf-boton-icono:active { background: color-mix(in srgb, var(--ink) 16%, transparent); }
+.pf-boton-icono:disabled { opacity: .35; cursor: default; }
+.pf-boton-icono svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
 /* @pieza boton-color
    Web/Botón nota: píldora tiza con texto azul y flecha, para llamados sobre color o foto (nunca sobre tiza).
@@ -82,33 +95,76 @@
 .pf-boton-color:active { background: var(--color-blanco); }
 
 /* @pieza etiqueta
-   Etiqueta (Master, manual p. 64): badge con la forma de la categoría + rótulo blanco + dato opcional.
-   Radio 32% del alto, texto al 48%. Tamaños S 22 / M 27 / L 32 (--etq-s/m/l). Colores: --fo (forma) y --tx (texto). */
+   Etiqueta (Master, manual p. 64): badge con la forma de la categoría + rótulo blanco + dato y flecha opcionales.
+   Radio 32% del alto, texto al 48%. Tamaños S 22 / M 27 / L 32 (--etq-s/m/l). Colores: --fo (forma) y --tx (texto).
+   Como botón (filtro) se marca con aria-pressed; como link, la flecha toma el color al pasar. */
 .pf-etiqueta { --s: var(--etq-m); display: inline-flex; align-items: stretch; gap: calc(var(--s) * .06); height: var(--s); flex: none; font: 400 calc(var(--s) * .48)/1 var(--f-display); }
 .pf-etiqueta__badge { width: var(--s); height: var(--s); flex: none; display: block; }
-.pf-etiqueta__rotulo, .pf-etiqueta__dato { display: inline-flex; align-items: center; padding: 0 calc(var(--s) * .36); border-radius: calc(var(--s) * .32); white-space: nowrap; text-box: trim-both cap alphabetic; }
+.pf-etiqueta__rotulo, .pf-etiqueta__dato, .pf-etiqueta__flecha { display: inline-flex; align-items: center; padding: 0 calc(var(--s) * .36); border-radius: calc(var(--s) * .32); white-space: nowrap; text-box: trim-both cap alphabetic; }
 .pf-etiqueta__rotulo { background: var(--color-blanco); color: var(--tx); }
+/* El dato va en tiza sobre el color: el color de la familia sobre su complementario contrastaba poco. */
 .pf-etiqueta__dato { background: var(--fo); color: var(--tiza); font-variant-numeric: tabular-nums; }
+.pf-etiqueta__flecha { width: var(--s); padding: 0; justify-content: center; background: var(--color-blanco); color: var(--tx); }
+.pf-etiqueta__flecha svg { width: 46%; height: 46%; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.pf-etiqueta__corto { display: none; }
+button.pf-etiqueta { border: 0; padding: 0; background: transparent; cursor: pointer; color: inherit; }
+button.pf-etiqueta .pf-etiqueta__rotulo { transition: background 160ms ease, color 160ms ease; }
+@media (hover: hover) and (pointer: fine) { button.pf-etiqueta:hover .pf-etiqueta__rotulo { box-shadow: inset 0 0 0 1.5px var(--tx); } }
+button.pf-etiqueta[aria-pressed="true"] .pf-etiqueta__rotulo { background: var(--tx); color: var(--color-blanco); }
+a.pf-etiqueta { text-decoration: none; }
+@media (hover: hover) and (pointer: fine) { a.pf-etiqueta:hover .pf-etiqueta__flecha { background: var(--tx); color: var(--color-blanco); } }
 
 /* @pieza barra
-   Web/Barra navegación: logo, menú en cápsula de vidrio y lupa, sobre la barra azul. */
-.pf-barra { position: fixed; inset: 0 0 auto; z-index: 50; background: var(--barra); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
-.pf-barra__nav { position: relative; display: flex; align-items: center; gap: 14px; height: 76px; padding: 0 clamp(16px, 4vw, 48px); }
-.pf-barra__logo { display: block; flex: none; color: var(--tiza); line-height: 0; }
-.pf-barra__logo svg { width: 74px; height: auto; }
-.pf-barra__menu { display: flex; gap: 2px; margin: 0 auto; padding: 7px; border-radius: 999px; background: var(--foto-fondo); border: 1px solid var(--foto-borde); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
-.pf-barra__menu button { padding: 7px 14px; border: 0; border-radius: 999px; background: none; color: var(--foto-texto); font: 400 var(--texto-chico)/1.2 var(--f-body); white-space: nowrap; cursor: pointer; transition: background 200ms ease, color 200ms ease; }
-.pf-barra__menu button[aria-current] { background: var(--tiza); color: var(--azul); font-weight: 500; }
-.pf-barra__lupa { width: var(--btn-l); height: var(--btn-l); flex: none; display: grid; place-items: center; border-radius: 999px; background: var(--foto-boton); border: 1px solid var(--foto-borde); color: var(--tiza); }
+   Web/Barra navegación: logo, menú en cápsula de vidrio y buscador en la lupa.
+   Transparente sobre el header de foto o color; .pf-barra--solida toma el azul (al bajar, o siempre).
+   Markup: header.pf-barra > .pf-barra__in > nav.pf-barra__nav > logo, menú, menú mobile, buscador y su cerrar. */
+.pf-barra { position: fixed; inset: 0 0 auto; z-index: 50; padding-top: env(safe-area-inset-top, 0px); transition: background 260ms ease, box-shadow 260ms ease; }
+.pf-barra--solida { background: var(--barra); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 10px 30px -18px rgba(0, 20, 60, .7); }
+.pf-barra__in { width: min(100% - 32px, 1320px); margin-inline: auto; }
+.pf-barra__nav { position: relative; display: flex; align-items: center; gap: 14px; height: 76px; padding-right: 58px; transition: height 260ms var(--ease); }
+.pf-barra__logo { display: block; flex: none; color: var(--tiza); fill: currentColor; line-height: 0; }
+.pf-barra__logo svg { width: 74px; height: auto; aspect-ratio: 1458 / 1021; transition: width 260ms var(--ease); }
+.pf-barra__menu, .pf-barra__menu-mobile { margin-left: auto; margin-right: auto; }
+.pf-barra__menu { display: flex; gap: 2px; padding: 7px; border-radius: 999px; background: var(--foto-fondo); border: 1px solid var(--foto-borde); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); transition: opacity 220ms ease; }
+.pf-barra__menu > * { padding: 7px 14px; border: 0; border-radius: 999px; background: none; color: var(--foto-texto); font: 400 var(--texto-chico)/1.5 var(--f-body); white-space: nowrap; cursor: pointer; transition: background 200ms ease, color 200ms ease; }
+.pf-barra__menu > [aria-current] { background: var(--tiza); color: var(--azul); font-weight: 500; }
+.pf-barra__menu-mobile { display: none; align-items: center; gap: 8px; padding: 8px 14px; color: var(--tiza); font-size: var(--texto-chico); transition: opacity 220ms ease; }
+.pf-barra__menu-mobile i { display: grid; grid-template-columns: repeat(2, 7px); gap: 3px; }
+.pf-barra__menu-mobile i b { width: 7px; height: 7px; border-radius: 999px; border: 1.5px solid currentColor; }
+.pf-barra__nav.pf-buscando .pf-barra__menu, .pf-barra__nav.pf-buscando .pf-barra__menu-mobile { opacity: 0; pointer-events: none; }
+/* Buscador: la lupa es un círculo de vidrio que se estira en campo (.pf-abierto). */
+.pf-barra__busca { position: absolute; right: 0; top: 50%; transform: translateY(-50%); display: flex; align-items: center; width: var(--btn-l); height: var(--btn-l); border-radius: 999px;
+  background: var(--foto-boton); border: 1px solid var(--foto-borde); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); overflow: hidden;
+  transition: width var(--t-buscador) var(--ease), right var(--t-buscador) var(--ease), background 220ms ease, border-color 220ms ease; }
+.pf-barra__busca.pf-abierto { right: 56px; width: min(480px, calc(100% - 152px)); background: var(--tiza); border-color: var(--color-blanco); box-shadow: var(--sombra-tarjeta); }
+.pf-barra__lupa { width: 46px; height: 46px; flex: none; padding: 0; border: 0; border-radius: 999px; background: transparent; color: var(--tiza); cursor: pointer; display: grid; place-items: center; }
+.pf-barra__busca.pf-abierto .pf-barra__lupa { color: var(--azul); }
 .pf-barra__lupa svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
-/* Mobile: si el menú no entra, la cápsula se desliza de costado en lugar de salirse de la pantalla. */
-@media (max-width: 760px) {
-  .pf-barra__nav { gap: 10px; }
-  .pf-barra__menu { min-width: 0; margin-right: 0; overflow-x: auto; scrollbar-width: none; }
-  .pf-barra__menu::-webkit-scrollbar { display: none; }
-  .pf-barra__menu button { flex: none; padding: 7px 10px; font-size: var(--texto-mini); }
-  .pf-barra__logo svg { width: 56px; }
-  .pf-barra__lupa { display: none; }
+.pf-barra__busca input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font: 400 var(--texto-cuerpo)/1.2 var(--f-display); color: var(--ink); padding: 0 4px; opacity: 0; transition: opacity 200ms ease; }
+.pf-barra__busca.pf-abierto input { opacity: 1; }
+.pf-barra__busca input::placeholder { color: var(--ink-3); }
+.pf-barra__busca input::-webkit-search-cancel-button { display: none; }
+.pf-barra__cuenta { flex: none; margin-right: 5px; padding: 6px 10px; border-radius: 999px; background: var(--color-blanco); color: var(--ink-2); font-size: var(--texto-mini); font-variant-numeric: tabular-nums; }
+.pf-barra__busca:not(.pf-abierto) .pf-barra__cuenta { display: none; }
+.pf-barra__cerrar { position: absolute; right: 0; top: 50%; transform: translateY(-50%) scale(.6); width: var(--btn-l); height: var(--btn-l); padding: 0; border-radius: 999px;
+  background: var(--foto-boton); border: 1px solid var(--foto-borde); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); color: var(--tiza); cursor: pointer; display: grid; place-items: center; opacity: 0; visibility: hidden;
+  transition: opacity 200ms ease, transform var(--t-buscador) var(--ease), background 200ms ease, color 200ms ease, visibility 0s linear var(--t-buscador); }
+.pf-barra__cerrar svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+@media (hover: hover) and (pointer: fine) { .pf-barra__cerrar:hover { background: var(--tiza); color: var(--azul); } }
+.pf-barra__cerrar:active { background: var(--tiza); color: var(--azul); }
+.pf-barra__nav.pf-buscando .pf-barra__cerrar { opacity: 1; visibility: visible; transform: translateY(-50%); transition: opacity 220ms ease 120ms, transform var(--t-buscador) var(--ease), background 200ms ease, color 200ms ease; }
+/* Menú de muestra (Novedades): en pantallas medianas queda solo la página actual.
+   Menú que se usa para navegar (.pf-barra__menu--deslizable): nunca esconde ítems; en mobile se desliza de costado. */
+@media (max-width: 900px) { .pf-barra__menu:not(.pf-barra__menu--deslizable) > :not([aria-current]) { display: none; } }
+@media (max-width: 640px) {
+  .pf-barra__menu { display: none; }
+  .pf-barra__menu-mobile { display: inline-flex; border-radius: 999px; background: var(--foto-fondo); border: 1px solid var(--foto-borde); }
+  .pf-barra__nav { height: 66px; }
+  .pf-barra__logo svg { width: 62px; }
+  .pf-barra__busca.pf-abierto { width: calc(100% - 134px); }
+  .pf-barra__menu.pf-barra__menu--deslizable { display: flex; min-width: 0; margin-right: 0; overflow-x: auto; scrollbar-width: none; }
+  .pf-barra__menu--deslizable::-webkit-scrollbar { display: none; }
+  .pf-barra__menu--deslizable > * { flex: none; padding: 7px 10px; font-size: var(--texto-mini); }
 }
 
 /* @pieza oculto

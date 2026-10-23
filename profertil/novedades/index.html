@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=DM+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../componentes/tokens.css">
+<link rel="stylesheet" href="../componentes/base.css">
 <style>
 /* ==========================================================================
    Novedades Profertil: maqueta del archivo de notas.
@@ -20,65 +22,10 @@
    ========================================================================== */
 :root {
   color-scheme: light;
-  /* Tokens del sistema: los genera build.py desde tokens.json, que se
-     exporta de las variables del Figma Master. No escribir valores aca:
-     se cambian en Figma. */
-  --azul: #003DA5; /* Marca/Azul */
-  --celeste: #4086FF; /* Marca/Celeste */
-  --verde: #2D8035; /* Marca/Verde */
-  --verde-claro: #5EB53A; /* Marca/Verde Claro */
-  --amarillo: #EABA2C; /* Marca/Amarillo */
-  --naranja: #E57F19; /* Marca/Naranja */
-  --terra: #8A4818; /* Marca/Terra */
-  --tiza: #FFFEEF; /* Observados/Crema */
-  --color-blanco: #FFFFFF; /* Neutro/Blanco */
-  --color-negro: #000000; /* Neutro/Negro */
-  --color-gris-slogan: #676668; /* Neutro/Gris Slogan */
-  --color-verde-oscuro: #154B1A; /* Observados/Verde Oscuro */
-  --color-gris: #D9D9D9; /* Observados/Gris */
-  --bg: #E9E7D6; /* Web/Fondo */
-  --card: #FFFEEF; /* Web/Superficie */
-  --ink: #0A1E4A; /* Web/Tinta */
-  --ink-2: #44506E; /* Web/Tinta secundaria */
-  --ink-3: #737D96; /* Web/Tinta terciaria */
-  --barra: rgba(0, 61, 165, 0.94); /* Web/Barra */
-  --line: rgba(10, 30, 74, 0.1); /* Web/Línea */
-  --glass: rgba(255, 254, 239, 0.78); /* Web/Vidrio */
-  --etq-s: 22px; /* Web/Etiqueta/S */
-  --etq-m: 27px; /* Web/Etiqueta/M */
-  --etq-l: 32px; /* Web/Etiqueta/L */
-  --btn-s: 40px; /* Web/Botón/S */
-  --btn-m: 44px; /* Web/Botón/M */
-  --btn-l: 48px; /* Web/Botón/L */
-  --f-abrir: 600ms; /* Web/Movimiento/Filtros abrir */
-  --f-cerrar: 460ms; /* Web/Movimiento/Filtros cerrar */
-  --f-fundido: 360ms; /* Web/Movimiento/Filtros fundido */
-  --f-fundido-retraso: 160ms; /* Web/Movimiento/Filtros fundido retraso */
-  --f-flecha: 460ms; /* Web/Movimiento/Filtros flecha */
-  --f-chica: 280ms; /* Web/Movimiento/Compacto */
-  --t-buscador: 420ms; /* Web/Movimiento/Buscador */
-  --t-vista: 420ms; /* Web/Movimiento/Vista */
-  --carrusel-dura: 7000ms; /* Web/Movimiento/Carrusel duración */
-  --carrusel-pase: 700ms; /* Web/Movimiento/Carrusel pase */
-  --ease: cubic-bezier(0.22, 1, 0.36, 1); /* Web/Movimiento/Curva base */
-  --f-curva: cubic-bezier(0.67, 0, 0.24, 0.99); /* Web/Movimiento/Curva filtros */
-  --curva-vista: cubic-bezier(0.67, 0, 0.24, 0.99); /* Web/Movimiento/Curva vista */
-  --f-chica-curva: cubic-bezier(0.32, 0.72, 0, 1); /* Web/Movimiento/Curva compacto */
-  --carrusel-curva: cubic-bezier(0.65, 0, 0.25, 1); /* Web/Movimiento/Curva carrusel */
-  --ancla-gap: 5px; /* Web/Ancla/Separación */
-  --ancla-giro-k: 150; /* Web/Resorte/Ancla giro rigidez */
-  --ancla-giro-c: 13.5; /* Web/Resorte/Ancla giro amortiguación */
-  --ancla-aparecer-k: 220; /* Web/Resorte/Ancla aparecer rigidez */
-  --ancla-aparecer-c: 29.7; /* Web/Resorte/Ancla aparecer amortiguación */
-  --ancla-apretar-k: 600; /* Web/Resorte/Ancla apretar rigidez */
-  --ancla-apretar-c: 49; /* Web/Resorte/Ancla apretar amortiguación */
-  --ancla-apretar: 0.92; /* Web/Proporción/Ancla apretar */
-  --ancla-bajar: 0.8; /* Web/Proporción/Ancla bajar */
-  --ancla-cambio: 0.6; /* Web/Proporción/Ancla cambio */
-
-  --shadow: 0 1px 2px rgba(10, 30, 74, 0.06), 0 12px 28px -16px rgba(10, 30, 74, 0.28);
-  --f-display: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
-  --f-body: "DM Sans", "Helvetica Neue", Arial, sans-serif;
+  /* Los tokens del sistema salen de ../componentes/tokens.css (generado desde el Figma Master) y las
+     piezas compartidas (Barra, Selector, Pastilla, Chip, Etiqueta, Botón) de ../componentes/base.css:
+     las mismas que usan la librería de componentes y el resto del Lab. Acá solo lo propio de la página. */
+  --shadow: var(--sombra-tarjeta);
   --f-mono: "DM Mono", ui-monospace, Menlo, monospace;
 }
 
@@ -98,8 +45,8 @@ body {
 button { font: inherit; color: inherit; }
 a { color: inherit; }
 :focus-visible { outline: 2px solid var(--celeste); outline-offset: 2px; }
-.wrap { width: min(100% - 32px, 1320px); margin-inline: auto; }
-.ico { display: block; width: 100%; height: 100%; }
+.pf-wrap { width: min(100% - 32px, 1320px); margin-inline: auto; }
+.pf-ico { display: block; width: 100%; height: 100%; }
 
 /* --- Tacto -----------------------------------------------------------------
    Los :hover van todos dentro de (hover: hover) and (pointer: fine): en el
@@ -110,86 +57,16 @@ html { -webkit-tap-highlight-color: transparent; }
 button, a, [role="button"] { touch-action: manipulation; }
 button, [role="button"] { -webkit-user-select: none; user-select: none; }
 @media (hover: none) {
-  .card:active { transform: scale(0.985); transition-duration: 120ms; }
-  .lbl:active { background: color-mix(in srgb, var(--pc, var(--azul)) 86%, var(--ink)); }
-  .lbl-todas:active { background: var(--line); }
-  .f-body .sub:active { background: color-mix(in srgb, var(--c) 28%, #fff); }
-  .d-flecha:active, .busca-x:active { background: var(--tiza); color: var(--azul); }
-  .d-cta:active { background: #fff; }
-  .btn:active { background: #256c2c; }
-  .icon-btn:active { background: rgba(10, 30, 74, 0.16); }
+  .pf-card:active { transform: scale(0.985); transition-duration: 120ms; }
+  .pf-d-flecha:active { background: var(--tiza); color: var(--azul); }
+  .pf-d-cta:active { background: #fff; }
 }
 
-/* --- Barra superior fija ---------------------------------------------------
-   Logo, menu y lupa. Arriba de la foto es transparente; al bajar toma el azul.
-   La busqueda vive en la lupa: se expande hacia la izquierda y tapa el menu,
-   asi la navegacion y el buscador no compiten. Abierta, en el lugar de la
-   lupa aparece un boton circular igual con la X: se cierra donde se abrio. */
-.top { position: fixed; inset: 0 0 auto; z-index: 50; padding-top: env(safe-area-inset-top, 0px); transition: background 260ms ease, box-shadow 260ms ease; }
-.top.solid { background: var(--barra); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 10px 30px -18px rgba(0, 20, 60, 0.7); }
-.nav { position: relative; display: flex; align-items: center; gap: 14px; height: 76px; padding-right: 58px; transition: height 260ms var(--ease); }
-.nav .menu, .nav .menu-mobile { margin-left: auto; margin-right: auto; }
-.logo { display: block; flex: none; color: var(--tiza); fill: currentColor; line-height: 0; }
-.logo svg { width: 74px; height: auto; aspect-ratio: 1458 / 1021; transition: width 260ms var(--ease); }
-.menu {
-  display: flex; gap: 2px; padding: 7px;
-  border-radius: 999px;
-  background: rgba(255, 254, 239, 0.14);
-  border: 1px solid rgba(255, 254, 239, 0.22);
-  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-  transition: opacity 220ms ease;
-}
-.menu span { padding: 7px 14px; border-radius: 999px; font-size: 0.82rem; white-space: nowrap; color: rgba(255, 254, 239, 0.9); }
-.menu span[aria-current] { background: var(--tiza); color: var(--azul); font-weight: 500; }
-.menu-mobile { display: none; align-items: center; gap: 8px; padding: 8px 14px; color: var(--tiza); transition: opacity 220ms ease; }
-.menu-mobile i { display: grid; grid-template-columns: repeat(2, 7px); gap: 3px; }
-.menu-mobile i b { width: 7px; height: 7px; border-radius: 999px; border: 1.5px solid currentColor; }
-.nav.buscando .menu, .nav.buscando .menu-mobile { opacity: 0; pointer-events: none; }
-
-.busca {
-  position: absolute; right: 0; top: 50%; transform: translateY(-50%);
-  display: flex; align-items: center;
-  width: 48px; height: 48px;
-  border-radius: 999px;
-  background: rgba(255, 254, 239, 0.16);
-  border: 1px solid rgba(255, 254, 239, 0.24);
-  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-  overflow: hidden;
-  transition: width var(--t-buscador) var(--ease), right var(--t-buscador) var(--ease), background 220ms ease, border-color 220ms ease;
-}
-.busca.open { right: 56px; width: min(480px, calc(100% - 152px)); background: var(--tiza); border-color: #fff; box-shadow: var(--shadow); }
-.busca-x {
-  position: absolute; right: 0; top: 50%; transform: translateY(-50%) scale(0.6);
-  width: 48px; height: 48px; padding: 0;
-  border-radius: 999px;
-  background: rgba(255, 254, 239, 0.16);
-  border: 1px solid rgba(255, 254, 239, 0.24);
-  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-  color: var(--tiza); cursor: pointer;
-  display: grid; place-items: center;
-  opacity: 0; visibility: hidden;
-  transition: opacity 200ms ease, transform var(--t-buscador) var(--ease), background 200ms ease, color 200ms ease, visibility 0s linear var(--t-buscador);
-}
-.busca-x svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
-@media (hover: hover) and (pointer: fine) { .busca-x:hover { background: var(--tiza); color: var(--azul); } }
-.nav.buscando .busca-x { opacity: 1; visibility: visible; transform: translateY(-50%); transition: opacity 220ms ease 120ms, transform var(--t-buscador) var(--ease), background 200ms ease, color 200ms ease; }
-.lupa { width: 46px; height: 46px; flex: none; border: 0; border-radius: 999px; background: transparent; color: var(--tiza); cursor: pointer; display: grid; place-items: center; }
-.busca.open .lupa { color: var(--azul); }
-.lupa svg { width: 20px; height: 20px; }
-.busca input {
-  flex: 1; min-width: 0; border: 0; outline: none; background: transparent;
-  font-family: var(--f-display); font-size: 1.04rem; color: var(--ink); padding: 0 4px;
-  opacity: 0; transition: opacity 200ms ease;
-}
-.busca.open input { opacity: 1; }
-.busca input::placeholder { color: var(--ink-3); }
-.busca input::-webkit-search-cancel-button { display: none; }
-.busca:not(.open) .q-count { display: none; }
-.q-count { flex: none; margin-right: 5px; padding: 6px 10px; border-radius: 999px; background: #fff; color: var(--ink-2); font-size: 0.8rem; font-variant-numeric: tabular-nums; }
+/* --- Barra superior: la pieza "barra" de base.css (transparente sobre el carrusel, sólida al bajar). */
 
 /* --- Destacadas: carrusel a pantalla completa ---------------------------
    Las cinco notas mas recientes (o las de DESTACADAS, si se cargan), una por
-   pantalla, como en el archivo de waabi.ai/insights y como las stories: la
+   pantalla, como en el archivo de waabi.pf-ai/insights y como las stories: la
    barra de la nota se llena y al terminar entra la siguiente deslizandose de
    costado. Tocar a la derecha pasa, a la izquierda vuelve, mantener apretado
    pausa y en touch la placa sigue al dedo. Se frena tambien con el foco del
@@ -199,7 +76,7 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
    otra delante: el mismo lenguaje que las piezas de redes (Figma Master,
    Header de noticias · con foto). Parallax al hacer scroll y al pasar de
    placa: ver "Profundidad" abajo. */
-.dest {
+.pf-dest {
   position: relative; overflow: hidden;
   height: 100vh; height: 100svh; min-height: 540px;
   background: var(--azul); color: var(--tiza);
@@ -207,11 +84,11 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
 }
 /* La posicion de cada placa la maneja el JS (translateX); aca solo cual se ve. */
-.d-slide { position: absolute; inset: 0; visibility: hidden; transform: translateX(100%); will-change: transform; }
-.d-slide.vis { visibility: visible; }
-.d-slide.on { z-index: 1; }
-.d-slide { overflow: hidden; background: var(--fondo); }
-.d-art { position: absolute; inset: 0; }
+.pf-d-slide { position: absolute; inset: 0; visibility: hidden; transform: translateX(100%); will-change: transform; }
+.pf-d-slide.pf-vis { visibility: visible; }
+.pf-d-slide.pf-on { z-index: 1; }
+.pf-d-slide { overflow: hidden; background: var(--fondo); }
+.pf-d-art { position: absolute; inset: 0; }
 /* Escena: la caja de la foto. Las flores se ubican en unidades de su ancho
    (cqw), asi los arcos cruzan las mismas esquinas en cualquier pantalla. Sin
    deriva ni reaccion al mouse: las capas solo se mueven con el scroll y el pase.
@@ -228,8 +105,8 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
    foto menos 48 px (--g) y nunca es menor a 560 px (--col; en pantallas chicas,
    media pantalla). Si no entra, cede la foto: primero se corre a la derecha y
    sangra mas (hasta 12vw afuera) y despues se achica. El titulo se escala con
-   esa columna (ver .d-in h2). */
-.dest {
+   esa columna (ver .pf-d-in h2). */
+.pf-dest {
   --t: clamp(0px, 100vw - 1440px, 571px);
   --m: max(16px, (100vw - 1320px) / 2);
   --g: 48px;
@@ -240,51 +117,51 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   --f-der: max(-12vw, min(var(--f-der0), 100vw - var(--f-ini) - var(--f-ancho0)));
   --f-ancho: min(var(--f-ancho0), 100vw - var(--f-der) - var(--f-ini));
 }
-.d-esc { position: absolute; z-index: 1; top: 15.5%; bottom: 15.5%; right: var(--f-der); width: var(--f-ancho); container-type: size; }
-.d-capa { position: absolute; display: block; height: auto; }
-.d-capa svg { display: block; width: 100%; height: auto; }
+.pf-d-esc { position: absolute; z-index: 1; top: 15.5%; bottom: 15.5%; right: var(--f-der); width: var(--f-ancho); container-type: size; }
+.pf-d-capa { position: absolute; display: block; height: auto; }
+.pf-d-capa svg { display: block; width: 100%; height: auto; }
 /* Profundidad, en dos niveles y sin JS en cada cuadro:
-   - Scroll: la capa (.d-capa) sube con la pagina a su velocidad mediante una
+   - Scroll: la capa (.pf-d-capa) sube con la pagina a su velocidad mediante una
      animacion atada al scroll (animation-timeline), que el navegador mueve en el
      mismo paso que la pagina. Asi no tironea en Safari (el parallax con JS
      llegaba un cuadro tarde). Donde no hay soporte (Safari < 26) queda quieta.
      --v es cuanto se queda atras por cada px de scroll: positivo va mas lento
      (lejos), negativo mas rapido (cerca).
-   - Pase de placa: adentro, .d-desliz acompana el deslizamiento con su propia
+   - Pase de placa: adentro, .pf-d-desliz acompana el deslizamiento con su propia
      velocidad: --sx es donde esta la placa (-1 a 1, lo escribe el JS al pasar)
      y --k cuanto se separa de ella. --tr es la misma transicion que la placa. */
-.d-desliz { display: block; transform: translate3d(calc(var(--sx, 0) * var(--k)), 0, 0); transition: var(--tr, none); }
+.pf-d-desliz { display: block; transform: translate3d(calc(var(--sx, 0) * var(--k)), 0, 0); transition: var(--tr, none); }
 @supports (animation-timeline: scroll()) {
-  .d-capa { animation: d-prof linear both; animation-timeline: scroll(root block); animation-range: 0px 1000px; }
-  @keyframes d-prof { to { transform: translate3d(0, calc(var(--v) * 1000px), 0); } }
+  .pf-d-capa { animation: pf-d-prof linear both; animation-timeline: scroll(root block); animation-range: 0px 1000px; }
+  @keyframes pf-d-prof { to { transform: translate3d(0, calc(var(--v) * 1000px), 0); } }
 }
-.d-atras { --v: 0.45; --k: -48vw; width: 236cqw; left: calc(36.1cqw + var(--t) * 0.1475); top: calc(-179.2cqw + var(--t) * 1.1955); color: var(--atras); }
-.d-frente { --v: -0.25; --k: 38vw; z-index: 2; width: calc(180.6cqw + var(--t) * 0.2862); left: calc(-157.1cqw - var(--t) * 0.2875); top: calc(100cqh - 22.8cqw - var(--t) * 0.1122); color: var(--frente); }
-.d-foto { --v: 0.2; --k: -16vw; z-index: 1; inset: 0; }
-.d-foto .d-desliz, .d-recorte { position: absolute; inset: 0; }
-.d-recorte { overflow: hidden; border-radius: 0 37cqw 0 37cqw; background: rgba(255, 254, 239, 0.12); }
-.d-foto img { display: block; width: 100%; height: 100%; object-fit: cover; transform: scale(1.1); transition: transform 9s linear, opacity 600ms ease; }
-.d-foto img.carga { opacity: 0; }
-.d-slide.on .d-foto img { transform: scale(1.02); }
+.pf-d-atras { --v: 0.45; --k: -48vw; width: 236cqw; left: calc(36.1cqw + var(--t) * 0.1475); top: calc(-179.2cqw + var(--t) * 1.1955); color: var(--atras); }
+.pf-d-frente { --v: -0.25; --k: 38vw; z-index: 2; width: calc(180.6cqw + var(--t) * 0.2862); left: calc(-157.1cqw - var(--t) * 0.2875); top: calc(100cqh - 22.8cqw - var(--t) * 0.1122); color: var(--frente); }
+.pf-d-foto { --v: 0.2; --k: -16vw; z-index: 1; inset: 0; }
+.pf-d-foto .pf-d-desliz, .pf-d-recorte { position: absolute; inset: 0; }
+.pf-d-recorte { overflow: hidden; border-radius: 0 37cqw 0 37cqw; background: rgba(255, 254, 239, 0.12); }
+.pf-d-foto img { display: block; width: 100%; height: 100%; object-fit: cover; transform: scale(1.1); transition: transform 9s linear, opacity 600ms ease; }
+.pf-d-foto img.pf-carga { opacity: 0; }
+.pf-d-slide.pf-on .pf-d-foto img { transform: scale(1.02); }
 /* El bloque de texto va centrado con la foto (Figma: 216 a 672 en 900 de alto). */
-.d-txt { position: absolute; z-index: 3; left: 0; right: 0; top: 50%; transform: translateY(calc(-50% - 6px)); }
-.d-in { display: grid; gap: 22px; justify-items: start; max-width: min(720px, 100vw - var(--f-der) - var(--f-ancho) - var(--g) - var(--m)); container-type: inline-size; }
-.d-kick { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; font-size: 0.95rem; color: rgba(255, 254, 239, 0.88); }
-.d-kick .etq { --s: var(--etq-l); }
-.d-in h2 {
+.pf-d-txt { position: absolute; z-index: 3; left: 0; right: 0; top: 50%; transform: translateY(calc(-50% - 6px)); }
+.pf-d-in { display: grid; gap: 22px; justify-items: start; max-width: min(720px, 100vw - var(--f-der) - var(--f-ancho) - var(--g) - var(--m)); container-type: inline-size; }
+.pf-d-kick { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; font-size: 0.95rem; color: rgba(255, 254, 239, 0.88); }
+.pf-d-kick .pf-etiqueta { --s: var(--etq-l); }
+.pf-d-in h2 {
   margin: 0;
   font-family: var(--f-display); font-weight: 600;
   /* Entre 64 y 88: el 13.5% de la columna (unos 15 caracteres por linea) y,
      en pantallas bajas, lo que deja el alto para 5 lineas entre la barra y los
      indicadores. Los titulos de mas de 80 caracteres (el 10% de las notas) van
-     a 64 (.largo). Una palabra sin cortes (p. ej. "compartida.Profertil") se
+     a 64 (.pf-largo). Una palabra sin cortes (p. ej. "compartida.pf-Profertil") se
      parte antes que pisar la foto. */
   font-size: clamp(64px, min(13.5cqi, (100svh - 330px) / 4.7), 88px); line-height: 0.94; letter-spacing: -0.04em;
   text-wrap: balance; overflow-wrap: break-word;
 }
-.d-in h2.largo { font-size: 64px; }
-.d-bajada { margin: 0; max-width: 56ch; font-size: clamp(1rem, 1.4vw, 1.12rem); line-height: 1.5; color: rgba(255, 254, 239, 0.9); }
-.d-cta {
+.pf-d-in h2.pf-largo { font-size: 64px; }
+.pf-d-bajada { margin: 0; max-width: 56ch; font-size: clamp(1rem, 1.4vw, 1.12rem); line-height: 1.5; color: rgba(255, 254, 239, 0.9); }
+.pf-d-cta {
   display: inline-flex; align-items: center; gap: 10px;
   height: var(--btn-l); padding: 0 22px 0 24px;
   border: 0; border-radius: 999px; cursor: pointer;
@@ -292,100 +169,87 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   font-family: var(--f-display); font-size: 1.02rem; font-weight: 500;
   transition: background 200ms ease, color 200ms ease;
 }
-@media (hover: hover) and (pointer: fine) { .d-cta:hover { background: #fff; } }
-.d-cta svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 260ms var(--ease); }
-@media (hover: hover) and (pointer: fine) { .d-cta:hover svg { transform: translateX(3px); } }
+@media (hover: hover) and (pointer: fine) { .pf-d-cta:hover { background: #fff; } }
+.pf-d-cta svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 260ms var(--ease); }
+@media (hover: hover) and (pointer: fine) { .pf-d-cta:hover svg { transform: translateX(3px); } }
 
 /* Indicadores: una barra por nota, como en las stories: las anteriores
    llenas y la actual llenandose (las mueve el JS). Sin texto: el titulo ya
    esta en la placa. */
-.d-nav { position: absolute; z-index: 2; left: 0; right: 0; bottom: calc(26px + env(safe-area-inset-bottom, 0px)); }
-.d-nav .wrap { display: flex; align-items: center; gap: 28px; }
-.d-segs { flex: 1; min-width: 0; display: grid; grid-template-columns: repeat(var(--n, 5), minmax(0, 1fr)); gap: 16px; }
-.d-seg { display: grid; padding: 14px 0; border: 0; background: transparent; cursor: pointer; text-align: left; color: rgba(255, 254, 239, 0.56); transition: color 240ms ease; }
-.d-seg.on { color: var(--tiza); }
-@media (hover: hover) and (pointer: fine) { .d-seg:hover { color: var(--tiza); } }
-.d-bar { display: block; height: 2px; border-radius: 2px; background: rgba(255, 254, 239, 0.26); overflow: hidden; }
-.d-bar i { display: block; height: 100%; background: var(--tiza); transform: scaleX(0); transform-origin: left; }
-.d-flechas { flex: none; display: flex; gap: 8px; }
-.d-flecha {
+.pf-d-nav { position: absolute; z-index: 2; left: 0; right: 0; bottom: calc(26px + env(safe-area-inset-bottom, 0px)); }
+.pf-d-nav .pf-wrap { display: flex; align-items: center; gap: 28px; }
+.pf-d-segs { flex: 1; min-width: 0; display: grid; grid-template-columns: repeat(var(--n, 5), minmax(0, 1fr)); gap: 16px; }
+.pf-d-seg { display: grid; padding: 14px 0; border: 0; background: transparent; cursor: pointer; text-align: left; color: rgba(255, 254, 239, 0.56); transition: color 240ms ease; }
+.pf-d-seg.pf-on { color: var(--tiza); }
+@media (hover: hover) and (pointer: fine) { .pf-d-seg:hover { color: var(--tiza); } }
+.pf-d-bar { display: block; height: 2px; border-radius: 2px; background: rgba(255, 254, 239, 0.26); overflow: hidden; }
+.pf-d-bar i { display: block; height: 100%; background: var(--tiza); transform: scaleX(0); transform-origin: left; }
+.pf-d-flechas { flex: none; display: flex; gap: 8px; }
+.pf-d-flecha {
   width: 46px; height: 46px; border-radius: 999px; cursor: pointer;
   border: 1px solid rgba(255, 254, 239, 0.3); background: rgba(255, 254, 239, 0.08); color: var(--tiza);
   backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   display: grid; place-items: center; transition: background 200ms ease, color 200ms ease;
 }
-@media (hover: hover) and (pointer: fine) { .d-flecha:hover { background: var(--tiza); color: var(--azul); } }
-.d-flecha svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+@media (hover: hover) and (pointer: fine) { .pf-d-flecha:hover { background: var(--tiza); color: var(--azul); } }
+.pf-d-flecha svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
 /* --- Resultado ------------------------------------------------------------ */
-.result-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; padding-block: 22px 16px; }
-.result-text { margin: 0; color: var(--ink-2); min-width: 0; }
-.result-text b { color: var(--azul); font-weight: 600; font-variant-numeric: tabular-nums; }
-.herramientas { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-.seg { position: relative; isolation: isolate; display: inline-flex; padding: 3px; border-radius: 999px; background: var(--line); }
-/* El elegido se marca con un indicador marfil que se desliza al boton tocado
-   (lo ubica el JS). Al cambiar de vista lo mueve la View Transition, junto
-   con las tarjetas; al cambiar el orden, esta transicion. */
-.seg-ind {
-  position: absolute; z-index: -1; top: 3px; left: 0; bottom: 3px; width: 0;
-  border-radius: 999px; background: var(--card); box-shadow: 0 1px 3px rgba(10, 30, 74, 0.12);
-  pointer-events: none;
-  transition: transform var(--t-vista) var(--curva-vista), width var(--t-vista) var(--curva-vista);
-}
-.seg-ind.quieto { transition: none; }
-.seg.vista .seg-ind { view-transition-name: ind-vista; }
+.pf-result-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; padding-block: 22px 16px; }
+.pf-result-text { margin: 0; color: var(--ink-2); min-width: 0; }
+.pf-result-text b { color: var(--azul); font-weight: 600; font-variant-numeric: tabular-nums; }
+.pf-herramientas { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+/* El Selector es la pieza "selector" de base.css. Al cambiar de vista el indicador lo mueve la View
+   Transition, junto con las tarjetas; al cambiar el orden, su transición. */
+.pf-selector.pf-vista .pf-selector__ind { view-transition-name: pf-ind-vista; }
 /* Los botones tambien viajan como capa propia: si no, quedan en la foto de la
    pagina, que la View Transition pinta debajo del indicador, y el icono
    elegido se tapa mientras el indicador se mueve. */
-.seg.vista [data-vista="chico"] { view-transition-name: vista-chico; }
-.seg.vista [data-vista="medio"] { view-transition-name: vista-medio; }
-.seg.vista [data-vista="grande"] { view-transition-name: vista-grande; }
+.pf-selector.pf-vista [data-vista="chico"] { view-transition-name: pf-vista-chico; }
+.pf-selector.pf-vista [data-vista="medio"] { view-transition-name: pf-vista-medio; }
+.pf-selector.pf-vista [data-vista="grande"] { view-transition-name: pf-vista-grande; }
 
 /* --- Vista: tres tamaños de tarjeta (chico, medio, grande), un ícono cada
    uno, con el mismo estilo que el orden. El cambio se anima con View
    Transitions donde hay. En mobile no hay "chico". */
-.seg.vista button { display: grid; place-items: center; padding: 6px 11px; }
-.seg.vista svg { width: 15px; height: 15px; fill: currentColor; }
-@media (max-width: 640px) { .seg.vista [data-vista="chico"] { display: none; } }
+@media (max-width: 640px) { .pf-selector.pf-vista [data-vista="chico"] { display: none; } }
 ::view-transition-group(*) { animation-duration: var(--t-vista); animation-timing-function: var(--curva-vista); }
-.seg button { border: 0; background: transparent; cursor: pointer; padding: 6px 13px; border-radius: 999px; font-size: 0.86rem; color: var(--ink-2); transition: color 240ms ease; }
-.seg button[aria-pressed="true"] { color: var(--azul); font-weight: 500; }
 
 /* --- Grilla --------------------------------------------------------------- */
-.grid { display: flex; gap: 16px; align-items: flex-start; padding-bottom: 170px; }
-.gcol { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
-.sentinel { height: 1px; }
+.pf-grid { display: flex; gap: 16px; align-items: flex-start; padding-bottom: 170px; }
+.pf-gcol { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+.pf-sentinel { height: 1px; }
 
-.card {
+.pf-card {
   position: relative; display: grid; text-align: left;
   border: 0; padding: 0; cursor: pointer;
   background: var(--card);
   border-radius: 26px;
   box-shadow: var(--shadow);
   transition: transform 320ms var(--ease), box-shadow 320ms var(--ease);
-  animation: entra 420ms var(--ease) backwards;
+  animation: pf-entra 420ms var(--ease) backwards;
 }
-@media (hover: hover) and (pointer: fine) { .card:hover { transform: translateY(-3px); box-shadow: 0 1px 2px rgba(10, 30, 74, 0.06), 0 18px 34px -16px rgba(10, 30, 74, 0.34); } }
-@keyframes entra { from { transform: translateY(8px); } to { transform: none; } }
+@media (hover: hover) and (pointer: fine) { .pf-card:hover { transform: translateY(-3px); box-shadow: 0 1px 2px rgba(10, 30, 74, 0.06), 0 18px 34px -16px rgba(10, 30, 74, 0.34); } }
+@keyframes pf-entra { from { transform: translateY(8px); } to { transform: none; } }
 
-.media { position: relative; margin: 8px 8px 0; border-radius: 19px; overflow: hidden; line-height: 0; max-width: 100%; }
-.media > svg { display: block; width: 100%; height: auto; }
-.media .etq { position: absolute; top: 10px; left: 10px; }
-.play { position: absolute; top: 10px; right: 10px; width: 36px; height: 36px; border-radius: 999px; background: rgba(255, 254, 239, 0.94); display: grid; place-items: center; }
-.play svg { width: 12px; height: 12px; fill: var(--azul); margin-left: 2px; }
+.pf-media { position: relative; margin: 8px 8px 0; border-radius: 19px; overflow: hidden; line-height: 0; max-width: 100%; }
+.pf-media > svg { display: block; width: 100%; height: auto; }
+.pf-media .pf-etiqueta { position: absolute; top: 10px; left: 10px; }
+.pf-play { position: absolute; top: 10px; right: 10px; width: 36px; height: 36px; border-radius: 999px; background: rgba(255, 254, 239, 0.94); display: grid; place-items: center; }
+.pf-play svg { width: 12px; height: 12px; fill: var(--azul); margin-left: 2px; }
 
-.lead { padding: 18px 18px 2px; display: grid; gap: 14px; justify-items: start; }
-.lead h3 {
+.pf-lead { padding: 18px 18px 2px; display: grid; gap: 14px; justify-items: start; }
+.pf-lead h3 {
   margin: 0;
   font-family: var(--f-display); font-weight: 600;
   font-size: 1.36rem; line-height: 1.06; letter-spacing: -0.025em;
   color: var(--azul);
   text-wrap: balance;
 }
-.meta { padding: 12px 18px 18px; display: grid; gap: 8px; min-width: 0; }
-.when { margin: 0; font-size: 0.84rem; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.when b { font-weight: 500; color: var(--ink-2); }
-.ttl {
+.pf-meta { padding: 12px 18px 18px; display: grid; gap: 8px; min-width: 0; }
+.pf-when { margin: 0; font-size: 0.84rem; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pf-when b { font-weight: 500; color: var(--ink-2); }
+.pf-ttl {
   margin: 0;
   font-family: var(--f-display); font-weight: 500;
   font-size: 1.1rem; line-height: 1.2; letter-spacing: -0.015em;
@@ -393,96 +257,36 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
 }
 mark { background: rgba(234, 186, 44, 0.42); color: inherit; border-radius: 3px; padding: 0 1px; }
-.tags { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 4px; }
-.more { font-size: 0.86rem; color: var(--ink-3); padding-left: 2px; }
+.pf-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 4px; }
+.pf-more { font-size: 0.86rem; color: var(--ink-3); padding-left: 2px; }
 
-/* --- Etiqueta: componente `Etiqueta` del Figma Master (manual p. 64) -------
-   Badge (forma del sistema sobre el color de la familia) + rotulo blanco con
-   el texto en el color de la familia + dato y flecha opcionales. Radio = 32%
-   del alto (p. 66) y texto al 44% del alto, como en los tamanos S/M/L. */
-.etq { --s: var(--etq-m); display: inline-flex; align-items: stretch; gap: calc(var(--s) * 0.06); height: var(--s); flex: none; font-family: var(--f-display); font-weight: 400; }
-.etq .bd { width: var(--s); height: var(--s); flex: none; display: block; }
-.etq .lb, .etq .dt, .etq .fl {
-  display: inline-flex; align-items: center;
-  padding: 0 calc(var(--s) * 0.36);
-  border-radius: calc(var(--s) * 0.32);
-  font-size: calc(var(--s) * 0.48);
-  line-height: 1; white-space: nowrap;
-}
-.etq .lb { background: #fff; color: var(--tx); }
-/* El dato (año) va en marfil sobre el color: el color de la familia sobre su
-   complementario contrastaba poco. Mismo cambio en Uso/Dato tinta del master. */
-.etq .dt { background: var(--fo); color: var(--tiza); font-variant-numeric: tabular-nums; }
-.etq .fl { width: var(--s); padding: 0; justify-content: center; background: #fff; color: var(--tx); }
-.etq .fl svg { width: 46%; height: 46%; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
-button.etq { border: 0; padding: 0; background: transparent; cursor: pointer; color: inherit; }
-button.etq .lb { transition: background 160ms ease, color 160ms ease; }
-@media (hover: hover) and (pointer: fine) { button.etq:hover .lb { box-shadow: inset 0 0 0 1.5px var(--tx); } }
-button.etq[aria-pressed="true"] .lb { background: var(--tx); color: #fff; }
-a.etq { text-decoration: none; }
-@media (hover: hover) and (pointer: fine) { a.etq:hover .fl { background: var(--tx); color: #fff; } }
-.media .etq .lb, .m-art .etq .lb { box-shadow: none; }
-.etq .corto { display: none; }
+/* --- Etiqueta: la pieza "etiqueta" de base.css. Acá, solo cómo se acomoda en tarjetas y en el detalle. */
+.pf-media .pf-etiqueta .pf-etiqueta__rotulo, .pf-m-art .pf-etiqueta .pf-etiqueta__rotulo { box-shadow: none; }
 /* La etiqueta nunca se sale de la tarjeta: la tarjeta es contenedor y, si es
    angosta, la etiqueta pasa al nombre corto y suelta el año. Si aun asi no
    entra, el rotulo se corta con puntos suspensivos. */
-.card { container-type: inline-size; }
-.card .etq { max-width: 100%; }
-.card .media .etq { max-width: calc(100% - 20px); }
-.card .etq .lb { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.card .etq .lb > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pf-card { container-type: inline-size; }
+.pf-card .pf-etiqueta { max-width: 100%; }
+.pf-card .pf-media .pf-etiqueta { max-width: calc(100% - 20px); }
+.pf-card .pf-etiqueta .pf-etiqueta__rotulo { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.pf-card .pf-etiqueta .pf-etiqueta__rotulo > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* Tarjetas anchas (vista con pocas columnas): la tipografia crece. */
 @container (min-width: 420px) {
-  .lead { padding: 26px 26px 4px; gap: 18px; }
-  .lead h3 { font-size: 2.1rem; line-height: 1.02; }
-  .meta { padding: 14px 18px 22px; }
-  .ttl { font-size: 1.55rem; line-height: 1.12; -webkit-line-clamp: 3; }
-  .when { font-size: 0.92rem; }
-  .etq { --s: var(--etq-l); }
-  .media .etq { top: 14px; left: 14px; }
+  .pf-lead { padding: 26px 26px 4px; gap: 18px; }
+  .pf-lead h3 { font-size: 2.1rem; line-height: 1.02; }
+  .pf-meta { padding: 14px 18px 22px; }
+  .pf-ttl { font-size: 1.55rem; line-height: 1.12; -webkit-line-clamp: 3; }
+  .pf-when { font-size: 0.92rem; }
+  .pf-etiqueta { --s: var(--etq-l); }
+  .pf-media .pf-etiqueta { top: 14px; left: 14px; }
 }
 @container (max-width: 250px) {
-  .etq .full { display: none; }
-  .etq .corto { display: inline; }
-  .etq .dt { display: none; }
+  .pf-etiqueta .pf-etiqueta__completo { display: none; }
+  .pf-etiqueta .pf-etiqueta__corto { display: inline; }
+  .pf-etiqueta .pf-etiqueta__dato { display: none; }
 }
 
-/* --- Pastilla principal de la barra: full rounded, relleno con el color de
-   la familia del tipo y texto tiza. El azul oscuro queda reservado para la
-   activa (sin aro); "Todas" sin elegir es transparente. */
-.lbl {
-  --h: 30px;
-  display: inline-flex; align-items: center; flex: none;
-  height: var(--h); padding: 0 calc(var(--h) * 0.48);
-  border: 0; border-radius: 999px;
-  background: var(--pc, var(--azul)); color: var(--tiza);
-  font-family: var(--f-display); font-size: calc(var(--h) * 0.47); font-weight: 400;
-  white-space: nowrap; cursor: pointer;
-  transition: background 240ms var(--ease), color 240ms var(--ease);
-}
-@media (hover: hover) and (pointer: fine) { .lbl:hover { background: color-mix(in srgb, var(--pc, var(--azul)) 86%, var(--ink)); } }
-.lbl[aria-pressed="true"] { background: var(--ink); color: var(--tiza); }
-.lbl-todas { background: transparent; color: var(--ink); }
-@media (hover: hover) and (pointer: fine) { .lbl-todas:hover { background: var(--line); } }
-
-/* --- Subcategoria (cultivo): relleno del color, texto tiza. Sin badge
-   ni flecha, para no competir con la etiqueta principal de la nota. */
-.sub {
-  --h: 22px;
-  display: inline-flex; align-items: center; gap: 6px; flex: none;
-  height: var(--h); padding: 0 calc(var(--h) * 0.42);
-  border: 0; border-radius: calc(var(--h) * 0.32);
-  background: var(--c); color: var(--tiza);
-  font-family: var(--f-body); font-size: calc(var(--h) * 0.5); font-weight: 500; line-height: 1;
-  white-space: nowrap;
-}
-button.sub { cursor: pointer; transition: background 160ms ease, color 160ms ease; }
-.f-body .sub { --h: 32px; background: color-mix(in srgb, var(--c) 16%, #fff); color: var(--c); }
-@media (hover: hover) and (pointer: fine) { .f-body .sub:hover { background: color-mix(in srgb, var(--c) 28%, #fff); } }
-.f-body .sub[aria-pressed="true"] { background: var(--c); color: var(--tiza); }
-.sub-anio { --c: var(--azul); font-variant-numeric: tabular-nums; }
-.sub .n { font-weight: 400; opacity: 0.7; font-variant-numeric: tabular-nums; }
-.m-body .sub { --h: 28px; }
+/* --- Pastillas de categoría y chips de año: piezas "pastilla" y "chip" de base.css. */
 
 /* --- Panel de filtros: barra fija full rounded con "Todas" y las tres
    categorias con mas notas; arriba se despliega el panel con las demas y el
@@ -490,7 +294,7 @@ button.sub { cursor: pointer; transition: background 160ms ease, color 160ms eas
    todas las categorias. Abre y cierra animando el alto del panel (medido en
    JS: animar 0fr a 1fr en un contenedor de alto automatico falla en Chrome)
    y, en mobile, el ancho. */
-.filters {
+.pf-filters {
   /* left y right en 0 con margen auto: con left 50% el ancho se calcula sobre
      media pantalla y las pastillas quedan cortadas. */
   position: fixed; left: 0; right: 0; margin-inline: auto;
@@ -508,59 +312,51 @@ button.sub { cursor: pointer; transition: background 160ms ease, color 160ms eas
   -webkit-backdrop-filter: blur(22px) saturate(1.4);
   overflow: hidden;
 }
-.filters.open { border-radius: 26px; transition-duration: var(--f-abrir), var(--f-abrir), 520ms, 300ms; }
+.pf-filters.pf-abierto { border-radius: 26px; transition-duration: var(--f-abrir), var(--f-abrir), 520ms, 300ms; }
 /* Mientras el carrusel ocupa la pantalla el dock baja y no tapa los
    indicadores; vuelve cuando aparecen las tarjetas. */
-.filters.fuera { transform: translateY(calc(100% + 40px)); opacity: 0; pointer-events: none; }
+.pf-filters.pf-fuera { transform: translateY(calc(100% + 40px)); opacity: 0; pointer-events: none; }
 /* El panel no ensancha la barra: los años se acomodan al ancho que ya tiene.
    Cerrado queda invisible (fuera del tab) recien cuando termina de bajar. */
-.f-body {
+.pf-f-body {
   contain: inline-size; flex: 0 1 auto; min-height: 0; height: 0; overflow: hidden;
   border-bottom: 1px solid transparent;
   visibility: hidden; opacity: 0;
   transition: height var(--f-cerrar) var(--f-curva), opacity calc(var(--f-fundido) * 0.7) ease, border-color 260ms ease, visibility 0s linear var(--f-cerrar);
 }
-.filters.open .f-body { visibility: visible; opacity: 1; border-bottom-color: var(--line); transition: height var(--f-abrir) var(--f-curva), opacity var(--f-fundido) ease var(--f-fundido-retraso), border-color 260ms ease; }
+.pf-filters.pf-abierto .pf-f-body { visibility: visible; opacity: 1; border-bottom-color: var(--line); transition: height var(--f-abrir) var(--f-curva), opacity var(--f-fundido) ease var(--f-fundido-retraso), border-color 260ms ease; }
 /* Mientras anima no hay scroll (si no, aparece la barra a mitad de camino):
-   se habilita recien con .listo, cuando el panel termino de abrir. */
-.filters.open.listo .f-body { height: auto; overflow-y: auto; }
-.f-bar { flex: none; }
-.f-in { padding: 18px 20px 14px; display: grid; gap: 14px; }
-.filters .f-cats { display: grid; }
-.f-group { display: grid; gap: 8px; }
-.f-label { margin: 0; font-size: 0.74rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
-.f-row { display: flex; flex-wrap: wrap; gap: 7px; padding: 3px; }
-.f-bar { display: flex; align-items: center; gap: 4px; padding: 5px 5px 5px 6px; }
-.f-main { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; flex: 1; min-width: 0; padding: 3px; }
-.f-main::-webkit-scrollbar { display: none; }
-.f-toggle {
+   se habilita recien con .pf-listo, cuando el panel termino de abrir. */
+.pf-filters.pf-abierto.pf-listo .pf-f-body { height: auto; overflow-y: auto; }
+.pf-f-bar { flex: none; }
+.pf-f-in { padding: 18px 20px 14px; display: grid; gap: 14px; }
+.pf-filters .pf-f-cats { display: grid; }
+.pf-f-group { display: grid; gap: 8px; }
+.pf-f-label { margin: 0; font-size: 0.74rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+.pf-f-row { display: flex; flex-wrap: wrap; gap: 7px; padding: 3px; }
+.pf-f-bar { display: flex; align-items: center; gap: 4px; padding: 5px 5px 5px 6px; }
+.pf-f-main { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; flex: 1; min-width: 0; padding: 3px; }
+.pf-f-main::-webkit-scrollbar { display: none; }
+.pf-f-toggle {
   position: relative; flex: none;
   width: 36px; height: 36px; border: 0; border-radius: 999px;
   background: transparent; color: var(--ink-2); cursor: pointer;
   display: flex; align-items: center; justify-content: center; gap: 8px;
 }
-.f-txt { display: none; }
-@media (hover: hover) and (pointer: fine) { .f-toggle:hover { background: var(--line); } }
-.f-toggle svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform var(--f-flecha) var(--f-curva); }
-.filters.open .f-toggle svg { transform: rotate(180deg); }
-.f-count { position: absolute; top: 2px; right: 2px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 999px; background: var(--verde); color: #fff; display: grid; place-items: center; font-size: 0.66rem; font-variant-numeric: tabular-nums; }
-.f-clear { justify-self: start; border: 0; background: transparent; cursor: pointer; padding: 4px 0; color: var(--azul); font-size: 0.88rem; text-decoration: underline; text-underline-offset: 3px; }
+.pf-f-txt { display: none; }
+@media (hover: hover) and (pointer: fine) { .pf-f-toggle:hover { background: var(--line); } }
+.pf-f-toggle svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform var(--f-flecha) var(--f-curva); }
+.pf-filters.pf-abierto .pf-f-toggle svg { transform: rotate(180deg); }
+.pf-f-count { position: absolute; top: 2px; right: 2px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 999px; background: var(--verde); color: #fff; display: grid; place-items: center; font-size: 0.66rem; font-variant-numeric: tabular-nums; }
+.pf-f-clear { justify-self: start; border: 0; background: transparent; cursor: pointer; padding: 4px 0; color: var(--azul); font-size: 0.88rem; text-decoration: underline; text-underline-offset: 3px; }
 
 /* --- Vacio ---------------------------------------------------------------- */
-.empty { padding: 60px 0 200px; display: grid; justify-items: center; gap: 14px; text-align: center; }
-.empty svg { width: 64px; height: 76px; }
-.empty p { margin: 0; max-width: 42ch; color: var(--ink-2); font-size: 1.05rem; }
-.btn {
-  display: inline-flex; align-items: center; gap: 8px;
-  height: var(--btn-s); padding: 0 18px;
-  border: 0; border-radius: 13px; cursor: pointer; text-decoration: none;
-  background: var(--verde); color: #fff; font-weight: 500; font-size: 0.95rem;
-}
-@media (hover: hover) and (pointer: fine) { .btn:hover { background: #256c2c; } }
-.btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.pf-empty { padding: 60px 0 200px; display: grid; justify-items: center; gap: 14px; text-align: center; }
+.pf-empty svg { width: 64px; height: 76px; }
+.pf-empty p { margin: 0; max-width: 42ch; color: var(--ink-2); font-size: 1.05rem; }
 
 /* --- Detalle ---------------------------------------------------------------- */
-dialog.modal {
+dialog.pf-modal {
   width: min(100% - 24px, 760px); max-height: calc(100% - 32px);
   padding: 0; border: 0; border-radius: 28px;
   background: var(--card); color: var(--ink);
@@ -569,92 +365,82 @@ dialog.modal {
 }
 /* Columna flex y no grid: con solo max-height, Safari (iPad) a veces resolvia
    la fila 1fr en cero y el modal quedaba reducido a la barra de navegacion. */
-dialog.modal[open] { display: flex; flex-direction: column; animation: sube 360ms var(--ease); }
-@keyframes sube { from { transform: translateY(16px); opacity: 0.4; } to { transform: none; opacity: 1; } }
-dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blur(4px); }
-.m-scroll { flex: 0 1 auto; min-height: 0; overflow-y: auto; padding: 10px; }
-.m-art { position: relative; border-radius: 20px; overflow: hidden; line-height: 0; }
-.m-art > svg { width: 100%; height: auto; aspect-ratio: 720 / 300; display: block; }
-.m-art .etq { position: absolute; top: 14px; left: 14px; --s: var(--etq-l); }
-.m-body { padding: 20px 16px 12px; display: grid; gap: 14px; }
-.m-date { margin: 0; color: var(--ink-3); font-size: 0.92rem; }
-.m-body h2 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: clamp(1.7rem, 4.4vw, 2.5rem); line-height: 1.02; letter-spacing: -0.035em; color: var(--azul); text-wrap: balance; }
-.m-bajada { margin: 0; max-width: 62ch; font-size: 1.06rem; line-height: 1.55; }
-.m-data { margin: 2px 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1px; background: var(--line); border-radius: 16px; overflow: hidden; }
-.m-data div { background: var(--card); padding: 12px 14px; display: grid; gap: 2px; min-width: 0; }
-.m-data dt { font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
-.m-data dd { margin: 0; font-weight: 500; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
-.m-data .ruta { grid-column: 1 / -1; }
-.m-data .ruta dd { font-family: var(--f-mono); font-size: 0.8rem; font-weight: 400; color: var(--ink-2); }
-.m-nav { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; border-top: 1px solid var(--line); }
-.m-nav .pos { font-size: 0.86rem; color: var(--ink-3); font-variant-numeric: tabular-nums; }
-.m-nav-group { display: flex; gap: 6px; }
-.icon-btn { width: 42px; height: 42px; border-radius: 13px; border: 0; background: var(--line); cursor: pointer; display: grid; place-items: center; }
-@media (hover: hover) and (pointer: fine) { .icon-btn:hover { background: rgba(10, 30, 74, 0.16); } }
-.icon-btn:disabled { opacity: 0.35; cursor: default; }
-.icon-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+dialog.pf-modal[open] { display: flex; flex-direction: column; animation: pf-sube 360ms var(--ease); }
+@keyframes pf-sube { from { transform: translateY(16px); opacity: 0.4; } to { transform: none; opacity: 1; } }
+dialog.pf-modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blur(4px); }
+.pf-m-scroll { flex: 0 1 auto; min-height: 0; overflow-y: auto; padding: 10px; }
+.pf-m-art { position: relative; border-radius: 20px; overflow: hidden; line-height: 0; }
+.pf-m-art > svg { width: 100%; height: auto; aspect-ratio: 720 / 300; display: block; }
+.pf-m-art .pf-etiqueta { position: absolute; top: 14px; left: 14px; --s: var(--etq-l); }
+.pf-m-body { padding: 20px 16px 12px; display: grid; gap: 14px; }
+.pf-m-date { margin: 0; color: var(--ink-3); font-size: 0.92rem; }
+.pf-m-body h2 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: clamp(1.7rem, 4.4vw, 2.5rem); line-height: 1.02; letter-spacing: -0.035em; color: var(--azul); text-wrap: balance; }
+.pf-m-bajada { margin: 0; max-width: 62ch; font-size: 1.06rem; line-height: 1.55; }
+.pf-m-data { margin: 2px 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1px; background: var(--line); border-radius: 16px; overflow: hidden; }
+.pf-m-data div { background: var(--card); padding: 12px 14px; display: grid; gap: 2px; min-width: 0; }
+.pf-m-data dt { font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.pf-m-data dd { margin: 0; font-weight: 500; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.pf-m-data .pf-ruta { grid-column: 1 / -1; }
+.pf-m-data .pf-ruta dd { font-family: var(--f-mono); font-size: 0.8rem; font-weight: 400; color: var(--ink-2); }
+.pf-m-nav { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; border-top: 1px solid var(--line); }
+.pf-m-nav .pf-pos { font-size: 0.86rem; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.pf-m-nav-group { display: flex; gap: 6px; }
 
-@media (max-width: 860px) {
-  .menu span:not([aria-current]) { display: none; }
-}
 @media (max-width: 640px) {
-  .menu { display: none; }
-  .menu-mobile { display: inline-flex; border-radius: 999px; background: rgba(255, 254, 239, 0.14); border: 1px solid rgba(255, 254, 239, 0.2); font-size: 0.82rem; }
-  .nav { height: 66px; }
-  .logo svg { width: 62px; }
-  .busca.open { width: calc(100% - 134px); }
+  /* Vista y orden tienen que entrar en una línea (en 375 sobran pocos px). */
+  .pf-herramientas { gap: 8px; }
   /* Mobile: como la historia. Texto arriba y la foto abajo, a todo el ancho. */
-  .d-slide { display: flex; flex-direction: column; padding: 96px 0 calc(74px + env(safe-area-inset-bottom, 0px)); }
-  .d-txt { position: relative; top: auto; transform: none; order: 1; }
-  .d-art { position: relative; inset: auto; order: 2; flex: 1; min-height: 0; }
-  .d-esc { top: 34px; bottom: 0; right: -10px; left: -10px; width: auto; }
-  .d-atras { width: 228cqw; left: 54cqw; top: -162cqw; }
-  .d-frente { width: 192cqw; left: -63cqw; top: calc(100cqh - 37.5cqw); }
-  .d-in { gap: 16px; max-width: none; }
-  .d-in h2, .d-in h2.largo { font-size: 2.3rem; }
-  .d-kick { font-size: 0.86rem; gap: 10px; }
-  .d-kick .etq { --s: var(--etq-m); }
-  .d-cta { height: var(--btn-m); font-size: 0.96rem; }
-  .d-nav { bottom: calc(22px + env(safe-area-inset-bottom, 0px)); }
-  .d-segs { gap: 6px; }
-  .d-flechas { display: none; }
-  .grid, .gcol { gap: 10px; }
-  .card { border-radius: 20px; }
-  .media { margin: 6px 6px 0; border-radius: 15px; }
-  .media .etq { top: 7px; left: 7px; --s: var(--etq-s); }
-  .play { width: 28px; height: 28px; top: 7px; right: 7px; }
-  .lead { padding: 13px 12px 2px; gap: 10px; }
-  .lead h3 { font-size: 1.08rem; }
-  .lead .etq { --s: var(--etq-s); }
-  .meta { padding: 9px 12px 13px; gap: 6px; }
-  .when { font-size: 0.76rem; }
-  .ttl { font-size: 0.96rem; }
-  .f-in { padding: 16px 14px 12px; }
-  .lbl { --h: 30px; }
+  .pf-d-slide { display: flex; flex-direction: column; padding: 96px 0 calc(74px + env(safe-area-inset-bottom, 0px)); }
+  .pf-d-txt { position: relative; top: auto; transform: none; order: 1; }
+  .pf-d-art { position: relative; inset: auto; order: 2; flex: 1; min-height: 0; }
+  .pf-d-esc { top: 34px; bottom: 0; right: -10px; left: -10px; width: auto; }
+  .pf-d-atras { width: 228cqw; left: 54cqw; top: -162cqw; }
+  .pf-d-frente { width: 192cqw; left: -63cqw; top: calc(100cqh - 37.5cqw); }
+  .pf-d-in { gap: 16px; max-width: none; }
+  .pf-d-in h2, .pf-d-in h2.pf-largo { font-size: 2.3rem; }
+  .pf-d-kick { font-size: 0.86rem; gap: 10px; }
+  .pf-d-kick .pf-etiqueta { --s: var(--etq-m); }
+  .pf-d-cta { height: var(--btn-m); font-size: 0.96rem; }
+  .pf-d-nav { bottom: calc(22px + env(safe-area-inset-bottom, 0px)); }
+  .pf-d-segs { gap: 6px; }
+  .pf-d-flechas { display: none; }
+  .pf-grid, .pf-gcol { gap: 10px; }
+  .pf-card { border-radius: 20px; }
+  .pf-media { margin: 6px 6px 0; border-radius: 15px; }
+  .pf-media .pf-etiqueta { top: 7px; left: 7px; --s: var(--etq-s); }
+  .pf-play { width: 28px; height: 28px; top: 7px; right: 7px; }
+  .pf-lead { padding: 13px 12px 2px; gap: 10px; }
+  .pf-lead h3 { font-size: 1.08rem; }
+  .pf-lead .pf-etiqueta { --s: var(--etq-s); }
+  .pf-meta { padding: 9px 12px 13px; gap: 6px; }
+  .pf-when { font-size: 0.76rem; }
+  .pf-ttl { font-size: 0.96rem; }
+  .pf-f-in { padding: 16px 14px 12px; }
+  .pf-pastilla { --h: 30px; }
   /* Mobile: la barra es solo el boton "Filtros"; el panel trae categorias y año. */
-  /* Cerrado y abierto ocupan la columna del contenido (.wrap deja 16 px por
+  /* Cerrado y abierto ocupan la columna del contenido (.pf-wrap deja 16 px por
      lado): el ancho no se anima. El tweak puede probar un cerrado mas angosto
      con --f-ancho-cerrado. */
-  .filters { width: var(--f-ancho-cerrado, calc(100% - 32px)); border-radius: 28px; }
-  .filters.open { width: calc(100% - 32px); transition-duration: var(--f-abrir), var(--f-abrir), var(--f-abrir), 520ms, 300ms; }
-  .f-main { display: none; }
-  .f-bar { justify-content: center; padding: 4px; }
-  .f-toggle { width: auto; height: 46px; padding: 0 22px 0 26px; color: var(--ink); font-family: var(--f-display); font-size: 1.04rem; transition: height var(--f-chica) var(--f-chica-curva), padding var(--f-chica) var(--f-chica-curva), gap var(--f-chica) var(--f-chica-curva), font-size var(--f-chica) var(--f-chica-curva); }
-  .f-toggle svg { transition: transform var(--f-flecha) var(--f-curva), width var(--f-chica) var(--f-chica-curva), height var(--f-chica) var(--f-chica-curva); }
+  .pf-filters { width: var(--f-ancho-cerrado, calc(100% - 32px)); border-radius: 28px; }
+  .pf-filters.pf-abierto { width: calc(100% - 32px); transition-duration: var(--f-abrir), var(--f-abrir), var(--f-abrir), 520ms, 300ms; }
+  .pf-f-main { display: none; }
+  .pf-f-bar { justify-content: center; padding: 4px; }
+  .pf-f-toggle { width: auto; height: 46px; padding: 0 22px 0 26px; color: var(--ink); font-family: var(--f-display); font-size: 1.04rem; transition: height var(--f-chica) var(--f-chica-curva), padding var(--f-chica) var(--f-chica-curva), gap var(--f-chica) var(--f-chica-curva), font-size var(--f-chica) var(--f-chica-curva); }
+  .pf-f-toggle svg { transition: transform var(--f-flecha) var(--f-curva), width var(--f-chica) var(--f-chica-curva), height var(--f-chica) var(--f-chica-curva); }
   /* Bajando, la pastilla se compacta como la barra de direcciones de Safari:
      angosta, mas baja, con el texto y la flecha mas chicos y pegada al borde.
      Subiendo (o al llegar al final) vuelve. Abierta nunca esta chica. El ancho
      del cerrado y el abierto es el mismo, asi que esta transicion solo corre
      al compactar y al volver. */
-  .filters { transition: width var(--f-chica) var(--f-chica-curva), bottom var(--f-chica) var(--f-chica-curva), border-radius var(--f-cerrar) var(--f-curva), transform 520ms var(--ease), opacity 300ms ease; }
-  .filters.chica:not(.open) { width: 104px; bottom: calc(6px + env(safe-area-inset-bottom, 0px)); }
-  .filters.chica:not(.open):has(.f-count:not([hidden])) { width: 128px; }
-  .filters.chica:not(.open) .f-toggle { height: 30px; padding: 0 12px 0 15px; gap: 5px; font-size: 0.82rem; }
-  .filters.chica:not(.open) .f-toggle svg { width: 13px; height: 13px; }
-  .filters.chica:not(.open) .f-count { transform: scale(0.85); }
-  .f-toggle:hover { background: transparent; }
-  .f-txt { display: inline; }
-  .f-count { position: static; order: 2; }
+  .pf-filters { transition: width var(--f-chica) var(--f-chica-curva), bottom var(--f-chica) var(--f-chica-curva), border-radius var(--f-cerrar) var(--f-curva), transform 520ms var(--ease), opacity 300ms ease; }
+  .pf-filters.pf-chica:not(.pf-abierto) { width: 104px; bottom: calc(6px + env(safe-area-inset-bottom, 0px)); }
+  .pf-filters.pf-chica:not(.pf-abierto):has(.pf-f-count:not([hidden])) { width: 128px; }
+  .pf-filters.pf-chica:not(.pf-abierto) .pf-f-toggle { height: 30px; padding: 0 12px 0 15px; gap: 5px; font-size: 0.82rem; }
+  .pf-filters.pf-chica:not(.pf-abierto) .pf-f-toggle svg { width: 13px; height: 13px; }
+  .pf-filters.pf-chica:not(.pf-abierto) .pf-f-count { transform: scale(0.85); }
+  .pf-f-toggle:hover { background: transparent; }
+  .pf-f-txt { display: inline; }
+  .pf-f-count { position: static; order: 2; }
 }
 /* --- Ancla: la accion principal, afuera del dock -------------------------
    Un circulo azul con la flecha, pegado a la derecha del dock pero separado
@@ -665,7 +451,7 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
    separacion y los resortes son tokens del Figma (--ancla-*, ver "Ancla" en
    el JS). */
 :root { --a: 49px; }
-.filters { right: calc(var(--a) + var(--ancla-gap)); max-width: min(100% - 32px - var(--a), 980px); }
+.pf-filters { right: calc(var(--a) + var(--ancla-gap)); max-width: min(100% - 32px - var(--a), 980px); }
 /* Abajo se ancla con el mismo bottom que el dock (y la misma transicion al
    compactarse): asi Safari, al mostrar o esconder su barra, mueve los dos
    juntos. Si la altura la pusiera el JS desde arriba, la bola llegaria un
@@ -673,24 +459,24 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
    con la transicion del dock: su borde derecho es lineal en su ancho, asi
    que los dos se mueven juntos cuadro a cuadro. En desktop la x la pone el JS
    (--ancla-x: ahi el dock no se compacta). El JS solo pone la escala. */
-.ancla {
+.pf-ancla {
   position: fixed; left: var(--ancla-x, -200px); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 41;
   width: var(--a); height: var(--a);
   padding: 0; border: 0; background: none; cursor: pointer;
   will-change: transform; transform: scale(0);
   transform-origin: left bottom; /* al compactarse no se abre el hueco con el dock */
 }
-.ancla-cuerpo {
+.pf-ancla-cuerpo {
   display: grid; place-items: center; width: 100%; height: 100%;
   border-radius: 50%; background: var(--azul); color: var(--tiza);
   will-change: transform;
 }
-.ancla svg { width: 44%; height: 44%; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; will-change: transform; }
-.ancla:focus-visible { outline: none; }
-.ancla:focus-visible .ancla-cuerpo { outline: 2px solid var(--celeste); outline-offset: 3px; }
+.pf-ancla svg { width: 44%; height: 44%; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; will-change: transform; }
+.pf-ancla:focus-visible { outline: none; }
+.pf-ancla:focus-visible .pf-ancla-cuerpo { outline: 2px solid var(--celeste); outline-offset: 3px; }
 @media (max-width: 640px) {
-  .filters { width: var(--f-ancho-cerrado, calc(100% - 32px - var(--ancla-gap) - var(--a))); }
-  .filters.open { width: calc(100% - 32px - var(--ancla-gap) - var(--a)); }
+  .pf-filters { width: var(--f-ancho-cerrado, calc(100% - 32px - var(--ancla-gap) - var(--a))); }
+  .pf-filters.pf-abierto { width: calc(100% - 32px - var(--ancla-gap) - var(--a)); }
   /* Mobile: --a es 57, toggle 46 + 2 x 4 de f-bar + 2 de borde + 1 del
      f-body. El dock (ancho w) va centrado entre 0 y 100% - --a - gap: su borde
      derecho es (100% - --a - gap + w) / 2 y la bola arranca un gap despues.
@@ -698,34 +484,34 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
      (128 con contador) y el alto 41: toggle 30 + 2 x 4 de f-bar + 2 de
      borde + 1 del borde del f-body. */
   :root { --a: 57px; }
-  .ancla {
+  .pf-ancla {
     left: calc(100% - 16px - var(--a));
     transition: bottom var(--f-chica) var(--f-chica-curva), left var(--f-chica) var(--f-chica-curva), width var(--f-chica) var(--f-chica-curva), height var(--f-chica) var(--f-chica-curva);
   }
-  .filters.chica:not(.open) ~ .ancla {
+  .pf-filters.pf-chica:not(.pf-abierto) ~ .pf-ancla {
     bottom: calc(6px + env(safe-area-inset-bottom, 0px));
     left: calc((100% - var(--a) + var(--ancla-gap) + 104px) / 2);
     width: 41px; height: 41px;
   }
-  .filters.chica:not(.open):has(.f-count:not([hidden])) ~ .ancla { left: calc((100% - var(--a) + var(--ancla-gap) + 128px) / 2); }
+  .pf-filters.pf-chica:not(.pf-abierto):has(.pf-f-count:not([hidden])) ~ .pf-ancla { left: calc((100% - var(--a) + var(--ancla-gap) + 128px) / 2); }
 }
 
 /* ?solo=dock: solo la barra de arriba y el dock de filtros, sin carrusel ni
    tarjetas. Lo usa el tweak de la animacion. */
-.solo-dock .dest, .solo-dock main { display: none; }
+.pf-solo-dock .pf-dest, .pf-solo-dock main { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
-  .d-desliz { transform: none; }
+  .pf-d-desliz { transform: none; }
 }
 </style>
 </head>
 <body>
 
 
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="defs">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="pf-defs">
   <!-- Logo oficial, exportado del Figma Master (◆ Logos) -->
-  <symbol id="logo-blanco" viewBox="0 0 1458 1021"><path d="M781.717 0.0950403H778.009H444.67V675.816H685.119V444.493C609.438 435.465 604.874 374.26 605.635 353.447V312.01H613.526V347.079C677.038 352.877 693.01 392.793 696.338 419.974C699.666 392.793 715.639 352.877 779.15 347.079V312.01H787.042V353.447C787.707 374.355 783.143 436.225 706.131 444.683V676.006H719.917V450.196C739.408 455.993 759.85 459.034 781.812 459.034C908.55 459.034 1011.42 356.298 1011.42 229.517C1011.42 102.736 908.645 0 781.812 0M692.345 46.5687V0.0950403H700.141V46.8538C768.121 119.463 696.338 176.011 696.338 176.011C634.063 113.761 678.084 60.8244 692.345 46.5687ZM787.042 257.934C787.802 279.697 782.858 345.939 696.338 349.93C609.913 345.844 604.969 279.697 605.635 257.934V216.497H613.526V251.566C677.038 257.363 693.01 297.279 696.338 324.46C699.666 297.279 715.639 257.363 779.15 251.566V216.497H787.042V257.934ZM787.042 161.945C787.802 183.709 782.858 249.95 696.338 253.942C609.913 249.95 604.969 183.709 605.635 161.945V93.0423H613.526V155.577C677.038 161.375 693.01 201.291 696.338 228.472C699.666 201.291 715.639 161.375 779.15 155.577V93.0423H787.042V161.945Z"/>
+  <symbol id="pf-logo-blanco" viewBox="0 0 1458 1021"><path d="M781.717 0.0950403H778.009H444.67V675.816H685.119V444.493C609.438 435.465 604.874 374.26 605.635 353.447V312.01H613.526V347.079C677.038 352.877 693.01 392.793 696.338 419.974C699.666 392.793 715.639 352.877 779.15 347.079V312.01H787.042V353.447C787.707 374.355 783.143 436.225 706.131 444.683V676.006H719.917V450.196C739.408 455.993 759.85 459.034 781.812 459.034C908.55 459.034 1011.42 356.298 1011.42 229.517C1011.42 102.736 908.645 0 781.812 0M692.345 46.5687V0.0950403H700.141V46.8538C768.121 119.463 696.338 176.011 696.338 176.011C634.063 113.761 678.084 60.8244 692.345 46.5687ZM787.042 257.934C787.802 279.697 782.858 345.939 696.338 349.93C609.913 345.844 604.969 279.697 605.635 257.934V216.497H613.526V251.566C677.038 257.363 693.01 297.279 696.338 324.46C699.666 297.279 715.639 257.363 779.15 251.566V216.497H787.042V257.934ZM787.042 161.945C787.802 183.709 782.858 249.95 696.338 253.942C609.913 249.95 604.969 183.709 605.635 161.945V93.0423H613.526V155.577C677.038 161.375 693.01 201.291 696.338 228.472C699.666 201.291 715.639 161.375 779.15 155.577V93.0423H787.042V161.945Z"/>
 <path d="M77.4876 788.056C118.846 788.056 150.317 809.82 150.317 848.405C150.317 886.991 116.279 913.221 80.435 913.221C72.5436 913.221 64.5571 912.176 57.2362 908.374C84.5232 906.664 114.092 888.416 114.092 855.343C114.092 825.026 94.3163 812.956 68.9307 812.956C61.3246 812.956 54.0037 813.621 46.6828 815.047V970.529C46.6828 989.822 46.3975 1003.7 63.2261 1013.96V1015.01H0V1013.96C16.1631 1007.78 14.2615 982.219 14.2615 966.728V836.716C14.2615 821.224 16.1631 796.039 0.285219 789.102V788.056H77.4876Z"/>
 <path d="M563.044 899.157C563.044 969.485 509.326 1020.52 446.1 1020.52C382.874 1020.52 330.106 971.576 330.106 900.868C330.106 835.386 382.494 780.549 449.333 782.26C516.077 781.88 563.14 837.097 563.14 899.157M366.235 897.731C366.235 946.011 397.706 995.621 447.621 995.621C497.536 995.621 526.725 957.32 526.725 906C526.725 854.679 497.156 807.065 446.956 807.065C396.755 807.065 366.235 845.65 366.235 897.731Z"/>
 <path d="M618.662 966.633C618.662 982.124 616.095 1007.31 631.973 1013.87V1014.91H571.884V1013.87C588.142 1007.69 586.146 982.124 586.146 966.633V836.621C586.146 820.749 588.047 795.564 571.884 789.007V787.961H673.616C679.036 787.961 684.455 788.626 688.543 786.25H689.494V826.262H688.543C678.655 814.192 665.63 812.861 650.988 812.861C639.864 812.861 628.74 813.241 618.567 815.237V879.388H656.693C660.02 879.388 675.233 879.388 683.98 879.578C687.783 879.578 691.015 878.247 691.015 878.247C691.015 878.247 685.596 893.549 669.528 899.061C649.086 905.999 618.567 904.288 618.567 904.288V966.728"/>
@@ -734,98 +520,98 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
 <path d="M299.486 966.633L253.754 904.193C279.805 897.635 304.24 873.875 304.24 843.463C304.24 813.051 281.041 787.961 238.446 787.961H162.765V789.006C178.928 795.564 176.742 820.749 176.742 836.62V966.633C176.742 982.124 178.928 1007.69 162.765 1013.87V1014.91H223.424V1013.87C207.261 1007.69 209.163 982.504 209.163 966.633V913.126H226.372L246.053 945.629L284.844 997.71C294.352 1010.45 304.81 1014.91 321.734 1014.91H350.923C332.858 1002.56 312.797 984.595 299.486 966.633ZM229.7 891.362H209.163V812.196C216.484 810.77 223.424 809.82 230.84 809.44C252.138 808.394 271.819 822.935 271.819 847.74C271.819 874.256 252.803 887.466 229.7 891.362Z"/>
 <path d="M1146.15 970.149C1146.15 989.822 1145.77 1003.22 1162.6 1013.96V1015.01H1099.65V1013.96C1115.63 1007.4 1113.73 982.219 1113.73 966.727V812.956H1085.77C1072.08 812.956 1057.82 816.757 1047.93 826.736H1046.98L1058.11 785.68H1059.06C1062.86 787.39 1066.95 787.39 1071.04 788.056H1197.58C1203 788.056 1213.18 788.056 1213.18 788.056C1213.18 788.056 1207.28 803.072 1194.07 809.439C1184.94 813.811 1167.54 813.051 1157.08 813.051H1146.15V970.244"/>
 <path d="M1240.37 836.716C1240.37 820.844 1242.56 795.659 1226.3 789.102V788.056H1286.67V789.102C1270.8 795.659 1272.7 821.129 1272.7 836.716V966.728C1272.7 982.219 1270.8 1007.4 1286.67 1013.96V1015.01H1226.3V1013.96C1242.27 1007.78 1240.37 982.219 1240.37 966.728V836.716Z"/>
-<path d="M1400.86 990.107C1422.44 991.533 1441.17 983.55 1457.05 969.104H1458L1441.46 1015.01H1310.82V1013.96C1327.08 1007.78 1325.18 982.219 1325.18 966.728V836.716C1325.18 820.844 1327.08 795.659 1310.82 789.102V788.056H1371.57V789.102C1355.41 795.659 1357.6 821.129 1357.6 836.716V990.012L1400.86 990.202"/></symbol><symbol id="simbolo" viewBox="0 0 555 662"><path d="M326.209 0H0V661.016H235.489V428.16L234.586 426.92C264.036 441.128 294.953 449.021 329.819 449.021C453.939 449.021 554.476 348.55 554.476 224.623C554.476 100.697 453.826 0 329.707 0H326.096" fill="#003DA5"/>
+<path d="M1400.86 990.107C1422.44 991.533 1441.17 983.55 1457.05 969.104H1458L1441.46 1015.01H1310.82V1013.96C1327.08 1007.78 1325.18 982.219 1325.18 966.728V836.716C1325.18 820.844 1327.08 795.659 1310.82 789.102V788.056H1371.57V789.102C1355.41 795.659 1357.6 821.129 1357.6 836.716V990.012L1400.86 990.202"/></symbol><symbol id="pf-simbolo" viewBox="0 0 555 662"><path d="M326.209 0H0V661.016H235.489V428.16L234.586 426.92C264.036 441.128 294.953 449.021 329.819 449.021C453.939 449.021 554.476 348.55 554.476 224.623C554.476 100.697 453.826 0 329.707 0H326.096" fill="#003DA5"/>
 <path d="M250.011 45.7817V0H242.338V45.4434C228.347 59.3132 185.356 111.184 246.288 172.076C246.288 172.076 316.471 116.709 250.011 45.7817Z" fill="#EABA2C"/>
 <path d="M334.865 90.9953H327.079V152.225C264.906 157.864 249.335 196.88 246.063 223.492C242.791 196.992 227.219 157.864 165.047 152.225V90.9953H157.261V158.427C156.584 179.74 161.436 244.465 245.95 248.412C330.464 244.465 335.429 179.74 334.639 158.427V90.9953H334.865Z" fill="#EABA2C"/>
 <path d="M334.865 211.646H327.079V245.926C264.906 251.564 249.335 290.58 246.063 317.192C242.791 290.58 227.219 251.564 165.047 245.926V211.646H157.261V252.241C156.584 273.553 161.436 338.279 245.95 342.226C330.464 338.279 335.429 273.553 334.639 252.241V211.646H334.865Z" fill="#EABA2C"/>
 <path d="M334.868 305.145H327.082V339.425C264.91 345.063 249.338 384.079 246.066 410.691C242.794 384.079 227.223 345.063 165.05 339.425V305.145H157.264V345.627C156.587 366.037 161.101 425.914 235.121 434.709V661.137H255.544V434.935C330.919 426.703 335.319 366.149 334.642 345.739V305.257L334.868 305.145Z" fill="#EABA2C"/></symbol>
   <!-- Fondo del badge: el squircle del componente (radio 32%) -->
-  <symbol id="badge-bg" viewBox="0 0 100 100"><path d="M32 0H68C76.4869 0 84.6263 3.37142 90.6274 9.37258C96.6286 15.3737 100 23.5131 100 32V68C100 76.4869 96.6286 84.6263 90.6274 90.6274C84.6263 96.6286 76.4869 100 68 100H32C23.5131 100 15.3737 96.6286 9.37258 90.6274C3.37142 84.6263 0 76.4869 0 68V32C0 23.5131 3.37142 15.3737 9.37258 9.37258C15.3737 3.37142 23.5131 0 32 0Z"/></symbol>
+  <symbol id="pf-badge-bg" viewBox="0 0 100 100"><path d="M32 0H68C76.4869 0 84.6263 3.37142 90.6274 9.37258C96.6286 15.3737 100 23.5131 100 32V68C100 76.4869 96.6286 84.6263 90.6274 90.6274C84.6263 96.6286 76.4869 100 68 100H32C23.5131 100 15.3737 96.6286 9.37258 90.6274C3.37142 84.6263 0 76.4869 0 68V32C0 23.5131 3.37142 15.3737 9.37258 9.37258C15.3737 3.37142 23.5131 0 32 0Z"/></symbol>
 </defs></svg>
 
-<script>if (/[?&]solo=dock\b/.test(location.search)) document.documentElement.classList.add("solo-dock");</script>
-<header class="top" id="top">
-  <div class="wrap">
-    <nav class="nav" id="nav" aria-label="Sitio">
-      <a class="logo" href="https://www.profertil.com.ar/" aria-label="Profertil">
-        <svg viewBox="0 0 1458 1021" aria-hidden="true"><use href="#logo-blanco"/></svg>
+<script>if (/[?&]solo=dock\b/.test(location.search)) document.documentElement.classList.add("pf-solo-dock");</script>
+<header class="pf-barra" id="pf-top">
+  <div class="pf-barra__in">
+    <nav class="pf-barra__nav" id="pf-nav" aria-label="Sitio">
+      <a class="pf-barra__logo" href="https://www.profertil.com.ar/" aria-label="Profertil">
+        <svg viewBox="0 0 1458 1021" aria-hidden="true"><use href="#pf-logo-blanco"/></svg>
       </a>
-      <div class="menu" aria-hidden="true">
+      <div class="pf-barra__menu" aria-hidden="true">
         <span>Home</span><span>Empresa</span><span>Sostenibilidad</span><span>Productos y Servicios</span><span aria-current="page">Novedades</span><span>Compliance</span>
       </div>
-      <span class="menu-mobile" aria-hidden="true"><i><b></b><b></b><b></b><b></b></i>Menú</span>
-      <div class="busca" id="busca" role="search">
-        <button class="lupa" id="goSearch" type="button" aria-label="Buscar notas" aria-expanded="false" aria-controls="q"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></button>
-        <input id="q" type="search" autocomplete="off" placeholder="Buscá: trigo, becas…" aria-label="Buscar notas" tabindex="-1">
-        <span class="q-count" id="qCount">0</span>
+      <span class="pf-barra__menu-mobile" aria-hidden="true"><i><b></b><b></b><b></b><b></b></i>Menú</span>
+      <div class="pf-barra__busca" id="pf-busca" role="search">
+        <button class="pf-barra__lupa" id="pf-goSearch" type="button" aria-label="Buscar notas" aria-expanded="false" aria-controls="pf-q"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></button>
+        <input id="pf-q" type="search" autocomplete="off" placeholder="Buscá: trigo, becas…" aria-label="Buscar notas" tabindex="-1">
+        <span class="pf-barra__cuenta" id="pf-qCount">0</span>
       </div>
-      <button class="busca-x" id="qClose" type="button" aria-label="Cerrar buscador" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <button class="pf-barra__cerrar" id="pf-qClose" type="button" aria-label="Cerrar buscador" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </nav>
   </div>
 </header>
 
-<section class="dest" id="dest" aria-roledescription="carrusel" aria-label="Notas destacadas">
-  <div id="dSlides"></div>
-  <div class="d-nav">
-    <div class="wrap">
-      <div class="d-segs" id="dSegs"></div>
-      <div class="d-flechas">
-        <button class="d-flecha" id="dPrev" type="button" aria-label="Destacada anterior"><svg viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg></button>
-        <button class="d-flecha" id="dNext" type="button" aria-label="Destacada siguiente"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></button>
+<section class="pf-dest" id="pf-dest" aria-roledescription="carrusel" aria-label="Notas destacadas">
+  <div id="pf-dSlides"></div>
+  <div class="pf-d-nav">
+    <div class="pf-wrap">
+      <div class="pf-d-segs" id="pf-dSegs"></div>
+      <div class="pf-d-flechas">
+        <button class="pf-d-flecha" id="pf-dPrev" type="button" aria-label="Destacada anterior"><svg viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg></button>
+        <button class="pf-d-flecha" id="pf-dNext" type="button" aria-label="Destacada siguiente"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></button>
       </div>
     </div>
   </div>
 </section>
 
-<main class="wrap">
-  <div class="result-row">
-    <p class="result-text" id="resultText" aria-live="polite"></p>
-    <div class="herramientas">
-      <div class="seg vista" role="group" aria-label="Tamaño de las tarjetas">
-        <span class="seg-ind" aria-hidden="true"></span>
+<main class="pf-wrap">
+  <div class="pf-result-row">
+    <p class="pf-result-text" id="pf-resultText" aria-live="polite"></p>
+    <div class="pf-herramientas">
+      <div class="pf-selector pf-selector--iconos pf-vista" role="group" aria-label="Tamaño de las tarjetas">
+        <span class="pf-selector__ind" aria-hidden="true"></span>
         <button type="button" data-vista="chico" aria-pressed="false" aria-label="Tarjetas chicas" title="Chicas"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0" width="4" height="4" rx="1.3"/><rect x="5.5" y="0" width="4" height="4" rx="1.3"/><rect x="11" y="0" width="4" height="4" rx="1.3"/><rect x="0" y="5.5" width="4" height="4" rx="1.3"/><rect x="5.5" y="5.5" width="4" height="4" rx="1.3"/><rect x="11" y="5.5" width="4" height="4" rx="1.3"/><rect x="0" y="11" width="4" height="4" rx="1.3"/><rect x="5.5" y="11" width="4" height="4" rx="1.3"/><rect x="11" y="11" width="4" height="4" rx="1.3"/></svg></button>
         <button type="button" data-vista="medio" aria-pressed="true" aria-label="Tarjetas medianas" title="Medianas"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0" width="6.5" height="6.5" rx="2.1"/><rect x="8.5" y="0" width="6.5" height="6.5" rx="2.1"/><rect x="0" y="8.5" width="6.5" height="6.5" rx="2.1"/><rect x="8.5" y="8.5" width="6.5" height="6.5" rx="2.1"/></svg></button>
         <button type="button" data-vista="grande" aria-pressed="false" aria-label="Tarjetas grandes" title="Grandes"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0" width="15" height="15" rx="4.8"/></svg></button>
       </div>
-      <div class="seg orden" role="group" aria-label="Orden">
-        <span class="seg-ind" aria-hidden="true"></span>
-        <button type="button" id="sortNew" aria-pressed="true">Más recientes</button>
-        <button type="button" id="sortOld" aria-pressed="false">Más antiguas</button>
+      <div class="pf-selector pf-orden" role="group" aria-label="Orden">
+        <span class="pf-selector__ind" aria-hidden="true"></span>
+        <button type="button" id="pf-sortNew" aria-pressed="true">Más recientes</button>
+        <button type="button" id="pf-sortOld" aria-pressed="false">Más antiguas</button>
       </div>
     </div>
   </div>
-  <div class="grid" id="grid"></div>
-  <div class="empty" id="empty" hidden>
-    <svg viewBox="0 0 555 662" aria-hidden="true"><use href="#simbolo"/></svg>
-    <p id="emptyText"></p>
-    <button class="btn" id="emptyReset" type="button">Ver todas las notas</button>
+  <div class="pf-grid" id="pf-grid"></div>
+  <div class="pf-empty" id="pf-empty" hidden>
+    <svg viewBox="0 0 555 662" aria-hidden="true"><use href="#pf-simbolo"/></svg>
+    <p id="pf-emptyText"></p>
+    <button class="pf-boton pf-boton--verde" id="pf-emptyReset" type="button">Ver todas las notas</button>
   </div>
-  <div class="sentinel" id="sentinel"></div>
+  <div class="pf-sentinel" id="pf-sentinel"></div>
 </main>
 
-<section class="filters fuera" id="filters" aria-label="Filtros">
-  <div class="f-body" id="fBody"><div class="f-in">
-    <div class="f-group f-cats"><p class="f-label" id="fCatsLabel">Categoría</p><div class="f-row" id="fTiposTodas"></div></div>
-    <div class="f-group"><p class="f-label">Año</p><div class="f-row" id="fAnios"></div></div>
-    <button class="f-clear" id="fClear" type="button" hidden>Limpiar filtros</button>
+<section class="pf-filters pf-fuera" id="pf-filters" aria-label="Filtros">
+  <div class="pf-f-body" id="pf-fBody"><div class="pf-f-in">
+    <div class="pf-f-group pf-f-cats"><p class="pf-f-label" id="pf-fCatsLabel">Categoría</p><div class="pf-f-row" id="pf-fTiposTodas"></div></div>
+    <div class="pf-f-group"><p class="pf-f-label">Año</p><div class="pf-f-row" id="pf-fAnios"></div></div>
+    <button class="pf-f-clear" id="pf-fClear" type="button" hidden>Limpiar filtros</button>
   </div></div>
-  <div class="f-bar">
-    <div class="f-main" id="fTipos" role="group" aria-label="Tipo de nota"></div>
-    <button class="f-toggle" id="fToggle" type="button" aria-expanded="false" aria-controls="fBody" aria-label="Más filtros"><span class="f-txt">Filtros</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg><span class="f-count" id="fCount" hidden>0</span></button>
+  <div class="pf-f-bar">
+    <div class="pf-f-main" id="pf-fTipos" role="group" aria-label="Tipo de nota"></div>
+    <button class="pf-f-toggle" id="pf-fToggle" type="button" aria-expanded="false" aria-controls="pf-fBody" aria-label="Más filtros"><span class="pf-f-txt">Filtros</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg><span class="pf-f-count" id="pf-fCount" hidden>0</span></button>
   </div>
 </section>
 
-<button class="ancla" id="ancla" type="button" aria-label="Bajar"><span class="ancla-cuerpo"><svg viewBox="0 0 24 24" aria-hidden="true" style="transform: rotate(90deg)"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
+<button class="pf-ancla" id="pf-ancla" type="button" aria-label="Bajar"><span class="pf-ancla-cuerpo"><svg viewBox="0 0 24 24" aria-hidden="true" style="transform: rotate(90deg)"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
 
-<dialog class="modal" id="modal" aria-labelledby="mTitle">
-  <div class="m-scroll" id="mScroll"></div>
-  <div class="m-nav">
-    <div class="m-nav-group">
-      <button class="icon-btn" id="mPrev" type="button" aria-label="Nota anterior"><svg viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg></button>
-      <button class="icon-btn" id="mNext" type="button" aria-label="Nota siguiente"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></button>
+<dialog class="pf-modal" id="pf-modal" aria-labelledby="pf-mTitle">
+  <div class="pf-m-scroll" id="pf-mScroll"></div>
+  <div class="pf-m-nav">
+    <div class="pf-m-nav-group">
+      <button class="pf-boton-icono" id="pf-mPrev" type="button" aria-label="Nota anterior"><svg viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg></button>
+      <button class="pf-boton-icono" id="pf-mNext" type="button" aria-label="Nota siguiente"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></button>
     </div>
-    <span class="pos" id="mPos"></span>
-    <button class="icon-btn" id="mClose" type="button" aria-label="Cerrar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <span class="pf-pos" id="pf-mPos"></span>
+    <button class="pf-boton-icono" id="pf-mClose" type="button" aria-label="Cerrar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
   </div>
 </dialog>
 
@@ -845,9 +631,9 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   var A = {"formas":{"barras":{"vb":"0 0 217 235","d":"<path d=\"M0 102.901C0 78.1579 20.0582 58.0997 44.8012 58.0997H64.3985V234.82H0V102.901Z\"/> <path d=\"M75.3335 0H139.732V234.82H75.3335V0Z\"/> <path d=\"M151.883 125.883H216.282V193.108C216.282 216.145 197.607 234.82 174.57 234.82H151.883V125.883Z\"/>"},"c":{"vb":"0 0 252 204","d":"<path d=\"M97.1621 203.028C96.2867 202.99 95.4104 202.943 94.535 202.882C77.8732 201.726 61.7537 196.478 47.6041 187.604C33.4543 178.73 21.7097 166.504 13.4137 152.008C5.1181 137.512 0.52565 121.194 0.0424727 104.499C-0.440492 87.8041 3.20178 71.2456 10.6458 56.2941C18.0898 41.3431 29.1065 28.4587 42.7192 18.7819C56.3324 9.105 72.1229 2.93359 88.6903 0.816508C93.8441 0.157956 99.0237 -0.0991858 104.184 0.0340506L251.821 0.0340377C251.821 56.2035 206.286 101.739 150.117 101.739H150.031C206.122 101.739 251.593 147.209 251.593 203.301L97.1621 203.301V203.028Z\"/>"},"capas":{"vb":"0 0 223 285","d":"<path d=\"M111.131 0C125.725 -6.37923e-07 140.176 2.8751 153.659 8.45996C167.142 14.0448 179.393 22.2304 189.713 32.5498C200.032 42.8693 208.219 55.1204 213.804 68.6035C219.389 82.0866 222.263 96.5379 222.263 111.132H178.911C182.704 114.047 186.314 117.209 189.713 120.604C200.032 130.91 208.219 143.145 213.804 156.61C219.389 170.076 222.263 184.508 222.263 199.083H182.663C185.101 201.133 187.453 203.291 189.713 205.551C200.032 215.87 208.219 228.121 213.804 241.604C219.389 255.088 222.263 269.539 222.263 284.133H0C-1.27584e-06 269.539 2.87415 255.088 8.45898 241.604C14.0439 228.121 22.2303 215.87 32.5498 205.551C34.8096 203.291 37.1619 201.133 39.5996 199.083H0C1.43212e-05 184.508 2.87412 170.076 8.45898 156.61C14.0439 143.145 22.2303 130.91 32.5498 120.604C35.9488 117.209 39.5585 114.047 43.3516 111.132H0C6.2847e-06 96.5379 2.87411 82.0866 8.45898 68.6035C14.0439 55.1205 22.2303 42.8693 32.5498 32.5498C42.8691 22.2306 55.1198 14.0448 68.6025 8.45996C82.0855 2.87512 96.537 4.18031e-05 111.131 0Z\"/>"},"casco":{"vb":"0 0 267 234","d":"<path d=\"M1.82251e-05 131.956C1.82251e-05 81.3434 37.6371 40.3138 84.0648 40.3138V136.371C84.0648 159.022 67.2211 177.384 46.4434 177.384H1.82251e-05V131.956Z\"/> <path d=\"M265.103 131.956C265.103 81.3434 227.465 40.3138 181.038 40.3138V136.371C181.038 159.022 197.881 177.384 218.659 177.384H265.103V131.956Z\"/> <path d=\"M97.5252 34.1771C97.5252 15.3016 111.562 0 128.876 0H136.228C153.543 0 167.579 15.3016 167.579 34.1771V177.385H97.5252V34.1771Z\"/> <path d=\"M266.205 196.642C266.205 217.276 250.861 234.003 231.934 234.003L34.2716 234.003C15.3439 234.003 -1.56727e-06 217.276 0 196.642L2.24369e-07 193.688L266.205 193.688V196.642Z\"/>"},"circulos":{"vb":"0 0 275 184","d":"<path d=\"M45.8311 91.9197C20.5198 91.9197 0 71.3422 0 45.9599C0 20.5775 20.5198 0 45.8311 0C71.1424 0 91.6623 20.5775 91.6623 45.9599C91.6623 71.3422 71.1424 91.9197 45.8311 91.9197ZM137.493 91.9197C162.805 91.9197 183.325 71.3422 183.325 45.9599C183.325 20.5775 162.805 0 137.493 0C112.182 0 91.6623 20.5775 91.6623 45.9599C91.6623 71.3422 112.182 91.9197 137.493 91.9197ZM45.8311 91.9197C20.5198 91.9197 0 112.497 0 137.88C0 163.262 20.5198 183.839 45.8311 183.839C71.1424 183.839 91.6623 163.262 91.6623 137.88C91.6623 112.497 71.1424 91.9197 45.8311 91.9197ZM137.493 91.9197C112.182 91.9197 91.6623 112.497 91.6623 137.88C91.6623 163.262 112.182 183.839 137.493 183.839C162.805 183.839 183.325 163.262 183.325 137.88C183.325 112.497 162.805 91.9197 137.493 91.9197Z\"/> <path d=\"M137.493 91.9197C112.182 91.9197 91.6623 71.3422 91.6623 45.9599C91.6623 20.5775 112.182 0 137.493 0C162.805 0 183.325 20.5775 183.325 45.9599C183.325 71.3422 162.805 91.9197 137.493 91.9197ZM229.156 91.9197C254.467 91.9197 274.987 71.3422 274.987 45.9599C274.987 20.5775 254.467 0 229.156 0C203.844 0 183.325 20.5775 183.325 45.9599C183.325 71.3422 203.844 91.9197 229.156 91.9197ZM137.493 91.9197C112.182 91.9197 91.6623 112.497 91.6623 137.88C91.6623 163.262 112.182 183.839 137.493 183.839C162.805 183.839 183.325 163.262 183.325 137.88C183.325 112.497 162.805 91.9197 137.493 91.9197ZM229.156 91.9197C203.844 91.9197 183.325 112.497 183.325 137.88C183.325 163.262 203.844 183.839 229.156 183.839C254.467 183.839 274.987 163.262 274.987 137.88C274.987 112.497 254.467 91.9197 229.156 91.9197Z\"/>"},"escudo":{"vb":"0 0 246 285","d":"<path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M245.423 42.9531C245.493 42.953 245.564 42.9531 245.634 42.9531V175.186H245.305C245.259 176.168 245.2 177.151 245.127 178.133C243.731 196.838 237.39 214.934 226.669 230.818C215.948 246.703 201.174 259.886 183.66 269.199C166.146 278.511 146.43 283.669 126.26 284.212C106.089 284.754 86.0812 280.665 68.0167 272.308C49.9525 263.951 34.3842 251.582 22.6925 236.301C11.0012 221.019 3.54538 203.293 0.987451 184.695C0.254784 179.368 -0.0604958 174.015 0.0188685 168.678H0V0H245.423V42.9531ZM25.2125 28.1141V108.448C25.2131 140.016 50.8056 165.606 82.3736 165.607H121.029V251.458H145.916C186.017 251.458 218.524 218.95 218.524 178.85V95.2733H175.1C145.238 95.2737 121.029 119.482 121.029 149.344V69.826C121.029 46.7894 102.354 28.1141 79.3169 28.1141H25.2125Z\"/>"},"estrella":{"vb":"0 0 285 285","d":"<path d=\"M142.164 0C143.399 0 144.399 1.00066 144.399 2.23535C144.399 51.4455 154.9 85.7075 177.049 107.713C199.201 129.721 233.467 139.929 282.094 139.929C283.328 139.929 284.329 140.93 284.329 142.164C284.329 143.399 283.328 144.399 282.094 144.399C233.482 144.399 199.211 154.896 177.054 177.054C154.896 199.211 144.399 233.482 144.399 282.094C144.399 283.328 143.399 284.329 142.164 284.329C140.93 284.329 139.929 283.328 139.929 282.094C139.929 233.486 129.36 199.215 107.165 177.056C84.9695 154.896 50.6977 144.399 2.23535 144.399C1.00066 144.399 0 143.399 0 142.164C0.000112018 140.929 1.00073 139.929 2.23535 139.929C50.7125 139.929 84.9798 129.721 107.17 107.711C129.356 85.7042 139.929 51.4418 139.929 2.23535C139.929 1.00072 140.929 0.000103465 142.164 0Z\"/>"},"flor":{"vb":"0 0 269 279","d":"<path d=\"M0.122525 0C104.518 6.16695 129.089 71.9464 134.315 111.945C139.551 71.9428 164.14 6.20302 268.503 0.0380859C269.392 27.8878 267.823 119.947 166.907 139.112C267.841 158.27 269.41 250.339 268.522 278.19C164.051 272.019 139.519 206.15 134.318 166.159C129.107 206.153 104.56 271.988 0.117642 278.158C-0.770961 250.306 0.797104 158.234 101.737 139.078C0.802177 119.92 -0.766054 27.8514 0.122525 0Z\"/>"},"grafico":{"vb":"0 0 228 229","d":"<path d=\"M115.314 0.00433095L114.32 114.32L114.318 114.325L227.094 114.722C227.018 136.314 220.828 157.443 209.242 175.664C197.656 193.884 181.147 208.45 161.625 217.677L114.29 117.53L113.325 228.637C83.0067 228.373 54.0353 216.075 32.7834 194.45C11.5316 172.825 -0.259414 143.644 0.00433126 113.325C0.268304 83.007 12.5645 54.0351 34.1892 32.7834C55.8141 11.5315 84.9957 -0.259404 115.314 0.00433095Z\"/>"},"hoja":{"vb":"0 0 255 249","d":"<path d=\"M100.334 77.48C149.937 -9.94785 254.374 0.363473 254.604 0.38623C253.868 111.726 195.419 153.26 143.571 168.58C146.912 202.677 139.814 233.225 135.742 248.318C-50.3429 192.658 8.99902 30.3813 8.99902 30.3813C50.5227 41.3302 79.8541 58.0146 100.334 77.48Z\"/>"},"industria":{"vb":"0 0 252 239","d":"<path d=\"M176.673 48.244C217.821 48.2445 251.177 81.6257 251.177 122.803V238.297H42.366C18.9681 238.297 0.000369796 219.315 0 195.9V77.4833H126.026V48.244H176.673Z\"/> <path d=\"M23.3744 0C45.1589 0 62.8187 17.6724 62.8187 39.4724V77.4833H23.3744L23.3744 0Z\"/>"},"lupa":{"vb":"0 0 260 227","d":"<path d=\"M106.108 0C164.71 0 212.217 47.5063 212.217 106.108C212.217 123.332 208.111 139.595 200.828 153.978L259.268 212.417C239.93 231.755 208.578 231.755 189.24 212.417L168.654 191.831C151.116 204.65 129.496 212.217 106.108 212.217C47.5063 212.217 0 164.711 0 106.108C9.43891e-05 47.5063 47.5063 1.07058e-05 106.108 0Z\"/>"},"ondas":{"vb":"0 0 288 142","d":"<path d=\"M287.673 70.8449C239.728 23.615 191.782 23.615 143.837 70.8449C95.8911 23.615 47.9456 23.615 0 70.8449V35.4225C47.9456 -11.8075 95.8911 -11.8075 143.837 35.4225C191.782 -11.8075 239.728 -11.8075 287.673 35.4225M287.673 141.69C239.728 94.4599 191.782 94.4599 143.837 141.69C95.8911 94.4599 47.9456 94.4599 0 141.69V106.267C47.9456 59.0374 95.8911 59.0374 143.837 106.267C191.782 59.0374 239.728 59.0374 287.673 106.267\"/>"},"plantas":{"vb":"0 0 269 291","d":"<path d=\"M3.26108e-08 225.696C29.4699 255.337 138.816 354.778 268.196 225.696C268.196 225.696 150.704 84.9006 3.26108e-08 225.696Z\"/> <path d=\"M0 144.123C29.4699 174.107 138.816 274.698 268.196 144.123C268.196 144.123 150.704 1.70041 0 144.123Z\"/> <path d=\"M3.26108e-08 62.5756C29.4699 92.2166 138.816 191.658 268.196 62.5757C268.196 62.5757 150.704 -78.2195 3.26108e-08 62.5756Z\"/>"},"sol":{"vb":"0 0 262 265","d":"<path d=\"M130.956 204.045C112.011 204.045 93.8427 196.458 80.4469 182.952C67.051 169.447 59.5254 151.129 59.5254 132.029C59.5254 112.929 67.051 94.6118 80.4469 81.1062C93.8427 67.6006 112.011 60.0133 130.956 60.0133C149.9 60.0133 168.069 67.6006 181.465 81.1062C194.861 94.6118 202.386 112.929 202.386 132.029C202.386 151.129 194.861 169.447 181.465 182.952C168.069 196.458 149.9 204.045 130.956 204.045ZM119.051 0H142.861V36.008H119.051V0ZM119.051 228.05H142.861V264.058H119.051V228.05ZM29.9413 47.1584L46.775 30.1867L72.0257 55.6443L55.1919 72.6161L29.9413 47.1584ZM189.886 208.414L206.72 191.442L231.97 216.9L215.137 233.872L189.886 208.414ZM215.137 30.1747L231.97 47.1584L206.72 72.6161L189.886 55.6443L215.137 30.1747ZM55.1919 191.442L72.0257 208.414L46.775 233.872L29.9413 216.9L55.1919 191.442ZM261.912 120.027V144.032H226.196V120.027H261.912ZM35.7152 120.027V144.032H0V120.027H35.7152Z\"/>"},"suelo":{"vb":"0 0 256 140","d":"<path d=\"M36.8051 108.912V139.543H0V108.912H36.8051ZM255.471 108.912V139.543H61.5481V108.912H255.471ZM112.58 54.4557V85.0871H0.308558V54.4557H112.58ZM255.47 54.4559V85.0871H142.271V54.4557L255.47 54.4559ZM193.923 0V30.6315H0V0H193.923ZM255.471 0V30.6315H218.666V0H255.471Z\"/>"},"trigo":{"vb":"0 0 263 292","d":"<path d=\"M0.269531 152.09C102.309 158.14 126.099 222.86 131.089 261.95C136.089 222.85 159.889 158.159 261.909 152.109C262.859 181.969 260.929 287.27 131.839 291.47C131.319 291.47 130.849 291.47 130.329 291.45C1.24927 287.24 -0.670468 181.94 0.269531 152.09ZM141.531 10.6104C188.391 57.4704 188.391 133.45 141.531 180.32L130.911 190.93L120.301 180.32C73.441 133.46 73.4412 57.4804 120.301 10.6104L130.911 0L141.531 10.6104Z\"/>"},"urea":{"vb":"0 0 235 273","d":"<path d=\"M177.988 0C209.042 0 234.217 25.174 234.217 56.2275C234.217 79.3312 220.281 99.1793 200.358 107.828C210.345 124.2 216.101 143.436 216.101 164.017C216.101 223.691 167.724 272.067 108.05 272.067C48.3754 272.067 0 223.691 0 164.017C0.000154623 104.342 48.3755 55.967 108.05 55.9668C112.696 55.9668 117.273 56.2602 121.765 56.8291C121.763 56.6289 121.761 56.4282 121.761 56.2275C121.761 25.1742 146.935 0.000239177 177.988 0Z\"/>"}}};
 
   // Formas e iconos oficiales a <symbol>, una sola vez.
-  var defs = document.getElementById("defs");
+  var defs = document.getElementById("pf-defs");
   var simbolos = "";
-  Object.keys(A.formas).forEach(function (k) { simbolos += '<symbol id="f-' + k + '" viewBox="' + A.formas[k].vb + '">' + A.formas[k].d + "</symbol>"; });
+  Object.keys(A.formas).forEach(function (k) { simbolos += '<symbol id="pf-forma-' + k + '" viewBox="' + A.formas[k].vb + '">' + A.formas[k].d + "</symbol>"; });
   defs.insertAdjacentHTML("beforeend", simbolos);
 
   /* --- Taxonomia ---------------------------------------------------------
@@ -947,7 +733,7 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   };
   function usar(f, x, y, w, h, rot, color) {
     var cx = x + w / 2, cy = y + h / 2;
-    return '<g transform="rotate(' + rot + " " + cx + " " + cy + ')"><use href="#f-' + f + '" x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="' + color + '"/></g>';
+    return '<g transform="rotate(' + rot + " " + cx + " " + cy + ')"><use href="#pf-forma-' + f + '" x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="' + color + '"/></g>';
   }
   function arte(n, W, H, semilla) {
     var r = rnd32(semilla);
@@ -986,17 +772,17 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   var PROP = [[4, 3], [1, 1], [3, 4], [4, 3], [5, 4]];
 
   function badge(x) {
-    return '<svg class="bd" viewBox="0 0 100 100" aria-hidden="true"><use href="#badge-bg" width="100" height="100" fill="' + x.f.bg + '"/>' +
-      '<use href="#f-' + x.forma + '" x="21" y="21" width="58" height="58" fill="' + x.f.fo + '"/></svg>';
+    return '<svg class="pf-etiqueta__badge" viewBox="0 0 100 100" aria-hidden="true"><use href="#pf-badge-bg" width="100" height="100" fill="' + x.f.bg + '"/>' +
+      '<use href="#pf-forma-' + x.forma + '" x="21" y="21" width="58" height="58" fill="' + x.f.fo + '"/></svg>';
   }
-  var FLECHA = '<span class="fl"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 8v10H8"/></svg></span>';
+  var FLECHA = '<span class="pf-etiqueta__flecha"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 8v10H8"/></svg></span>';
   function vars(x) { return "--eb:" + x.f.bg + ";--fo:" + x.f.fo + ";--tx:" + x.f.tx; }
   // o = { dato, flecha, cls, tag, attrs }
   function etq(id, o) {
     o = o || {};
     var x = POR[id], tag = o.tag || "span";
-    return "<" + tag + ' class="etq ' + (o.cls || "") + '" style="' + vars(x) + '"' + (o.attrs || "") + ">" + badge(x) +
-      '<span class="lb">' + (x.corto ? '<span class="full">' + x.nombre + '</span><span class="corto">' + x.corto + "</span>" : x.nombre) + "</span>" + (o.dato != null ? '<span class="dt">' + o.dato + "</span>" : "") + (o.flecha ? FLECHA : "") + "</" + tag + ">";
+    return "<" + tag + ' class="pf-etiqueta ' + (o.cls || "") + '" style="' + vars(x) + '"' + (o.attrs || "") + ">" + badge(x) +
+      '<span class="pf-etiqueta__rotulo">' + (x.corto ? '<span class="pf-etiqueta__completo">' + x.nombre + '</span><span class="pf-etiqueta__corto">' + x.corto + "</span>" : x.nombre) + "</span>" + (o.dato != null ? '<span class="pf-etiqueta__dato">' + o.dato + "</span>" : "") + (o.flecha ? FLECHA : "") + "</" + tag + ">";
   }
 
   /* --- Estado ------------------------------------------------------------- */
@@ -1005,7 +791,7 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   var pintadas = 0;
   var TANDA = 30;
   var $ = function (id) { return document.getElementById(id); };
-  var grid = $("grid");
+  var grid = $("pf-grid");
   var esMobile = window.matchMedia("(max-width: 640px)");
   function activos(o) { return Object.keys(o).filter(function (k) { return o[k]; }); }
 
@@ -1037,39 +823,39 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   }
   // Lleva el indicador del selector al boton elegido. Sin animar: aparece ahi.
   function moverInd(seg, animar) {
-    var ind = seg.querySelector(".seg-ind"), b = seg.querySelector('button[aria-pressed="true"]');
+    var ind = seg.querySelector(".pf-selector__ind"), b = seg.querySelector('button[aria-pressed="true"]');
     if (!b || !b.offsetWidth) return;
-    if (!animar) ind.classList.add("quieto");
+    if (!animar) ind.classList.add("pf-quieto");
     ind.style.width = b.offsetWidth + "px";
     ind.style.transform = "translateX(" + b.offsetLeft + "px)";
-    if (!animar) { void ind.offsetWidth; ind.classList.remove("quieto"); }
+    if (!animar) { void ind.offsetWidth; ind.classList.remove("pf-quieto"); }
   }
-  function moverInds() { document.querySelectorAll(".seg").forEach(function (s) { moverInd(s, false); }); }
+  function moverInds() { document.querySelectorAll(".pf-selector").forEach(function (s) { moverInd(s, false); }); }
   function marcarVista(animar) {
-    document.querySelectorAll(".seg.vista button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.vista === vista)); });
-    moverInd(document.querySelector(".seg.vista"), animar);
+    document.querySelectorAll(".pf-selector.pf-vista button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.vista === vista)); });
+    moverInd(document.querySelector(".pf-selector.pf-vista"), animar);
   }
 
   function armarCols() {
     grid.innerHTML = ""; cols = [];
-    for (var i = 0, n = cuantasCols(); i < n; i++) { var c = document.createElement("div"); c.className = "gcol"; grid.appendChild(c); cols.push(c); }
+    for (var i = 0, n = cuantasCols(); i < n; i++) { var c = document.createElement("div"); c.className = "pf-gcol"; grid.appendChild(c); cols.push(c); }
   }
   function conArte(n) { return n.v || ((n.id * 2654435761) >>> 0) % 100 < 46; }
 
   function tarjeta(n, idx) {
     var q = plano(estado.q.trim());
     var b = document.createElement("button");
-    b.type = "button"; b.className = "card"; b.dataset.idx = idx;
-    b.style.viewTransitionName = "nota-" + n.id;
-    var when = '<p class="when"><b>' + fecha(n.f) + "</b></p>";
+    b.type = "button"; b.className = "pf-card"; b.dataset.idx = idx;
+    b.style.viewTransitionName = "pf-nota-" + n.id;
+    var when = '<p class="pf-when"><b>' + fecha(n.f) + "</b></p>";
     var h;
     if (conArte(n)) {
       var pr = PROP[n.id % PROP.length];
-      h = '<div class="media">' + arte(n, pr[0] * 60, pr[1] * 60, n.id * 7919 + 13) + etq(n.tp, { dato: n.anio }) +
-        (n.v ? '<span class="play"><svg viewBox="0 0 12 14"><path d="M0 0l12 7-12 7Z"/></svg></span>' : "") + "</div>" +
-        '<div class="meta">' + when + '<p class="ttl">' + resaltar(n.t, q) + "</p></div>";
+      h = '<div class="pf-media">' + arte(n, pr[0] * 60, pr[1] * 60, n.id * 7919 + 13) + etq(n.tp, { dato: n.anio }) +
+        (n.v ? '<span class="pf-play"><svg viewBox="0 0 12 14"><path d="M0 0l12 7-12 7Z"/></svg></span>' : "") + "</div>" +
+        '<div class="pf-meta">' + when + '<p class="pf-ttl">' + resaltar(n.t, q) + "</p></div>";
     } else {
-      h = '<div class="lead">' + etq(n.tp, { dato: n.anio }) + "<h3>" + resaltar(n.t, q) + '</h3></div><div class="meta">' + when + "</div>";
+      h = '<div class="pf-lead">' + etq(n.tp, { dato: n.anio }) + "<h3>" + resaltar(n.t, q) + '</h3></div><div class="pf-meta">' + when + "</div>";
     }
     b.innerHTML = h;
     b.setAttribute("aria-label", n.t + ". " + POR[n.tp].nombre + ", " + fecha(n.f, true));
@@ -1088,7 +874,7 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
     var objetivo = mantener ? Math.max(pintadas, TANDA) : TANDA;
     armarCols(); pintadas = 0;
     while (pintadas < Math.min(objetivo, lista.length)) pintarTanda();
-    $("empty").hidden = lista.length > 0;
+    $("pf-empty").hidden = lista.length > 0;
   }
 
   /* --- Años ----------------------------------------------------------------- */
@@ -1109,17 +895,17 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   }
   function pintarFiltros() {
     var ninguno = !activos(estado.tipos).length;
-    var todas = '<button type="button" class="lbl lbl-todas" data-f="todas" aria-pressed="' + ninguno + '">Todas</button>';
+    var todas = '<button type="button" class="pf-pastilla pf-pastilla--todas" data-f="todas" aria-pressed="' + ninguno + '">Todas</button>';
     function pill(x) {
-      return '<button type="button" class="lbl" style="--pc:' + x.f.bg + '" data-f="tipo" data-v="' + x.id + '" aria-pressed="' + !!estado.tipos[x.id] + '">' + x.nombre + "</button>";
+      return '<button type="button" class="pf-pastilla" style="--pc:' + x.f.bg + '" data-f="tipo" data-v="' + x.id + '" aria-pressed="' + !!estado.tipos[x.id] + '">' + x.nombre + "</button>";
     }
     // Barra: "Todas" y las tres categorias con mas notas (mas la activa, si es
     // otra). Panel: todas, en desktop y en mobile.
     var barra = TIPOS.filter(function (x) { return PRINCIPALES.indexOf(x.id) !== -1 || estado.tipos[x.id]; });
-    $("fTipos").innerHTML = todas + barra.map(pill).join("");
-    $("fTiposTodas").innerHTML = todas + TIPOS.map(pill).join("");
-    $("fAnios").innerHTML = ANIOS.map(function (a) {
-      return '<button type="button" class="sub sub-anio" data-f="anio" data-v="' + a + '" aria-pressed="' + !!estado.anios[a] + '">' + a + '<b class="n">' + contar("anio", a) + "</b></button>";
+    $("pf-fTipos").innerHTML = todas + barra.map(pill).join("");
+    $("pf-fTiposTodas").innerHTML = todas + TIPOS.map(pill).join("");
+    $("pf-fAnios").innerHTML = ANIOS.map(function (a) {
+      return '<button type="button" class="pf-chip" data-f="anio" data-v="' + a + '" aria-pressed="' + !!estado.anios[a] + '">' + a + '<b class="pf-chip__n">' + contar("anio", a) + "</b></button>";
     }).join("");
   }
   function resumen() {
@@ -1135,13 +921,13 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
     if (q) t += " con «" + esc(q) + "»";
     if (partes.length) t += " · " + esc(partes.join(" · "));
     if (!q && !partes.length) t = "Todas las notas · <b>" + lista.length + "</b>";
-    $("resultText").innerHTML = t;
-    $("qCount").textContent = lista.length;
+    $("pf-resultText").innerHTML = t;
+    $("pf-qCount").textContent = lista.length;
     var nf = activos(estado.tipos).length + as.length;
     var nsub = esMobile.matches ? nf : as.length;
-    $("fCount").hidden = nsub === 0; $("fCount").textContent = nsub;
-    $("fClear").hidden = nf === 0;
-    $("emptyText").textContent = q
+    $("pf-fCount").hidden = nsub === 0; $("pf-fCount").textContent = nsub;
+    $("pf-fClear").hidden = nf === 0;
+    $("pf-emptyText").textContent = q
       ? "Ninguna nota coincide con «" + q + "»" + (nf ? " con esos filtros" : "") + ". Probá con otra palabra o limpiá los filtros."
       : "Ninguna nota cumple esa combinación de filtros. Sacá alguno para ver más.";
   }
@@ -1150,31 +936,31 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   /* --- Eventos -------------------------------------------------------------- */
   esMobile.addEventListener("change", function () { resumen(); pintarFiltros(); });
   var tq;
-  $("q").addEventListener("input", function (e) { clearTimeout(tq); tq = setTimeout(function () { estado.q = e.target.value; aplicar(); }, 120); });
+  $("pf-q").addEventListener("input", function (e) { clearTimeout(tq); tq = setTimeout(function () { estado.q = e.target.value; aplicar(); }, 120); });
   // La X cierra el buscador y borra la busqueda (como Escape).
-  function cerrarBusca() { $("q").value = ""; estado.q = ""; aplicar(); abrirBusca(false); $("goSearch").focus(); }
-  $("qClose").addEventListener("click", cerrarBusca);
+  function cerrarBusca() { $("pf-q").value = ""; estado.q = ""; aplicar(); abrirBusca(false); $("pf-goSearch").focus(); }
+  $("pf-qClose").addEventListener("click", cerrarBusca);
   function abrirBusca(si) {
-    $("busca").classList.toggle("open", si);
-    $("nav").classList.toggle("buscando", si);
-    $("goSearch").setAttribute("aria-expanded", String(si));
-    $("q").tabIndex = si ? 0 : -1;
-    $("qClose").tabIndex = si ? 0 : -1;
-    if (si) setTimeout(function () { $("q").focus(); }, 60);
+    $("pf-busca").classList.toggle("pf-abierto", si);
+    $("pf-nav").classList.toggle("pf-buscando", si);
+    $("pf-goSearch").setAttribute("aria-expanded", String(si));
+    $("pf-q").tabIndex = si ? 0 : -1;
+    $("pf-qClose").tabIndex = si ? 0 : -1;
+    if (si) setTimeout(function () { $("pf-q").focus(); }, 60);
   }
-  $("goSearch").addEventListener("click", function () {
-    var abierta = $("busca").classList.contains("open");
+  $("pf-goSearch").addEventListener("click", function () {
+    var abierta = $("pf-busca").classList.contains("pf-abierto");
     if (!abierta) abrirBusca(true);
-    else if (!$("q").value) abrirBusca(false);
-    else $("q").focus();
+    else if (!$("pf-q").value) abrirBusca(false);
+    else $("pf-q").focus();
   });
-  $("q").addEventListener("blur", function () { setTimeout(function () { if (!$("q").value && document.activeElement !== $("q")) abrirBusca(false); }, 180); });
-  $("q").addEventListener("keydown", function (e) { if (e.key === "Escape") cerrarBusca(); });
+  $("pf-q").addEventListener("blur", function () { setTimeout(function () { if (!$("pf-q").value && document.activeElement !== $("pf-q")) abrirBusca(false); }, 180); });
+  $("pf-q").addEventListener("keydown", function (e) { if (e.key === "Escape") cerrarBusca(); });
   document.addEventListener("keydown", function (e) {
-    if (e.key === "/" && document.activeElement !== $("q") && !$("modal").open) { e.preventDefault(); abrirBusca(true); }
+    if (e.key === "/" && document.activeElement !== $("pf-q") && !$("pf-modal").open) { e.preventDefault(); abrirBusca(true); }
   });
   // La barra toma el azul cuando termina el carrusel.
-  function barraSolida() { $("top").classList.toggle("solid", window.scrollY > $("dest").offsetHeight - 80); }
+  function barraSolida() { $("pf-top").classList.toggle("pf-barra--solida", window.scrollY > $("pf-dest").offsetHeight - 80); }
   window.addEventListener("scroll", barraSolida, { passive: true });
   // Mobile: el dock de filtros se achica al bajar y vuelve al subir. Umbral de
   // unos px para que el rebote del scroll no lo haga titilar.
@@ -1183,13 +969,13 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
     var y = window.scrollY, dy = y - yAntes;
     if (Math.abs(dy) < 8) return;
     yAntes = y;
-    var f = $("filters");
-    if (!esMobile.matches || f.classList.contains("open")) { f.classList.remove("chica"); return; }
+    var f = $("pf-filters");
+    if (!esMobile.matches || f.classList.contains("pf-abierto")) { f.classList.remove("pf-chica"); return; }
     var alFinal = y + window.innerHeight >= document.documentElement.scrollHeight - 4;
-    f.classList.toggle("chica", dy > 0 && y > 40 && !alFinal);
+    f.classList.toggle("pf-chica", dy > 0 && y > 40 && !alFinal);
   }, { passive: true });
   barraSolida();
-  $("filters").addEventListener("click", function (e) {
+  $("pf-filters").addEventListener("click", function (e) {
     var b = e.target.closest("[data-f]"); if (!b) return;
     if (b.dataset.f === "todas") { estado.tipos = {}; aplicar(); return; }
     // Categoria: una sola a la vez (tocar la activa vuelve a "Todas"). Año: varios.
@@ -1197,9 +983,9 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
     else estado.anios[b.dataset.v] = !estado.anios[b.dataset.v];
     aplicar();
   });
-  function limpiar() { estado.tipos = {}; estado.anios = {}; estado.q = ""; $("q").value = ""; aplicar(); }
-  $("fClear").addEventListener("click", limpiar);
-  $("emptyReset").addEventListener("click", limpiar);
+  function limpiar() { estado.tipos = {}; estado.anios = {}; estado.q = ""; $("pf-q").value = ""; aplicar(); }
+  $("pf-fClear").addEventListener("click", limpiar);
+  $("pf-emptyReset").addEventListener("click", limpiar);
   // El panel anima su alto en px: se mide el alto final (con el ancho final,
   // sin transiciones y sin pintar), se arranca desde el actual y al terminar
   // queda en auto con scroll (.listo). Mientras dura, el contenido queda fijo
@@ -1207,48 +993,48 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   // cuadro mientras el panel se ensancha y la animacion se ve sucia.
   var tListo;
   function abrirFiltros(si) {
-    var f = $("filters"), b = $("fBody");
+    var f = $("pf-filters"), b = $("pf-fBody");
     clearTimeout(tListo);
     var desde = b.offsetHeight, anchoAhora = b.firstElementChild.offsetWidth;
     f.style.transition = b.style.transition = "none";
-    f.classList.remove("listo");
-    f.classList.toggle("open", si);
+    f.classList.remove("pf-listo");
+    f.classList.toggle("pf-abierto", si);
     b.style.height = "";
-    var hasta = si ? (f.classList.add("listo"), b.offsetHeight) : 0;
+    var hasta = si ? (f.classList.add("pf-listo"), b.offsetHeight) : 0;
     var ancho = si ? b.clientWidth : anchoAhora;
     b.firstElementChild.style.width = ancho + "px";
-    f.classList.remove("listo");
-    f.classList.toggle("open", !si);
+    f.classList.remove("pf-listo");
+    f.classList.toggle("pf-abierto", !si);
     b.style.height = desde + "px";
     void f.offsetWidth;
     f.style.transition = b.style.transition = "";
-    f.classList.toggle("open", si);
+    f.classList.toggle("pf-abierto", si);
     b.style.height = hasta + "px";
-    $("fToggle").setAttribute("aria-expanded", String(si));
+    $("pf-fToggle").setAttribute("aria-expanded", String(si));
     // Respaldo del transitionend (sin animacion, p. ej. con movimiento reducido).
     var dur = parseFloat(getComputedStyle(document.documentElement).getPropertyValue(si ? "--f-abrir" : "--f-cerrar")) || 420;
     tListo = setTimeout(terminar, dur + 60);
   }
   function terminar() {
-    var f = $("filters");
+    var f = $("pf-filters");
     clearTimeout(tListo);
-    $("fBody").style.height = "";
-    $("fBody").firstElementChild.style.width = "";
-    if (f.classList.contains("open")) f.classList.add("listo");
+    $("pf-fBody").style.height = "";
+    $("pf-fBody").firstElementChild.style.width = "";
+    if (f.classList.contains("pf-abierto")) f.classList.add("pf-listo");
   }
-  $("fBody").addEventListener("transitionend", function (e) { if (e.target === this && e.propertyName === "height") terminar(); });
-  $("fToggle").addEventListener("click", function () { abrirFiltros(!$("filters").classList.contains("open")); });
+  $("pf-fBody").addEventListener("transitionend", function (e) { if (e.target === this && e.propertyName === "height") terminar(); });
+  $("pf-fToggle").addEventListener("click", function () { abrirFiltros(!$("pf-filters").classList.contains("pf-abierto")); });
   abrirFiltros(false);
-  function ordenar(o) { estado.orden = o; $("sortNew").setAttribute("aria-pressed", String(o === "new")); $("sortOld").setAttribute("aria-pressed", String(o === "old")); moverInd(document.querySelector(".seg.orden"), true); aplicar(); }
-  $("sortNew").addEventListener("click", function () { ordenar("new"); });
-  $("sortOld").addEventListener("click", function () { ordenar("old"); });
+  function ordenar(o) { estado.orden = o; $("pf-sortNew").setAttribute("aria-pressed", String(o === "new")); $("pf-sortOld").setAttribute("aria-pressed", String(o === "old")); moverInd(document.querySelector(".pf-selector.pf-orden"), true); aplicar(); }
+  $("pf-sortNew").addEventListener("click", function () { ordenar("new"); });
+  $("pf-sortOld").addEventListener("click", function () { ordenar("old"); });
   if ("IntersectionObserver" in window) {
-    new IntersectionObserver(function (en) { if (en[0].isIntersecting && pintadas < lista.length) pintarTanda(); }, { rootMargin: "900px 0px" }).observe($("sentinel"));
+    new IntersectionObserver(function (en) { if (en[0].isIntersecting && pintadas < lista.length) pintarTanda(); }, { rootMargin: "900px 0px" }).observe($("pf-sentinel"));
   } else { TANDA = 1000; }
   var nCols = cuantasCols();
   window.addEventListener("resize", function () { moverInds(); var n = cuantasCols(); if (n !== nCols) { nCols = n; repintar(true); } });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(moverInds);
-  document.querySelector(".seg.vista").addEventListener("click", function (e) {
+  document.querySelector(".pf-selector.pf-vista").addEventListener("click", function (e) {
     var b = e.target.closest("[data-vista]"); if (!b || b.dataset.vista === vista) return;
     vista = b.dataset.vista;
     try { localStorage.setItem("novedades-vista", vista); } catch (err) {}
@@ -1265,7 +1051,7 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   moverInds();
 
   /* --- Detalle ---------------------------------------------------------------- */
-  var modal = $("modal");
+  var modal = $("pf-modal");
   var actual = -1;
   // ctx: la lista que recorren las flechas (la grilla filtrada o las destacadas).
   var ctx = lista;
@@ -1274,28 +1060,28 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
     actual = idx;
     var n = ctx[idx];
     var q = plano(estado.q.trim());
-    var h = '<div class="m-art">' + arte(n, 720, 300, n.id * 7919 + 13) + etq(n.tp, { dato: n.anio }) + "</div>";
-    h += '<div class="m-body"><p class="m-date">' + fecha(n.f, true) + "</p>";
-    h += '<h2 id="mTitle">' + resaltar(n.t, q) + "</h2>";
-    h += '<div><a class="btn" href="https://www.profertil.com.ar/index.php/' + esc(n.u) + '" target="_blank" rel="noopener">Ver la nota original <svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></a></div>';
-    if (n.b) h += '<p class="m-bajada">' + resaltar(n.b, q) + "</p>";
-    h += '<dl class="m-data">' +
+    var h = '<div class="pf-m-art">' + arte(n, 720, 300, n.id * 7919 + 13) + etq(n.tp, { dato: n.anio }) + "</div>";
+    h += '<div class="pf-m-body"><p class="pf-m-date">' + fecha(n.f, true) + "</p>";
+    h += '<h2 id="pf-mTitle">' + resaltar(n.t, q) + "</h2>";
+    h += '<div><a class="pf-boton pf-boton--verde" href="https://www.profertil.com.ar/index.php/' + esc(n.u) + '" target="_blank" rel="noopener">Ver la nota original <svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></a></div>';
+    if (n.b) h += '<p class="pf-m-bajada">' + resaltar(n.b, q) + "</p>";
+    h += '<dl class="pf-m-data">' +
       "<div><dt>Publicada</dt><dd>" + fecha(n.f) + "</dd></div>" +
       "<div><dt>Palabras</dt><dd>" + n.w.toLocaleString("es-AR") + "</dd></div>" +
       "<div><dt>Imágenes</dt><dd>" + n.i + (n.v ? " + video" : "") + "</dd></div>" +
       "<div><dt>Categoría</dt><dd>" + POR[n.tp].nombre + "</dd></div>" +
-      '<div class="ruta"><dt>Ruta actual</dt><dd>/index.php/' + esc(n.u) + "</dd></div></dl></div>";
-    $("mScroll").innerHTML = h;
-    $("mScroll").scrollTop = 0;
-    $("mPos").textContent = (idx + 1) + " / " + ctx.length;
-    $("mPrev").disabled = idx === 0;
-    $("mNext").disabled = idx === ctx.length - 1;
+      '<div class="pf-ruta"><dt>Ruta actual</dt><dd>/index.php/' + esc(n.u) + "</dd></div></dl></div>";
+    $("pf-mScroll").innerHTML = h;
+    $("pf-mScroll").scrollTop = 0;
+    $("pf-mPos").textContent = (idx + 1) + " / " + ctx.length;
+    $("pf-mPrev").disabled = idx === 0;
+    $("pf-mNext").disabled = idx === ctx.length - 1;
     if (!modal.open) modal.showModal();
   }
-  grid.addEventListener("click", function (e) { var c = e.target.closest(".card"); if (c) abrirNota(Number(c.dataset.idx), lista); });
-  $("mPrev").addEventListener("click", function () { if (actual > 0) abrirNota(actual - 1); });
-  $("mNext").addEventListener("click", function () { if (actual < ctx.length - 1) abrirNota(actual + 1); });
-  $("mClose").addEventListener("click", function () { modal.close(); });
+  grid.addEventListener("click", function (e) { var c = e.target.closest(".pf-card"); if (c) abrirNota(Number(c.dataset.idx), lista); });
+  $("pf-mPrev").addEventListener("click", function () { if (actual > 0) abrirNota(actual - 1); });
+  $("pf-mNext").addEventListener("click", function () { if (actual < ctx.length - 1) abrirNota(actual + 1); });
+  $("pf-mClose").addEventListener("click", function () { modal.close(); });
   modal.addEventListener("click", function (e) { if (e.target === modal) modal.close(); });
   modal.addEventListener("keydown", function (e) {
     if (e.key === "ArrowLeft" && actual > 0) abrirNota(actual - 1);
@@ -1310,7 +1096,7 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
      esconde, y al volver al principio de las notas quedan a mano el orden y
      los filtros). El rebote vive solo en el giro de la flecha; el circulo
      sigue al dock sin rebote y aparece y se aplasta con resortes amortiguados. */
-  var ancla = $("ancla"), cuerpo = ancla.firstElementChild, flecha = cuerpo.firstElementChild;
+  var ancla = $("pf-ancla"), cuerpo = ancla.firstElementChild, flecha = cuerpo.firstElementChild;
   var quieto = matchMedia("(prefers-reduced-motion: reduce)");
   // Resortes: masa 1, rigidez k, amortiguacion c. c = 2*raiz(k) no rebota.
   // Los valores son tokens del Figma Master (06 · Web, Web/Resorte/* y
@@ -1324,11 +1110,11 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
     q: R(1, tk("ancla-apretar-k"), tk("ancla-apretar-c")),   // aplaste al apretar, sin rebote
     r: R(90, tk("ancla-giro-k"), tk("ancla-giro-c"))          // giro: el unico que rebota
   };
-  function inicioLista() { return Math.max(0, document.querySelector("main").offsetTop - $("top").offsetHeight - 8); }
+  function inicioLista() { return Math.max(0, document.querySelector("main").offsetTop - $("pf-top").offsetHeight - 8); }
   function arriba() { return window.scrollY > inicioLista() + window.innerHeight * CAMBIO; }
   function medir() {
-    var f = $("filters"), r = f.getBoundingClientRect();
-    var fuera = f.classList.contains("fuera");
+    var f = $("pf-filters"), r = f.getBoundingClientRect();
+    var fuera = f.classList.contains("pf-fuera");
     M.s.t = fuera || modal.open || !lista.length ? 0 : 1;
     var sube = arriba();
     M.r.t = sube ? -90 : 90;
@@ -1357,7 +1143,7 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   ancla.addEventListener("pointercancel", soltarAncla);
   ancla.addEventListener("pointerleave", soltarAncla);
   ancla.addEventListener("click", function () {
-    if ($("filters").classList.contains("open")) abrirFiltros(false);
+    if ($("pf-filters").classList.contains("pf-abierto")) abrirFiltros(false);
     var suave = quieto.matches ? "auto" : "smooth";
     if (arriba()) window.scrollTo({ top: inicioLista(), behavior: suave });
     else window.scrollBy({ top: Math.round(window.innerHeight * BAJAR), behavior: suave });
@@ -1384,47 +1170,47 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
   // datos; mientras, fotos de banco de la marca para ver la composicion.
   var FOTOS_DEMO = [1, 2, 3, 4, 5].map(function (i) { return "../novedades/fotos/demo-" + i + ".webp"; });
   function flor() {
-    return '<svg viewBox="' + A.formas.flor.vb + '" aria-hidden="true"><use href="#f-flor" fill="currentColor"/></svg>';
+    return '<svg viewBox="' + A.formas.flor.vb + '" aria-hidden="true"><use href="#pf-forma-flor" fill="currentColor"/></svg>';
   }
   function escena(n, k) {
     var demo = FOTOS_DEMO[k % FOTOS_DEMO.length];
-    return '<div class="d-esc">' +
-      '<div class="d-capa d-atras"><div class="d-desliz">' + flor() + "</div></div>" +
-      '<div class="d-capa d-foto"><div class="d-desliz"><div class="d-recorte"><img class="carga" src="' + esc(n.img || demo) + '" data-demo="' + demo + '" alt="" decoding="async"' + (k ? ' loading="lazy"' : "") + "></div></div></div>" +
-      '<div class="d-capa d-frente"><div class="d-desliz">' + flor() + "</div></div></div>";
+    return '<div class="pf-d-esc">' +
+      '<div class="pf-d-capa pf-d-atras"><div class="pf-d-desliz">' + flor() + "</div></div>" +
+      '<div class="pf-d-capa pf-d-foto"><div class="pf-d-desliz"><div class="pf-d-recorte"><img class="pf-carga" src="' + esc(n.img || demo) + '" data-demo="' + demo + '" alt="" decoding="async"' + (k ? ' loading="lazy"' : "") + "></div></div></div>" +
+      '<div class="pf-d-capa pf-d-frente"><div class="pf-d-desliz">' + flor() + "</div></div></div>";
   }
   var FLECHA_CTA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
-  $("dSlides").innerHTML = dest.map(function (n, k) {
+  $("pf-dSlides").innerHTML = dest.map(function (n, k) {
     var c = PARES_DEST[k % PARES_DEST.length];
-    return '<article class="d-slide" role="group" aria-roledescription="nota" aria-label="' + (k + 1) + " de " + dest.length + '" inert style="--fondo:' + c[0] + ";--atras:" + c[1] + ";--frente:" + c[2] + '">' +
-      '<div class="d-art">' + escena(n, k) + "</div>" +
-      '<div class="d-txt"><div class="wrap"><div class="d-in">' +
-      '<div class="d-kick">' + etq(n.tp, { dato: fechaDato(n.f) }) + "</div>" +
-      "<h2" + (n.t.length > 80 ? ' class="largo"' : "") + ">" + esc(n.t) + "</h2>" +
-      (n.b ? '<p class="d-bajada">' + esc(n.b) + "</p>" : "") +
-      '<button class="d-cta" type="button" data-k="' + k + '">Leer la nota ' + FLECHA_CTA + "</button>" +
+    return '<article class="pf-d-slide" role="group" aria-roledescription="nota" aria-label="' + (k + 1) + " de " + dest.length + '" inert style="--fondo:' + c[0] + ";--atras:" + c[1] + ";--frente:" + c[2] + '">' +
+      '<div class="pf-d-art">' + escena(n, k) + "</div>" +
+      '<div class="pf-d-txt"><div class="pf-wrap"><div class="pf-d-in">' +
+      '<div class="pf-d-kick">' + etq(n.tp, { dato: fechaDato(n.f) }) + "</div>" +
+      "<h2" + (n.t.length > 80 ? ' class="pf-largo"' : "") + ">" + esc(n.t) + "</h2>" +
+      (n.b ? '<p class="pf-d-bajada">' + esc(n.b) + "</p>" : "") +
+      '<button class="pf-d-cta" type="button" data-k="' + k + '">Leer la nota ' + FLECHA_CTA + "</button>" +
       "</div></div></div></article>";
   }).join("");
-  $("dSegs").style.setProperty("--n", dest.length);
-  $("dSegs").innerHTML = dest.map(function (n, k) {
-    return '<button class="d-seg" type="button" data-k="' + k + '" aria-label="Ver destacada ' + (k + 1) + ": " + esc(n.t) + '">' +
-      '<span class="d-bar"><i></i></span></button>';
+  $("pf-dSegs").style.setProperty("--n", dest.length);
+  $("pf-dSegs").innerHTML = dest.map(function (n, k) {
+    return '<button class="pf-d-seg" type="button" data-k="' + k + '" aria-label="Ver destacada ' + (k + 1) + ": " + esc(n.t) + '">' +
+      '<span class="pf-d-bar"><i></i></span></button>';
   }).join("");
   // Las fotos aparecen con un fundido al cargar; si la de la nota falla, va la de prueba.
-  [].forEach.call($("dSlides").querySelectorAll(".d-foto img"), function (img) {
-    function lista() { img.classList.remove("carga"); }
+  [].forEach.call($("pf-dSlides").querySelectorAll(".pf-d-foto img"), function (img) {
+    function lista() { img.classList.remove("pf-carga"); }
     if (img.complete && img.naturalWidth) lista();
     img.addEventListener("load", lista);
     img.addEventListener("error", function () { if (img.getAttribute("src") !== img.dataset.demo) img.src = img.dataset.demo; });
   });
-  var slides = $("dSlides").children, segs = $("dSegs").children, dk = -1;
-  var barras = [].map.call(segs, function (s) { return s.querySelector(".d-bar i"); });
+  var slides = $("pf-dSlides").children, segs = $("pf-dSegs").children, dk = -1;
+  var barras = [].map.call(segs, function (s) { return s.querySelector(".pf-d-bar i"); });
   // Tiempos del carrusel: salen de los tokens (--carrusel-*), como el resto.
   var raiz = getComputedStyle(document.documentElement);
   var DURA = parseFloat(raiz.getPropertyValue("--carrusel-dura")) || 7000;
   var PASE = parseFloat(raiz.getPropertyValue("--carrusel-pase")) || 700;
   var CURVA = raiz.getPropertyValue("--carrusel-curva").trim() || "cubic-bezier(0.65, 0, 0.25, 1)";
-  var dEl = $("dest"), motivos = {}, pausado = false;
+  var dEl = $("pf-dest"), motivos = {}, pausado = false;
   function pausa(motivo, si) {
     motivos[motivo] = si;
     pausado = Object.keys(motivos).some(function (m) { return motivos[m]; });
@@ -1447,19 +1233,19 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
     transcurrido = 0;
     if (k === viejo) { poner(k, 0, true); return; }
     dir = dir || (k > viejo ? 1 : -1);
-    for (var i = 0; i < slides.length; i++) if (i !== viejo && i !== k) slides[i].classList.remove("vis");
+    for (var i = 0; i < slides.length; i++) if (i !== viejo && i !== k) slides[i].classList.remove("pf-vis");
     if (!yaPuesta) poner(k, dir, false);
-    slides[k].classList.add("vis");
+    slides[k].classList.add("pf-vis");
     void slides[k].offsetWidth;
     poner(k, 0, viejo >= 0);
-    slides[k].classList.add("on"); slides[k].inert = false;
+    slides[k].classList.add("pf-on"); slides[k].inert = false;
     if (viejo >= 0) {
       poner(viejo, -dir, true);
-      slides[viejo].classList.remove("on"); slides[viejo].inert = true;
-      setTimeout(function () { if (viejo !== dk && !arrastre) slides[viejo].classList.remove("vis"); }, PASE + 40);
+      slides[viejo].classList.remove("pf-on"); slides[viejo].inert = true;
+      setTimeout(function () { if (viejo !== dk && !arrastre) slides[viejo].classList.remove("pf-vis"); }, PASE + 40);
     }
     for (var j = 0; j < segs.length; j++) {
-      segs[j].classList.toggle("on", j === k);
+      segs[j].classList.toggle("pf-on", j === k);
       if (j === k) segs[j].setAttribute("aria-current", "true"); else segs[j].removeAttribute("aria-current");
     }
     dk = k;
@@ -1480,10 +1266,10 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
     }
     requestAnimationFrame(tic);
   }
-  $("dSegs").addEventListener("click", function (e) { var b = e.target.closest(".d-seg"); if (b) irA(Number(b.dataset.k)); });
-  $("dPrev").addEventListener("click", function () { irA(dk - 1, -1); });
-  $("dNext").addEventListener("click", function () { irA(dk + 1, 1); });
-  $("dSlides").addEventListener("click", function (e) { var b = e.target.closest(".d-cta"); if (b) abrirNota(Number(b.dataset.k), dest); });
+  $("pf-dSegs").addEventListener("click", function (e) { var b = e.target.closest(".pf-d-seg"); if (b) irA(Number(b.dataset.k)); });
+  $("pf-dPrev").addEventListener("click", function () { irA(dk - 1, -1); });
+  $("pf-dNext").addEventListener("click", function () { irA(dk + 1, 1); });
+  $("pf-dSlides").addEventListener("click", function (e) { var b = e.target.closest(".pf-d-cta"); if (b) abrirNota(Number(b.dataset.k), dest); });
   dEl.addEventListener("focusin", function (e) { if (e.target.matches(":focus-visible")) pausa("foco", true); });
   dEl.addEventListener("focusout", function (e) { if (!dEl.contains(e.relatedTarget)) pausa("foco", false); });
   dEl.addEventListener("keydown", function (e) {
@@ -1498,7 +1284,7 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
      pausa; en touch, arrastrar de costado mueve la placa con el dedo. */
   var arrastre = null;
   dEl.addEventListener("pointerdown", function (e) {
-    if (e.button > 0 || e.target.closest("button, a, .d-nav")) return;
+    if (e.button > 0 || e.target.closest("button, a, .pf-d-nav")) return;
     arrastre = { x0: e.clientX, y0: e.clientY, t0: Date.now(), dx: 0, mueve: false, vecino: -1, touch: e.pointerType !== "mouse" };
     pausa("toque", true);
   });
@@ -1512,10 +1298,10 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
       try { dEl.setPointerCapture(e.pointerId); } catch (err) {}
     }
     var dir = a.dx < 0 ? 1 : -1, v = rot(dk + dir);
-    if (a.vecino !== v && a.vecino !== -1 && a.vecino !== dk) slides[a.vecino].classList.remove("vis");
+    if (a.vecino !== v && a.vecino !== -1 && a.vecino !== dk) slides[a.vecino].classList.remove("pf-vis");
     a.vecino = v; a.dir = dir;
     poner(dk, a.dx / dEl.clientWidth, false);
-    if (v !== dk) { slides[v].classList.add("vis"); poner(v, dir + a.dx / dEl.clientWidth, false); }
+    if (v !== dk) { slides[v].classList.add("pf-vis"); poner(v, dir + a.dx / dEl.clientWidth, false); }
   });
   function soltar(e, cancelar) {
     var a = arrastre; if (!a) return;
@@ -1527,7 +1313,7 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
       if (!cancelar && (Math.abs(a.dx) > dEl.clientWidth * 0.2 || rapido)) irA(a.vecino, a.dir, true);
       else {
         poner(dk, 0, true);
-        if (a.vecino !== dk) { poner(a.vecino, a.dir, true); var v = a.vecino; setTimeout(function () { if (v !== dk) slides[v].classList.remove("vis"); }, PASE + 40); }
+        if (a.vecino !== dk) { poner(a.vecino, a.dir, true); var v = a.vecino; setTimeout(function () { if (v !== dk) slides[v].classList.remove("pf-vis"); }, PASE + 40); }
       }
       return;
     }
@@ -1544,8 +1330,8 @@ dialog.modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: blu
       var r = en[0].intersectionRatio;
       pausa("vista", r < 0.25);
       var tapa = en[0].isIntersecting && r > 0.4;
-      if (tapa && $("filters").classList.contains("open")) abrirFiltros(false);
-      $("filters").classList.toggle("fuera", tapa);
+      if (tapa && $("pf-filters").classList.contains("pf-abierto")) abrirFiltros(false);
+      $("pf-filters").classList.toggle("pf-fuera", tapa);
     }, { threshold: [0, 0.25, 0.4, 0.6, 1] }).observe(dEl);
   }
   irA(0);

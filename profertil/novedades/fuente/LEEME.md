@@ -8,7 +8,14 @@
   sitio actual (`urls.csv`, en Drive).
 - `assets.json`: las 18 formas oficiales del sistema.
 - `tokens.json`: colores, escalas y tiempos de animacion. Salen del Figma
-  Master; `build.py` arma con eso el `:root` de la pagina.
+  Master. Desde el 23/10/2026 la pagina no arma su propio `:root`: carga
+  `../componentes/tokens.css` (que sale de este archivo con
+  `componentes/fuente/generar-tokens.py`) y `../componentes/base.css`, las
+  piezas compartidas con la libreria de componentes (Barra, Selector,
+  Pastilla, Chip, Etiqueta, Boton). Si cambia un token: exportar
+  tokens.json, correr generar-tokens.py y despues build.py.
+- Toda clase, id y animacion lleva el prefijo `pf-` (regla de todo el
+  sistema web; ver arriba de `componentes/base.css`).
 - `logo-blanco.svg`, `simbolo-color.svg`: exportados del Figma Master.
 - El hero es un carrusel a pantalla completa con las 5 notas mas recientes.
   Para elegir otras, cargar sus rutas (`u`) en `DESTACADAS`, en

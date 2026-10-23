@@ -330,10 +330,10 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
     r.setProperty("--f-flecha", v.flecha * k + "ms");
     if (v.ancho) r.setProperty("--f-ancho-cerrado", "min(100% - 48px, 380px)"); else r.removeProperty("--f-ancho-cerrado");
   }
-  function abierto() { var d = doc(); return !!(d && d.getElementById("filters") && d.getElementById("filters").classList.contains("open")); }
+  function abierto() { var d = doc(); return !!(d && d.getElementById("pf-filters") && d.getElementById("pf-filters").classList.contains("pf-abierto")); }
   function alternar() {
     var d = doc(); if (!d) return;
-    var b = d.getElementById("fToggle"); if (!b) return;
+    var b = d.getElementById("pf-fToggle"); if (!b) return;
     if (!abierto()) correrBola();
     b.click();
     $("estado").textContent = abierto() ? "Abierto" : "Cerrado";
@@ -361,7 +361,7 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
   frame.addEventListener("load", alCargar);
   (function esperar() {
     var d = doc();
-    if (d && d.readyState === "complete" && d.getElementById("fToggle")) alCargar();
+    if (d && d.readyState === "complete" && d.getElementById("pf-fToggle")) alCargar();
     else if (!alCargar.listo) setTimeout(esperar, 150);
   })();
 

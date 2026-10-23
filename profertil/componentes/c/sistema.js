@@ -30,12 +30,12 @@
     },
     /* Barra de navegación (Web/Barra navegación): logo, menú en cápsula de vidrio y lupa. */
     barra: function (items, actual) {
-      return '<header class="pf-barra"><nav class="pf-barra__nav" aria-label="Sitio">' +
+      return '<header class="pf-barra pf-barra--solida"><div class="pf-barra__in"><nav class="pf-barra__nav" aria-label="Sitio">' +
         '<a class="pf-barra__logo" href="#" aria-label="Profertil">' + LOGO_BLANCO.replace("<svg", '<svg aria-hidden="true"') + '</a>' +
-        '<div class="pf-barra__menu">' + items.map(function (it) {
+        '<div class="pf-barra__menu pf-barra__menu--deslizable">' + items.map(function (it) {
           return '<button type="button" data-ir="' + it[0] + '"' + (it[0] === actual ? ' aria-current="page"' : '') + '>' + it[1] + '</button>'; }).join("") + '</div>' +
-        '<span class="pf-barra__lupa" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></span>' +
-        '</nav></header>';
+        '<div class="pf-barra__busca"><span class="pf-barra__lupa" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></span></div>' +
+        '</nav></div></header>';
     }
   };
 })();
