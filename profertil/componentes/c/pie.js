@@ -15,17 +15,17 @@
     variantes: [
       ["institucional", "Institucional", "La base: fondo de color, logo y bajada arriba, cuatro columnas, línea ética y legales."],
       ["trigo", "Con trigo", "Fondo tiza y el trigo del sistema en amarillo pleno, a la izquierda, que sube más lento que la página."],
-      ["vida", "Vida para nuestra tierra", "Alto de pantalla completa con un video de campo en loop de fondo y un filtro negro parejo. La frase va abajo a la izquierda, a tamaño de título, y nace desde el borde con el scroll."]
+      ["vida", "Vida para nuestra tierra", "Alto de pantalla completa con un video de campo en loop de fondo y un filtro negro parejo. La frase va abajo a la izquierda, a tamaño de título, y entra con el animador Ventana."]
     ],
     tamano: "media",
-    claves: ["La línea ética va siempre en el pie, destacada, con su propio llamado.", "Los fondos de color son solo los del Master (azul, verde, terra, amarillo); sobre amarillo el texto va en azul.", "El logo va siempre completo: no se recorta ni se separa el símbolo de la palabra.", "Las columnas repiten el menú principal: si cambia la arquitectura, cambia el pie.", "Con trigo y Vida para nuestra tierra tienen parallax: el trigo y la foto se mueven a otra velocidad que la página mientras el pie entra en pantalla.", "Vida para nuestra tierra ocupa una pantalla entera. La frase va alineada a la izquierda junto a la línea ética, y cada línea sube desde el borde de abajo atada al scroll, una después de la otra.", "Nunca degradados sobre la foto (ni de color ni de tinta). Si hace falta contraste, un filtro negro parejo."],
+    claves: ["La línea ética va siempre en el pie, destacada, con su propio llamado.", "Los fondos de color son solo los del Master (azul, verde, terra, amarillo); sobre amarillo el texto va en azul.", "El logo va siempre completo: no se recorta ni se separa el símbolo de la palabra.", "Las columnas repiten el menú principal: si cambia la arquitectura, cambia el pie.", "Con trigo y Vida para nuestra tierra tienen parallax: el trigo y la foto se mueven a otra velocidad que la página mientras el pie entra en pantalla.", "Vida para nuestra tierra ocupa una pantalla entera. La frase va alineada a la izquierda junto a la línea ética, y entra con el animador Ventana, palabra por palabra.", "Nunca degradados sobre la foto (ni de color ni de tinta). Si hace falta contraste, un filtro negro parejo."],
     accesibilidad: "Es un <footer> con listas de links reales. El trigo es decorativo (aria-hidden); el video es decorativo, mudo y sin controles; la frase es texto real, legible por lectores y buscadores. Con movimiento reducido no hay parallax y el video queda quieto en el primer cuadro.",
     previo: '<div style="height:80vh;display:grid;place-items:center;color:var(--ink-3);font-size:var(--texto-chico)">Final de la página</div>',
     controles: [
       { id: "fondo", tipo: "seg", etiqueta: "Fondo", solo: ["institucional"], def: "azul", aplica: { attr: "data-fondo" }, opciones: [["azul", "Azul"], ["verde", "Verde"], ["terra", "Terra"], ["amarillo", "Amarillo"]], desc: "Color de fondo y tinta que va encima." },
       { id: "filtro", tipo: "rango", etiqueta: "Filtro negro", solo: ["vida"], unidad: "%", min: 0, max: 70, def: 26, aplica: { var: "--filtro" }, desc: "Negro parejo sobre toda la foto para que el texto en tiza se lea. Sin degradado." },
       { id: "frase", tipo: "rango", etiqueta: "Frase", solo: ["vida"], unidad: "px", min: 32, max: 140, def: 100, aplica: { var: "--frase", unidad: "px" }, desc: "Cuerpo de Vida para nuestra tierra. En pantallas chicas no pasa del 14% del ancho." },
-      { id: "par", tipo: "rango", etiqueta: "Parallax", solo: ["trigo", "vida"], unidad: "%", min: 0, max: 40, def: 22, aplica: { var: "--par" }, desc: "Cuánto se corre el trigo o el video mientras entra el pie; en Vida, también cuánto sube la frase." },
+      { id: "par", tipo: "rango", etiqueta: "Parallax", solo: ["trigo", "vida"], unidad: "%", min: 0, max: 40, def: 22, aplica: { var: "--par" }, desc: "Cuánto se corre el trigo o el video mientras entra el pie. En Vida, solo el video." },
       "---",
       { id: "radio", tipo: "rango", etiqueta: "Radio de arriba", unidad: "px", min: 0, max: 56, def: 26, aplica: { var: "--radio", unidad: "px" }, desc: "Radio de las esquinas de arriba." },
       { id: "logo", tipo: "rango", etiqueta: "Logo", unidad: "px", min: 80, max: 260, def: 150, aplica: { var: "--logo", unidad: "px" }, desc: "Ancho del logo completo." },
@@ -85,11 +85,9 @@
         '.pf-pie[data-variante="vida"] .pf-pie__etica { flex: 0 1 560px; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }',
         "/* La frase: tiza, a tamaño de título y alineada a la izquierda. */",
         '.pf-pie__vida { margin: 0; font: 500 min(var(--frase), 14vw)/.92 var(--f-display); letter-spacing: -.035em; color: var(--tiza); text-align: left; }',
-        "/* Cada línea en su ventana: sube desde abajo atada al scroll (--q: 0 cuando al pie le falta 0,7 pantalla para terminar, 1 al final), la segunda un poco después. El padding deja lugar a la p de para. */",
-        '.pf-pie__vida-l { display: block; overflow: clip; padding: .04em 0 .12em; margin-bottom: -.12em; }',
-        '.pf-pie__vida-l > span { display: inline-block; transform: translate3d(0, calc((1 - var(--v)) * (100% + var(--par) * 2%)), 0); will-change: transform; }',
-        '.pf-pie__vida-l:nth-child(1) > span { --v: clamp(0, calc(var(--q, 1) / .7), 1); }',
-        '.pf-pie__vida-l:nth-child(2) > span { --v: clamp(0, calc((var(--q, 1) - .2) / .7), 1); }',
+        "/* Entra con el animador Ventana (animadores.css y animadores.js), palabra por palabra al aparecer en pantalla.",
+        "   El animador rearma el texto por palabras: el ancho máximo es lo que corta en Vida para / nuestra tierra. */",
+        '.pf-pie__vida { max-width: 6.6em; }',
         '.pf-pie[data-variante="vida"] .pf-pie__legal { border-top-color: color-mix(in srgb, var(--tiza) 30%, transparent); color: var(--tiza); }',
         "",
         "@media (max-width: 760px) {",
@@ -98,7 +96,7 @@
         "  .pf-pie[data-variante=\"trigo\"] .pf-pie__in { grid-template-columns: 1fr; } .pf-pie[data-variante=\"trigo\"] .pf-pie__der { grid-column: 1; padding-top: 34vw; }",
         "  .pf-pie__trigo { height: auto; width: 46vw; left: auto; right: -6vw; bottom: auto; top: -3vw; }",
         "}",
-        "@media (prefers-reduced-motion: reduce) { .pf-pie { --p: 1 !important; --q: 1 !important; } }"
+        "@media (prefers-reduced-motion: reduce) { .pf-pie { --p: 1 !important; } }"
       ].join("\n");
     },
     html: function (s) {
@@ -110,7 +108,7 @@
         ? '  <div class="pf-pie__etica"><div><b>Línea ética</b><span>Confidencial y anónima. Atiende un tercero independiente.</span></div><a class="pf-pie__pill" href="#">Hacer una denuncia</a></div>\n'
         : '';
       var legal = '  <div class="pf-pie__legal"><span>© 2026 Profertil S.A. Todos los derechos reservados.</span><nav><a href="#">Privacidad</a><a href="#">Términos de uso</a><a href="#">LinkedIn</a><a href="#">Instagram</a></nav></div>\n';
-      var cab = '  <div class="pf-pie__cab"><div><a class="pf-pie__logo" href="#" aria-label="Profertil">' + logo + '</a><p>Nutrientes para el campo argentino, desde Bahía Blanca.</p></div><a class="pf-pie__pill" href="#">Contacto</a></div>\n';
+      var cab = '  <div class="pf-pie__cab"><div><a class="pf-pie__logo" href="#" aria-label="Profertil">' + logo + '</a><p>Vida para nuestra tierra</p></div><a class="pf-pie__pill" href="#">Contacto</a></div>\n';
       var h = '<footer class="pf-pie" data-c="footer">\n';
       if (v === "trigo") h += '<div class="pf-pie__trigo" aria-hidden="true">' + formaSVG("trigo") + '</div>\n';
       if (v === "vida") h += '<div class="pf-pie__foto" aria-hidden="true"><video autoplay muted loop playsinline preload="metadata" poster="media/pie-campo.jpg"><source src="media/pie-campo.mp4" type="video/mp4"></video></div>\n';
@@ -118,7 +116,7 @@
       if (v === "institucional") h += cab + cols + etica + legal;
       if (v === "trigo") h += ' <div class="pf-pie__der">\n' + cab + cols + etica + legal + ' </div>\n';
       if (v === "vida") h += '  <div class="pf-pie__arriba">\n  <a class="pf-pie__logo" href="#" aria-label="Profertil">' + logo + '</a>\n' + cols + '  </div>\n' +
-        '  <div class="pf-pie__abajo">\n  <p class="pf-pie__vida"><span class="pf-pie__vida-l"><span>Vida para</span></span><span class="pf-pie__vida-l"><span>nuestra tierra</span></span></p>\n' + etica + '  </div>\n' + legal;
+        '  <div class="pf-pie__abajo">\n  <p class="pf-pie__vida" data-anim="ventana">Vida para nuestra tierra</p>\n' + etica + '  </div>\n' + legal;
       return h + '</div>\n</footer>';
     },
     js: function (s) {
@@ -137,7 +135,6 @@
           pedido = false;
           var r = pie.getBoundingClientRect(), p = Math.min(1, Math.max(0, (innerHeight - r.top) / r.height));
           pie.style.setProperty("--p", p.toFixed(4));
-          pie.style.setProperty("--q", Math.min(1, Math.max(0, 1 - (r.bottom - innerHeight) / (innerHeight * .7))).toFixed(4));
         }
         addEventListener("scroll", function () { if (!pedido) { pedido = true; requestAnimationFrame(tic); } }, { passive: true });
         addEventListener("resize", tic); tic();
