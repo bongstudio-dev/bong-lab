@@ -51,6 +51,29 @@
   filtros") y componente interactivo `Web/Ancla` (seccion Filtros), con sus
   estados y transiciones; esta puesto en los prototipos de Novedades.
 
+## Página de Nota
+
+`../nota/index.html` es la plantilla de una nota: `nota/?n=<ar>` (sin
+parámetro, la más reciente). Sale de `nota.html` con el mismo `build.py`, que
+le copia de `template.html` el bloque entre `@comun` y `@fin-comun` (tipos,
+etiquetas, arte de tarjeta), y le suma notas.json, las formas, el logo y el
+pie de la librería (componente Pie de página, variante Institucional, que
+`build.py` arma con node desde `../../componentes/c/pie.js`). El texto de cada
+nota lo lee al abrir de `../notas/<ar>.json`.
+
+- Cabecera de color por tipo de nota (solo fondos del Master: azul, verde,
+  terra) con dos Flores del sistema, etiqueta con fecha, antetítulo, título,
+  bajada, lugar y tiempo de lectura.
+- Foto principal entera, sin recorte, con esquinas de hoja, montada sobre el
+  borde de la cabecera. Una foto chica no se estira más de 1,5 veces. Si la
+  nota no tiene foto, la cabecera cierra antes y sigue el texto.
+- Cuerpo a una columna de lectura; al costado (fijo al bajar) los datos, los
+  temas (etiquetas de WordPress, cada una lleva a Novedades con esa búsqueda:
+  `../#q=tema`), compartir y "Ver la nota original".
+- Nota anterior y siguiente (por fecha) y tres relacionadas: comparten temas,
+  cultivo, pilar o tipo; a igual puntaje, la más cercana en el tiempo.
+- Sin sombras: las cajas se separan del fondo por el color.
+
 Regenerar la página:
 
 ```bash

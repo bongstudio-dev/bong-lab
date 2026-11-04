@@ -609,6 +609,7 @@ dialog.pf-modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: 
   var NOTAS = /*__NOTAS__*/[];
   var A = /*__ASSETS__*/{};
 
+  /* @comun: este bloque (hasta @fin-comun) lo usa también la página de Nota; build.py lo copia. */
   // Formas e iconos oficiales a <symbol>, una sola vez.
   var defs = document.getElementById("pf-defs");
   var simbolos = "";
@@ -763,6 +764,8 @@ dialog.pf-modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: 
     return "<" + tag + ' class="pf-etiqueta ' + (o.cls || "") + '" style="' + vars(x) + '"' + (o.attrs || "") + ">" + badge(x) +
       '<span class="pf-etiqueta__rotulo">' + (x.corto ? '<span class="pf-etiqueta__completo">' + x.nombre + '</span><span class="pf-etiqueta__corto">' + x.corto + "</span>" : x.nombre) + "</span>" + (o.dato != null ? '<span class="pf-etiqueta__dato">' + o.dato + "</span>" : "") + (o.flecha ? FLECHA : "") + "</" + tag + ">";
   }
+
+  /* @fin-comun */
 
   /* --- Estado ------------------------------------------------------------- */
   var estado = { q: "", tipos: {}, anios: {}, orden: "new" };
@@ -1323,5 +1326,13 @@ dialog.pf-modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: 
   requestAnimationFrame(tic);
 
   aplicar();
+
+  // Desde la página de Nota: #q=texto abre el buscador con esa búsqueda y baja a la lista.
+  var pedido = decodeURIComponent(location.hash.slice(1));
+  if (pedido.indexOf("q=") === 0 && pedido.length > 2) {
+    $("pf-q").value = estado.q = pedido.slice(2);
+    aplicar(); abrirBusca(true);
+    window.scrollTo({ top: inicioLista(), behavior: "instant" });
+  }
 })();
 </script>
