@@ -1131,7 +1131,13 @@ dialog.pf-modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: 
   /* --- Destacadas ---------------------------------------------------------------
      Cinco notas a pantalla completa. Por defecto, las mas recientes; si
      DESTACADAS trae rutas (n.u), mandan esas, en ese orden. */
-  var DESTACADAS = [];
+  var DESTACADAS = [
+    "noticias-recientes/profertil-recibio-a-su-visitante-numero-60-000",
+    "noticias-recientes/donacion-al-cfp-n401-que-fortalece-la-formacion-en-oficios",
+    "noticias-recientes/somos-profertil/nueva-edicion-del-programa-de-becas-educar-para-transformar",
+    "noticias-recientes/profertil-fue-reconocida-con-3-premios-dircoms",
+    "noticias-recientes/laboratorios-quimica"
+  ];
   var dest = DESTACADAS.length
     ? DESTACADAS.map(function (u) { return NOTAS.filter(function (n) { return n.u === u; })[0]; }).filter(Boolean)
     : NOTAS.slice(-5).reverse();

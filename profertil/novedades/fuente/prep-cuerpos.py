@@ -325,7 +325,14 @@ def bajar_destacadas(notas, cuantas=5):
     import subprocess, tempfile
     carpeta = os.path.join(AQUI, '..', 'fotos', 'notas')
     os.makedirs(carpeta, exist_ok=True)
-    for n in [n for n in notas if n.get('img')][-cuantas:]:
+    # Las del header: las rutas de DESTACADAS en template.html o, si esta
+    # vacia, las mas recientes (igual que la pagina).
+    tpl = open(os.path.join(AQUI, 'template.html'), encoding='utf-8').read()
+    m = re.search(r'var DESTACADAS = \[(.*?)\];', tpl, re.S)
+    rutas = re.findall(r'"([^"]+)"', m.group(1)) if m else []
+    por_ruta = {n['u']: n for n in notas}
+    elegidas = [por_ruta[r] for r in rutas if r in por_ruta] or [n for n in notas if n.get('img')][-cuantas:]
+    for n in elegidas:
         dest = os.path.join(carpeta, n['ar'] + '.webp')
         if not os.path.exists(dest):
             url = n.get('imgG') or n['img']

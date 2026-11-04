@@ -26,9 +26,9 @@
 - La foto de cada placa es la de la nota: primero la copia local `n.imgL`
   (`../fotos/notas/`, WebP), despues la grande del sitio actual `n.imgG` y la
   principal `n.img`. Si ninguna carga, va una foto de banco de
-  `../fotos/demo-*.webp`. Ojo: muchas notas usan de foto principal un flyer
-  con texto encima, que recortado en la hoja no funciona; para el header
-  conviene elegir notas con foto (cargarlas en `DESTACADAS`).
+  `../fotos/demo-*.webp`. La placa recorta la foto en la hoja, asi que pide
+  una foto sin texto encima. `prep-cuerpos.py` baja la foto de las notas
+  cargadas en `DESTACADAS`.
 - `../campo.webp` y `../campo-m.webp` (la foto de campo del header anterior,
   sacada de `01 Profertil/Caso de Estudio/Animacion/Editables/Assets/Imagenes/`
   con `cwebp -q 70 -resize <ancho> 0`) hoy no se usan.
