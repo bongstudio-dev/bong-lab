@@ -23,10 +23,12 @@
   dos Flores del sistema enormes (atras y adelante), con parallax: ver
   "Header de noticias · con foto" en el Figma Master. Los colores de cada
   placa estan en `PARES_DEST`.
-- La foto sale de `n.img` (URL absoluta de la foto principal en el sitio
-  actual). Todavia no esta en `notas.json`: hay que sumarla en `prep.py` desde
-  el crawl. Mientras, cada placa usa una foto de banco de la marca de
-  `../fotos/demo-*.webp` (sacadas de la maqueta de mascaras, WebP q72).
+- La foto de cada placa es la de la nota: primero la copia local `n.imgL`
+  (`../fotos/notas/`, WebP), despues la grande del sitio actual `n.imgG` y la
+  principal `n.img`. Si ninguna carga, va una foto de banco de
+  `../fotos/demo-*.webp`. Ojo: muchas notas usan de foto principal un flyer
+  con texto encima, que recortado en la hoja no funciona; para el header
+  conviene elegir notas con foto (cargarlas en `DESTACADAS`).
 - `../campo.webp` y `../campo-m.webp` (la foto de campo del header anterior,
   sacada de `01 Profertil/Caso de Estudio/Animacion/Editables/Assets/Imagenes/`
   con `cwebp -q 70 -resize <ancho> 0`) hoy no se usan.
@@ -60,6 +62,22 @@ Rehacer `notas.json` desde el crawl:
 ```bash
 URLS_CSV=/ruta/a/urls.csv python3 profertil/novedades/fuente/prep.py
 ```
+
+Despues, sumarle texto y fotos de cada nota (lee el HTML guardado por el crawl,
+`relevamiento-profertil/data`):
+
+```bash
+CRAWL=/ruta/a/relevamiento-profertil/data python3 profertil/novedades/fuente/prep-cuerpos.py
+```
+
+Agrega a cada nota de `notas.json`: `img` (foto principal), `imgG` (la mas
+grande, si la principal es una miniatura), `imgL` (copia local, solo las 5 del
+header), `et` (etiquetas de WordPress), `ca` (categorias), `lg` (lugar) y `ar`
+(nombre de su archivo). Y escribe `../notas/<ar>.json` con la nota completa:
+antetitulo, bajada, fecha y hora, fotos y el cuerpo como HTML limpio (p,
+subtitulos, listas, citas, links, fotos con epigrafe, tablas y videos), sin
+clases ni estilos del theme actual. Es una copia fija del sitio, no se
+conecta en vivo. `SIN_FOTOS=1` saltea la bajada de fotos.
 
 ## Tokens: Figma manda
 

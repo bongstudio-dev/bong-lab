@@ -1145,8 +1145,8 @@ dialog.pf-modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: 
     ["#2D8035", "#EABA2C", "#5EB53A"],
     ["#003DA5", "#4086FF", "#EABA2C"]
   ];
-  // Foto: la de la nota (n.img, la URL en el sitio actual) cuando este en los
-  // datos; mientras, fotos de banco de la marca para ver la composicion.
+  // Foto: la de la nota. Primero la copia local (n.imgL), despues la grande del
+  // sitio actual (n.imgG) y la principal (n.img); si ninguna carga, una de banco.
   var FOTOS_DEMO = [1, 2, 3, 4, 5].map(function (i) { return "../novedades/fotos/demo-" + i + ".webp"; });
   function flor() {
     return '<svg viewBox="' + A.formas.flor.vb + '" aria-hidden="true"><use href="#pf-forma-flor" fill="currentColor"/></svg>';
@@ -1155,7 +1155,7 @@ dialog.pf-modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: 
     var demo = FOTOS_DEMO[k % FOTOS_DEMO.length];
     return '<div class="pf-d-esc">' +
       '<div class="pf-d-capa pf-d-atras"><div class="pf-d-desliz">' + flor() + "</div></div>" +
-      '<div class="pf-d-capa pf-d-foto"><div class="pf-d-desliz"><div class="pf-d-recorte"><img class="pf-carga" src="' + esc(n.img || demo) + '" data-demo="' + demo + '" alt="" decoding="async"' + (k ? ' loading="lazy"' : "") + "></div></div></div>" +
+      '<div class="pf-d-capa pf-d-foto"><div class="pf-d-desliz"><div class="pf-d-recorte"><img class="pf-carga" src="' + esc(n.imgL || n.imgG || n.img || demo) + '" data-demo="' + demo + '" alt="" decoding="async"' + (k ? ' loading="lazy"' : "") + "></div></div></div>" +
       '<div class="pf-d-capa pf-d-frente"><div class="pf-d-desliz">' + flor() + "</div></div></div>";
   }
   var FLECHA_CTA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
