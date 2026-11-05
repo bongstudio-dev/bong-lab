@@ -269,10 +269,13 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
 .pf-pie__logo { display: block; width: var(--logo); }
 .pf-pie__logo svg { display: block; width: 100%; height: auto; }
 .pf-pie__cols { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
-.pf-pie__etica { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding: 18px 22px; border-radius: 18px; background: color-mix(in srgb, currentColor 9%, transparent); }
-.pf-pie__etica b { font: 500 var(--texto-subtitulo)/1.1 var(--f-display); letter-spacing: -.02em; }
-.pf-pie__etica span { display: block; margin-top: 4px; font-size: var(--texto-chico); opacity: .75; }
-.pf-pie__pill { display: inline-flex; align-items: center; height: 44px; padding: 0 20px; border-radius: 999px; background: var(--pie-tinta, var(--azul)); color: var(--pie-fondo, var(--tiza)) !important; opacity: 1 !important; font-weight: 500; text-decoration: none !important;  text-box: trim-both cap alphabetic; }
+/* Línea ética: una línea discreta, sin caja, con su llamado en un botón chico de contorno. */
+.pf-pie__etica { display: flex; align-items: center; gap: 6px 14px; flex-wrap: wrap; font-size: var(--texto-chico); }
+.pf-pie__etica > div { display: flex; align-items: baseline; gap: 4px 10px; flex-wrap: wrap; }
+.pf-pie__etica b { font-weight: 500; }
+.pf-pie__etica span { opacity: .7; }
+.pf-pie__etica .pf-pie__pill { height: 28px; padding: 0 12px; background: transparent; color: inherit !important; border: 1px solid color-mix(in srgb, currentColor 40%, transparent); font-size: var(--texto-mini); }
+.pf-pie__pill { display: inline-flex; align-items: center; height: 34px; padding: 0 16px; border-radius: 999px; background: var(--pie-tinta, var(--azul)); color: var(--pie-fondo, var(--tiza)) !important; opacity: 1 !important; font-weight: 500; text-decoration: none !important;  text-box: trim-both cap alphabetic; }
 .pf-pie__legal { display: flex; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; padding-top: 20px; border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent); font-size: var(--texto-mini); opacity: .8; }
 .pf-pie__legal nav { display: flex; gap: 18px; flex-wrap: wrap; }
 
@@ -292,7 +295,6 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
 .pf-pie[data-variante="trigo"] .pf-pie__cab { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; }
 .pf-pie[data-variante="trigo"] .pf-pie__logo { color: var(--azul); }
 .pf-pie[data-variante="trigo"] .pf-pie__cab p { margin: 12px 0 0; max-width: 28ch; font: 500 var(--texto-subtitulo)/1.2 var(--f-display); letter-spacing: -.02em; color: var(--azul); }
-.pf-pie[data-variante="trigo"] .pf-pie__etica { background: var(--bg); }
 
 /* Vida para nuestra tierra: una pantalla entera con la foto de fondo. Arriba logo y links; abajo, la frase a la izquierda
    y la línea ética a la derecha; al final, los legales. Todo en tiza sobre la foto. */
@@ -307,7 +309,7 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
 .pf-pie__arriba { display: flex; justify-content: space-between; align-items: flex-start; gap: 32px 56px; flex-wrap: wrap; }
 .pf-pie[data-variante="vida"] .pf-pie__cols { flex: 1; max-width: 760px; }
 .pf-pie__abajo { margin-top: auto; display: flex; justify-content: space-between; align-items: flex-end; gap: 24px 48px; flex-wrap: wrap; }
-.pf-pie[data-variante="vida"] .pf-pie__etica { flex: 0 1 560px; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.pf-pie[data-variante="vida"] .pf-pie__etica { flex: 0 1 auto; }
 /* La frase: tiza, a tamaño de título y alineada a la izquierda. */
 .pf-pie__vida { margin: 0; font: 500 min(var(--frase), 14vw)/.92 var(--f-display); letter-spacing: -.035em; color: var(--tiza); text-align: left; }
 /* Entra con el animador Ventana (animadores.css y animadores.js), palabra por palabra al aparecer en pantalla.
@@ -320,11 +322,7 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
 .pf-pie[data-variante="formas"] { --pie-tinta: var(--azul); --pie-fondo: var(--tiza); min-height: 100vh; min-height: 100svh; background: var(--tiza); color: var(--azul); }
 .pf-pie[data-variante="formas"] .pf-pie__in { display: grid; gap: 28px; max-width: none; }
 .pf-pie[data-variante="formas"] .pf-pie__cols { flex: 1; max-width: 760px; }
-/* Línea ética más chica que en las otras variantes: acá el protagonismo es de las formas. */
-.pf-pie[data-variante="formas"] .pf-pie__etica { width: fit-content; max-width: 100%; margin-left: auto; gap: 10px 18px; padding: 10px 10px 10px 18px; border-radius: 14px; }
-.pf-pie[data-variante="formas"] .pf-pie__etica b { font-size: var(--texto-destacado); }
-.pf-pie[data-variante="formas"] .pf-pie__etica span { margin-top: 2px; font-size: var(--texto-mini); }
-.pf-pie[data-variante="formas"] .pf-pie__etica .pf-pie__pill { height: 36px; padding: 0 16px; font-size: var(--texto-chico); }
+.pf-pie[data-variante="formas"] .pf-pie__etica, .pf-pie[data-variante="flores"] .pf-pie__etica { justify-content: flex-end; }
 /* Los legales van pegados abajo, por encima de las formas. */
 .pf-pie[data-variante="formas"] .pf-pie__legal { position: absolute; z-index: 3; left: clamp(20px, 4vw, 48px); right: clamp(20px, 4vw, 48px); bottom: 20px; padding-top: 0; border-top: 0; opacity: 1; }
 .pf-pie__fisica { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; pointer-events: none; }
@@ -334,10 +332,6 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
 .pf-pie[data-variante="flores"] { --pie-tinta: var(--azul); --pie-fondo: var(--tiza); display: flex; flex-direction: column; min-height: 100vh; min-height: 100svh; background: var(--tiza); color: var(--azul); }
 .pf-pie[data-variante="flores"] .pf-pie__in { display: grid; gap: 28px; width: 100%; max-width: none; }
 .pf-pie[data-variante="flores"] .pf-pie__cols { flex: 1; max-width: 760px; }
-.pf-pie[data-variante="flores"] .pf-pie__etica { width: fit-content; max-width: 100%; margin-left: auto; gap: 10px 18px; padding: 10px 10px 10px 18px; border-radius: 14px; }
-.pf-pie[data-variante="flores"] .pf-pie__etica b { font-size: var(--texto-destacado); }
-.pf-pie[data-variante="flores"] .pf-pie__etica span { margin-top: 2px; font-size: var(--texto-mini); }
-.pf-pie[data-variante="flores"] .pf-pie__etica .pf-pie__pill { height: 36px; padding: 0 16px; font-size: var(--texto-chico); }
 .pf-pie__flores { position: relative; flex: 1; min-height: 200px; }
 .pf-pie__flores canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 
