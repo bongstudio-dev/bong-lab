@@ -134,14 +134,15 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
 .pf-n-rel__cab h2 { margin: 0; font: 600 var(--texto-subtitulo)/1.1 var(--f-display); letter-spacing: -0.02em; color: var(--azul); }
 .pf-n-rel__fila { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
 
-/* Tarjeta: miniatura cuadrada (foto de la nota o el arte de Novedades), etiqueta y título. */
+/* Tarjeta: la de Novedades sin el fondo. El arte con la etiqueta adentro, arriba a la izquierda; abajo la fecha y el título. */
 .pf-n-mini { display: grid; gap: 14px; align-content: start; text-decoration: none; }
-.pf-n-mini__img { position: relative; aspect-ratio: 1; border-radius: var(--radio-media); overflow: hidden; background: var(--card); line-height: 0; transition: transform 320ms var(--ease); }
-.pf-n-mini__img > :is(img, svg) { width: 100%; height: 100%; object-fit: cover; display: block; }
-/* La etiqueta va adentro de la imagen, arriba a la izquierda, como en las tarjetas de Novedades. */
-.pf-n-mini__img .pf-etiqueta { position: absolute; top: 10px; left: 10px; max-width: calc(100% - 20px); }
+.pf-n-mini__img { position: relative; border-radius: var(--radio-media); overflow: hidden; line-height: 0; transition: transform 320ms var(--ease); }
+.pf-n-mini__img > svg { display: block; width: 100%; height: auto; }
+.pf-n-mini__img .pf-etiqueta { position: absolute; top: 12px; left: 12px; max-width: calc(100% - 24px); }
 .pf-n-mini__img .pf-etiqueta__rotulo { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.pf-n-mini b { font: 600 1.36rem/1.1 var(--f-display); letter-spacing: -0.025em; color: var(--azul); text-wrap: balance; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.pf-n-mini__txt { display: grid; gap: 8px; padding: 0 2px; }
+.pf-n-mini .pf-when { margin: 0; font-size: 0.88rem; color: var(--ink-3); }
+.pf-n-mini .pf-ttl { margin: 0; font: 500 1.36rem/1.14 var(--f-display); letter-spacing: -0.015em; color: var(--azul); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 @media (hover: hover) and (pointer: fine) { .pf-n-mini:hover .pf-n-mini__img { transform: translateY(-3px); } }
 .pf-n-mini:active .pf-n-mini__img { transform: scale(.985); }
 
@@ -173,7 +174,8 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
   .pf-n-rel__fila::-webkit-scrollbar { display: none; }
   .pf-n-mini { flex: 0 0 76%; scroll-snap-align: start; gap: 12px; }
   .pf-n-mini__img .pf-etiqueta { top: 8px; left: 8px; --s: var(--etq-s); }
-  .pf-n-mini b { font-size: 1.15rem; }
+  .pf-n-mini .pf-ttl { font-size: 1.12rem; }
+  .pf-n-mini .pf-when { font-size: 0.8rem; }
   /* Fecha, minutos, modo lectura y compartir en una sola línea. */
   .pf-n-datos { flex-wrap: nowrap; gap: 6px; font-size: var(--texto-mini); }
   .pf-n-fecha { margin-right: 4px; }
@@ -369,11 +371,10 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
   var ta;
   function avisar(txt) { var a = $("pf-aviso"); a.textContent = txt; a.classList.add("pf-on"); clearTimeout(ta); ta = setTimeout(function () { a.classList.remove("pf-on"); }, 2000); }
 
-  // Tarjeta chica: la foto de la nota o, si no tiene, el arte de Novedades; etiqueta con el año y título.
+  // Tarjeta: la de Novedades sin el fondo. Arte 4:3 con la etiqueta y el año adentro; fecha y título abajo.
   function mini(x) {
-    var img = x.imgL ? "../" + x.imgL : x.img;
-    var m = img ? '<img src="' + esc(img) + '" alt="" loading="lazy" decoding="async">' : arte(x, 180, 120, x.id * 7919 + 13);
-    return '<a class="pf-n-mini" href="' + url(x) + '"><div class="pf-n-mini__img">' + m + etq(x.tp, { dato: x.anio }) + "</div><b>" + esc(x.t) + "</b></a>";
+    return '<a class="pf-n-mini" href="' + url(x) + '"><div class="pf-n-mini__img">' + arte(x, 240, 180, x.id * 7919 + 13) + etq(x.tp, { dato: x.anio }) + "</div>" +
+      '<div class="pf-n-mini__txt"><p class="pf-when">' + fecha(x.f) + '</p><p class="pf-ttl">' + esc(x.t) + "</p></div></a>";
   }
 
   // Relacionadas: comparten temas de WordPress, cultivo, pilar o tipo; a igual puntaje, la más cercana en el tiempo.
