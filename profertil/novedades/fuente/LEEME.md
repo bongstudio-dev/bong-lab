@@ -66,12 +66,14 @@ nota lo lee al abrir de `../notas/<ar>.json`.
   va solo junto al título), antetítulo, título y bajada.
 - Abajo, tres columnas. Al centro la foto principal, entera, sin recorte, con
   radio (una foto chica no se estira más de 1,5 veces). A la izquierda el
-  índice numerado de la nota, fijo al bajar, que marca la sección que se está
-  leyendo; aparece solo si la nota tiene dos subtítulos o más (muchos h4 del
-  sitio actual son firmas o fuentes y se descartan). A la derecha los datos,
-  rótulo y valor: Publicada, Lectura, Cultivo, Temas (cada uno lleva a
-  Novedades con esa búsqueda: `../#q=tema`), Compartir, Original y el botón
-  Modo lectura. Sin foto, el texto sube a esa fila.
+  índice numerado de la nota, fijo al bajar: un punto azul viaja con resorte
+  (la misma curva de la librería de componentes) hasta la sección que se está
+  leyendo, y tocar una sección baja suave hasta ella. Se arma solo con los
+  subtítulos del texto (h2, h3 y h4), sin marcar nada en el CMS; aparece solo
+  si hay dos o más (muchos h4 del sitio actual son firmas o fuentes y se
+  descartan). Sin índice, esa columna queda como aire. A la derecha, sin
+  rótulos: la fecha, el tiempo de lectura en un chip, compartir y el botón
+  chico de modo lectura (solo el ícono). Sin foto, el texto sube a esa fila.
 - Modo lectura: deja solo título, foto y texto; se sale con el mismo botón, el
   de arriba a la derecha o Esc, sin perder el punto de lectura.
 - Hasta 1100 px de ancho queda una columna: título, foto, datos y texto; el
