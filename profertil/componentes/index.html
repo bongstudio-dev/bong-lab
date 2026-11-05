@@ -86,8 +86,19 @@ html { scrollbar-color: rgba(10, 30, 74, .25) transparent; }
 .lado__tit { display: block; color: inherit; text-decoration: none; margin: 0; border: 0; background: none; padding: 0; text-align: left; font: 600 15px/1.1 var(--f-display); letter-spacing: -.02em; }
 .lado__tit small { display: block; margin-top: 4px; font: 400 11px/1.3 var(--f-body); letter-spacing: 0; color: var(--ink-3); }
 .lado nav { display: flex; flex-direction: column; gap: 16px; }
-.grupo__tit { margin: 0 0 5px; font: 500 10px/1 var(--f-body); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
-.grupo ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
+.lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
+.lista li[hidden] { display: none; }
+/* Filtro de la sidebar: el Selector del sistema con íconos, uno por familia. El nombre aparece al pasar el mouse o al enfocar. */
+.lado__filtro { display: flex; margin: 0 -4px; padding: 3px; }
+.lado__filtro button { position: relative; flex: 1 1 0; padding: 6px 0; }
+.lado__filtro svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.lado__filtro button[aria-pressed="true"] svg { stroke-width: 2; }
+.lado__filtro [data-tip]::after { content: attr(data-tip); position: absolute; z-index: 3; top: calc(100% + 7px); left: 50%; translate: -50% -3px; padding: 5px 9px; border-radius: 7px; background: var(--ink); color: var(--card); font: 400 11.5px/1 var(--f-body); white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .15s ease, translate .2s var(--ease); }
+.lado__filtro button:first-of-type::after { left: 0; translate: 0 -3px; }
+.lado__filtro button:last-of-type::after { left: auto; right: 0; translate: 0 -3px; }
+@media (hover: hover) and (pointer: fine) { .lado__filtro [data-tip]:hover::after { opacity: 1; translate: -50% 0; transition-delay: .25s; } .lado__filtro button:first-of-type:hover::after, .lado__filtro button:last-of-type:hover::after { translate: 0 0; } }
+.lado__filtro [data-tip]:focus-visible::after { opacity: 1; translate: -50% 0; }
+.lado__filtro button:first-of-type:focus-visible::after, .lado__filtro button:last-of-type:focus-visible::after { translate: 0 0; }
 .item { text-decoration: none; display: flex; justify-content: space-between; align-items: center; gap: 6px; width: calc(100% + 12px); margin: 0 -6px; padding: 5px 6px; border: 0; border-radius: 7px; background: none; text-align: left; font-size: 12px; line-height: 1.25; color: var(--ink-2); transition: background .2s var(--ease), color .2s var(--ease); }
 .item:hover { background: var(--suave); color: var(--ink); }
 /* El elegido no se pinta: lo marca el punto azul, que viaja de un ítem al otro. */
@@ -95,7 +106,7 @@ html { scrollbar-color: rgba(10, 30, 74, .25) transparent; }
 .item[aria-current="page"]:hover { background: none; }
 .item .n { font-size: 10px; opacity: .55; font-weight: 400; font-variant-numeric: tabular-nums; }
 .lado nav { position: relative; }
-.todos { list-style: none; margin: 0 0 -4px; padding: 0; }
+.punto.fuera { opacity: 0; }
 /* El punto: uno solo para toda la lista. La curva es un resorte (--punto-curva, la calcula el JS). */
 .punto { position: absolute; top: 0; left: 0; z-index: 1; width: 6px; height: 6px; border-radius: 50%; background: var(--azul); pointer-events: none;
   transition: transform var(--punto-dura, 560ms) var(--punto-curva, cubic-bezier(.32, .72, 0, 1)); }
@@ -107,18 +118,9 @@ html { scrollbar-color: rgba(10, 30, 74, .25) transparent; }
 
 /* ---------- Galería ---------- */
 .gal { padding: 28px 32px 72px; }
-.gal__cab { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
+.gal__cab { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; margin-bottom: 24px; }
 .gal h1 { margin: 0; font: 600 24px/1.1 var(--f-display); letter-spacing: -.025em; }
 .gal__cab p { margin: 0; color: var(--ink-3); }
-.pills { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 7px; margin: 0 -32px; padding: 18px 32px 18px; background: var(--bg); }
-/* Categorías: el Selector del sistema con íconos. El nombre aparece al pasar el mouse o al enfocar. */
-.pills .pf-selector--desborda { overflow: visible; } /* entran siempre: que no recorte los nombres */
-.pills .pf-selector--iconos button { position: relative; padding: 7px 12px; }
-.pills .pf-selector--iconos svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
-.pills .pf-selector--iconos button[aria-pressed="true"] svg { stroke-width: 2; }
-.pills [data-tip]::after { content: attr(data-tip); position: absolute; top: calc(100% + 8px); left: 50%; translate: -50% -3px; padding: 5px 9px; border-radius: 7px; background: var(--ink); color: var(--card); font: 400 11.5px/1 var(--f-body); white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .15s ease, translate .2s var(--ease); }
-@media (hover: hover) and (pointer: fine) { .pills [data-tip]:hover::after { opacity: 1; translate: -50% 0; transition-delay: .25s; } }
-.pills [data-tip]:focus-visible::after { opacity: 1; translate: -50% 0; }
 /* Masonry como el de Novedades: columnas parejas y cada tarjeta cae en la más corta.
    Las tarjetas se ubican con translate (el JS calcula x e y): al filtrar se deslizan a su lugar nuevo
    sin moverse en el DOM, así las miniaturas en vivo no se recargan. */
@@ -326,11 +328,10 @@ html.con-pleno { overflow: hidden; }
   /* Mobile: la navegación pasa al dock de abajo; arriba queda solo el encabezado. */
   .app { grid-template-columns: minmax(0, 1fr); }
   .lado { position: static; height: auto; flex-direction: row-reverse; justify-content: space-between; align-items: center; gap: 12px; border-right: 0; border-bottom: 1px solid var(--line); padding: 14px 16px; }
-  .lado nav { display: none; }
+  .lado nav, .lado__filtro { display: none; }
   body { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
   .gal { padding: 24px 16px 32px; }
   .gal__cab { margin-bottom: 18px; }
-  .pills { display: none; } /* en el teléfono las categorías están en el dock */
   .tar { border-radius: 20px; }
   .tar__vista { margin: 6px 6px 0; border-radius: 15px; }
   .tar__meta { padding: 9px 12px 13px; gap: 4px; }
@@ -363,6 +364,7 @@ html.con-pleno { overflow: hidden; }
   <aside class="lado">
     <a class="lado__volver" href="../../"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 12H7M11 8l-4 4 4 4"/></svg>Bong Lab</a>
     <a class="lado__tit" href="#">Componentes<small>Profertil · web</small></a>
+    <div class="pf-selector pf-selector--iconos lado__filtro" id="filtro" role="group" aria-label="Filtrar componentes"></div>
     <nav id="nav" aria-label="Componentes"></nav>
   </aside>
   <main class="centro" id="centro" tabindex="-1"></main>
@@ -444,20 +446,18 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
     der: '<path d="M7 12h10M13 8l4 4-4 4"/>',
     abre: '<path d="M10 7l5 5-5 5"/>'
   };
-  // Un ícono por categoría (la barra de arriba de la galería).
-  var ICO_GRUPO = {
-    "": '<rect x="4" y="4" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="2"/>',
-    "Datos": '<path d="M5 20v-7M12 20V5M19 20v-10"/>',
-    "Navegación": '<circle cx="12" cy="12" r="8.5"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
-    "Controles": '<rect x="3" y="7" width="18" height="10" rx="5"/><circle cx="16" cy="12" r="2.4"/>',
-    "Avisos": '<path d="M6.5 16.5V11a5.5 5.5 0 0 1 11 0v5.5l1.5 1.5H5zM10 21h4"/>',
-    "Listas": '<path d="M9.5 6.5H20M9.5 12H20M9.5 17.5H20M4.5 6.5h.5M4.5 12h.5M4.5 17.5h.5"/>',
-    "Scroll": '<rect x="6.5" y="3" width="11" height="18" rx="5.5"/><path d="M12 7.5v3"/>',
-    "Transiciones": '<rect x="3.5" y="3.5" width="11" height="11" rx="2.5"/><path d="M17.5 9.5h.5a2.5 2.5 0 0 1 2.5 2.5v6a2.5 2.5 0 0 1-2.5 2.5h-6A2.5 2.5 0 0 1 9.5 18v-.5"/>',
-    "Medios": '<rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="M20.5 15.5l-4.5-4.5-8.5 8.5"/>',
-    "Texto": '<path d="M5 7V5h14v2M12 5v14M9 19h6"/>',
-    "Páginas": '<path d="M6.5 3.5h7.5l4 4v13h-11.5zM14 3.5v4h4"/>'
-  };
+  // Familias del filtro de la sidebar: agrupan las categorías en seis.
+  var FAMILIAS = [
+    ["", "Todos", [], '<rect x="4" y="4" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="2"/>'],
+    ["datos", "Datos y listas", ["Datos", "Listas"], '<path d="M5 20v-7M12 20V5M19 20v-10"/>'],
+    ["navegacion", "Navegación", ["Navegación", "Páginas"], '<circle cx="12" cy="12" r="8.5"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>'],
+    ["interfaz", "Controles y avisos", ["Controles", "Avisos"], '<rect x="3" y="7" width="18" height="10" rx="5"/><circle cx="16" cy="12" r="2.4"/>'],
+    ["movimiento", "Movimiento", ["Scroll", "Transiciones", "Texto"], '<path d="M3.5 16.5c3 0 3.5-9 8.5-9s5.5 9 8.5 9"/>'],
+    ["medios", "Medios", ["Medios"], '<rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="M20.5 15.5l-4.5-4.5-8.5 8.5"/>']
+  ];
+  var FAM = {}; FAMILIAS.forEach(function (f) { f[2].forEach(function (g) { FAM[g] = f[0]; }); });
+  function famNombre(id) { return FAMILIAS.filter(function (f) { return f[0] === id; })[0][1]; }
+  function enFiltro(c) { return !filtro || FAM[c.grupo] === filtro; }
   function ico(n) { return '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">' + ICO[n] + '</svg>'; }
   function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function porId(id) { return L.filter(function (c) { return c.id === id; })[0]; }
@@ -561,15 +561,22 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
   var nav = $("nav"), punto;
   function construirNav() {
     nav.innerHTML = '<span class="punto" id="punto" aria-hidden="true"></span>' +
-      '<ul class="todos"><li><a class="item" href="#" data-id=""><span class="item__t">Todos</span><span class="n">' + L.length + '</span></a></li></ul>' +
-      GRUPOS.map(function (g) {
-        var cs = L.filter(function (c) { return c.grupo === g; }); if (!cs.length) return "";
-        return '<div class="grupo"><p class="grupo__tit">' + g + '</p><ul>' + cs.map(function (c) {
-          return '<li><a class="item" href="#' + c.id + '" data-id="' + c.id + '"><span class="item__t">' + esc(c.nombre) + '</span>' +
-            (c.variantes ? '<span class="n" aria-label="' + c.variantes.length + ' variantes">' + c.variantes.length + '</span>' : '') + '</a></li>';
-        }).join("") + '</ul></div>';
-      }).join("");
+      '<ul class="lista"><li><a class="item" href="#" data-id=""><span class="item__t">Todos</span><span class="n" id="navN">' + L.length + '</span></a></li>' +
+      ordenados().map(function (c) {
+        return '<li data-fam="' + FAM[c.grupo] + '"><a class="item" href="#' + c.id + '" data-id="' + c.id + '"><span class="item__t">' + esc(c.nombre) + '</span>' +
+          (c.variantes ? '<span class="n" aria-label="' + c.variantes.length + ' variantes">' + c.variantes.length + '</span>' : '') + '</a></li>';
+      }).join("") + '</ul>';
     punto = $("punto");
+    $("filtro").innerHTML = filtroHTML();
+    filtrarNav();
+    moverInd($("filtro"), false);
+  }
+  // La lista de la sidebar muestra solo la familia elegida. "Todos" cuenta lo que queda a la vista.
+  function filtrarNav() {
+    var n = 0;
+    nav.querySelectorAll("li[data-fam]").forEach(function (li) { var si = !filtro || li.dataset.fam === filtro; li.hidden = !si; if (si) n++; });
+    $("navN").textContent = n;
+    moverPunto(true);
   }
   function marcarNav(animar) {
     var id = actual ? actual.id : "";
@@ -580,7 +587,9 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
   }
   // El punto se para justo después del nombre, centrado en la línea.
   function moverPunto(animar) {
-    var t = nav.querySelector('.item[aria-current] .item__t'); if (!t || !t.offsetWidth) return;
+    if (!punto) return;
+    var t = nav.querySelector('.item[aria-current] .item__t');
+    punto.classList.toggle("fuera", !t || !t.offsetWidth); if (!t || !t.offsetWidth) return;
     var n = nav.getBoundingClientRect(), r = t.getBoundingClientRect();
     var x = Math.round(r.right - n.left + 7), y = Math.round(r.top - n.top + r.height / 2 - 3);
     if (!animar) punto.classList.add("quieto");
@@ -607,19 +616,18 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
   var galeriaLista = false, masRO = null, masAncho = 0;
   // Proporción de cada tarjeta: es lo que hace al masonry. Anchas apaisadas, páginas verticales, piezas chicas cuadradas.
   function proporcion(c) { return c.tamano === "ancha" ? 4 / 3 : (c.tamano === "media" || typeof c.alto === "number") ? 4 / 5 : 1; }
-  function pillsHTML() {
-    return '<div class="pf-selector pf-selector--iconos"><span class="pf-selector__ind" aria-hidden="true"></span>' +
-      [""].concat(GRUPOS.filter(function (g) { return L.some(function (c) { return c.grupo === g; }); })).map(function (g) {
-        var n = g || "Todas";
-        return '<button type="button" data-grupo="' + esc(g) + '" data-tip="' + esc(n) + '" aria-label="' + esc(n) + '" aria-pressed="' + (filtro === g) + '">' +
-          '<svg viewBox="0 0 24 24" aria-hidden="true">' + ICO_GRUPO[g] + '</svg></button>'; }).join("") + '</div>';
+  function filtroHTML() {
+    return '<span class="pf-selector__ind" aria-hidden="true"></span>' + FAMILIAS.filter(function (f) {
+      return !f[0] || L.some(function (c) { return FAM[c.grupo] === f[0]; }); }).map(function (f) {
+      return '<button type="button" data-fam="' + f[0] + '" data-tip="' + esc(f[1]) + '" aria-label="' + esc(f[1]) + '" aria-pressed="' + (filtro === f[0]) + '">' +
+        '<svg viewBox="0 0 24 24" aria-hidden="true">' + f[3] + '</svg></button>'; }).join("");
   }
   function galeria() {
     galeriaLista = true; actual = null; marcarNav(true); dibujarDock(); document.title = "Componentes Profertil";
-    $("centro").innerHTML = '<div class="gal"><header class="gal__cab"><h1 id="galTit">' + (filtro ? 'Componentes · ' + esc(filtro) : 'Componentes') + '</h1><p>Lo que vamos armando para el sitio, en vivo.</p></header>' +
-      '<div class="pills" id="pills" role="group" aria-label="Categoría">' + pillsHTML() + '</div><div class="mas quieta" id="mas">' +
+    $("centro").innerHTML = '<div class="gal"><header class="gal__cab"><h1 id="galTit">' + (filtro ? 'Componentes · ' + esc(famNombre(filtro)) : 'Componentes') + '</h1><p>Lo que vamos armando para el sitio, en vivo.</p></header>' +
+      '<div class="mas quieta" id="mas">' +
       ordenados().map(function (c) {
-        var fuera = filtro && c.grupo !== filtro;
+        var fuera = !enFiltro(c);
         return '<a class="tar' + (fuera ? ' fuera' : '') + '" href="#' + c.id + '" data-id="' + c.id + '" data-grupo="' + esc(c.grupo) + '"' + (fuera ? ' data-oculta="1"' : '') + '>' +
           '<div class="tar__vista" style="aspect-ratio: ' + proporcion(c).toFixed(4) + '"><iframe tabindex="-1" loading="lazy" aria-hidden="true" title="" data-mini="' + c.id + '"></iframe></div>' +
           '<div class="tar__meta"><p class="when"><b>' + esc(c.grupo) + '</b>' + (c.variantes ? ' · ' + c.variantes.length + ' variantes' : '') + '</p><p class="ttl">' + esc(c.nombre) + '</p></div></a>';
@@ -641,7 +649,6 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
         } catch (e) {}
       }, true);
     });
-    moverInd(document.querySelector("#pills .pf-selector"), false);
     var mas = $("mas"); masAncho = 0;
     if (masRO) masRO.disconnect();
     masRO = new ResizeObserver(function () { if (mas.clientWidth !== masAncho) acomodar(false); });
@@ -671,20 +678,21 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
   }
   function filtrar(g) {
     filtro = g;
-    document.querySelectorAll("#pills button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.grupo === g)); });
-    var sel = document.querySelector("#pills .pf-selector"); if (sel) moverInd(sel, !quieto.matches);
-    if ($("galTit")) $("galTit").textContent = g ? "Componentes · " + g : "Componentes";
+    $("filtro").querySelectorAll("button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.fam === g)); });
+    moverInd($("filtro"), !quieto.matches);
+    filtrarNav();
+    if ($("galTit")) $("galTit").textContent = g ? "Componentes · " + famNombre(g) : "Componentes";
     var entran = [];
     document.querySelectorAll("#mas .tar").forEach(function (t) {
-      var fuera = !!g && t.dataset.grupo !== g;
+      var fuera = !!g && FAM[t.dataset.grupo] !== g;
       if (!fuera && t.dataset.oculta) { entran.push(t); t.style.transition = "none"; }
       else if (fuera) t.classList.add("fuera");
       t.dataset.oculta = fuera ? "1" : "";
       if (!fuera) t.removeAttribute("data-oculta");
     });
     acomodar(!quieto.matches, entran);
-    // Si la grilla quedó más arriba de donde estaba el scroll, volver a las pastillas.
-    var p = $("pills"); if (p && !movil.matches) { var top = Math.round($("mas").getBoundingClientRect().top + scrollY - p.offsetHeight); if (scrollY > top) scrollTo({ top: top, behavior: quieto.matches ? "auto" : "smooth" }); }
+    // Si la grilla quedó más arriba de donde estaba el scroll, volver arriba.
+    if ($("mas") && !movil.matches && scrollY > 0) scrollTo({ top: 0, behavior: quieto.matches ? "auto" : "smooth" });
     dibujarDock();
   }
 
@@ -795,7 +803,7 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
   }
   // Anterior y siguiente recorren lo que se ve en la galería (si hay categoría elegida, solo esa).
   function vecinosLista() {
-    var o = ordenados(), f = filtro ? o.filter(function (c) { return c.grupo === filtro; }) : o;
+    var o = ordenados(), f = o.filter(enFiltro);
     return actual && f.indexOf(actual) < 0 ? o : f;
   }
   function terminarCierre() { if (cierre) { var f = cierre; cierre = null; f(); } }
@@ -1010,7 +1018,7 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
     ind.style.width = b.offsetWidth + "px"; ind.style.transform = "translateX(" + b.offsetLeft + "px)";
     if (!animar) { void ind.offsetWidth; ind.classList.remove("pf-quieto"); }
   }
-  function moverInds() { document.querySelectorAll("#ajustes .pf-selector, #pills .pf-selector").forEach(function (s) { moverInd(s, false); }); }
+  function moverInds() { document.querySelectorAll("#ajustes .pf-selector, #filtro").forEach(function (s) { moverInd(s, false); }); }
   addEventListener("resize", moverInds);
   document.fonts && document.fonts.ready.then(moverInds);
 
@@ -1039,15 +1047,15 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
   // Anterior y siguiente recorren siempre todos los componentes, en el orden de la galería (la categoría solo filtra la lista).
   function secuencia() { return ordenados(); }
   function dibujarDock() {
-    var o = ordenados(), lista = filtro ? o.filter(function (c) { return c.grupo === filtro; }) : o;
+    var o = ordenados(), lista = o.filter(enFiltro);
     $("dkCats").innerHTML = '<button type="button" class="pf-pastilla pf-pastilla--todas" data-grupo="" aria-pressed="' + !filtro + '">Todas</button>' +
-      GRUPOS.filter(function (g) { return L.some(function (c) { return c.grupo === g; }); }).map(function (g) {
-        return '<button type="button" class="pf-pastilla" data-grupo="' + esc(g) + '" aria-pressed="' + (filtro === g) + '">' + esc(g) + '</button>'; }).join("");
+      FAMILIAS.slice(1).filter(function (f) { return L.some(function (c) { return FAM[c.grupo] === f[0]; }); }).map(function (f) {
+        return '<button type="button" class="pf-pastilla" data-grupo="' + f[0] + '" aria-pressed="' + (filtro === f[0]) + '">' + esc(f[1]) + '</button>'; }).join("");
     $("dkLista").innerHTML = lista.map(function (c) {
       return '<li><a class="dk-item" href="#' + c.id + '"' + (actual === c ? ' aria-current="page"' : '') + '><span>' + esc(c.nombre) + '</span><small>' + esc(c.grupo) + '</small></a></li>'; }).join("");
     var sq = secuencia(), i = actual ? sq.indexOf(actual) : -1;
     dock.dataset.modo = actual ? "ficha" : "galeria";
-    $("dkTxt").textContent = actual ? actual.nombre : (filtro || "Componentes");
+    $("dkTxt").textContent = actual ? actual.nombre : (filtro ? famNombre(filtro) : "Componentes");
     $("dkN").textContent = actual ? (i + 1) + " / " + sq.length : lista.length;
     $("dkPrev").disabled = !(i > 0);
   }
@@ -1076,17 +1084,18 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
     var g = b.dataset.grupo, nuevo = filtro === g ? "" : g;
     // Cambia el alto del panel: se anima desde el actual hasta el nuevo.
     var desde = dkBody.offsetHeight;
-    if ($("mas")) filtrar(nuevo); else { filtro = nuevo; dibujarDock(); }
+    if ($("mas")) filtrar(nuevo); else { filtro = nuevo; dibujarDock(); filtrarNav(); }
     if (dock.classList.contains("listo")) {
       var hasta = dkBody.scrollHeight; dock.classList.remove("listo"); dkBody.style.height = desde + "px"; void dkBody.offsetHeight;
       dkBody.style.height = Math.min(hasta, dock.parentNode.clientHeight) + "px";
       clearTimeout(tListo); tListo = setTimeout(terminarDock, 660);
     }
   });
-  // Las pastillas de arriba de la galería (desktop).
-  document.addEventListener("click", function (e) {
-    var b = e.target.closest("#pills [data-grupo]"); if (!b || b.dataset.grupo === filtro) return;
-    filtrar(b.dataset.grupo);
+  // El filtro de la sidebar (desktop): filtra la lista y la galería.
+  $("filtro").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-fam]"); if (!b || b.dataset.fam === filtro) return;
+    if ($("mas")) filtrar(b.dataset.fam);
+    else { filtro = b.dataset.fam; $("filtro").querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); }); moverInd($("filtro"), true); filtrarNav(); dibujarDock(); }
   });
   document.addEventListener("pointerdown", function (e) { if (dock.classList.contains("open") && !dock.contains(e.target) && !ancla.contains(e.target)) abrirDock(false); });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") abrirDock(false); });
