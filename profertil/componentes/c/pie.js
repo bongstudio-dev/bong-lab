@@ -206,13 +206,13 @@
   }
 
   /* Flores (experimento): una banda de mosaicos al pie. Cada mosaico es un par secundario del Master (fondo y
-     forma, 70/30) y corre su propio programa en loop: nueve movimientos agrupados en seis familias (rotación,
-     tira, rejilla, corte, eco y morph). Cada programa tiene su tiempo, sus formas y sus pasos con pausa; después de
+     forma, 70/30) y corre su propio programa en loop: ocho movimientos agrupados en seis familias (rotación,
+     tira, salto, corte, órbita y morph), todos con una sola forma a la vez. Cada programa tiene su tiempo, sus formas y sus pasos con pausa; después de
      unos compases el mosaico cambia: otro programa con una transición (barras, silueta de forma, empuje o diagonal)
      o, a veces, otro par del Master (por las rutas que siempre dejan a la vista un par o una terciaria).
      Dos mosaicos vecinos nunca comparten un color: antes de cambiar se mira lo que usan (y lo que van a usar) los
      cuatro de al lado. Curvas, duración y pesos se ajustan en vivo: window.pfVivo(O) los recibe sin reiniciar.
-     O = { tamano, tempo, repeticiones, duracion, giro, curvaEntra, curvaCambio, pColor, pRot, pTira, pRejilla, pCorte, pEco, pMorph }. */
+     O = { tamano, tempo, repeticiones, duracion, giro, curvaEntra, curvaCambio, pColor, pRot, pTira, pSalto, pCorte, pOrbita, pMorph }. */
   function FLORES(O) {
     var pie = document.querySelector(".pf-pie"), banda = pie.querySelector(".pf-pie__flores"), lienzo = banda.querySelector("canvas"), ctx = lienzo.getContext("2d");
     var quieto = matchMedia("(prefers-reduced-motion: reduce)").matches, css = getComputedStyle(document.documentElement);
@@ -221,8 +221,6 @@
 
     // Pares secundarios con fondo permitido (Color y texto: solo azul, verde, amarillo y terra llevan fondo de color).
     var PARES = { azul: "celeste", verde: "verde-claro", amarillo: "naranja", terra: "naranja" };
-    // La terciaria que sale de cada par sumando un color (60/25/15). Terra/Naranja no está en ninguna: no hace tríada.
-    var TERCERA = { azul: "verde", verde: "amarillo", amarillo: "verde" };
     /* Cambios de par por cobertura: el color nuevo entra por encima. En cada momento los colores a la vista son un
        par o una terciaria: azul→verde pasa por Azul/Celeste/Verde; verde→amarillo por Verde/Verde Claro/Amarillo;
        amarillo→verde por Amarillo/Naranja/Verde; con terra, primero se vacía o se pasa por el naranja que comparte
@@ -233,7 +231,7 @@
       "verde>terra": ["vaciar", "cubrir:terra"], "terra>verde": ["vaciar", "cubrir:verde"],
       "amarillo>terra": ["cubrir:naranja", "cubrir:terra"], "terra>amarillo": ["cubrir:naranja", "cubrir:amarillo"]
     };
-    var FAM = { rot: ["reloj", "carta"], tira: ["tira"], rejilla: ["onda"], corte: ["rebanadas", "barrido"], eco: ["eco", "orbita"], morph: ["morph"] };
+    var FAM = { rot: ["reloj", "carta"], tira: ["tira"], salto: ["salto"], corte: ["rebanadas", "barrido"], orbita: ["orbita"], morph: ["morph"] };
     var MASCARAS = ["barras", "iris", "empuje", "diag"];
 
     // Curvas de Web/Movimiento, leídas de tokens.css.
@@ -368,25 +366,20 @@
         var q = pos(p), f = Math.max(Math.abs(Math.cos(Math.PI * q)), .001), n = p.fs[Math.floor(q + .5) % 2];
         forma(n, p.c1, 0, 0, tam(n, .36), 0, p.vert ? 1 : f, p.vert ? f : 1);
       },
-      // Una marquesina: pasan formas distintas, de a una por compás, y las del centro se ven más grandes.
+      // Una marquesina de una sola forma: cruza el mosaico de lado a lado y, cuando sale, entra la siguiente.
       tira: function (p) {
-        var q = pos(p), sp = (p.vert ? alto : ancho) * .8, N = p.fs.length, off = q * sp * p.sg;
-        var j0 = Math.floor((off - 1.3 * sp) / sp), j1 = Math.ceil((off + 1.3 * sp) / sp);
+        var q = pos(p), sp = (p.vert ? alto : ancho) * 1.5, N = p.fs.length, off = q * sp * p.sg;
+        var j0 = Math.floor((off - sp) / sp), j1 = Math.ceil((off + sp) / sp);
         for (var j = j0; j <= j1; j++) {
           var d = j * sp - off, n = p.fs[((j % N) + N) % N];
-          forma(n, (j & 1) ? p.c2 : p.c1, p.vert ? 0 : d, p.vert ? d : 0, tam(n, .2) * (1.25 - .5 * Math.min(1, Math.abs(d) / sp)), p.sg * GIRO * .5 * d / sp);
+          if (Math.abs(d) < sp) forma(n, p.c1, p.vert ? 0 : d, p.vert ? d : 0, tam(n, .3), p.sg * GIRO * .5 * d / sp);
         }
       },
-      // El mosaico se subdivide y una onda recorre las celdas: crecen de a una, o giran escalonadas.
-      onda: function (p) {
-        var g = p.g, cw = ancho / g, ch = alto / g;
-        for (var r = 0; r < g; r++) for (var c = 0; c < g; c++) {
-          var f = p.mod === 0 ? r + c : p.mod === 1 ? r : p.mod === 2 ? c : (r * 7 + c * 3) % g;
-          var q = pos(p, f * p.esc), par = (r + c) & 1, n = p.fs[par], s = Math.min(Math.sqrt(.55 * cw * ch / T[n].llena), .92 * Math.min(cw, ch));
-          var x = -ancho / 2 + cw * (c + .5), y = -alto / 2 + ch * (r + .5);
-          if (p.giro) forma(n, par ? p.c2 : p.c1, x, y, s * .9, p.sg * GIRO * q);
-          else { var e = .5 + .5 * Math.cos(Math.PI * q); forma(n, par ? p.c2 : p.c1, x, y, s * e, p.sg * GIRO * (1 - e)); }
-        }
+      // Una forma que salta de una esquina a otra del mosaico; en el salto se estira y gira.
+      salto: function (p) {
+        var q = pos(p), j = Math.floor(q), e = q - j, a = p.pts[j % 4], b = p.pts[(j + 1) % 4], n = p.fs[0];
+        var x = (a[0] + (b[0] - a[0]) * e) * ancho, y = (a[1] + (b[1] - a[1]) * e) * alto;
+        forma(n, p.c1, x, y, tam(n, .2) * (1 + .4 * Math.sin(Math.PI * e)), p.sg * GIRO * q);
       },
       // Una forma cortada en bandas que se desplazan fuera de fase y vuelven a alinearse.
       rebanadas: function (p) {
@@ -395,35 +388,20 @@
           var e = .5 - .5 * Math.cos(Math.PI * pos(p, i * p.esc * .6)), b0 = -s / 2 + s * i / nb, bh = s / nb, off = amp * (i % 2 ? -1 : 1) * e;
           ctx.save(); ctx.beginPath();
           if (p.vert) ctx.rect(b0 - .5, -alto, bh + 1, alto * 2); else ctx.rect(-ancho, b0 - .5, ancho * 2, bh + 1);
-          ctx.clip(); forma(n, (i & 1) ? p.c2 : p.c1, p.vert ? 0 : off, p.vert ? off : 0, s, 0); ctx.restore();
+          ctx.clip(); forma(n, p.c1, p.vert ? 0 : off, p.vert ? off : 0, s, 0); ctx.restore();
         }
       },
-      // Una línea barre la forma y deja a la vista la que sigue, cortada en dos; cada compás barre desde otro lado.
+      // Una línea barre el mosaico: deja ver la forma y, al compás siguiente, la borra por el mismo lado. Después viene otra.
       barrido: function (p) {
-        var q = pos(p), j = Math.floor(q), e = q - j, N = p.fs.length, a = p.fs[j % N], b = p.fs[(j + 1) % N];
-        var sa = tam(a, .5), sb = tam(b, .5), Rr = Math.max(sa, sb) * .7, ang = p.ang + p.sg * j * Math.PI / 2, borde = -Rr + 2 * Rr * e;
-        ctx.save(); ctx.rotate(ang); ctx.beginPath(); ctx.rect(borde, -2 * Rr, 4 * Rr, 4 * Rr); ctx.clip(); ctx.rotate(-ang);
-        forma(a, (j & 1) ? p.c2 : p.c1, 0, 0, sa, 0); ctx.restore();
-        ctx.save(); ctx.rotate(ang); ctx.beginPath(); ctx.rect(-4 * Rr, -2 * Rr, 4 * Rr + borde, 4 * Rr); ctx.clip(); ctx.rotate(-ang);
-        forma(b, ((j + 1) & 1) ? p.c2 : p.c1, 0, 0, sb, 0); ctx.restore();
+        var q = pos(p), j = Math.floor(q), e = q - j, n = p.fs[Math.floor(j / 2) % p.fs.length], s = tam(n, .5), Rr = s * .7, ang = p.ang + p.sg * Math.floor(j / 2) * Math.PI / 2, borde = -Rr + 2 * Rr * e;
+        ctx.save(); ctx.rotate(ang); ctx.beginPath();
+        if (j % 2 === 0) ctx.rect(-4 * Rr, -2 * Rr, 4 * Rr + borde, 4 * Rr); else ctx.rect(borde, -2 * Rr, 4 * Rr, 4 * Rr);
+        ctx.clip(); ctx.rotate(-ang); forma(n, p.c1, 0, 0, s, 0); ctx.restore();
       },
-      // Siluetas concéntricas del mismo contorno que crecen desde el centro, una adentro de otra, alternando
-      // la forma y el fondo (y el acento, si lo hay). Cada dos compases vuelve exactamente al principio.
-      eco: function (p) {
-        var q = pos(p), R0 = .96 * Math.min(ancho, alto), r = .6, m0 = Math.floor(q), ciclo = p.acento ? 4 : 2;
-        for (var m = m0; m <= m0 + 7; m++) {
-          var k = m % ciclo, col = k === 0 ? p.c1 : k === 2 && p.acento ? p.c2 : p.bg, j = m - q;
-          forma(p.fs[0], col, 0, 0, Math.min(R0, R0 * Math.pow(r, j)), p.sg * GIRO * .25 * j);
-        }
-      },
-      // Una forma grande y, en su borde, dos chicas que la rodean: del color del acento, o del fondo si no hay (la calan).
+      // Una forma que da vueltas alrededor del centro, con una parada por compás.
       orbita: function (p) {
-        var q = pos(p), s = tam(p.fs[0], .3), n = p.fs[1];
-        forma(p.fs[0], p.c1, 0, 0, s, p.sg * GIRO * .5 * q);
-        for (var k = 0; k < 2; k++) {
-          var th = p.ang + p.sg * q * 2 * Math.PI / 3 + k * Math.PI;
-          forma(n, p.acento ? p.c2 : p.bg, Math.cos(th) * s * .52, Math.sin(th) * s * .52, tam(n, .07), -th);
-        }
+        var q = pos(p), n = p.fs[0], th = p.ang + p.sg * q * 2 * Math.PI / p.est, rr = .24 * Math.min(ancho, alto);
+        forma(n, p.c1, Math.cos(th) * rr, Math.sin(th) * rr, tam(n, .22), -p.sg * GIRO * .5 * q);
       },
       // Una forma que se transforma en la siguiente de una cadena de tres.
       morph: function (p) {
@@ -433,22 +411,22 @@
     };
 
     // Un programa nuevo: su tiempo, sus formas y los parámetros propios de cada movimiento.
-    function crear(tipo, fam, acento) {
-      var ac = !!(acento && TERCERA[fam]);
+    function crear(tipo, fam) {
       var p = { tipo: tipo, fase: 0, fk: .8 + Math.random() * .5, hold: .3 + Math.random() * .3, sg: Math.random() < .5 ? 1 : -1, vert: Math.random() < .5,
-        bg: fam, c1: PARES[fam], c2: ac ? TERCERA[fam] : PARES[fam], acento: ac, esc: .08 + Math.random() * .14,
-        g: Math.random() < .5 ? 2 : 3, mod: Math.floor(Math.random() * 4), giro: Math.random() < .5, nb: 4 + Math.floor(Math.random() * 4), ang: Math.floor(Math.random() * 4) * Math.PI / 4 };
+        bg: fam, c1: PARES[fam], esc: .08 + Math.random() * .14, nb: 4 + Math.floor(Math.random() * 4), est: 3 + Math.floor(Math.random() * 2),
+        ang: Math.floor(Math.random() * 4) * Math.PI / 4 };
       p.fs = mezclar(LISTA).slice(0, 3);
+      p.pts = mezclar([[-.22, -.22], [.22, -.22], [.22, .22], [-.22, .22]]);
       if (tipo === "morph") p.pares = p.fs.map(function (n, i) { return emparejar(T[n].aros, T[p.fs[(i + 1) % p.fs.length]].aros); });
       return p;
     }
     function tipoNuevo(actual) {
-      var pesos = { rot: O.pRot, tira: O.pTira, rejilla: O.pRejilla, corte: O.pCorte, eco: O.pEco, morph: O.pMorph };
+      var pesos = { rot: O.pRot, tira: O.pTira, salto: O.pSalto, corte: O.pCorte, orbita: O.pOrbita, morph: O.pMorph };
       if (actual) { var resto = 0; for (var k in pesos) if (k !== actual) resto += pesos[k]; if (resto > 0) pesos[actual] = 0; }
       var f = sortear(pesos) || "rot", t = azar(FAM[f]); return { fam: f, tipo: t };
     }
-    function pal(fam, ac) { return [fam, PARES[fam]].concat(ac && TERCERA[fam] ? [TERCERA[fam]] : []); }
-    function palEstado(e) { return e.fam ? pal(e.fam, e.prog && e.prog.acento) : [e.bg]; }
+    function pal(fam) { return [fam, PARES[fam]]; }
+    function palEstado(e) { return e.fam ? pal(e.fam) : [e.bg]; }
 
     // Los cuatro mosaicos de al lado: los colores que usan ahora y los que van a usar.
     function ocupadosVecinos(i) {
@@ -464,9 +442,9 @@
     function vida(p) { return p.fk * O.tempo * O.repeticiones * (.8 + Math.random() * .5); }
     function nuevo(i, t) {
       var cerca = ocupadosVecinos(i), fams = Object.keys(PARES), ok = fams.filter(function (f) { return libre(pal(f), cerca); });
-      var fam = azar(ok.length ? ok : fams), n = tipoNuevo(null), ac = TERCERA[fam] && Math.random() < .3 && libre(pal(fam, true), cerca);
-      var prog = crear(n.tipo, fam, ac); prog.fase = Math.random() * 4; prog.fam = n.fam;
-      mos[i] = { estado: { bg: fam, fam: fam, prog: prog }, tr: null, cola: [], ocupa: pal(fam, prog.acento), cambioEn: quieto ? Infinity : t + Math.random() * vida(prog) };
+      var fam = azar(ok.length ? ok : fams), n = tipoNuevo(null);
+      var prog = crear(n.tipo, fam); prog.fase = Math.random() * 4; prog.fam = n.fam;
+      mos[i] = { estado: { bg: fam, fam: fam, prog: prog }, tr: null, cola: [], ocupa: pal(fam), cambioEn: quieto ? Infinity : t + Math.random() * vida(prog) };
     }
 
     // Elige el cambio siguiente y arma la cola de transiciones: cada una lleva de un estado (fondo + programa) al siguiente.
@@ -483,7 +461,7 @@
         });
       }
       if (opciones.length) {
-        var o = azar(opciones), n = tipoNuevo(null), prog = crear(n.tipo, o.f, TERCERA[o.f] && Math.random() < .3 && libre(pal(o.f, true), cerca)); prog.fam = n.fam;
+        var o = azar(opciones), n = tipoNuevo(null), prog = crear(n.tipo, o.f); prog.fam = n.fam;
         var bg = E.bg, fa = fam;
         if (o.ruta[0] === "carta") cola.push({ mascara: "carta", hacia: { bg: o.f, fam: o.f, prog: prog } });
         else {
@@ -493,13 +471,12 @@
           });
           cola.push({ mascara: azar(MASCARAS), hacia: { bg: o.f, fam: o.f, prog: prog } });
         }
-        ocupa = ocupa.concat(pal(o.f, prog.acento));
+        ocupa = ocupa.concat(pal(o.f));
       } else {
-        // Otro programa en el mismo par: con acento solo si la terciaria no choca con ningún vecino.
-        var n2 = tipoNuevo(E.prog && E.prog.fam), ac = fam && TERCERA[fam] && Math.random() < .35 && libre(pal(fam, true), cerca);
-        var p2 = crear(n2.tipo, fam || "azul", ac); p2.fam = n2.fam;
+        // Otro movimiento en el mismo par: primero sale la forma y después entra la siguiente, así nunca hay dos a la vez.
+        var n2 = tipoNuevo(E.prog && E.prog.fam), p2 = crear(n2.tipo, fam || "azul"); p2.fam = n2.fam;
+        if (E.prog) cola.push({ mascara: azar(["barras", "iris", "diag", "empuje"]), hacia: { bg: E.bg, fam: fam, prog: null } });
         cola.push({ mascara: azar(MASCARAS), hacia: { bg: E.bg, fam: fam, prog: fam ? p2 : null } });
-        if (ac) ocupa = ocupa.concat(pal(fam, true));
       }
       m.cola = cola; m.ocupa = ocupa; m.cambioEn = Infinity; siguiente(m, t);
     }
@@ -606,7 +583,7 @@
     window.pfVivo = function (N) {
       var antes = O; O = N; ajustar();
       if (N.tamano !== antes.tamano) medir();
-      var cambioPesos = ["pColor", "pRot", "pTira", "pRejilla", "pCorte", "pEco", "pMorph", "repeticiones"].some(function (k) { return N[k] !== antes[k]; });
+      var cambioPesos = ["pColor", "pRot", "pTira", "pSalto", "pCorte", "pOrbita", "pMorph", "repeticiones"].some(function (k) { return N[k] !== antes[k]; });
       if (cambioPesos && !quieto) { var t = performance.now(); mos.forEach(function (m) { if (!m.tr && !m.cola.length) m.cambioEn = Math.min(m.cambioEn, t + 250 + Math.random() * 900); }); }
       if (quieto) dibujar();
     };
@@ -619,7 +596,7 @@
   // Los ajustes de Flores tal como los lee FLORES. La librería también los manda en vivo (vivo) sin recargar la vista.
   function opcionesFlores(s) {
     return { tamano: +s.mosaico, tempo: +s.tempo, repeticiones: +s.repeticiones, duracion: +s.duracion, giro: +s.giro, curvaEntra: s.curvaEntra, curvaCambio: s.curvaCambio,
-      pColor: +s.pColor, pRot: +s.pRot, pTira: +s.pTira, pRejilla: +s.pRejilla, pCorte: +s.pCorte, pEco: +s.pEco, pMorph: +s.pMorph };
+      pColor: +s.pColor, pRot: +s.pRot, pTira: +s.pTira, pSalto: +s.pSalto, pCorte: +s.pCorte, pOrbita: +s.pOrbita, pMorph: +s.pMorph };
   }
 
   Libreria.sumar({
@@ -630,7 +607,7 @@
       ["trigo", "Con trigo", "Fondo tiza y el trigo del sistema en amarillo pleno, a la izquierda, que sube más lento que la página."],
       ["vida", "Vida para nuestra tierra", "Alto de pantalla completa con un video de campo en loop de fondo y un filtro negro parejo. La frase va abajo a la izquierda, a tamaño de título, y entra con el animador Ventana."],
       ["formas", "Formas que caen", "Experimento. Alto de pantalla completa en marfil: arriba logo, links y línea ética; abajo caen las formas del sistema con física, se apilan hasta la mitad y se pueden agarrar y tirar."],
-      ["flores", "Flores", "Experimento. Alto de pantalla completa en marfil: arriba logo, links y línea ética; abajo una banda de mosaicos, cada uno un par secundario del Master: fondo y forma en 70/30. Cada mosaico corre su propio loop (rotación, tira, rejilla, corte, eco u órbita, morph) y cada tanto cambia a otro con una transición, o de par de colores. Dos mosaicos vecinos nunca comparten un color. Al pasar el puntero o tocar, cambian en el acto."]
+      ["flores", "Flores", "Experimento. Alto de pantalla completa en marfil: arriba logo, links y línea ética; abajo una banda de mosaicos, cada uno un par secundario del Master: fondo y forma en 70/30. Cada mosaico muestra una sola forma a la vez y corre su propio loop (rotación, tira, salto, corte, órbita o morph); cada tanto la forma sale y entra otro movimiento, o cambia el par de colores. Dos mosaicos vecinos nunca comparten un color. Al pasar el puntero o tocar, cambian en el acto."]
     ],
     tamano: "media",
     vivo: function (s) { return s.variante === "flores" ? opcionesFlores(s) : null; },
@@ -654,10 +631,10 @@
       { id: "curvaCambio", tipo: "select", etiqueta: "Curva de cambio", solo: ["flores"], def: "vista", opciones: [["base", "Base", "Web/Movimiento/Curva base: arranca rápido y frena largo."], ["vista", "Vista", "Curva vista: sale y llega suave, pareja en los dos extremos."], ["compacto", "Compacto", "Curva compacto: arranque seco, frenada corta."], ["carrusel", "Carrusel", "Curva carrusel: ida y vuelta marcada, más pesada."]], desc: "Curva de los pasos de cada movimiento y de las transiciones que vacían o cubren." },
       { id: "pColor", tipo: "rango", etiqueta: "Cambio de par", solo: ["flores"], unidad: "%", min: 0, max: 100, def: 25, desc: "Qué tan seguido un mosaico cambia de par de colores en vez de solo de movimiento. Siempre queda a la vista un par o una terciaria, y nunca el mismo color que un vecino." },
       { id: "pRot", tipo: "rango", etiqueta: "Rotación", solo: ["flores"], unidad: "%", min: 0, max: 100, def: 20, desc: "Peso de la familia: una forma que se achica y crece girando, o una moneda que da vuelta y muestra otra." },
-      { id: "pTira", tipo: "rango", etiqueta: "Tira", solo: ["flores"], unidad: "%", min: 0, max: 100, def: 20, desc: "Peso de la familia: una marquesina de formas distintas que pasa de a una por compás." },
-      { id: "pRejilla", tipo: "rango", etiqueta: "Rejilla", solo: ["flores"], unidad: "%", min: 0, max: 100, def: 20, desc: "Peso de la familia: el mosaico se subdivide y una onda recorre las celdas, que crecen o giran escalonadas." },
-      { id: "pCorte", tipo: "rango", etiqueta: "Corte", solo: ["flores"], unidad: "%", min: 0, max: 100, def: 20, desc: "Peso de la familia: una forma cortada en bandas que se desplazan fuera de fase, o una línea que barre y deja ver la forma siguiente." },
-      { id: "pEco", tipo: "rango", etiqueta: "Eco y órbita", solo: ["flores"], unidad: "%", min: 0, max: 100, def: 20, desc: "Peso de la familia: siluetas concéntricas que crecen desde el centro, o una forma grande rodeada por dos chicas. Pueden sumar el acento de una terciaria." },
+      { id: "pTira", tipo: "rango", etiqueta: "Tira", solo: ["flores"], unidad: "%", min: 0, max: 100, def: 20, desc: "Peso de la familia: una forma cruza el mosaico de lado a lado y, cuando sale, entra la siguiente." },
+      { id: "pSalto", tipo: "rango", etiqueta: "Salto", solo: ["flores"], unidad: "%", min: 0, max: 100, def: 20, desc: "Peso de la familia: una forma que salta de una esquina a otra del mosaico, estirándose y girando en el salto." },
+      { id: "pCorte", tipo: "rango", etiqueta: "Corte", solo: ["flores"], unidad: "%", min: 0, max: 100, def: 20, desc: "Peso de la familia: una forma cortada en bandas que se desplazan fuera de fase, o una línea que barre el mosaico y deja ver la forma y después la borra." },
+      { id: "pOrbita", tipo: "rango", etiqueta: "Órbita", solo: ["flores"], unidad: "%", min: 0, max: 100, def: 20, desc: "Peso de la familia: una forma que da vueltas alrededor del centro del mosaico, con una parada por compás." },
       { id: "pMorph", tipo: "rango", etiqueta: "Morph", solo: ["flores"], unidad: "%", min: 0, max: 100, def: 20, desc: "Peso de la familia: una forma que se transforma en otra, en cadena de tres." },
       "---",
       { id: "radio", tipo: "rango", etiqueta: "Radio de arriba", unidad: "px", min: 0, max: 56, def: 26, aplica: { var: "--radio", unidad: "px" }, desc: "Radio de las esquinas de arriba." },
