@@ -83,7 +83,8 @@ nota lo lee al abrir de `../notas/<ar>.json`.
   fondo, para que pese menos. La foto de la nota en 4:3 (si no tiene, el arte
   de Novedades) con la etiqueta y el año adentro,
   arriba a la izquierda, y abajo la fecha y el título; en celular,
-  una fila que se desliza con encastre. Comparten temas, cultivo, pilar o tipo; a igual puntaje,
+  una fila que se desliza con encastre. Cuando no entran, aparecen flechas
+  redondas centradas en la foto que corren de a una tarjeta. Comparten temas, cultivo, pilar o tipo; a igual puntaje,
   la más cercana en el tiempo.
 - Sin sombras.
 

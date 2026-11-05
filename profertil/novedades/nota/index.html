@@ -181,6 +181,15 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
 .pf-n-rel__cab h2 { margin: 0; font: 600 var(--texto-subtitulo)/1.1 var(--f-display); letter-spacing: -0.02em; color: var(--azul); }
 .pf-n-rel__fila { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
 
+/* Flechas: solo cuando las tarjetas no entran; se centran en la altura de la foto. */
+.pf-n-rel__marco { position: relative; }
+.pf-n-rel__flecha { position: absolute; top: var(--mitad, 40%); z-index: 2; translate: 0 -50%; display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 999px; background: var(--color-blanco); color: var(--azul); cursor: pointer; transition: scale 200ms var(--ease), background 200ms ease, color 200ms ease; }
+.pf-n-rel__flecha--ant { left: -8px; }
+.pf-n-rel__flecha--sig { right: -8px; }
+.pf-n-rel__flecha svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+@media (hover: hover) and (pointer: fine) { .pf-n-rel__flecha:hover { background: var(--azul); color: var(--tiza); } }
+.pf-n-rel__flecha:active { scale: .92; }
+
 /* Tarjeta: la de Novedades sin el fondo. La foto (o el arte) con la etiqueta adentro, arriba a la izquierda; abajo la fecha y el título. */
 .pf-n-mini { display: grid; gap: 14px; align-content: start; text-decoration: none; }
 .pf-n-mini__img { position: relative; aspect-ratio: 4 / 3; border-radius: var(--radio-media); overflow: hidden; background: var(--card); line-height: 0; transition: transform 320ms var(--ease); }
@@ -220,6 +229,8 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
   .pf-n-rel__fila { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin-inline: -16px; padding-inline: 16px; scroll-padding-inline: 16px; overscroll-behavior-x: contain; }
   .pf-n-rel__fila::-webkit-scrollbar { display: none; }
   .pf-n-mini { flex: 0 0 76%; scroll-snap-align: start; gap: 12px; }
+  .pf-n-rel__flecha--ant { left: 6px; }
+  .pf-n-rel__flecha--sig { right: 6px; }
   .pf-n-mini__img .pf-etiqueta { top: 8px; left: 8px; --s: var(--etq-s); }
   .pf-n-mini .pf-ttl { font-size: 1.12rem; }
   .pf-n-mini .pf-when { font-size: 0.8rem; }
@@ -379,7 +390,11 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
   </div>
   <section class="pf-n-sigue pf-n-col" aria-label="Notas relacionadas">
     <div class="pf-n-rel__cab"><h2>Notas relacionadas</h2></div>
-    <div class="pf-n-rel__fila" id="pf-rel"></div>
+    <div class="pf-n-rel__marco">
+      <div class="pf-n-rel__fila" id="pf-rel"></div>
+      <button class="pf-n-rel__flecha pf-n-rel__flecha--ant" id="pf-relAnt" type="button" aria-label="Notas anteriores" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 12H7M11 8l-4 4 4 4"/></svg></button>
+      <button class="pf-n-rel__flecha pf-n-rel__flecha--sig" id="pf-relSig" type="button" aria-label="Más notas" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12h10M13 8l4 4-4 4"/></svg></button>
+    </div>
   </section>
 </main>
 
@@ -726,8 +741,30 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
     }).sort(function (a, b) { return b.s - a.s; }).slice(0, 3).map(function (r) { return r.x; });
   }
 
+  // Flechas de las relacionadas: aparecen solo si la fila se desliza; cada toque corre una tarjeta.
+  function flechas() {
+    var f = $("pf-rel"), ant = $("pf-relAnt"), sig = $("pf-relSig");
+    function ver() {
+      var max = f.scrollWidth - f.clientWidth;
+      ant.hidden = f.scrollLeft < 4;
+      sig.hidden = max < 4 || f.scrollLeft > max - 4;
+      var im = f.querySelector(".pf-n-mini__img");
+      if (im) f.parentNode.style.setProperty("--mitad", Math.round(im.offsetHeight / 2) + "px");
+    }
+    function correr(dir) {
+      var c = f.querySelector(".pf-n-mini");
+      if (c) f.scrollBy({ left: dir * (c.offsetWidth + parseFloat(getComputedStyle(f).columnGap || 12)), behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    }
+    ant.addEventListener("click", function () { correr(-1); });
+    sig.addEventListener("click", function () { correr(1); });
+    f.addEventListener("scroll", ver, { passive: true });
+    window.addEventListener("resize", ver);
+    ver();
+  }
+
   function seguir() {
     $("pf-rel").innerHTML = relacionadas().map(mini).join("");
+    flechas();
   }
 
   // La barra toma el azul al terminar la cabecera; la línea de abajo sigue la lectura del cuerpo.
