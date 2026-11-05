@@ -12,6 +12,9 @@ python3 profertil/documentos/fuente/build.py
 - `lista.html`: la lista. Misma lógica que Novedades (barra, buscador en la lupa, filtros en el dock, ancla,
   transición entre páginas) con un encabezado chico y filas en vez de tarjetas: categoría, título, año y descarga.
   Toda la fila es el enlace al visor; el botón de descarga queda por encima.
+  Tres vistas (selector de íconos, se recuerda en el navegador): compacta (una línea, solo el ícono de la categoría),
+  lista y miniaturas (cuadrados con el arte de las Formas del sistema según la categoría, determinista por documento).
+  Los filtros activos (categoría, año y búsqueda) aparecen como chips que se sacan de a uno.
 - `visor.html`: la página de un documento, `ver/?d=<id>`. Título arriba a la izquierda y tres columnas: índice de
   páginas (el punto azul viaja con el resorte de la librería), el PDF con scroll continuo y los datos (descarga,
   cantidad de páginas, modo lectura, copiar el link). Cierra con documentos de la misma categoría y el pie.

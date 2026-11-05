@@ -299,6 +299,59 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   .pf-doc__d { grid-column: 2; grid-row: 1 / span 3; align-self: start; }
 }
 
+/* --- Filtros activos: un chip por filtro (categoría, año y búsqueda); tocarlo lo saca. */
+.pf-activos { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 0 16px; }
+.pf-activos .pf-chip { --h: 30px; gap: 8px; padding-right: 10px; }
+.pf-activos .pf-chip svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+.pf-activos__limpiar { align-self: center; border: 0; background: transparent; cursor: pointer; padding: 4px 6px; color: var(--azul); font-size: var(--texto-chico); text-decoration: underline; text-underline-offset: 3px; }
+.pf-activos[hidden] { display: none; }
+
+/* --- Vistas: compacta, lista (la de siempre) y miniaturas. El selector es el de Novedades; al cambiar, cada documento viaja a su lugar
+   (View Transitions) y el indicador viaja con ellos. */
+.pf-selector.pf-vista .pf-selector__ind { view-transition-name: pf-ind-vista; }
+.pf-selector.pf-vista [data-vista="compacta"] { view-transition-name: pf-vista-compacta; }
+.pf-selector.pf-vista [data-vista="lista"] { view-transition-name: pf-vista-lista; }
+.pf-selector.pf-vista [data-vista="mini"] { view-transition-name: pf-vista-mini; }
+::view-transition-group(*) { animation-duration: var(--t-vista); animation-timing-function: var(--curva-vista); }
+.pf-doc__arte { display: none; }
+
+/* Compacta: una línea por documento, solo el ícono de la categoría. */
+.pf-docs[data-vista="compacta"] .pf-doc { grid-template-columns: 22px minmax(0, 1fr) 44px 30px; column-gap: 14px; padding: 7px 0; }
+.pf-docs[data-vista="compacta"] .pf-etiqueta__rotulo, .pf-docs[data-vista="compacta"] .pf-etiqueta__dato { display: none; }
+.pf-docs[data-vista="compacta"] .pf-doc__t { font-size: 1rem; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pf-docs[data-vista="compacta"] .pf-doc__d { width: 28px; height: 28px; }
+.pf-docs[data-vista="compacta"] .pf-doc__d svg { width: 14px; height: 14px; }
+
+/* Miniaturas: cuadrados con el arte de la categoría (las Formas del sistema), el título abajo. */
+.pf-docs[data-vista="mini"] { display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: 30px 18px; border-top: 0; padding-top: 4px; }
+.pf-docs[data-vista="mini"] .pf-doc { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; align-items: start; row-gap: 10px; padding: 0; border: 0; }
+.pf-docs[data-vista="mini"] .pf-doc__arte { display: block; grid-row: 1; aspect-ratio: 1; border-radius: var(--radio-media); overflow: hidden; line-height: 0; transition: transform 320ms var(--ease); }
+.pf-docs[data-vista="mini"] .pf-doc__arte svg { width: 100%; height: 100%; }
+.pf-docs[data-vista="mini"] .pf-doc .pf-etiqueta { position: absolute; top: 10px; left: 10px; z-index: 1; max-width: calc(100% - 20px); }
+.pf-docs[data-vista="mini"] .pf-etiqueta__rotulo { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.pf-docs[data-vista="mini"] .pf-doc__t { grid-row: 2; padding: 0 2px; font-size: 1.04rem; line-height: 1.18; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.pf-docs[data-vista="mini"] .pf-doc__y { grid-row: 3; padding: 0 2px; text-align: left; margin-top: -4px; }
+.pf-docs[data-vista="mini"] .pf-doc__y:empty { display: none; }
+.pf-docs[data-vista="mini"] .pf-doc__d { position: absolute; top: 10px; right: 10px; z-index: 2; width: 30px; height: 30px; background: var(--color-blanco); border-color: transparent; }
+@media (hover: hover) and (pointer: fine) {
+  .pf-docs[data-vista="mini"] .pf-doc:hover .pf-doc__arte { transform: translateY(-3px); }
+  .pf-docs[data-vista="mini"] .pf-doc:hover .pf-doc__t { translate: 0 0; }
+}
+.pf-docs[data-vista="mini"] .pf-doc:active .pf-doc__arte { transform: scale(.985); }
+@media (max-width: 640px) {
+  .pf-docs[data-vista="compacta"] .pf-doc { grid-template-columns: 22px minmax(0, 1fr) 30px; padding: 9px 0; row-gap: 0; }
+  .pf-docs[data-vista="compacta"] .pf-doc .pf-etiqueta, .pf-docs[data-vista="compacta"] .pf-doc__t { grid-row: 1; }
+  .pf-docs[data-vista="compacta"] .pf-doc .pf-etiqueta { grid-column: 1; }
+  .pf-docs[data-vista="compacta"] .pf-doc__t { grid-column: 2; font-size: .98rem; }
+  .pf-docs[data-vista="compacta"] .pf-doc__y { display: none; }
+  .pf-docs[data-vista="compacta"] .pf-doc__d { grid-column: 3; grid-row: 1; align-self: center; }
+  .pf-docs[data-vista="mini"] { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 12px; }
+  .pf-docs[data-vista="mini"] .pf-doc .pf-etiqueta { grid-column: auto; grid-row: auto; }
+  .pf-docs[data-vista="mini"] .pf-doc__t { grid-column: 1; grid-row: 2; font-size: .98rem; }
+  .pf-docs[data-vista="mini"] .pf-doc__y { grid-column: 1; grid-row: 3; }
+  .pf-docs[data-vista="mini"] .pf-doc__d { grid-column: auto; grid-row: auto; }
+}
+
 /* Transición entre páginas: el componente "Transiciones de página" de la librería
    (persiana con logo, persiana con logo animado o fundido), usado entre Novedades y cada Nota. La elección vive
    en el navegador de quien prueba y se cambia con el panel de abajo a la izquierda. */
@@ -449,6 +502,12 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   <div class="pf-result-row">
     <p class="pf-result-text" id="pf-resultText" aria-live="polite"></p>
     <div class="pf-herramientas">
+      <div class="pf-selector pf-selector--iconos pf-vista" role="group" aria-label="Cómo se ven los documentos">
+        <span class="pf-selector__ind" aria-hidden="true"></span>
+        <button type="button" data-vista="compacta" aria-pressed="false" aria-label="Lista compacta" title="Compacta"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0.5" width="15" height="2" rx="1"/><rect x="0" y="4.5" width="15" height="2" rx="1"/><rect x="0" y="8.5" width="15" height="2" rx="1"/><rect x="0" y="12.5" width="15" height="2" rx="1"/></svg></button>
+        <button type="button" data-vista="lista" aria-pressed="true" aria-label="Lista" title="Lista"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0" width="4" height="4" rx="1.3"/><rect x="6" y="1" width="9" height="2" rx="1"/><rect x="0" y="5.5" width="4" height="4" rx="1.3"/><rect x="6" y="6.5" width="9" height="2" rx="1"/><rect x="0" y="11" width="4" height="4" rx="1.3"/><rect x="6" y="12" width="9" height="2" rx="1"/></svg></button>
+        <button type="button" data-vista="mini" aria-pressed="false" aria-label="Miniaturas" title="Miniaturas"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0" width="6.5" height="6.5" rx="2.1"/><rect x="8.5" y="0" width="6.5" height="6.5" rx="2.1"/><rect x="0" y="8.5" width="6.5" height="6.5" rx="2.1"/><rect x="8.5" y="8.5" width="6.5" height="6.5" rx="2.1"/></svg></button>
+      </div>
       <div class="pf-selector pf-orden" role="group" aria-label="Orden">
         <span class="pf-selector__ind" aria-hidden="true"></span>
         <button type="button" id="pf-sortAz" aria-pressed="true">A a Z</button>
@@ -456,7 +515,8 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
       </div>
     </div>
   </div>
-  <ul class="pf-docs" id="pf-docs"></ul>
+  <div class="pf-activos" id="pf-activos" hidden></div>
+  <ul class="pf-docs" id="pf-docs" data-vista="lista"></ul>
   <div class="pf-empty" id="pf-empty" hidden>
     <svg viewBox="0 0 555 662" aria-hidden="true"><use href="#pf-simbolo"/></svg>
     <p id="pf-emptyText"></p>
@@ -566,15 +626,63 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
     else lista.sort(function (a, b) { return a.n < b.n ? -1 : a.n > b.n ? 1 : 0; });
   }
 
+  /* --- Arte de miniatura: las Formas del sistema sobre un par de color distinto al de la categoría, figura sobre fondo
+     (la misma lógica que las tarjetas de Novedades). Es determinista: cada documento siempre tiene el mismo. */
+  function rnd32(a) {
+    return function () {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  var FORMAS_CAT = {
+    cereales: ["trigo", "plantas"], oleaginosas: ["capas", "hoja", "flor"], pasturas: ["ondas", "plantas", "hoja"], industriales: ["industria", "urea", "sol"],
+    msds: ["casco", "escudo"], inversores: ["grafico", "barras"], biblioteca: ["lupa", "suelo", "capas"]
+  };
+  var PARES = { azul: ["#003DA5", "#4086FF"], verde: ["#2D8035", "#5EB53A"], amarillo: ["#EABA2C", "#E57F19"], naranja: ["#E57F19", "#8A4818"] };
+  var PARES_CONTRA = {
+    cereales: ["azul", "amarillo", "naranja"], oleaginosas: ["azul", "verde"], pasturas: ["azul", "amarillo", "naranja"], industriales: ["azul", "verde"],
+    msds: ["azul", "verde", "naranja"], inversores: ["verde", "amarillo", "naranja"], biblioteca: ["verde", "amarillo", "naranja"]
+  };
+  function usar(f, x, y, w, h, rot, color) {
+    var cx = x + w / 2, cy = y + h / 2;
+    return '<g transform="rotate(' + rot + " " + cx + " " + cy + ')"><use href="#pf-forma-' + f + '" x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="' + color + '"/></g>';
+  }
+  function arte(d) {
+    var W = 240, H = 240, r = rnd32(d.k * 7919 + 13);
+    var op = PARES_CONTRA[d.c], par = PARES[op[d.k % op.length]];
+    var inv = r() < 0.3, fig = inv ? par[1] : par[0], fondo = inv ? par[0] : par[1];
+    var fs = FORMAS_CAT[d.c], f1 = fs[Math.floor(r() * fs.length)], f2 = fs[Math.floor(r() * fs.length)];
+    var s = '<svg viewBox="0 0 ' + W + " " + H + '" aria-hidden="true"><rect width="' + W + '" height="' + H + '" fill="' + fondo + '"/>';
+    var modo = r(), rots = [0, 90, 180, 270];
+    if (modo < 0.45) {
+      var t = W * (1.05 + r() * 0.35);
+      s += usar(f1, W - t * (0.62 + r() * 0.2), H - t * (0.66 + r() * 0.2), t, t, rots[Math.floor(r() * 4)], fig);
+    } else if (modo < 0.75) {
+      var m = W / 2 * 0.92;
+      s += usar(f1, W / 2 - m - 4, (H - m) / 2, m, m, rots[Math.floor(r() * 4)], fig);
+      s += usar(f2, W / 2 + 4, (H - m) / 2, m, m, rots[Math.floor(r() * 4)], fig);
+    } else {
+      var cw = W / 2, lado = cw * 0.82;
+      for (var y = 0; y < 2; y++) for (var x = 0; x < 2; x++) s += usar((x + y) % 2 ? f2 : f1, x * cw + (cw - lado) / 2, y * cw + (cw - lado) / 2, lado, lado, rots[(x + y * 3) % 4], fig);
+    }
+    return s + "</svg>";
+  }
+
   /* --- Filas ---------------------------------------------------------------- */
   var BAJAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v13M6 13l6 6 6-6"/></svg>';
+  var vista = "lista";
+  try { vista = localStorage.getItem("documentos-vista") || "lista"; } catch (e) {}
+  if (["compacta", "lista", "mini"].indexOf(vista) === -1) vista = "lista";
   function fila(d) {
     var q = plano(estado.q.trim());
     var li = document.createElement("li");
     li.className = "pf-doc";
+    li.style.viewTransitionName = "pf-d-" + d.k;
     var bajar = d.l ? 'href="pdf/' + encodeURIComponent(d.l) + '" download' : 'href="' + esc(d.u) + '" target="_blank" rel="noopener"';
-    li.innerHTML = etq(d.c) +
-      '<h3 class="pf-doc__t"><a href="ver/?d=' + encodeURIComponent(d.id) + '">' + resaltar(d.t, q) + "</a></h3>" +
+    li.innerHTML = (vista === "mini" ? '<div class="pf-doc__arte">' + arte(d) + "</div>" : "") + etq(d.c, vista === "mini" ? "" : "").replace('class="pf-etiqueta"', 'class="pf-etiqueta" title="' + POR[d.c].nombre + '"') +
+      '<h3 class="pf-doc__t"' + (vista === "compacta" ? ' title="' + esc(d.t) + '"' : "") + '><a href="ver/?d=' + encodeURIComponent(d.id) + '">' + resaltar(d.t, q) + "</a></h3>" +
       '<span class="pf-doc__y">' + (d.y || "") + "</span>" +
       '<a class="pf-doc__d" ' + bajar + ' aria-label="Descargar PDF: ' + esc(d.t) + '">' + BAJAR + "</a>";
     return li;
@@ -586,6 +694,7 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
     pintadas = hasta;
   }
   function repintar() {
+    docs.dataset.vista = vista;
     docs.innerHTML = ""; pintadas = 0; pintarTanda();
     $("pf-empty").hidden = lista.length > 0;
   }
@@ -633,11 +742,32 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
     var nsub = esMobile.matches ? nf : as.length;
     $("pf-fCount").hidden = nsub === 0; $("pf-fCount").textContent = nsub;
     $("pf-fClear").hidden = nf === 0;
+    activosChips(q);
     $("pf-emptyText").textContent = q
       ? "Ningún documento coincide con «" + q + "»" + (nf ? " con esos filtros" : "") + ". Probá con otra palabra o limpiá los filtros."
       : "Ningún documento cumple esa combinación de filtros. Sacá alguno para ver más.";
   }
   function aplicar() { filtrar(); resumen(); pintarFiltros(); repintar(); }
+
+  /* --- Chips de filtros activos --------------------------------------------------- */
+  var X = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2 2 10"/></svg>';
+  function activosChips(q) {
+    var h = "";
+    activos(estado.cats).forEach(function (k) { h += '<button type="button" class="pf-chip" aria-pressed="true" data-quitar="cat" data-v="' + k + '" aria-label="Quitar el filtro ' + POR[k].nombre + '">' + POR[k].nombre + X + "</button>"; });
+    activos(estado.anios).sort().reverse().forEach(function (k) { h += '<button type="button" class="pf-chip" aria-pressed="true" data-quitar="anio" data-v="' + k + '" aria-label="Quitar el filtro ' + (k === "sin" ? "Sin año" : k) + '">' + (k === "sin" ? "Sin año" : k) + X + "</button>"; });
+    if (q) h += '<button type="button" class="pf-chip" aria-pressed="true" data-quitar="q" aria-label="Quitar la búsqueda">«' + esc(q) + "»" + X + "</button>";
+    if (h) h += '<button type="button" class="pf-activos__limpiar" data-quitar="todo">Limpiar todo</button>';
+    $("pf-activos").innerHTML = h; $("pf-activos").hidden = !h;
+  }
+  $("pf-activos").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-quitar]"); if (!b) return;
+    var t = b.dataset.quitar;
+    if (t === "todo") { limpiar(); return; }
+    if (t === "cat") delete estado.cats[b.dataset.v];
+    else if (t === "anio") delete estado.anios[b.dataset.v];
+    else if (t === "q") { estado.q = ""; $("pf-q").value = ""; }
+    aplicar();
+  });
 
   /* --- Selector (indicador) -------------------------------------------------- */
   function moverInd(seg, animar) {
@@ -654,6 +784,23 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
     $("pf-sortAz").setAttribute("aria-pressed", String(o === "az")); $("pf-sortAnio").setAttribute("aria-pressed", String(o === "anio"));
     moverInd(document.querySelector(".pf-selector.pf-orden"), true); aplicar();
   }
+  function marcarVista(animar) {
+    document.querySelectorAll(".pf-selector.pf-vista button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.vista === vista)); });
+    moverInd(document.querySelector(".pf-selector.pf-vista"), animar);
+  }
+  // Los documentos viajan a su lugar nuevo (View Transitions) y el indicador viaja con ellos; sin soporte, cambia directo.
+  document.querySelector(".pf-selector.pf-vista").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-vista]"); if (!b || b.dataset.vista === vista) return;
+    vista = b.dataset.vista;
+    try { localStorage.setItem("documentos-vista", vista); } catch (err) {}
+    if (document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      // Si se cambia de vista de nuevo en pleno viaje, el navegador cancela la anterior: no es un error.
+      var vt = document.startViewTransition(function () { marcarVista(false); repintar(); });
+      [vt.ready, vt.finished, vt.updateCallbackDone].forEach(function (p) { p.catch(function () {}); });
+    }
+    else { marcarVista(true); repintar(); }
+  });
+  marcarVista(false);
   $("pf-sortAz").addEventListener("click", function () { ordenar("az"); });
   $("pf-sortAnio").addEventListener("click", function () { ordenar("anio"); });
 
