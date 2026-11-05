@@ -438,16 +438,32 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
   function porId(id) { return L.filter(function (c) { return c.id === id; })[0]; }
   function ordenados() { var o = []; GRUPOS.forEach(function (g) { L.forEach(function (c) { if (c.grupo === g) o.push(c); }); }); return o; }
   /* Ajustes guardados: viven en un servicio aparte y pisan los valores por defecto de cada componente
-     para cualquiera que abra la librería. Guardar pide la clave del Lab (una vez por navegador). */
-  var API = "https://bong-lab-ajustes.bongstudiook.workers.dev/ajustes", GUARD = {}, LS = "pf-lab-clave";
-  function clave() { try { return localStorage.getItem(LS) || ""; } catch (e) { return ""; } }
-  (function () {
-    if (!/[?&]editar\b/.test(location.search)) return;
-    var k = prompt("Clave del Lab para guardar ajustes");
-    try { if (k) localStorage.setItem(LS, k.trim()); } catch (e) {}
-    history.replaceState(null, "", location.pathname + location.hash);
-  })();
-  var EDITA = !!clave();
+     para cualquiera que abra la librería. Para guardar hay que entrar con Cloudflare Access (código por mail):
+     Guardar abre una ventana de entrada y esa ventana le pasa a la librería un pase que dura 7 días.
+     Los botones aparecen solo en el navegador que abrió la librería con ?editar. */
+  var SERV = "https://lab-ajustes.bongstudio.ar", API = SERV + "/ajustes", GUARD = {}, LS = "pf-lab-pase", LSE = "pf-lab-edita";
+  function leer(k) { try { return localStorage.getItem(k) || ""; } catch (e) { return ""; } }
+  function poner(k, v) { try { if (v) localStorage.setItem(k, v); else localStorage.removeItem(k); } catch (e) {} }
+  function pase() {
+    var p = leer(LS); if (!p) return "";
+    try { var d = JSON.parse(atob(p.split(".")[0].replace(/-/g, "+").replace(/_/g, "/"))); if (d.exp > Date.now() + 6e4) return p; } catch (e) {}
+    poner(LS, ""); return "";
+  }
+  if (/[?&]editar\b/.test(location.search)) { poner(LSE, "1"); history.replaceState(null, "", location.pathname + location.hash); }
+  var EDITA = leer(LSE) === "1";
+  // Abre la entrada de Access en una ventana y espera el pase.
+  function entrar() {
+    return new Promise(function (ok, mal) {
+      var w = open(SERV + "/entrar?origen=" + encodeURIComponent(location.origin), "pf-lab-entrar", "width=480,height=640");
+      if (!w) { mal(new Error("ventana")); return; }
+      function msj(e) {
+        if (e.origin !== SERV || !e.data || e.data.tipo !== "pf-lab-pase") return;
+        removeEventListener("message", msj); clearInterval(vig); poner(LS, e.data.pase); ok(e.data.pase);
+      }
+      addEventListener("message", msj);
+      var vig = setInterval(function () { if (w.closed) { clearInterval(vig); setTimeout(function () { removeEventListener("message", msj); if (!pase()) mal(new Error("cerrada")); }, 400); } }, 500);
+    });
+  }
   function valido(k, v) {
     if (k.tipo === "rango") return typeof v === "number" ? Math.min(k.max, Math.max(k.min, v)) : undefined;
     if (k.tipo === "interr") return typeof v === "boolean" ? v : undefined;
@@ -468,12 +484,21 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
   }
   function guardarHTML(c) {
     var g = GUARD[c.id];
-    return '<div class="guardar"><small id="gEstado">' + (g ? "Guardado " + fecha(g.guardado) : "Valores de fábrica") + '</small>' +
+    return '<div class="guardar"><small id="gEstado">' + (g ? "Guardado " + fecha(g.guardado) + (g.por ? " por " + esc(g.por) : "") : "Valores de fábrica") + '</small>' +
       (g ? '<button type="button" class="btn-txt" id="fabrica">De fábrica</button>' : '') + '<button type="button" class="btn" id="guardar">Guardar</button></div>';
   }
-  function pedir(metodo, cuerpo) {
-    return fetch(API + "/" + actual.id, { method: metodo, headers: { "Content-Type": "application/json", "X-Clave": clave() }, body: cuerpo ? JSON.stringify(cuerpo) : undefined })
-      .then(function (r) { return r.json().then(function (j) { if (r.status === 401) { try { localStorage.removeItem(LS); } catch (e) {} throw new Error("clave"); } if (!r.ok) throw new Error(j.error || "error"); return j; }); });
+  // Si no hay pase (o venció), primero entra; si el servicio lo rechaza, entra de nuevo una vez.
+  function pedir(metodo, cuerpo, reintento) {
+    var p = pase();
+    var paso = p ? Promise.resolve(p) : entrar();
+    return paso.then(function (p) {
+      return fetch(API + "/" + actual.id, { method: metodo, headers: { "Content-Type": "application/json", "Authorization": "Bearer " + p }, body: cuerpo ? JSON.stringify(cuerpo) : undefined });
+    }).then(function (r) {
+      return r.json().then(function (j) {
+        if (r.status === 401) { poner(LS, ""); if (!reintento) return pedir(metodo, cuerpo, true); throw new Error("acceso"); }
+        if (!r.ok) throw new Error(j.error || "error"); return j;
+      });
+    });
   }
   function refrescarGuardar() { var cab = document.querySelector(".ajustes__cab"); if (cab && EDITA) { var g = cab.querySelector(".guardar"); if (g) g.outerHTML = guardarHTML(actual); } }
 
@@ -869,7 +894,9 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
         GUARD[actual.id] = j[actual.id]; refrescarGuardar(); $("aviso").textContent = "Ajustes guardados";
       }).catch(function (x) {
         b.disabled = false; b.textContent = "Guardar";
-        if (x.message === "clave") { EDITA = false; alert("La clave no es correcta. Abrí la librería con ?editar para cargarla de nuevo."); }
+        if (x.message === "ventana") alert("El navegador bloqueó la ventana de entrada. Permití ventanas emergentes para esta página y probá de nuevo.");
+        else if (x.message === "cerrada") {}
+        else if (x.message === "acceso") alert("Tu cuenta no tiene permiso para guardar ajustes.");
         else alert("No se pudo guardar. Probá de nuevo.");
       });
       return;
