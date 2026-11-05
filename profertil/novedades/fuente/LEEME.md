@@ -130,11 +130,11 @@ conecta en vivo. `SIN_FOTOS=1` saltea la bajada de fotos.
 
 Entre Novedades y cada Nota (y de una Nota a otra) corre el componente "Transiciones de página" de la librería. La elegida es Persiana con logo: azul, 700 ms por tramo, curva Fuerte. Vive en tres archivos que `build.py` mete en las dos páginas:
 
-- `transicion.css`: el paño, el fundido y el panel.
+- `transicion.css`: el paño, el fundido y el panel. La animación del logo armado se toma del componente al compilar.
 - `transicion-cabeza.js`: va en el head, antes de pintar. Lee la elección, pone las variables y, si se llega con la persiana, deja el paño tapando para que siga de largo.
 - `transicion.js`: intercepta los links internos de Novedades, tapa y recién ahí cambia de página. Arma el panel.
 
-El panel (abajo a la izquierda) permite ajustar la variante (Persiana, Fundido o Ninguna), el color del paño, la duración y la curva. Lo que se cambia queda guardado en el navegador de quien prueba; sin tocarlo, corre la Persiana. Con movimiento reducido no hay transición.
+El panel (abajo a la izquierda) permite ajustar la variante (Persiana, Persiana con logo animado, Fundido o Ninguna), el color del paño, la duración, lo que tarda el logo en armarse y la curva. Lo que se cambia queda guardado en el navegador de quien prueba; sin tocarlo, corre la Persiana. Con movimiento reducido no hay transición.
 
 ## Tokens: Figma manda
 

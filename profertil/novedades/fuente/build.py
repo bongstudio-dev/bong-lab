@@ -4,7 +4,7 @@ os.chdir(AQUI)
 t=open('template.html').read()
 # Tokens y piezas compartidas: la página carga ../componentes/tokens.css (sale de tokens.json, exportado
 # del Figma Master, con componentes/fuente/generar-tokens.py) y ../componentes/base.css.
-import re
+import re, subprocess
 def sym(f,i):
     v=open(f).read(); vb=re.search(r'viewBox="([^"]+)"',v).group(1)
     inner=re.sub(r'^.*?<svg[^>]*>|</svg>\s*$','',v,flags=re.S).strip()
@@ -19,7 +19,22 @@ t=t.replace('/*__NOTAS__*/[]',n).replace('/*__ASSETS__*/{}',a)
 TR_CSS = open('transicion.css', encoding='utf-8').read()
 TR_CAB = open('transicion-cabeza.js', encoding='utf-8').read()
 TR_JS = open('transicion.js', encoding='utf-8').read()
-TR_VELO = '<div class="pf-tr-velo" id="pf-tr-velo" aria-hidden="true"><svg viewBox="0 0 1458 1021"><use href="#pf-logo-blanco"/></svg></div>\n'
+# La variante "Persiana con logo animado": el logo por piezas y su animación se toman del componente
+# (componentes/c/transicion-navegacion.js) y se adaptan a las clases de acá.
+TR_COMP = open(os.path.join(AQUI, '..', '..', 'componentes', 'c', 'transicion-navegacion.js'), encoding='utf-8').read()
+LOGO_ANIMADO = json.loads(re.search(r'var LOGO_ANIMADO = ("(?:[^"\\]|\\.)*");', TR_COMP).group(1))
+TR_CSS_COMP = subprocess.run(['node', '-e', '''
+const vm = require("vm"), fs = require("fs"); let comp;
+const ctx = { Libreria: { sumar: c => { comp = c; } } }; vm.createContext(ctx);
+vm.runInContext(fs.readFileSync(process.argv[1], "utf8"), ctx);
+process.stdout.write(comp.css({}));
+''', os.path.join(AQUI, '..', '..', 'componentes', 'c', 'transicion-navegacion.js')], capture_output=True, text=True, check=True).stdout
+anim = TR_CSS_COMP[TR_CSS_COMP.index('/* Persiana con logo animado'):TR_CSS_COMP.index('/* Fundido')]
+anim = (anim.replace('.pf-tp__velo', '.pf-tr-velo').replace('.pf-entra .pf-la', '.pf-tr-velo.pf-entra .pf-la')
+        .replace('var(--color)', 'var(--pf-tr-color)').replace('var(--pf-dur)', 'var(--pf-tr-dur)'))
+TR_CSS = TR_CSS + '\n' + anim
+TR_VELO = ('<div class="pf-tr-velo" id="pf-tr-velo" aria-hidden="true"><svg class="pf-tr-logo" viewBox="0 0 1458 1021"><use href="#pf-logo-blanco"/></svg>'
+           + LOGO_ANIMADO + '</div>\n')
 def armar(head, rest):
     return ('<!DOCTYPE html>\n<html lang="es">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
             + head + '\n' + TR_CSS + '</style>\n<script>\n' + TR_CAB + '</script>\n</head>\n<body>\n' + TR_VELO + rest
