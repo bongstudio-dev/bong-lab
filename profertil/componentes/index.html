@@ -400,7 +400,9 @@ html.con-pleno { overflow: hidden; }
 /* ==========================================================================
    Librería. Cada componente vive en c/<id>.js y se suma con Libreria.sumar({...}).
      id, nombre, grupo, bajada, nota
-     variantes   [[id, nombre, descripción], ...]
+     variantes   [[id, nombre, descripción, valores], ...]
+                 valores (opcional) = un preset: {control: valor}. Al elegir la variante, los controles que nombra
+                 cualquier preset vuelven a su valor de fábrica y se aplican los de esta (los demás quedan como estaban).
      alto        "auto" (el contenido, centrado) o un número (página con scroll propio)
      previa      0 a 1: hasta dónde scrollear la miniatura de la galería
      mini        ancho en px al que se dibuja la miniatura (1280 por defecto; menos = más cerca)
@@ -907,11 +909,22 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
     $("pre").textContent = p[tab].trim();
   }
 
+  // Variantes que son presets: llevan sus valores a los controles.
+  function aplicarPreset(id) {
+    var vs = actual.variantes || [], v = vs.filter(function (x) { return x[0] === id; })[0];
+    if (!v || !v[3]) return;
+    var nombrados = {}; vs.forEach(function (x) { if (x[3]) Object.keys(x[3]).forEach(function (k) { nombrados[k] = 1; }); });
+    (actual.controles || []).forEach(function (k) {
+      if (k === "---" || !nombrados[k.id]) return;
+      estado[k.id] = k.id in v[3] ? v[3][k.id] : k.def;
+    });
+  }
   /* ---------------- eventos ---------------- */
   document.addEventListener("click", function (e) {
     var b = e.target.closest("button"); if (!b) return;
     if (b.dataset.var) {
       estado.variante = b.dataset.var;
+      aplicarPreset(b.dataset.var);
       document.querySelectorAll("[data-var]").forEach(function (x) { x.setAttribute("aria-pressed", x === b); });
       $("vdesc").innerHTML = descVariante(); dibujar(true); codigo();
       if ($("ajustes")) { $("ajustes").innerHTML = ajustesHTML(); moverInds(); }
