@@ -215,6 +215,7 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 .pf-gcol { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
 .pf-sentinel { height: 1px; }
 
+a.pf-card, a.pf-d-cta { text-decoration: none; }
 .pf-card {
   position: relative; display: grid; text-align: left;
   border: 0; padding: 0; cursor: pointer;
@@ -260,6 +261,7 @@ mark { background: rgba(234, 186, 44, 0.42); color: inherit; border-radius: 3px;
 /* La etiqueta nunca se sale de la tarjeta: la tarjeta es contenedor y, si es
    angosta, la etiqueta pasa al nombre corto y suelta el año. Si aun asi no
    entra, el rotulo se corta con puntos suspensivos. */
+a.pf-card, a.pf-d-cta { text-decoration: none; }
 .pf-card { container-type: inline-size; }
 .pf-card .pf-etiqueta { max-width: 100%; }
 .pf-card .pf-media .pf-etiqueta { max-width: calc(100% - 20px); }
@@ -400,7 +402,8 @@ dialog.pf-modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: 
   .pf-d-segs { gap: 6px; }
   .pf-d-flechas { display: none; }
   .pf-grid, .pf-gcol { gap: 10px; }
-  .pf-card { border-radius: 20px; }
+  a.pf-card, a.pf-d-cta { text-decoration: none; }
+.pf-card { border-radius: 20px; }
   .pf-media { margin: 6px 6px 0; border-radius: 15px; }
   .pf-media .pf-etiqueta { top: 7px; left: 7px; --s: var(--etq-s); }
   .pf-play { width: 28px; height: 28px; top: 7px; right: 7px; }
@@ -826,8 +829,9 @@ dialog.pf-modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: 
 
   function tarjeta(n, idx) {
     var q = plano(estado.q.trim());
-    var b = document.createElement("button");
-    b.type = "button"; b.className = "pf-card"; b.dataset.idx = idx;
+    // Cada tarjeta es un enlace a su página de Nota.
+    var b = document.createElement("a");
+    b.href = "nota/?n=" + encodeURIComponent(n.ar); b.className = "pf-card"; b.dataset.idx = idx;
     b.style.viewTransitionName = "pf-nota-" + n.id;
     var when = '<p class="pf-when"><b>' + fecha(n.f) + "</b></p>";
     var h;
@@ -1060,7 +1064,6 @@ dialog.pf-modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: 
     $("pf-mNext").disabled = idx === ctx.length - 1;
     if (!modal.open) modal.showModal();
   }
-  grid.addEventListener("click", function (e) { var c = e.target.closest(".pf-card"); if (c) abrirNota(Number(c.dataset.idx), lista); });
   $("pf-mPrev").addEventListener("click", function () { if (actual > 0) abrirNota(actual - 1); });
   $("pf-mNext").addEventListener("click", function () { if (actual < ctx.length - 1) abrirNota(actual + 1); });
   $("pf-mClose").addEventListener("click", function () { modal.close(); });
@@ -1176,7 +1179,7 @@ dialog.pf-modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: 
       '<div class="pf-d-kick">' + etq(n.tp, { dato: fechaDato(n.f) }) + "</div>" +
       "<h2" + (n.t.length > 80 ? ' class="pf-largo"' : "") + ">" + esc(n.t) + "</h2>" +
       (n.b ? '<p class="pf-d-bajada">' + esc(n.b) + "</p>" : "") +
-      '<button class="pf-d-cta" type="button" data-k="' + k + '">Leer la nota ' + FLECHA_CTA + "</button>" +
+      '<a class="pf-d-cta" href="nota/?n=' + encodeURIComponent(n.ar) + '">Leer la nota ' + FLECHA_CTA + "</a>" +
       "</div></div></div></article>";
   }).join("");
   $("pf-dSegs").style.setProperty("--n", dest.length);
@@ -1257,7 +1260,6 @@ dialog.pf-modal::backdrop { background: rgba(0, 30, 82, 0.55); backdrop-filter: 
   $("pf-dSegs").addEventListener("click", function (e) { var b = e.target.closest(".pf-d-seg"); if (b) irA(Number(b.dataset.k)); });
   $("pf-dPrev").addEventListener("click", function () { irA(dk - 1, -1); });
   $("pf-dNext").addEventListener("click", function () { irA(dk + 1, 1); });
-  $("pf-dSlides").addEventListener("click", function (e) { var b = e.target.closest(".pf-d-cta"); if (b) abrirNota(Number(b.dataset.k), dest); });
   dEl.addEventListener("focusin", function (e) { if (e.target.matches(":focus-visible")) pausa("foco", true); });
   dEl.addEventListener("focusout", function (e) { if (!dEl.contains(e.relatedTarget)) pausa("foco", false); });
   dEl.addEventListener("keydown", function (e) {

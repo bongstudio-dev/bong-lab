@@ -53,6 +53,10 @@
 
 ## Página de Nota
 
+Desde Novedades se llega por enlace directo: cada tarjeta de la grilla y el
+botón "Leer la nota" del header llevan a `nota/?n=<ar>`. Las 471 notas tienen
+su página.
+
 `../nota/index.html` es la plantilla de una nota: `nota/?n=<ar>` (sin
 parámetro, la más reciente). Sale de `nota.html` con el mismo `build.py`, que
 le copia de `template.html` el bloque entre `@comun` y `@fin-comun` (tipos,
