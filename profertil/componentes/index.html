@@ -199,12 +199,14 @@ input[type="text"], select { width: 100%; height: 32px; padding: 0 10px; border:
 .ctl > .pf-interruptor { justify-self: end; }
 
 /* Guardar ajustes: solo en el navegador que activó la edición (?editar). */
-.ajustes__cab { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 10px; }
+.ajustes__cab { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 12px; margin-bottom: 10px; }
 .ajustes__cab h2 { margin: 0; }
-.guardar { display: flex; align-items: center; gap: 14px; }
-.guardar small { font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
-.btn-txt { border: 0; background: none; padding: 0; font-size: 12.5px; color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; }
-.btn[disabled] { opacity: .45; }
+.guardar { display: contents; }
+.guardar__btns { display: flex; gap: 6px; }
+/* Pastilla del sistema en chico y de bajo contraste: son acciones de mantenimiento, no del componente. */
+.guardar .pf-pastilla { --h: 24px; --pc: var(--suave); color: var(--ink-2); }
+.guardar .pf-pastilla[disabled] { opacity: .5; cursor: default; }
+.guardar small { grid-column: 1 / -1; margin-top: 4px; font-size: 11.5px; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
 
 /* Código: una sola acción principal, Copiar. */
 .codigo__cab { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
@@ -484,8 +486,9 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
   }
   function guardarHTML(c) {
     var g = GUARD[c.id];
-    return '<div class="guardar"><small id="gEstado">' + (g ? "Guardado " + fecha(g.guardado) + (g.por ? " por " + esc(g.por) : "") : "Valores de fábrica") + '</small>' +
-      (g ? '<button type="button" class="btn-txt" id="fabrica">De fábrica</button>' : '') + '<button type="button" class="btn" id="guardar">Guardar</button></div>';
+    return '<div class="guardar"><div class="guardar__btns">' +
+      (g ? '<button type="button" class="pf-pastilla" id="fabrica">De fábrica</button>' : '') + '<button type="button" class="pf-pastilla" id="guardar">Guardar</button></div>' +
+      '<small id="gEstado">' + (g ? "Guardado " + fecha(g.guardado) + (g.por ? " · " + esc(g.por) : "") : "Valores de fábrica") + '</small></div>';
   }
   // Si no hay pase (o venció), primero entra; si el servicio lo rechaza, entra de nuevo una vez.
   function pedir(metodo, cuerpo, reintento) {
