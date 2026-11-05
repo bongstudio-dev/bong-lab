@@ -107,7 +107,8 @@ button, a { touch-action: manipulation; }
 
 /* --- Datos, a la derecha de la foto: rótulo y valor por fila. */
 .pf-n-datos { grid-column: 3; grid-row: 2; align-self: start; margin: 56px 0 0; display: grid; justify-items: start; gap: 14px; font-size: var(--texto-chico); }
-.pf-n-fecha { margin: 0; color: var(--ink-2); }
+.pf-n-fecha { margin: 0; color: var(--ink-2); white-space: nowrap; }
+.pf-n-fecha__corta { display: none; }
 /* Minutos de lectura y modo lectura, pegados y en azul. */
 .pf-n-par { display: flex; gap: 4px; }
 .pf-n-tiempo { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px 0 9px; border-radius: 999px; background: var(--azul); color: var(--tiza); font-size: var(--texto-mini); font-variant-numeric: tabular-nums; }
@@ -182,11 +183,12 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
 
 /* Tarjeta: miniatura cuadrada (foto de la nota o el arte de Novedades), etiqueta y título. */
 .pf-n-mini { display: grid; gap: 14px; align-content: start; text-decoration: none; }
-.pf-n-mini__img { aspect-ratio: 1; border-radius: var(--radio-media); overflow: hidden; background: var(--card); line-height: 0; transition: transform 320ms var(--ease); }
+.pf-n-mini__img { position: relative; aspect-ratio: 1; border-radius: var(--radio-media); overflow: hidden; background: var(--card); line-height: 0; transition: transform 320ms var(--ease); }
 .pf-n-mini__img > :is(img, svg) { width: 100%; height: 100%; object-fit: cover; display: block; }
-.pf-n-mini .pf-etiqueta { --s: var(--etq-s); }
-.pf-n-mini .pf-etiqueta__rotulo { outline: 1px solid var(--line); outline-offset: -1px; }
-.pf-n-mini b { font: 500 1.06rem/1.25 var(--f-display); letter-spacing: -0.01em; color: var(--azul); text-wrap: balance; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+/* La etiqueta va adentro de la imagen, arriba a la izquierda, como en las tarjetas de Novedades. */
+.pf-n-mini__img .pf-etiqueta { position: absolute; top: 10px; left: 10px; max-width: calc(100% - 20px); }
+.pf-n-mini__img .pf-etiqueta__rotulo { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.pf-n-mini b { font: 600 1.36rem/1.1 var(--f-display); letter-spacing: -0.025em; color: var(--azul); text-wrap: balance; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 @media (hover: hover) and (pointer: fine) { .pf-n-mini:hover .pf-n-mini__img { transform: translateY(-3px); } }
 .pf-n-mini:active .pf-n-mini__img { transform: scale(.985); }
 
@@ -213,10 +215,22 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
   .pf-n-foto { margin-top: 28px; }
   .pf-n-texto { font-size: 17px; line-height: 1.62; }
   .pf-n-sigue { margin-top: 80px; }
-  .pf-n-rel__fila { grid-template-columns: 1fr; gap: 16px; }
-  .pf-n-mini { grid-template-columns: 104px minmax(0, 1fr); gap: 6px 14px; }
-  .pf-n-mini__img { grid-row: span 2; border-radius: 12px; }
-  .pf-n-mini b { font-size: 1rem; }
+  /* Relacionadas en una fila que se desliza, con encastre en cada tarjeta. */
+  .pf-n-rel__fila { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; margin-inline: -16px; padding-inline: 16px; scroll-padding-inline: 16px; overscroll-behavior-x: contain; }
+  .pf-n-rel__fila::-webkit-scrollbar { display: none; }
+  .pf-n-mini { flex: 0 0 76%; scroll-snap-align: start; gap: 12px; }
+  .pf-n-mini__img .pf-etiqueta { top: 8px; left: 8px; --s: var(--etq-s); }
+  .pf-n-mini b { font-size: 1.15rem; }
+  /* Fecha, minutos, modo lectura y compartir en una sola línea. */
+  .pf-n-datos { flex-wrap: nowrap; gap: 6px; font-size: var(--texto-mini); }
+  .pf-n-fecha { margin-right: 4px; }
+  .pf-n-fecha__larga { display: none; }
+  .pf-n-fecha__corta { display: inline; }
+  .pf-n-par, .pf-n-compartir { gap: 4px; }
+  .pf-n-tiempo { height: 30px; padding: 0 10px 0 8px; gap: 5px; }
+  .pf-n-compartir > *, .pf-n-foco { width: 30px; height: 30px; }
+  .pf-n-compartir svg { width: 14px; height: 14px; }
+  .pf-n-foco svg { width: 16px; height: 16px; }
   .pf-pie { margin-top: 80px; }
 }
 .pf-pie { --radio: var(--radio-tarjeta); --logo: 150px; --par: 22; --p: 1;
@@ -615,7 +629,7 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
   var OJO = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="2.8"/></svg>';
   function datos(d) {
     // Sin rótulos: la fecha, el tiempo de lectura en un chip, compartir y el modo lectura.
-    var h = '<p class="pf-n-fecha">' + fecha(n.f, true) + "</p>" +
+    var h = '<p class="pf-n-fecha"><span class="pf-n-fecha__larga">' + fecha(n.f, true) + '</span><span class="pf-n-fecha__corta">' + fecha(n.f) + "</span></p>" +
       '<div class="pf-n-par"><span class="pf-n-tiempo">' + RELOJ + Math.max(1, Math.round(n.w / 200)) + " min</span>" +
       '<button class="pf-n-foco" type="button" id="pf-foco" aria-pressed="false" aria-label="Modo lectura" title="Modo lectura">' + OJO + "</button></div>";
     var aqui = encodeURIComponent(location.href), ttl = encodeURIComponent(n.t);
@@ -692,7 +706,7 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
   function mini(x) {
     var img = x.imgL ? "../" + x.imgL : x.img;
     var m = img ? '<img src="' + esc(img) + '" alt="" loading="lazy" decoding="async">' : arte(x, 180, 120, x.id * 7919 + 13);
-    return '<a class="pf-n-mini" href="' + url(x) + '"><div class="pf-n-mini__img">' + m + "</div>" + etq(x.tp, { dato: x.anio }) + "<b>" + esc(x.t) + "</b></a>";
+    return '<a class="pf-n-mini" href="' + url(x) + '"><div class="pf-n-mini__img">' + m + etq(x.tp, { dato: x.anio }) + "</div><b>" + esc(x.t) + "</b></a>";
   }
 
   // Relacionadas: comparten temas de WordPress, cultivo, pilar o tipo; a igual puntaje, la más cercana en el tiempo.

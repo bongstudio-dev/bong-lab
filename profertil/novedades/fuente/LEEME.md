@@ -78,10 +78,11 @@ nota lo lee al abrir de `../notas/<ar>.json`.
 - Modo lectura: deja solo título, foto y texto; se sale con el mismo botón, el
   de arriba a la derecha o Esc, sin perder el punto de lectura.
 - Hasta 1100 px de ancho queda una columna: título, foto, datos y texto; el
-  índice se va.
-- Cierra con tres relacionadas y nada más: tarjetas con miniatura cuadrada
-  (la foto de la nota o el arte de Novedades), etiqueta con el año y título;
-  en celular, lista. Comparten temas, cultivo, pilar o tipo; a igual puntaje,
+  índice se va. En celular los datos van en una sola línea, con la fecha corta.
+- Cierra con tres relacionadas y nada más: tarjetas con imagen cuadrada (la
+  foto de la nota o el arte de Novedades) con la etiqueta y el año adentro,
+  arriba a la izquierda, como en Novedades, y el título debajo; en celular,
+  una fila que se desliza con encastre. Comparten temas, cultivo, pilar o tipo; a igual puntaje,
   la más cercana en el tiempo.
 - Sin sombras.
 
