@@ -819,7 +819,13 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
     return true;
   }
   function ctrl(id) { return (actual.controles || []).filter(function (k) { return k.id === id; })[0]; }
-  function cambio(id, v) { estado[id] = v; var k = ctrl(id); if (!(k && aplicar(k))) dibujar(false); codigo(); }
+  /* Componentes con "vivo": su script expone window.pfVivo(opciones) y recibe los ajustes sin recargar la vista previa. */
+  function hayVivo() { try { return !!(actual.vivo && actual.vivo(estado)); } catch (e) { return false; } }
+  function mandarVivo() {
+    try { var o = actual.vivo(estado), w = iframe.contentWindow; if (o && w && typeof w.pfVivo === "function") { w.pfVivo(o); return true; } } catch (e) {}
+    return false;
+  }
+  function cambio(id, v) { estado[id] = v; var k = ctrl(id); if (!(k && aplicar(k)) && !(hayVivo() && mandarVivo())) dibujar(false); codigo(); }
   /* base.css: las piezas compartidas. Se lee una vez y se parte por sus marcas "@pieza nombre"
      para mostrar en la pestaña BASE solo las que usa el componente (las que declara en base: [...]). */
   var PIEZAS = {};
@@ -895,7 +901,7 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
   document.addEventListener("input", function (e) {
     var el = e.target, k = el.dataset && el.dataset.k; if (!k || !el.closest("#ajustes")) return;
     var c = ctrl(k);
-    if (el.type === "range") { $("v-" + k).textContent = el.value + " " + (c.unidad || ""); if (c.aplica) cambio(k, parseFloat(el.value)); else estado[k] = parseFloat(el.value); }
+    if (el.type === "range") { $("v-" + k).textContent = el.value + " " + (c.unidad || ""); if (c.aplica || hayVivo()) cambio(k, parseFloat(el.value)); else estado[k] = parseFloat(el.value); }
     else {
       if (el.tagName === "SELECT" && $("d-" + k)) { var o = c.opciones.filter(function (x) { return String(x[0]) === el.value; })[0]; $("d-" + k).textContent = o[2]; }
       cambio(k, el.value);
@@ -903,7 +909,7 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
   });
   document.addEventListener("change", function (e) {
     var el = e.target, k = el.dataset && el.dataset.k, c = k && actual && ctrl(k);
-    if (el.type === "range" && c && !c.aplica) cambio(k, parseFloat(el.value));
+    if (el.type === "range" && c && !c.aplica && !hayVivo()) cambio(k, parseFloat(el.value));
   });
 
   /* ---------------- pantalla completa ----------------
