@@ -66,7 +66,7 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
-html { background: var(--bg); }
+html { background: var(--bg); overflow-y: scroll; } /* la barra siempre está: si aparece y desaparece según el largo de la lista, el contenido se corre de costado */
 body {
   margin: 0;
   background: var(--bg);
@@ -271,6 +271,7 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 .pf-dh p { margin: 14px 0 0; max-width: 58ch; font-size: var(--texto-destacado); line-height: 1.5; color: var(--ink-2); }
 
 /* --- Filas: una por documento, separadas por una línea (sin cajas ni sombras). */
+.pf-docs:not(:empty) { min-height: 60vh; }
 .pf-docs { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
 .pf-doc { position: relative; display: grid; grid-template-columns: 172px minmax(0, 1fr) 52px 36px; align-items: center; column-gap: 20px; padding: 15px 0; border-bottom: 1px solid var(--line); animation: pf-entra 380ms var(--ease) backwards; }
 @keyframes pf-entra { from { opacity: 0; transform: translateY(6px); } }
@@ -300,11 +301,13 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 }
 
 /* --- Filtros activos: un chip por filtro (categoría, año y búsqueda); tocarlo lo saca. */
-.pf-activos { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 0 16px; }
+/* Van en la misma fila que el contador (con el alto de los selectores): al sumar o sacar un filtro la lista no se corre. */
+.pf-result-main { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; min-width: 0; min-height: 36px; }
+.pf-activos { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+@media (max-width: 640px) { .pf-result-main { min-height: 66px; align-content: flex-start; } } /* en celular los chips bajan a su propia línea: el lugar queda reservado */
 .pf-activos .pf-chip { --h: 30px; gap: 8px; padding-right: 10px; }
 .pf-activos .pf-chip svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
 .pf-activos__limpiar { align-self: center; border: 0; background: transparent; cursor: pointer; padding: 4px 6px; color: var(--azul); font-size: var(--texto-chico); text-decoration: underline; text-underline-offset: 3px; }
-.pf-activos[hidden] { display: none; }
 
 /* --- Vistas: compacta, lista (la de siempre) y miniaturas. El selector es el de Novedades; al cambiar, la lista se funde (View Transitions)
    y el indicador viaja a su lugar. */
@@ -504,7 +507,10 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 
 <main class="pf-col">
   <div class="pf-result-row">
-    <p class="pf-result-text" id="pf-resultText" aria-live="polite"></p>
+    <div class="pf-result-main">
+      <p class="pf-result-text" id="pf-resultText" aria-live="polite"></p>
+      <div class="pf-activos" id="pf-activos"></div>
+    </div>
     <div class="pf-herramientas">
       <div class="pf-selector pf-selector--iconos pf-vista" role="group" aria-label="Cómo se ven los documentos">
         <span class="pf-selector__ind" aria-hidden="true"></span>
@@ -519,7 +525,6 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
       </div>
     </div>
   </div>
-  <div class="pf-activos" id="pf-activos" hidden></div>
   <ul class="pf-docs" id="pf-docs" data-vista="lista"></ul>
   <div class="pf-empty" id="pf-empty" hidden>
     <svg viewBox="0 0 555 662" aria-hidden="true"><use href="#pf-simbolo"/></svg>
@@ -733,19 +738,13 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
     }).join("");
   }
   function resumen() {
-    var partes = [];
-    var a = activos(estado.cats).map(function (k) { return POR[k].nombre; });
-    if (a.length) partes.push(a.join(", "));
-    var as = activos(estado.anios).sort().map(function (x) { return x === "sin" ? "Sin año" : x; });
-    if (as.length) partes.push(as.join(", "));
+    var as = activos(estado.anios);
     var q = estado.q.trim();
+    var nf = activos(estado.cats).length + as.length;
     var t = "<b>" + lista.length + "</b> " + (lista.length === 1 ? "documento" : "documentos");
-    if (q) t += " con «" + esc(q) + "»";
-    if (partes.length) t += " · " + esc(partes.join(" · "));
-    if (!q && !partes.length) t = "Todos los documentos · <b>" + lista.length + "</b>";
+    if (!q && !nf) t = "Todos los documentos · <b>" + lista.length + "</b>";
     $("pf-resultText").innerHTML = t;
     $("pf-qCount").textContent = lista.length;
-    var nf = activos(estado.cats).length + as.length;
     var nsub = esMobile.matches ? nf : as.length;
     $("pf-fCount").hidden = nsub === 0; $("pf-fCount").textContent = nsub;
     $("pf-fClear").hidden = nf === 0;
@@ -754,7 +753,12 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
       ? "Ningún documento coincide con «" + q + "»" + (nf ? " con esos filtros" : "") + ". Probá con otra palabra o limpiá los filtros."
       : "Ningún documento cumple esa combinación de filtros. Sacá alguno para ver más.";
   }
-  function aplicar() { filtrar(); resumen(); pintarFiltros(); repintar(); }
+  function aplicar() {
+    // Con la lista más corta el scroll quedaría pegado al final: se vuelve al principio de los resultados.
+    var bajo = window.scrollY > inicioLista();
+    filtrar(); resumen(); pintarFiltros(); repintar();
+    if (bajo) window.scrollTo({ top: inicioLista(), behavior: "instant" });
+  }
 
   /* --- Chips de filtros activos --------------------------------------------------- */
   var X = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2 2 10"/></svg>';
@@ -764,7 +768,7 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
     activos(estado.anios).sort().reverse().forEach(function (k) { h += '<button type="button" class="pf-chip" aria-pressed="true" data-quitar="anio" data-v="' + k + '" aria-label="Quitar el filtro ' + (k === "sin" ? "Sin año" : k) + '">' + (k === "sin" ? "Sin año" : k) + X + "</button>"; });
     if (q) h += '<button type="button" class="pf-chip" aria-pressed="true" data-quitar="q" aria-label="Quitar la búsqueda">«' + esc(q) + "»" + X + "</button>";
     if (h) h += '<button type="button" class="pf-activos__limpiar" data-quitar="todo">Limpiar todo</button>';
-    $("pf-activos").innerHTML = h; $("pf-activos").hidden = !h;
+    $("pf-activos").innerHTML = h;
   }
   $("pf-activos").addEventListener("click", function (e) {
     var b = e.target.closest("[data-quitar]"); if (!b) return;

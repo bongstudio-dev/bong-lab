@@ -283,6 +283,17 @@ body.pf-foco .pf-v-doc { grid-column: 1; grid-row: 1; margin-top: 0; padding-bot
 .pf-pie__urea { position: relative; flex: 1; min-height: 320px; }
 .pf-pie__urea canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 
+/* Urea 2 (experimento): mismo fondo y colores que Urea; el campo de abajo se llena de granos. */
+.pf-pie[data-variante="urea2"] { --u-fondo: var(--azul); --u-surco: var(--celeste); --u-grano: var(--tiza);
+  --pie-tinta: var(--tiza); --pie-fondo: var(--u-fondo); display: flex; flex-direction: column; min-height: 100vh; min-height: 100svh; background: var(--u-fondo); color: var(--tiza); }
+.pf-pie[data-variante="urea2"][data-campo="verde"] { --u-fondo: var(--verde); --u-surco: var(--verde-claro); }
+.pf-pie[data-variante="urea2"] .pf-pie__in { display: grid; gap: 28px; width: 100%; max-width: none; }
+.pf-pie[data-variante="urea2"] .pf-pie__cols { flex: 1; max-width: 760px; }
+.pf-pie[data-variante="urea2"] .pf-pie__etica { justify-content: flex-end; }
+/* En pantallas táctiles el dedo arrastra de lado; para arriba y abajo sigue moviendo la página. */
+.pf-pie__urea2 { position: relative; flex: 1; min-height: 320px; }
+.pf-pie__urea2 canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: pan-y; }
+
 @media (max-width: 760px) {
   .pf-pie__cols, .pf-pie[data-variante] .pf-pie__cols { grid-template-columns: repeat(2, minmax(0, 1fr)); flex-basis: 100%; }
   .pf-pie[data-variante="vida"] .pf-pie__in { gap: 22px; }
