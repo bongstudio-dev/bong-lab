@@ -306,13 +306,17 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 .pf-activos__limpiar { align-self: center; border: 0; background: transparent; cursor: pointer; padding: 4px 6px; color: var(--azul); font-size: var(--texto-chico); text-decoration: underline; text-underline-offset: 3px; }
 .pf-activos[hidden] { display: none; }
 
-/* --- Vistas: compacta, lista (la de siempre) y miniaturas. El selector es el de Novedades; al cambiar, cada documento viaja a su lugar
-   (View Transitions) y el indicador viaja con ellos. */
+/* --- Vistas: compacta, lista (la de siempre) y miniaturas. El selector es el de Novedades; al cambiar, la lista se funde (View Transitions)
+   y el indicador viaja a su lugar. */
 .pf-selector.pf-vista .pf-selector__ind { view-transition-name: pf-ind-vista; }
 .pf-selector.pf-vista [data-vista="compacta"] { view-transition-name: pf-vista-compacta; }
 .pf-selector.pf-vista [data-vista="lista"] { view-transition-name: pf-vista-lista; }
 .pf-selector.pf-vista [data-vista="mini"] { view-transition-name: pf-vista-mini; }
 ::view-transition-group(*) { animation-duration: var(--t-vista); animation-timing-function: var(--curva-vista); }
+/* La lista cambia con un fundido: las filas y los cuadrados tienen formas muy distintas y un viaje de uno al otro se estira. Solo el
+   indicador del selector viaja. */
+::view-transition-group(root) { animation-duration: 240ms; }
+.pf-docs.pf-cambia .pf-doc { animation: none; }
 .pf-doc__arte { display: none; }
 
 /* Compacta: una línea por documento, solo el ícono de la categoría. */
@@ -679,7 +683,7 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
     var q = plano(estado.q.trim());
     var li = document.createElement("li");
     li.className = "pf-doc";
-    li.style.viewTransitionName = "pf-d-" + d.k;
+    li.dataset.k = d.k;
     var bajar = d.l ? 'href="pdf/' + encodeURIComponent(d.l) + '" download' : 'href="' + esc(d.u) + '" target="_blank" rel="noopener"';
     li.innerHTML = (vista === "mini" ? '<div class="pf-doc__arte">' + arte(d) + "</div>" : "") + etq(d.c, vista === "mini" ? "" : "").replace('class="pf-etiqueta"', 'class="pf-etiqueta" title="' + POR[d.c].nombre + '"') +
       '<h3 class="pf-doc__t"' + (vista === "compacta" ? ' title="' + esc(d.t) + '"' : "") + '><a href="ver/?d=' + encodeURIComponent(d.id) + '">' + resaltar(d.t, q) + "</a></h3>" +
@@ -693,9 +697,12 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
     docs.appendChild(f);
     pintadas = hasta;
   }
-  function repintar() {
+  function repintar(mantener) {
+    // Al cambiar de vista se mantiene lo ya cargado (si no, la lista se acorta de golpe y se pierde el lugar).
+    var objetivo = mantener ? Math.max(pintadas, TANDA) : TANDA;
     docs.dataset.vista = vista;
-    docs.innerHTML = ""; pintadas = 0; pintarTanda();
+    docs.innerHTML = ""; pintadas = 0;
+    while (pintadas < Math.min(objetivo, lista.length)) pintarTanda();
     $("pf-empty").hidden = lista.length > 0;
   }
 
@@ -793,12 +800,22 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
     var b = e.target.closest("[data-vista]"); if (!b || b.dataset.vista === vista) return;
     vista = b.dataset.vista;
     try { localStorage.setItem("documentos-vista", vista); } catch (err) {}
+    // El documento que está arriba de la pantalla queda en el mismo lugar después del cambio.
+    var ref = null, tope = $("pf-top").offsetHeight + 8, filas = docs.children;
+    for (var i = 0; i < filas.length; i++) { var r = filas[i].getBoundingClientRect(); if (r.bottom > tope) { ref = { k: filas[i].dataset.k, top: r.top }; break; } }
+    function cambiar(animar) {
+      marcarVista(!!animar); repintar(true);
+      var el = ref && docs.querySelector('[data-k="' + ref.k + '"]');
+      if (el) window.scrollTo({ top: Math.max(0, window.scrollY + el.getBoundingClientRect().top - ref.top), behavior: "instant" });
+    }
     if (document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
       // Si se cambia de vista de nuevo en pleno viaje, el navegador cancela la anterior: no es un error.
-      var vt = document.startViewTransition(function () { marcarVista(false); repintar(); });
-      [vt.ready, vt.finished, vt.updateCallbackDone].forEach(function (p) { p.catch(function () {}); });
+      docs.classList.add("pf-cambia");
+      var vt = document.startViewTransition(cambiar);
+      [vt.ready, vt.updateCallbackDone].forEach(function (p) { p.catch(function () {}); });
+      vt.finished.catch(function () {}).then(function () { docs.classList.remove("pf-cambia"); });
     }
-    else { marcarVista(true); repintar(); }
+    else cambiar(true);
   });
   marcarVista(false);
   $("pf-sortAz").addEventListener("click", function () { ordenar("az"); });
