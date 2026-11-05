@@ -61,21 +61,20 @@ pie de la librería (componente Pie de página, variante Institucional, que
 `build.py` arma con node desde `../../componentes/c/pie.js`). El texto de cada
 nota lo lee al abrir de `../notas/<ar>.json`.
 
-- Sobria, sobre el fondo y sin cajas: la barra azul desde arriba, la vuelta a
+- Sobria, una sola columna centrada, sobre el fondo y sin cajas (la
+  referencia es el blog de ElevenLabs): la barra azul desde arriba, la vuelta a
   Novedades, la etiqueta del tipo con el año (la etiqueta completa, con forma,
   va solo junto al título), antetítulo, título, bajada y una línea con fecha,
   lugar y tiempo de lectura.
 - Foto principal entera, sin recorte, con radio. Una foto chica no se estira
   más de 1,5 veces. Si la nota no tiene foto, sigue el texto.
-- Cuerpo a una columna de lectura; a la izquierda (fijo al bajar) los datos
-  sueltos con su rótulo chico y una línea entre cada uno: categoría y cultivo
-  en texto, temas (etiquetas de WordPress, cada una lleva a Novedades con esa
-  búsqueda: `../#q=tema`), compartir y "Ver la nota original". En celular van
-  después del texto.
-- Nota anterior y siguiente (por fecha) como dos links, y tres relacionadas en
-  fila de tarjetas chicas (miniatura 3:2 con la foto de la nota o el arte de
-  Novedades, etiqueta con el año y título; en celular, lista). Comparten
-  temas, cultivo, pilar o tipo; a igual puntaje, la más cercana en el tiempo.
+- Texto a una columna de lectura. Al terminar, una franja con los temas
+  (etiquetas de WordPress, cada una lleva a Novedades con esa búsqueda:
+  `../#q=tema`), compartir y "Ver la nota original".
+- Cierra con tres relacionadas y nada más: tarjetas chicas (miniatura 3:2 con
+  la foto de la nota o el arte de Novedades, etiqueta con el año y título; en
+  celular, lista). Comparten temas, cultivo, pilar o tipo; a igual puntaje, la
+  más cercana en el tiempo.
 - Sin sombras.
 
 Regenerar la página:
