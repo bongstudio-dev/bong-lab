@@ -29,10 +29,11 @@
       var NS = "http://www.w3.org/2000/svg", svg = document.createElementNS(NS, "svg"), lista = [];
       svg.setAttribute("style", "position:absolute;width:0;height:0;visibility:hidden"); document.body.appendChild(svg);
       Object.keys(FORMAS).forEach(function (n) {
-        var f = FORMAS[n], vb = f.vb.split(" ").map(Number), lado = Math.max(vb[2], vb[3]), g = document.createElementNS(NS, "g"), camino = new Path2D(), cs = [];
+        var f = FORMAS[n], vb = f.vb.split(" ").map(Number), lado = Math.max(vb[2], vb[3]), g = document.createElementNS(NS, "g"), caminos = [], cs = [];
         g.innerHTML = f.d; svg.appendChild(g);
         g.querySelectorAll("path").forEach(function (p) {
-          camino.addPath(new Path2D(p.getAttribute("d")));
+          // Cada trazo se pinta solo, como en el SVG: juntos en un camino, los que se pisan en sentido contrario se anulan.
+          caminos.push(new Path2D(p.getAttribute("d")));
           var L = p.getTotalLength(), k = Math.max(24, Math.min(180, Math.round(L / 5))), salto = lado * .04, c = [], prev = null;
           for (var i = 0; i < k; i++) {
             var q = p.getPointAtLength(L * i / k), pt = { x: q.x, y: q.y };
@@ -44,7 +45,7 @@
         });
         cs = cs.filter(function (c) { return area(c) > lado * lado * .002; });
         var solidos = cs.filter(function (c) { return !cs.some(function (o) { return o !== c && area(o) > area(c) && dentro(c[0], o); }); });
-        lista.push({ nombre: n, lado: lado, camino: camino, regla: /evenodd/.test(f.d) ? "evenodd" : "nonzero", solidos: solidos });
+        lista.push({ nombre: n, lado: lado, caminos: caminos, regla: /evenodd/.test(f.d) ? "evenodd" : "nonzero", solidos: solidos });
       });
       svg.remove();
       return lista;
@@ -146,7 +147,7 @@
         ctx.clearRect(0, 0, W, H);
         cuerpos.forEach(function (b) {
           var f = b.pf; ctx.save(); ctx.translate(b.position.x, b.position.y); ctx.rotate(b.angle); ctx.translate(-f.cx, -f.cy); ctx.scale(f.s, f.s);
-          ctx.fillStyle = f.color; ctx.fill(f.t.camino, f.t.regla); ctx.restore();
+          ctx.fillStyle = f.color; f.t.caminos.forEach(function (c) { ctx.fill(c, f.t.regla); }); ctx.restore();
         });
       }
 
@@ -270,18 +271,28 @@
       return lista;
     }
     function area(c) { var a = 0; for (var i = 0, j = c.length - 1; i < c.length; j = i++) a += (c[j][0] + c[i][0]) * (c[j][1] - c[i][1]); return a / 2; }
+    function adentro(p, c) { var r = false; for (var i = 0, j = c.length - 1; i < c.length; j = i++) { var a = c[i], b = c[j]; if ((a[1] > p[1]) !== (b[1] > p[1]) && p[0] < (b[0] - a[0]) * (p[1] - a[1]) / (b[1] - a[1]) + a[0]) r = !r; } return r; }
+    // El morph pinta todos los contornos juntos con nonzero: los macizos van en un sentido y los huecos en el otro,
+    // así los que se pisan suman en vez de anularse.
+    function orientar(aros, evenodd) {
+      return aros.map(function (c) {
+        var hueco = evenodd && aros.some(function (o) { return o !== c && Math.abs(area(o)) > Math.abs(area(c)) && adentro(c[0], o); });
+        return (area(c) > 0) === !hueco ? c : c.slice().reverse();
+      });
+    }
     Object.keys(FORMAS).forEach(function (n) {
-      var f = FORMAS[n], vb = f.vb.split(" ").map(Number), lado = Math.max(vb[2], vb[3]), m = new DOMMatrix().scale(1 / lado).translate(-vb[2] / 2, -vb[3] / 2), c = new Path2D();
-      f.d.replace(/ d="([^"]+)"/g, function (_, d) { c.addPath(new Path2D(d), m); });
-      T[n] = { camino: c, regla: /evenodd/.test(f.d) ? "evenodd" : "nonzero", aros: contornos(f) };
+      var f = FORMAS[n], vb = f.vb.split(" ").map(Number), lado = Math.max(vb[2], vb[3]), m = new DOMMatrix().scale(1 / lado).translate(-vb[2] / 2, -vb[3] / 2), cs = [];
+      // Un camino por trazo, como en el SVG: juntos, los que se pisan en sentido contrario se anulan (pasaba en Círculos).
+      f.d.replace(/ d="([^"]+)"/g, function (_, d) { var c = new Path2D(); c.addPath(new Path2D(d), m); cs.push(c); });
+      T[n] = { caminos: cs, regla: /evenodd/.test(f.d) ? "evenodd" : "nonzero", aros: orientar(contornos(f), /evenodd/.test(f.d)) };
     });
     var circ = new Path2D(), aro = []; circ.arc(0, 0, .5, 0, Math.PI * 2);
     for (var i = 0; i < P; i++) aro.push([.5 * Math.cos(2 * Math.PI * i / P - Math.PI / 2), .5 * Math.sin(2 * Math.PI * i / P - Math.PI / 2)]);
-    T.circulo = { camino: circ, regla: "nonzero", aros: [aro] };
+    T.circulo = { caminos: [circ], regla: "nonzero", aros: orientar([aro], false) };
     svg.remove();
     Object.keys(T).forEach(function (n) {
       prueba.setTransform(1, 0, 0, 1, 0, 0); prueba.clearRect(0, 0, R, R); prueba.setTransform(R, 0, 0, R, R / 2, R / 2);
-      prueba.fill(T[n].camino, T[n].regla);
+      T[n].caminos.forEach(function (c) { prueba.fill(c, T[n].regla); });
       var px = prueba.getImageData(0, 0, R, R).data, lleno = 0, macizo = R;
       for (var y = 0; y < R; y++) for (var x = 0; x < R; x++) {
         var a = px[(y * R + x) * 4 + 3] > 127;
@@ -406,11 +417,11 @@
       mos.length = cols * filas;
     }
 
-    function pintar(camino, regla, c, escala, giro) {
+    function pintar(caminos, regla, c, escala, giro) {
       if (escala <= 0) return;
-      ctx.save(); ctx.rotate(giro); ctx.scale(escala, escala); ctx.fillStyle = color(c); ctx.fill(camino, regla); ctx.restore();
+      ctx.save(); ctx.rotate(giro); ctx.scale(escala, escala); ctx.fillStyle = color(c); caminos.forEach(function (k) { ctx.fill(k, regla); }); ctx.restore();
     }
-    function forma(n, c, escala, giro) { pintar(T[n].camino, T[n].regla, c, escala, giro); }
+    function forma(n, c, escala, giro) { pintar(T[n].caminos, T[n].regla, c, escala, giro); }
     function dibujar(t) {
       ctx.clearRect(0, 0, W, H);
       mos.forEach(function (m, i) {
@@ -424,7 +435,7 @@
         var tinta = PARES[fondo];
         if (tipo === "morph") {
           var e2 = CAMBIO(k), s = lado(m.forma, p.desde) + (lado(p.forma, p.prop) - lado(m.forma, p.desde)) * e2;
-          pintar(caminoMorph(p.pares, e2), e2 < .5 ? T[m.forma].regla : T[p.forma].regla, tinta, s, 0);
+          pintar([caminoMorph(p.pares, e2)], "nonzero", tinta, s, 0);
         } else if (fn) {
           var vacia = tipo === "vaciar" ? CAMBIO(k) : 0;
           forma(fn, tinta, lado(fn, tipo === "flip" && e >= .5 ? PROP : m.prop) * (1 - vacia), GIRO * vacia);
