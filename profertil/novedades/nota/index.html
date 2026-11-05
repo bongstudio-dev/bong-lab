@@ -391,10 +391,10 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
 @media (prefers-reduced-motion: reduce) { .pf-tr-velo { display: none; } ::view-transition-old(root), ::view-transition-new(root), :root.pf-tr-fuera body, :root.pf-tr-llega body { animation: none; } }
 
 /* Persiana con logo animado. Arranca antes de que el logo entre en pantalla, así el brote ya está creciendo cuando se ve,
-   y dura --pf-la-dur; la página cambia cuando termina.
+   y dura --pf-la-dur; la página cambia cuando termina (más la pausa --pf-la-pausa).
    Solo transform, clip-path y opacity: lo dibuja la placa de video, sin recalcular la página. */
-.pf-tr-velo svg.pf-la, .pf-tr-velo.pf-entra svg.pf-la { opacity: 1; transform: none; transition: none; }
-.pf-la { --t: var(--pf-la-dur, 1100ms); --t0: calc(var(--pf-tr-dur) * .2); overflow: visible; }
+.pf-tr-velo svg.pf-la, .pf-tr-velo.pf-entra svg.pf-la { opacity: 1; transform: none; transition: none; width: min(28vw, var(--pf-la-ancho, 180px)); }
+.pf-la { --t: var(--pf-la-dur, 1100ms); --t0: var(--pf-la-t0, 140ms); overflow: visible; }
 .pf-la__calada { fill: var(--pf-tr-color); }
 .pf-la path { transform-box: view-box; }
 .pf-la__p, .pf-la__tallo { transform-origin: 680px 661px; }
@@ -404,14 +404,14 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
 @keyframes pf-la-crece { from { transform: scale(0); } }
 @keyframes pf-la-hoja { from { transform: scale(var(--desde)); } }
 @keyframes pf-la-destapa { from { clip-path: inset(100% 0 0 0); } }
-@keyframes pf-la-sube { from { transform: translateY(33px); } }
+@keyframes pf-la-sube { from { transform: translateY(calc(var(--pf-la-sube, 14) * 2.28px)); } }
 @keyframes pf-la-aparece { from { opacity: 0; } }
 .pf-tr-velo.pf-entra .pf-la__tallo { animation: pf-la-crece calc(var(--t) * .31) cubic-bezier(.72, 0, .4, 1) var(--t0) backwards; }
-.pf-tr-velo.pf-entra .pf-la__p { animation: pf-la-crece calc(var(--t) * .38) cubic-bezier(.83, 0, .18, 1) calc(var(--t0) + var(--t) * .07) backwards; }
+.pf-tr-velo.pf-entra .pf-la__p { animation: pf-la-crece calc(var(--t) * .38) var(--pf-la-curva-p, cubic-bezier(.83, 0, .18, 1)) calc(var(--t0) + var(--t) * .07) backwards; }
 .pf-tr-velo.pf-entra .pf-la__h2 { --desde: .76; animation: pf-la-hoja calc(var(--t) * .63) cubic-bezier(.03, 0, .02, 1) calc(var(--t0) + var(--t) * .24) backwards, pf-la-destapa calc(var(--t) * .64) cubic-bezier(.09, 0, .04, 1) calc(var(--t0) + var(--t) * .24) backwards; }
 .pf-tr-velo.pf-entra .pf-la__h1 { --desde: .57; animation: pf-la-hoja calc(var(--t) * .64) cubic-bezier(.03, 0, .02, 1) calc(var(--t0) + var(--t) * .27) backwards, pf-la-destapa calc(var(--t) * .63) cubic-bezier(.09, 0, .04, 1) calc(var(--t0) + var(--t) * .29) backwards; }
 .pf-tr-velo.pf-entra .pf-la__grano { --desde: .58; animation: pf-la-hoja calc(var(--t) * .68) cubic-bezier(.03, 0, .02, 1) calc(var(--t0) + var(--t) * .32) backwards, pf-la-destapa calc(var(--t) * .6) cubic-bezier(.09, 0, .04, 1) calc(var(--t0) + var(--t) * .32) backwards; }
-.pf-tr-velo.pf-entra .pf-la__letras path { --d: calc(var(--t0) + var(--t) * (.2 + var(--i) * .039)); animation: pf-la-sube calc(var(--t) * .36) cubic-bezier(.17, 0, .03, 1) var(--d) backwards, pf-la-aparece 1ms var(--d) backwards; }
+.pf-tr-velo.pf-entra .pf-la__letras path { --d: calc(var(--t0) + var(--t) * .2 + var(--i) * var(--pf-la-desfase, 45ms)); animation: pf-la-sube calc(var(--t) * .36) cubic-bezier(.17, 0, .03, 1) var(--d) backwards, pf-la-aparece 1ms var(--d) backwards; }
 
 </style>
 <script>
@@ -420,7 +420,7 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
 (function () {
   var d = document.documentElement, c = null, llega = null;
   try { c = JSON.parse(localStorage.getItem("pf-transicion") || "null"); } catch (e) {}
-  c = Object.assign({ v: "persiana", color: "azul", dur: 700, la: 1100, curva: "fuerte" }, c || {});
+  c = Object.assign({ v: "animada", color: "azul", dur: 700, la: 1100, curva: "fuerte" }, c || {});
   var CURVAS = { base: "cubic-bezier(.22, 1, .36, 1)", fuerte: "cubic-bezier(.67, 0, .24, .99)" };
   d.style.setProperty("--pf-tr-dur", c.dur + "ms");
   d.style.setProperty("--pf-tr-curva", CURVAS[c.curva] || CURVAS.fuerte);

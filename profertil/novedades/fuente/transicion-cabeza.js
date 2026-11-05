@@ -3,7 +3,7 @@
 (function () {
   var d = document.documentElement, c = null, llega = null;
   try { c = JSON.parse(localStorage.getItem("pf-transicion") || "null"); } catch (e) {}
-  c = Object.assign({ v: "persiana", color: "azul", dur: 700, la: 1100, curva: "fuerte" }, c || {});
+  c = Object.assign({ v: "animada", color: "azul", dur: 700, la: 1100, curva: "fuerte" }, c || {});
   var CURVAS = { base: "cubic-bezier(.22, 1, .36, 1)", fuerte: "cubic-bezier(.67, 0, .24, .99)" };
   d.style.setProperty("--pf-tr-dur", c.dur + "ms");
   d.style.setProperty("--pf-tr-curva", CURVAS[c.curva] || CURVAS.fuerte);
