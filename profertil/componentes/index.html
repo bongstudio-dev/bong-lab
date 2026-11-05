@@ -89,7 +89,7 @@ html { scrollbar-color: rgba(10, 30, 74, .25) transparent; }
 .lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
 .lista li[hidden] { display: none; }
 /* Filtro de la sidebar: el Selector del sistema con íconos, uno por familia. El nombre aparece al pasar el mouse o al enfocar. */
-.lado__filtro { display: flex; margin: 0 -4px; padding: 3px; }
+.lado__filtro { display: flex; margin: 0 -4px; padding: 3px; background: var(--suave); }
 .lado__filtro button { position: relative; flex: 1 1 0; padding: 6px 0; }
 .lado__filtro svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 .lado__filtro button[aria-pressed="true"] svg { stroke-width: 2; }
@@ -99,6 +99,16 @@ html { scrollbar-color: rgba(10, 30, 74, .25) transparent; }
 @media (hover: hover) and (pointer: fine) { .lado__filtro [data-tip]:hover::after { opacity: 1; translate: -50% 0; transition-delay: .25s; } .lado__filtro button:first-of-type:hover::after, .lado__filtro button:last-of-type:hover::after { translate: 0 0; } }
 .lado__filtro [data-tip]:focus-visible::after { opacity: 1; translate: -50% 0; }
 .lado__filtro button:first-of-type:focus-visible::after, .lado__filtro button:last-of-type:focus-visible::after { translate: 0 0; }
+/* Buscador chico: filtra por nombre la lista y la galería. "/" lo enfoca, Esc lo vacía. */
+.lado__busca { position: relative; display: flex; align-items: center; margin: -12px -4px 0; }
+.lado__busca .ico { position: absolute; left: 10px; width: 14px; height: 14px; stroke-width: 2; color: var(--ink-3); pointer-events: none; }
+.lado__busca input { width: 100%; height: 30px; padding: 0 30px 0 30px; border: 0; border-radius: 999px; background: var(--suave); font-size: 12px; color: var(--ink); -webkit-appearance: none; appearance: none; }
+.lado__busca input::placeholder { color: var(--ink-3); }
+.lado__busca input::-webkit-search-cancel-button { display: none; }
+.lado__busca input:focus-visible { outline: 2px solid var(--azul); outline-offset: 0; }
+.lado__busca kbd { position: absolute; right: 8px; min-width: 18px; padding: 2px 5px; border-radius: 5px; box-shadow: inset 0 0 0 1px var(--line); font: 400 10.5px/1 var(--f-mono); color: var(--ink-3); text-align: center; pointer-events: none; transition: opacity .15s ease; }
+.lado__busca input:focus ~ kbd, .lado__busca input:not(:placeholder-shown) ~ kbd { opacity: 0; }
+.lista .vacio { padding: 5px 0; font-size: 12px; color: var(--ink-3); }
 .item { text-decoration: none; display: flex; justify-content: space-between; align-items: center; gap: 6px; width: calc(100% + 12px); margin: 0 -6px; padding: 5px 6px; border: 0; border-radius: 7px; background: none; text-align: left; font-size: 12px; line-height: 1.25; color: var(--ink-2); transition: background .2s var(--ease), color .2s var(--ease); }
 .item:hover { background: var(--suave); color: var(--ink); }
 /* El elegido no se pinta: lo marca el punto azul, que viaja de un ítem al otro. */
@@ -252,10 +262,25 @@ details[open] summary .ico { transform: rotate(90deg); }
 
 /* Vista previa. */
 .previa { position: sticky; top: 16px; height: calc(100vh - 32px); border-radius: var(--r-l); overflow: hidden; background: var(--bg); box-shadow: 0 0 0 1px var(--line); display: grid; place-items: center; }
-.previa__marco { width: 100%; height: 100%; transition: width .4s var(--ease), height .4s var(--ease); }
+.previa__marco { position: relative; width: 100%; height: 100%; transition: width .4s var(--ease), height .4s var(--ease); }
 .previa[data-vista="mobile"] { background: #E2DFCC; }
 .previa[data-vista="mobile"] .previa__marco { width: 390px; height: min(820px, calc(100% - 72px)); border-radius: 24px; overflow: hidden; box-shadow: 0 0 0 1px var(--line); }
 .previa iframe { display: block; width: 100%; height: 100%; border: 0; background: var(--bg); }
+/* Alto de la vista previa: la manija de abajo se arrastra para achicar la ventana y ver mejor el scroll.
+   Doble clic (o Inicio) vuelve al alto completo; las flechas la mueven de a 40 px. */
+.previa.con-alto { place-items: start center; background: #E2DFCC; }
+.previa.con-alto[data-vista="mobile"] { padding-top: 36px; }
+.previa.con-alto .previa__marco, .previa.con-alto[data-vista="mobile"] .previa__marco { height: min(var(--alto), 100%); box-shadow: 0 0 0 1px var(--line); }
+.previa.arrastrando .previa__marco { transition: none; }
+.previa.arrastrando iframe { pointer-events: none; }
+.previa__asa { position: absolute; left: 50%; bottom: 0; z-index: 3; translate: -50% 0; display: grid; place-items: center; width: 72px; height: 20px; padding: 0; border: 0; background: none; cursor: ns-resize; touch-action: none; }
+.previa__asa::before { content: ""; width: 36px; height: 4px; border-radius: 2px; background: color-mix(in srgb, var(--ink) 28%, transparent); transition: width .2s var(--ease), background .2s ease; }
+.previa__asa:hover::before, .previa.arrastrando .previa__asa::before { width: 48px; background: var(--azul); }
+.previa__asa:focus-visible { outline: none; } .previa__asa:focus-visible::before { background: var(--azul); }
+.previa__asa span { position: absolute; bottom: 22px; padding: 4px 8px; border-radius: 7px; background: var(--ink); color: var(--card); font: 400 11px/1 var(--f-body); font-variant-numeric: tabular-nums; white-space: nowrap; opacity: 0; transition: opacity .15s ease; pointer-events: none; }
+.previa.arrastrando .previa__asa span, .previa__asa:focus-visible span { opacity: 1; }
+.previa:fullscreen .previa__marco, .previa.pleno .previa__marco { height: 100%; }
+.previa:fullscreen .previa__asa, .previa.pleno .previa__asa { display: none; }
 .herr { position: absolute; top: 10px; right: 10px; z-index: 2; display: flex; gap: 2px; padding: 2px; border-radius: var(--r); background: rgba(255, 254, 239, .9); box-shadow: 0 0 0 1px var(--line); }
 .herr button { display: grid; place-items: center; width: 30px; height: 30px; border: 0; border-radius: 8px; background: none; color: var(--ink-2); transition: background .15s var(--ease), color .15s var(--ease); }
 .herr button:hover { background: var(--suave); color: var(--ink); }
@@ -328,7 +353,7 @@ html.con-pleno { overflow: hidden; }
   /* Mobile: la navegación pasa al dock de abajo; arriba queda solo el encabezado. */
   .app { grid-template-columns: minmax(0, 1fr); }
   .lado { position: static; height: auto; flex-direction: row-reverse; justify-content: space-between; align-items: center; gap: 12px; border-right: 0; border-bottom: 1px solid var(--line); padding: 14px 16px; }
-  .lado nav, .lado__filtro { display: none; }
+  .lado nav, .lado__filtro, .lado__busca { display: none; }
   body { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
   .gal { padding: 24px 16px 32px; }
   .gal__cab { margin-bottom: 18px; }
@@ -365,6 +390,7 @@ html.con-pleno { overflow: hidden; }
     <a class="lado__volver" href="../../"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 12H7M11 8l-4 4 4 4"/></svg>Bong Lab</a>
     <a class="lado__tit" href="#">Componentes<small>Profertil · web</small></a>
     <div class="pf-selector pf-selector--iconos lado__filtro" id="filtro" role="group" aria-label="Filtrar componentes"></div>
+    <label class="lado__busca"><span class="oculto">Buscar componente</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg><input type="search" id="busca" placeholder="Buscar" autocomplete="off" spellcheck="false"><kbd aria-hidden="true">/</kbd></label>
     <nav id="nav" aria-label="Componentes"></nav>
   </aside>
   <main class="centro" id="centro" tabindex="-1"></main>
@@ -460,6 +486,10 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
   var FAM = {}; FAMILIAS.forEach(function (f) { f[2].forEach(function (g) { FAM[g] = f[0]; }); });
   function famNombre(id) { return FAMILIAS.filter(function (f) { return f[0] === id; })[0][1]; }
   function enFiltro(c) { return !filtro || FAM[c.grupo] === filtro; }
+  // Búsqueda por nombre (sin acentos ni mayúsculas). Se suma al filtro de familia.
+  var busqueda = "";
+  function norm(t) { return String(t).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); }
+  function ve(c) { return enFiltro(c) && (!busqueda || norm(c.nombre + " " + c.grupo).indexOf(busqueda) >= 0); }
   function ico(n) { return '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">' + ICO[n] + '</svg>'; }
   function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function porId(id) { return L.filter(function (c) { return c.id === id; })[0]; }
@@ -565,9 +595,9 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
     nav.innerHTML = '<span class="punto" id="punto" aria-hidden="true"></span>' +
       '<ul class="lista"><li><a class="item" href="#" data-id=""><span class="item__t">Todos</span><span class="n" id="navN">' + L.length + '</span></a></li>' +
       ordenados().map(function (c) {
-        return '<li data-fam="' + FAM[c.grupo] + '"><a class="item" href="#' + c.id + '" data-id="' + c.id + '"><span class="item__t">' + esc(c.nombre) + '</span>' +
+        return '<li data-fam="' + FAM[c.grupo] + '" data-id="' + c.id + '"><a class="item" href="#' + c.id + '" data-id="' + c.id + '"><span class="item__t">' + esc(c.nombre) + '</span>' +
           (c.variantes ? '<span class="n" aria-label="' + c.variantes.length + ' variantes">' + c.variantes.length + '</span>' : '') + '</a></li>';
-      }).join("") + '</ul>';
+      }).join("") + '<li class="vacio" id="navVacio" hidden>Nada con ese nombre</li></ul>';
     punto = $("punto");
     $("filtro").innerHTML = filtroHTML();
     filtrarNav();
@@ -576,8 +606,8 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
   // La lista de la sidebar muestra solo la familia elegida. "Todos" cuenta lo que queda a la vista.
   function filtrarNav() {
     var n = 0;
-    nav.querySelectorAll("li[data-fam]").forEach(function (li) { var si = !filtro || li.dataset.fam === filtro; li.hidden = !si; if (si) n++; });
-    $("navN").textContent = n;
+    nav.querySelectorAll("li[data-fam]").forEach(function (li) { var si = ve(porId(li.dataset.id)); li.hidden = !si; if (si) n++; });
+    $("navN").textContent = n; $("navVacio").hidden = n > 0;
     moverPunto(true);
   }
   function marcarNav(animar) {
@@ -629,7 +659,7 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
     $("centro").innerHTML = '<div class="gal"><header class="gal__cab"><h1 id="galTit">' + (filtro ? 'Componentes · ' + esc(famNombre(filtro)) : 'Componentes') + '</h1><p>Lo que vamos armando para el sitio, en vivo.</p></header>' +
       '<div class="mas quieta" id="mas">' +
       ordenados().map(function (c) {
-        var fuera = !enFiltro(c);
+        var fuera = !ve(c);
         return '<a class="tar' + (fuera ? ' fuera' : '') + '" href="#' + c.id + '" data-id="' + c.id + '" data-grupo="' + esc(c.grupo) + '"' + (fuera ? ' data-oculta="1"' : '') + '>' +
           '<div class="tar__vista" style="aspect-ratio: ' + proporcion(c).toFixed(4) + '"><iframe tabindex="-1" loading="lazy" aria-hidden="true" title="" data-mini="' + c.id + '"></iframe></div>' +
           '<div class="tar__meta"><p class="when"><b>' + esc(c.grupo) + '</b>' + (c.variantes ? ' · ' + c.variantes.length + ' variantes' : '') + '</p><p class="ttl">' + esc(c.nombre) + '</p></div></a>';
@@ -686,7 +716,7 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
     if ($("galTit")) $("galTit").textContent = g ? "Componentes · " + famNombre(g) : "Componentes";
     var entran = [];
     document.querySelectorAll("#mas .tar").forEach(function (t) {
-      var fuera = !!g && FAM[t.dataset.grupo] !== g;
+      var fuera = !ve(porId(t.dataset.id));
       if (!fuera && t.dataset.oculta) { entran.push(t); t.style.transition = "none"; }
       else if (fuera) t.classList.add("fuera");
       t.dataset.oculta = fuera ? "1" : "";
@@ -756,7 +786,8 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
     if (!enPanel) h += '<nav class="vecinos" aria-label="Otros componentes">' + (ant ? '<a href="#' + ant.id + '">' + ico("izq") + esc(ant.nombre) + '</a>' : '<span></span>') +
       (sig ? '<a href="#' + sig.id + '">' + esc(sig.nombre) + ico("der") + '</a>' : '') + '</nav>';
     h += '</div>';
-    var pv = '<div class="previa" id="previa" data-vista="' + vista + '"><div class="previa__marco"><iframe id="ifr" title="Vista previa de ' + esc(c.nombre) + '"></iframe></div>' +
+    var pv = '<div class="previa' + (altoPrevia ? ' con-alto' : '') + '" id="previa" data-vista="' + vista + '"' + (altoPrevia ? ' style="--alto: ' + altoPrevia + 'px"' : '') + '><div class="previa__marco"><iframe id="ifr" title="Vista previa de ' + esc(c.nombre) + '"></iframe>' +
+      '<button type="button" class="previa__asa" aria-label="Alto de la vista previa: arrastrar, flechas o doble clic para volver al completo" title="Arrastrá para cambiar el alto · doble clic: completo"><span></span></button></div>' +
       '<div class="herr" role="toolbar" aria-label="Vista previa">' +
         '<button type="button" id="vista" aria-label="' + (vista === "desktop" ? "Ver en mobile" : "Ver en desktop") + '" title="' + (vista === "desktop" ? "Ver en mobile" : "Ver en desktop") + '">' + ico(vista === "desktop" ? "mobile" : "desktop") + '</button>' +
         '<button type="button" id="repetir" aria-label="Repetir" title="Repetir">' + ico("repetir") + '</button>' +
@@ -805,7 +836,7 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
   }
   // Anterior y siguiente recorren lo que se ve en la galería (si hay categoría elegida, solo esa).
   function vecinosLista() {
-    var o = ordenados(), f = o.filter(enFiltro);
+    var o = ordenados(), f = o.filter(ve);
     return actual && f.indexOf(actual) < 0 ? o : f;
   }
   function terminarCierre() { if (cierre) { var f = cierre; cierre = null; f(); } }
@@ -919,6 +950,32 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
       estado[k.id] = k.id in v[3] ? v[3][k.id] : k.def;
     });
   }
+  // Alto de la vista previa: se arrastra desde la manija y queda para los demás componentes.
+  var altoPrevia = 0, ALTO_MIN = 200;
+  function ponerAlto(pv, h) {
+    var max = pv.clientHeight - (pv.dataset.vista === "mobile" ? 36 : 0);
+    h = Math.round(Math.max(ALTO_MIN, Math.min(max, h)));
+    altoPrevia = h >= max ? 0 : h;
+    pv.classList.toggle("con-alto", !!altoPrevia);
+    pv.style.setProperty("--alto", (altoPrevia || max) + "px");
+    var et = pv.querySelector(".previa__asa span"); if (et) et.textContent = altoPrevia ? h + " px" : "Completo";
+  }
+  document.addEventListener("pointerdown", function (e) {
+    var asa = e.target.closest(".previa__asa"); if (!asa || e.button) return;
+    var pv = asa.closest(".previa"), marco = pv.querySelector(".previa__marco"), arriba = marco.getBoundingClientRect().top;
+    e.preventDefault(); asa.setPointerCapture(e.pointerId); pv.classList.add("arrastrando");
+    ponerAlto(pv, marco.offsetHeight);
+    var mover = function (ev) { ponerAlto(pv, ev.clientY - arriba); };
+    var soltar = function () { pv.classList.remove("arrastrando"); asa.removeEventListener("pointermove", mover); asa.removeEventListener("pointerup", soltar); asa.removeEventListener("pointercancel", soltar); };
+    asa.addEventListener("pointermove", mover); asa.addEventListener("pointerup", soltar); asa.addEventListener("pointercancel", soltar);
+  });
+  document.addEventListener("dblclick", function (e) { var asa = e.target.closest(".previa__asa"); if (asa) ponerAlto(asa.closest(".previa"), 1e5); });
+  document.addEventListener("keydown", function (e) {
+    var asa = e.target.closest && e.target.closest(".previa__asa"); if (!asa) return;
+    var pv = asa.closest(".previa"), h = pv.querySelector(".previa__marco").offsetHeight;
+    if (e.key === "ArrowUp") ponerAlto(pv, h - 40); else if (e.key === "ArrowDown") ponerAlto(pv, h + 40); else if (e.key === "Home") ponerAlto(pv, 1e5); else return;
+    e.preventDefault();
+  });
   /* ---------------- eventos ---------------- */
   document.addEventListener("click", function (e) {
     var b = e.target.closest("button"); if (!b) return;
@@ -1103,6 +1160,20 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
       dkBody.style.height = Math.min(hasta, dock.parentNode.clientHeight) + "px";
       clearTimeout(tListo); tListo = setTimeout(terminarDock, 660);
     }
+  });
+  // Buscador de la sidebar: filtra mientras se escribe; "/" lo enfoca y Esc lo vacía.
+  $("busca").addEventListener("input", function () {
+    busqueda = norm(this.value.trim());
+    if ($("mas")) filtrar(filtro); else filtrarNav();
+  });
+  $("busca").addEventListener("keydown", function (e) {
+    if (e.key === "Escape") { e.stopPropagation(); if (this.value) { this.value = ""; this.dispatchEvent(new Event("input")); } else this.blur(); }
+    if (e.key === "Enter") { var a = nav.querySelector("li[data-id]:not([hidden]) a"); if (a) location.hash = a.getAttribute("href").slice(1); }
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "/" || e.metaKey || e.ctrlKey || movil.matches) return;
+    var t = e.target; if (t.closest && t.closest("input, textarea, select, [contenteditable]")) return;
+    e.preventDefault(); $("busca").focus();
   });
   // El filtro de la sidebar (desktop): filtra la lista y la galería.
   $("filtro").addEventListener("click", function (e) {
