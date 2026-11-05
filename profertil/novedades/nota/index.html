@@ -99,8 +99,8 @@ button, a { touch-action: manipulation; }
 .pf-n-in h1.pf-largo { font-size: clamp(30px, 3.4vw, 44px); line-height: 1.06; }
 .pf-n-bajada { margin: 0; max-width: 60ch; font-size: var(--texto-destacado); line-height: 1.5; color: var(--ink-2); }
 
-/* --- Foto principal: entera, sin recorte, con radio. Una foto chica no se estira más de 1,5 veces. */
-.pf-n-foto { grid-column: 2; grid-row: 2; margin: 56px auto 0; width: min(100%, var(--ancho-foto, 100%)); }
+/* --- Foto principal: entera, sin recorte, con radio, siempre al ancho de la columna (aunque sea chica). */
+.pf-n-foto { grid-column: 2; grid-row: 2; margin: 56px 0 0; width: 100%; }
 .pf-n-foto__hoja { overflow: hidden; border-radius: var(--radio-media); background: var(--card); line-height: 0; }
 .pf-n-foto img { display: block; width: 100%; height: auto; }
 
@@ -111,7 +111,7 @@ button, a { touch-action: manipulation; }
 @media (prefers-reduced-motion: reduce) { .pf-esqueleto { animation: none !important; } }
 img.pf-carga { opacity: 0; transition: opacity 500ms ease; }
 img.pf-carga.pf-lista { opacity: 1; }
-.pf-n-imgcaja { display: block; max-width: 100%; border-radius: var(--radio-media); overflow: hidden; line-height: 0; }
+.pf-n-imgcaja { display: block; width: 100%; border-radius: var(--radio-media); overflow: hidden; line-height: 0; }
 .pf-n-imgcaja > img { width: 100% !important; height: auto; border-radius: 0 !important; }
 
 /* --- Datos, a la derecha de la foto: rótulo y valor por fila. */
@@ -149,7 +149,7 @@ img.pf-carga.pf-lista { opacity: 1; }
 .pf-n-texto li::marker { color: var(--verde); font-weight: 600; }
 .pf-n-texto blockquote { margin: 1.6em 0; padding: 4px 0 4px 24px; border-left: 3px solid var(--verde); font: 500 calc(var(--texto-subtitulo) * 1.05)/1.35 var(--f-display); letter-spacing: -0.015em; color: var(--azul); }
 .pf-n-texto figure { margin: 2em 0; }
-.pf-n-texto figure img { display: block; width: auto; max-width: 100%; height: auto; border-radius: var(--radio-media); background: var(--card); }
+.pf-n-texto figure img { display: block; width: 100%; height: auto; border-radius: var(--radio-media); background: var(--card); }
 .pf-n-texto figcaption { margin-top: 10px; font-size: var(--texto-chico); line-height: 1.45; color: var(--ink-3); }
 .pf-n-texto .video iframe { display: block; width: 100%; aspect-ratio: 16 / 9; height: auto; border: 0; border-radius: var(--radio-media); background: var(--ink); }
 .pf-n-tabla { margin: 1.6em 0; overflow-x: auto; }
@@ -643,14 +643,9 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
     img.alt = ""; img.decoding = "async"; img.fetchPriority = "high";
     // El lugar se reserva con la proporción de la foto (3:2 si el nombre no la dice).
     hoja.style.aspectRatio = md ? md[0] + " / " + md[1] : "3 / 2";
-    if (md) fig.style.setProperty("--ancho-foto", Math.round(md[0] * 1.5) + "px");
     hoja.appendChild(img);
     fig.hidden = false;
-    img.addEventListener("load", function () {
-      // Una foto chica no se estira más de 1,5 veces su tamaño.
-      fig.style.setProperty("--ancho-foto", Math.round(img.naturalWidth * 1.5) + "px");
-      hoja.style.aspectRatio = "";
-    });
+    img.addEventListener("load", function () { hoja.style.aspectRatio = ""; });
     cargar(img, hoja, function () { fig.hidden = true; $("pf-grilla").classList.remove("pf-con-foto"); });
     img.src = src;
   }
@@ -669,7 +664,7 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
     [].forEach.call(t.querySelectorAll("figure img"), function (im) {
       var w = +im.getAttribute("width"), h = +im.getAttribute("height"), caja = document.createElement("span");
       caja.className = "pf-n-imgcaja";
-      if (w && h) { caja.style.aspectRatio = w + " / " + h; caja.style.width = w + "px"; }
+      if (w && h) caja.style.aspectRatio = w + " / " + h;
       im.parentNode.insertBefore(caja, im); caja.appendChild(im);
       cargar(im, caja, function () { var f = caja.closest("figure"); if (f) f.remove(); });
     });

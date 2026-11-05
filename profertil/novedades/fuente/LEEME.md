@@ -66,7 +66,8 @@ nota lo lee al abrir de `../notas/<ar>.json`.
   Novedades, la etiqueta del tipo con el año (la etiqueta completa, con forma,
   va solo junto al título), antetítulo, título y bajada.
 - Abajo, tres columnas. Al centro la foto principal, entera, sin recorte, con
-  radio (una foto chica no se estira más de 1,5 veces). A la izquierda el
+  radio, siempre al ancho de la columna aunque sea chica (igual que las fotos
+  del cuerpo). A la izquierda el
   índice de secciones de la nota (sin numerar), fijo al bajar: un punto azul viaja con resorte
   (la misma curva de la librería de componentes) hasta la sección que se está
   leyendo, y tocar una sección baja suave hasta ella. Se arma solo con los
