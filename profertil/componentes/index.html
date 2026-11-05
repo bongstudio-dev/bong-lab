@@ -198,6 +198,14 @@ input[type="range"] { width: 100%; accent-color: var(--ink); margin: 0; }
 input[type="text"], select { width: 100%; height: 32px; padding: 0 10px; border: 0; border-radius: var(--r); background: var(--suave); font-size: 12.5px; }
 .ctl > .pf-interruptor { justify-self: end; }
 
+/* Guardar ajustes: solo en el navegador que activó la edición (?editar). */
+.ajustes__cab { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 10px; }
+.ajustes__cab h2 { margin: 0; }
+.guardar { display: flex; align-items: center; gap: 14px; }
+.guardar small { font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.btn-txt { border: 0; background: none; padding: 0; font-size: 12.5px; color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; }
+.btn[disabled] { opacity: .45; }
+
 /* Código: una sola acción principal, Copiar. */
 .codigo__cab { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .codigo__cab h2 { margin: 0; }
@@ -429,10 +437,45 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
   function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function porId(id) { return L.filter(function (c) { return c.id === id; })[0]; }
   function ordenados() { var o = []; GRUPOS.forEach(function (g) { L.forEach(function (c) { if (c.grupo === g) o.push(c); }); }); return o; }
-  function inicial(c) {
-    var s = {}; if (c.variantes) s.variante = c.variantes[0][0];
-    (c.controles || []).forEach(function (k) { if (k !== "---") s[k.id] = k.def; }); return s;
+  /* Ajustes guardados: viven en un servicio aparte y pisan los valores por defecto de cada componente
+     para cualquiera que abra la librería. Guardar pide la clave del Lab (una vez por navegador). */
+  var API = "https://bong-lab-ajustes.bongstudiook.workers.dev/ajustes", GUARD = {}, LS = "pf-lab-clave";
+  function clave() { try { return localStorage.getItem(LS) || ""; } catch (e) { return ""; } }
+  (function () {
+    if (!/[?&]editar\b/.test(location.search)) return;
+    var k = prompt("Clave del Lab para guardar ajustes");
+    try { if (k) localStorage.setItem(LS, k.trim()); } catch (e) {}
+    history.replaceState(null, "", location.pathname + location.hash);
+  })();
+  var EDITA = !!clave();
+  function valido(k, v) {
+    if (k.tipo === "rango") return typeof v === "number" ? Math.min(k.max, Math.max(k.min, v)) : undefined;
+    if (k.tipo === "interr") return typeof v === "boolean" ? v : undefined;
+    if (k.tipo === "seg" || k.tipo === "select") return k.opciones.some(function (o) { return String(o[0]) === String(v); }) ? v : undefined;
+    return typeof v === "string" ? v : undefined;
   }
+  function inicial(c, fabrica) {
+    var s = {}, g = !fabrica && GUARD[c.id] && GUARD[c.id].valores; if (c.variantes) s.variante = c.variantes[0][0];
+    (c.controles || []).forEach(function (k) {
+      if (k === "---") return; s[k.id] = k.def;
+      if (g && k.id in g) { var v = valido(k, g[k.id]); if (v !== undefined) s[k.id] = v; }
+    }); return s;
+  }
+  function fecha(iso) {
+    var d = new Date(iso), h = new Date(), z = function (n) { return (n < 10 ? "0" : "") + n; };
+    var dia = d.toDateString() === h.toDateString() ? "hoy" : z(d.getDate()) + "/" + z(d.getMonth() + 1);
+    return dia + " " + z(d.getHours()) + ":" + z(d.getMinutes());
+  }
+  function guardarHTML(c) {
+    var g = GUARD[c.id];
+    return '<div class="guardar"><small id="gEstado">' + (g ? "Guardado " + fecha(g.guardado) : "Valores de fábrica") + '</small>' +
+      (g ? '<button type="button" class="btn-txt" id="fabrica">De fábrica</button>' : '') + '<button type="button" class="btn" id="guardar">Guardar</button></div>';
+  }
+  function pedir(metodo, cuerpo) {
+    return fetch(API + "/" + actual.id, { method: metodo, headers: { "Content-Type": "application/json", "X-Clave": clave() }, body: cuerpo ? JSON.stringify(cuerpo) : undefined })
+      .then(function (r) { return r.json().then(function (j) { if (r.status === 401) { try { localStorage.removeItem(LS); } catch (e) {} throw new Error("clave"); } if (!r.ok) throw new Error(j.error || "error"); return j; }); });
+  }
+  function refrescarGuardar() { var cab = document.querySelector(".ajustes__cab"); if (cab && EDITA) { var g = cab.querySelector(".guardar"); if (g) g.outerHTML = guardarHTML(actual); } }
 
   /* ---------------- el documento que corre adentro de cada vista previa ---------------- */
   function htmlFinal(c, s) {
@@ -637,7 +680,7 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
       '<h1 id="fichaTit">' + esc(c.nombre) + '</h1><p class="bajada">' + esc(c.bajada) + '</p></div>';
     if (c.variantes) h += '<section><div class="tabsv" role="group" aria-label="Variantes">' + c.variantes.map(function (v) {
       return '<button type="button" data-var="' + v[0] + '" aria-pressed="' + (v[0] === estado.variante) + '">' + esc(v[1]) + '</button>'; }).join("") + '</div><p id="vdesc">' + descVariante() + '</p></section>';
-    if (!pag && c.controles && c.controles.length) h += '<section><h2>Ajustes</h2><div class="ajustes" id="ajustes">' + ajustesHTML() + '</div></section>';
+    if (!pag && c.controles && c.controles.length) h += '<section><div class="ajustes__cab"><h2>Ajustes</h2>' + (EDITA ? guardarHTML(c) : '') + '</div><div class="ajustes" id="ajustes">' + ajustesHTML() + '</div></section>';
     if (!pag) h += '<section><div class="codigo__cab"><h2>Código</h2><div class="codigo__der"><div class="tabsc" id="tabs" role="group" aria-label="Lenguaje"></div><button type="button" class="btn" id="copiar">Copiar</button></div></div><pre id="pre" tabindex="0"></pre></section>';
     if (c.claves && c.claves.length) h += '<section><h2>Cómo se comporta</h2><ul class="claves">' + c.claves.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join("") + '</ul></section>';
     if (!pag) h += '<details><summary>Referencia técnica' + ico("abre") + '</summary><div class="ref">' + referencia(c) +
@@ -813,6 +856,27 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
       b.innerHTML = ico(vista === "desktop" ? "mobile" : "desktop"); b.setAttribute("aria-label", t); b.title = t; return;
     }
     if (b.id === "repetir") { dibujar(true); return; }
+    if (b.id === "guardar") {
+      var valores = {}; actual.controles.forEach(function (k) { if (k !== "---") valores[k.id] = estado[k.id]; });
+      b.disabled = true; b.textContent = "Guardando";
+      pedir("PUT", { valores: valores }).then(function (j) {
+        GUARD[actual.id] = j[actual.id]; refrescarGuardar(); $("aviso").textContent = "Ajustes guardados";
+      }).catch(function (x) {
+        b.disabled = false; b.textContent = "Guardar";
+        if (x.message === "clave") { EDITA = false; alert("La clave no es correcta. Abrí la librería con ?editar para cargarla de nuevo."); }
+        else alert("No se pudo guardar. Probá de nuevo.");
+      });
+      return;
+    }
+    if (b.id === "fabrica") {
+      if (!confirm("¿Volver a los valores de fábrica de " + actual.nombre + "? Lo guardado queda en el historial.")) return;
+      pedir("DELETE").then(function () {
+        delete GUARD[actual.id]; var v = estado.variante; estado = inicial(actual); if (v) estado.variante = v;
+        $("ajustes").innerHTML = ajustesHTML(); moverInds(); refrescarGuardar(); dibujar(true); codigo();
+        $("aviso").textContent = "Valores de fábrica";
+      }).catch(function () { alert("No se pudo volver a los valores de fábrica. Probá de nuevo."); });
+      return;
+    }
     if (b.id === "completa") { pantallaCompleta(); return; }
     if (b.closest("#tabs")) { tab = b.dataset.t; codigo(); return; }
     if (b.id === "copiar") {
@@ -1013,7 +1077,11 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
   addEventListener("resize", function () { moverPunto(false); });
   document.fonts && document.fonts.ready.then(function () { moverPunto(false); });
 
-  construirNav(); ruta(); marcarNav(false); mover();
+  // Antes de dibujar, trae los ajustes guardados (si el servicio no responde en 1,5 s, arranca con los de fábrica).
+  var listo = false;
+  function arrancar() { if (listo) return; listo = true; construirNav(); ruta(); marcarNav(false); mover(); }
+  setTimeout(arrancar, 1500);
+  fetch(API, { cache: "no-store" }).then(function (r) { return r.json(); }).then(function (j) { if (!listo && j && typeof j === "object") GUARD = j; }).catch(function () {}).then(arrancar);
 })();
 </script>
 </body>
