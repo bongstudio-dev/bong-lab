@@ -75,6 +75,11 @@ nota lo lee al abrir de `../notas/<ar>.json`.
   descartan). Sin índice, esa columna queda como aire. A la derecha, sin
   rótulos: la fecha; el tiempo de lectura y el botón de modo lectura (solo el
   ícono), pegados y en azul; y compartir. Sin foto, el texto sube a esa fila.
+- Carga de imágenes: la foto principal, las del cuerpo y las de las tarjetas
+  reservan su lugar con la proporción de la foto (la principal la lee del nombre
+  del archivo de WordPress, `-1536x1024`; las del cuerpo, del ancho y alto del
+  HTML; si no la hay, 3:2) y muestran un brillo que pasa mientras llegan. Al
+  llegar, la foto aparece con un fundido y la página no salta.
 - Modo lectura: deja solo título, foto y texto; se sale con el mismo botón, el
   de arriba a la derecha o Esc, sin perder el punto de lectura.
 - Hasta 1100 px de ancho queda una columna: título, foto, datos y texto; el

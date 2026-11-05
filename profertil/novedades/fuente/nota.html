@@ -55,8 +55,17 @@ button, a { touch-action: manipulation; }
 /* --- Foto principal: entera, sin recorte, con radio. Una foto chica no se estira más de 1,5 veces. */
 .pf-n-foto { grid-column: 2; grid-row: 2; margin: 56px auto 0; width: min(100%, var(--ancho-foto, 100%)); }
 .pf-n-foto__hoja { overflow: hidden; border-radius: var(--radio-media); background: var(--card); line-height: 0; }
-.pf-n-foto img { display: block; width: 100%; height: auto; opacity: 0; transition: opacity 600ms ease; }
-.pf-n-foto img.pf-lista { opacity: 1; }
+.pf-n-foto img { display: block; width: 100%; height: auto; }
+
+/* --- Carga de imágenes: mientras llega la foto, su lugar (con la proporción reservada) muestra un brillo que pasa;
+   al llegar, la foto aparece con un fundido. */
+:is(.pf-n-foto__hoja, .pf-n-imgcaja, .pf-n-mini__img).pf-esqueleto { background: linear-gradient(100deg, transparent 35%, color-mix(in srgb, var(--color-blanco) 70%, transparent) 50%, transparent 65%) var(--card); background-size: 250% 100%; animation: pf-brillo 1.5s linear infinite; }
+@keyframes pf-brillo { from { background-position: 125% 0; } to { background-position: -25% 0; } }
+@media (prefers-reduced-motion: reduce) { .pf-esqueleto { animation: none !important; } }
+img.pf-carga { opacity: 0; transition: opacity 500ms ease; }
+img.pf-carga.pf-lista { opacity: 1; }
+.pf-n-imgcaja { display: block; max-width: 100%; border-radius: var(--radio-media); overflow: hidden; line-height: 0; }
+.pf-n-imgcaja > img { width: 100% !important; height: auto; border-radius: 0 !important; }
 
 /* --- Datos, a la derecha de la foto: rótulo y valor por fila. */
 .pf-n-datos { grid-column: 3; grid-row: 2; align-self: start; margin: 56px 0 0; display: grid; justify-items: start; gap: 14px; font-size: var(--texto-chico); }
@@ -278,20 +287,38 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
     document.title = n.t + " · Novedades Profertil";
   }
 
+  // Carga de una imagen dentro de su caja: brillo mientras llega, fundido al llegar.
+  function cargar(img, caja, alFallar) {
+    caja.classList.add("pf-esqueleto"); img.classList.add("pf-carga");
+    function ok() { img.classList.add("pf-lista"); caja.classList.remove("pf-esqueleto"); }
+    if (img.complete && img.naturalWidth) ok();
+    else {
+      img.addEventListener("load", ok);
+      img.addEventListener("error", function () { caja.classList.remove("pf-esqueleto"); if (alFallar) alFallar(); });
+    }
+  }
+  // Tamaño desde el nombre del archivo de WordPress (foto-1536x1024.jpg), para reservar el lugar antes de que llegue.
+  function medidas(u) { var m = /-(\d{2,5})x(\d{2,5})\.(?:jpe?g|png|webp|gif)/i.exec(u || ""); return m ? [+m[1], +m[2]] : null; }
+
+  var conFoto = false;
   function foto(d) {
     var src = d.imgG || d.img;
-    if (!src) return;
-    var fig = $("pf-foto"), img = new Image();
+    if (!src || conFoto) return;
+    conFoto = true;
+    var fig = $("pf-foto"), hoja = $("pf-fotoHoja"), img = new Image(), md = medidas(src);
     $("pf-grilla").classList.add("pf-con-foto");
     img.alt = ""; img.decoding = "async"; img.fetchPriority = "high";
-    $("pf-fotoHoja").appendChild(img);
+    // El lugar se reserva con la proporción de la foto (3:2 si el nombre no la dice).
+    hoja.style.aspectRatio = md ? md[0] + " / " + md[1] : "3 / 2";
+    if (md) fig.style.setProperty("--ancho-foto", Math.round(md[0] * 1.5) + "px");
+    hoja.appendChild(img);
     fig.hidden = false;
     img.addEventListener("load", function () {
       // Una foto chica no se estira más de 1,5 veces su tamaño.
       fig.style.setProperty("--ancho-foto", Math.round(img.naturalWidth * 1.5) + "px");
-      img.classList.add("pf-lista");
+      hoja.style.aspectRatio = "";
     });
-    img.addEventListener("error", function () { fig.hidden = true; $("pf-grilla").classList.remove("pf-con-foto"); });
+    cargar(img, hoja, function () { fig.hidden = true; $("pf-grilla").classList.remove("pf-con-foto"); });
     img.src = src;
   }
 
@@ -304,8 +331,15 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
     var arriba = baseFoto(d.imgG || d.img);
     [].forEach.call(t.querySelectorAll("figure img"), function (im) { if (arriba && baseFoto(im.getAttribute("src")) === arriba) im.closest("figure").remove(); });
     [].forEach.call(t.querySelectorAll("table"), function (tb) { var w = document.createElement("div"); w.className = "pf-n-tabla"; tb.parentNode.insertBefore(w, tb); w.appendChild(tb); });
-    // Si una foto del cuerpo ya no existe en el sitio actual, sale.
-    [].forEach.call(t.querySelectorAll("figure img"), function (im) { im.addEventListener("error", function () { var f = im.closest("figure"); if (f) f.remove(); }); });
+    // Cada foto del cuerpo va en una caja con su proporción (ancho y alto del HTML) y carga con brillo.
+    // Si ya no existe en el sitio actual, sale.
+    [].forEach.call(t.querySelectorAll("figure img"), function (im) {
+      var w = +im.getAttribute("width"), h = +im.getAttribute("height"), caja = document.createElement("span");
+      caja.className = "pf-n-imgcaja";
+      if (w && h) { caja.style.aspectRatio = w + " / " + h; caja.style.width = w + "px"; }
+      im.parentNode.insertBefore(caja, im); caja.appendChild(im);
+      cargar(im, caja, function () { var f = caja.closest("figure"); if (f) f.remove(); });
+    });
   }
 
   // Datos, a la derecha de la foto: rótulo y valor por fila.
@@ -431,6 +465,7 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
 
   function seguir() {
     $("pf-rel").innerHTML = relacionadas().map(mini).join("");
+    [].forEach.call($("pf-rel").querySelectorAll(".pf-n-mini__img img"), function (im) { cargar(im, im.parentNode); });
     flechas();
   }
 
@@ -453,7 +488,7 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
   window.addEventListener("resize", alScroll);
 
   var base = { ante: "", b: n.b, lg: n.lg, img: n.img, imgG: n.imgG, et: n.et };
-  cabecera(base); seguir(); alScroll();
+  cabecera(base); foto(base); seguir(); alScroll();
   fetch("../notas/" + encodeURIComponent(n.ar) + ".json")
     .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then(function (d) { cabecera(d); datos(d); foto(d); cuerpo(d); indice(); })
