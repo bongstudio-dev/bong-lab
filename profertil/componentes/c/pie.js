@@ -205,10 +205,11 @@
   }
 
   /* Flores (experimento): una banda de mosaicos al pie. En reposo cada mosaico es un par secundario del Master:
-     el fondo y una forma en su color complementario, en proporción 70/30. Una tercera forma aparece solo para armar
-     o desarmar el cambio, y en ese momento los tres colores forman una terciaria del Master (nunca una combinación
-     suelta). Todo el movimiento usa las curvas de Web/Movimiento y un solo giro: un cuarto de vuelta en el mismo
-     sentido. Al pasar el puntero (o tocar) un mosaico quieto, cambia en el acto. O = { tamano, ritmo }. */
+     el fondo y una forma en su color complementario, en proporción 70/30. Cada tanto un mosaico cambia con uno de
+     cinco movimientos, mezclados según su peso: giro y escala, morph, desde el fondo, giro de par y tríada. Un tercer
+     color solo aparece para armar o desarmar un cambio, o como tríada para dar ritmo, y en los dos casos los tres
+     colores forman una terciaria del Master. Curvas, duración y giro se eligen en los ajustes.
+     O = { tamano, ritmo, duracion, giro, curvaEntra, curvaCambio, mGiro, mMorph, mFondo, mPar, mTriada }. */
   function FLORES(O) {
     var pie = document.querySelector(".pf-pie"), banda = pie.querySelector(".pf-pie__flores"), lienzo = banda.querySelector("canvas"), ctx = lienzo.getContext("2d");
     var quieto = matchMedia("(prefers-reduced-motion: reduce)").matches, css = getComputedStyle(document.documentElement);
@@ -217,22 +218,26 @@
 
     // Pares secundarios con fondo permitido (Color y texto: solo azul, verde, amarillo y terra llevan fondo de color).
     var PARES = { azul: "celeste", verde: "verde-claro", amarillo: "naranja", terra: "naranja" };
-    /* Cómo se pasa de un par a otro. "cubrir:x" hace crecer x desde el centro hasta llenar el mosaico; "vaciar" saca
-       la forma; "entrar" pone la forma del par nuevo. En cada momento los colores a la vista son un par o una terciaria:
-       azul→verde pasa por Azul/Celeste/Verde; verde→amarillo por Verde/Verde Claro/Amarillo; amarillo→verde por
-       Amarillo/Naranja/Verde; con terra, Verde/Amarillo/Terra (sin amarillo) o el naranja que comparte con amarillo,
-       así terra y amarillo nunca se tocan. Azul solo conversa con verde: es la única terciaria que lo tiene. */
+    // La terciaria que sale de cada par sumando un color (60/25/15). Terra/Naranja no está en ninguna: no hace tríada.
+    var TERCERA = { azul: "verde", verde: "amarillo", amarillo: "verde" };
+    /* Cambios de par por cobertura: el color nuevo crece desde el centro hasta ser el fondo. En cada momento los colores
+       a la vista son un par o una terciaria: azul→verde pasa por Azul/Celeste/Verde; verde→amarillo por Verde/Verde
+       Claro/Amarillo; amarillo→verde por Amarillo/Naranja/Verde; con terra, Verde/Amarillo/Terra (sin amarillo) o el
+       naranja que comparte con amarillo, así terra y amarillo nunca se tocan. */
     var RUTAS = {
       "azul>verde": ["cubrir:verde", "entrar"], "verde>azul": ["vaciar", "cubrir:azul", "entrar"],
       "verde>amarillo": ["cubrir:amarillo", "entrar"], "amarillo>verde": ["cubrir:verde", "entrar"],
       "verde>terra": ["vaciar", "cubrir:terra", "entrar"], "terra>verde": ["vaciar", "cubrir:verde", "entrar"],
       "amarillo>terra": ["cubrir:naranja", "cubrir:terra", "entrar"], "terra>amarillo": ["cubrir:naranja", "cubrir:amarillo", "entrar"]
     };
-    var DURA = { cubrir: 760, vaciar: 420, entrar: 680 }, PAUSA = 70, GIRO = Math.PI / 2, PROPORCION = .3;
+    // Tríadas: una forma de peso y un acento encima. La de peso se agranda lo que tapa el acento, para que a la vista queden 25% y 15%.
+    var COMBOS = [["capas", "estrella"], ["circulo", "estrella"], ["urea", "flor"], ["grafico", "estrella"], ["circulo", "flor"], ["escudo", "estrella"], ["capas", "flor"], ["industria", "estrella"]];
+    var D = O.duracion, DURA = { cubrir: 1.15 * D, vaciar: .6 * D, entrar: D, morph: 1.2 * D, flip: D, acento: D, sinacento: .6 * D };
+    var PAUSA = 70, GIRO = O.giro * Math.PI / 180, PROP = .3, PROP_BASE = .25, PROP_ACENTO = .15;
 
-    // Curvas del sistema, leídas de tokens.css: la base para entrar y la de vista (ida y vuelta) para cubrir y vaciar.
-    function bezier(v, def) {
-      var n = (v.match(/-?[\d.]+/g) || def).map(Number), x1 = n[0], y1 = n[1], x2 = n[2], y2 = n[3];
+    // Curvas de Web/Movimiento, leídas de tokens.css.
+    function bezier(v) {
+      var n = v.match(/-?[\d.]+/g).map(Number), x1 = n[0], y1 = n[1], x2 = n[2], y2 = n[3];
       function b(t, a, c) { return 3 * a * t * (1 - t) * (1 - t) + 3 * c * t * t * (1 - t) + t * t * t; }
       return function (x) {
         if (x <= 0) return 0; if (x >= 1) return 1;
@@ -241,29 +246,87 @@
         return b(t, y1, y2);
       };
     }
-    var BASE = bezier(color("ease"), [.22, 1, .36, 1]), VISTA = bezier(color("curva-vista"), [.67, 0, .24, .99]);
+    var CURVAS = { base: "ease", vista: "curva-vista", compacto: "f-chica-curva", carrusel: "carrusel-curva" };
+    function curva(n) { var v = color(CURVAS[n] || "ease"); return bezier(/cubic-bezier/.test(v) ? v : "cubic-bezier(.22,1,.36,1)"); }
+    var ENTRA = curva(O.curvaEntra), CAMBIO = curva(O.curvaCambio);
 
-    // Cada forma centrada y llevada a un cuadrado de lado 1. Se mide cuánto llena ese cuadrado para que, a cualquier
-    // tamaño de mosaico, ocupe el 30% del fondo (70/30) sin pasar del 90% del lado. Las muy finas quedan afuera.
-    var T = {}, prueba = document.createElement("canvas").getContext("2d", { willReadFrequently: true }), R = 96;
+    /* Cada forma centrada y llevada a un cuadrado de lado 1. De cada una se mide cuánto llena (para el 70/30), cuánto
+       radio macizo tiene en el centro (para cubrir el mosaico creciendo) y sus contornos como puntos (para el morph). */
+    var T = {}, NS = "http://www.w3.org/2000/svg", svg = document.createElementNS(NS, "svg"), R = 96, P = 120;
+    svg.setAttribute("style", "position:absolute;width:0;height:0;visibility:hidden"); document.body.appendChild(svg);
+    var prueba = document.createElement("canvas").getContext("2d", { willReadFrequently: true });
     prueba.canvas.width = prueba.canvas.height = R;
+    function contornos(f) {
+      var vb = f.vb.split(" ").map(Number), lado = Math.max(vb[2], vb[3]), lista = [];
+      f.d.replace(/ d="([^"]+)"/g, function (_, d) {
+        d.split(/(?=M)/).forEach(function (sub) {
+          var p = document.createElementNS(NS, "path"); p.setAttribute("d", sub); svg.appendChild(p);
+          var largo = p.getTotalLength(), pts = [];
+          for (var i = 0; i < P; i++) { var q = p.getPointAtLength(largo * i / P); pts.push([(q.x - vb[2] / 2) / lado, (q.y - vb[3] / 2) / lado]); }
+          svg.removeChild(p);
+          if (largo > 0) lista.push(pts);
+        });
+      });
+      return lista;
+    }
+    function area(c) { var a = 0; for (var i = 0, j = c.length - 1; i < c.length; j = i++) a += (c[j][0] + c[i][0]) * (c[j][1] - c[i][1]); return a / 2; }
     Object.keys(FORMAS).forEach(function (n) {
       var f = FORMAS[n], vb = f.vb.split(" ").map(Number), lado = Math.max(vb[2], vb[3]), m = new DOMMatrix().scale(1 / lado).translate(-vb[2] / 2, -vb[3] / 2), c = new Path2D();
       f.d.replace(/ d="([^"]+)"/g, function (_, d) { c.addPath(new Path2D(d), m); });
-      T[n] = { camino: c, regla: /evenodd/.test(f.d) ? "evenodd" : "nonzero" };
+      T[n] = { camino: c, regla: /evenodd/.test(f.d) ? "evenodd" : "nonzero", aros: contornos(f) };
     });
-    var circ = new Path2D(); circ.arc(0, 0, .5, 0, Math.PI * 2); T.circulo = { camino: circ, regla: "nonzero" };
+    var circ = new Path2D(), aro = []; circ.arc(0, 0, .5, 0, Math.PI * 2);
+    for (var i = 0; i < P; i++) aro.push([.5 * Math.cos(2 * Math.PI * i / P - Math.PI / 2), .5 * Math.sin(2 * Math.PI * i / P - Math.PI / 2)]);
+    T.circulo = { camino: circ, regla: "nonzero", aros: [aro] };
+    svg.remove();
     Object.keys(T).forEach(function (n) {
       prueba.setTransform(1, 0, 0, 1, 0, 0); prueba.clearRect(0, 0, R, R); prueba.setTransform(R, 0, 0, R, R / 2, R / 2);
       prueba.fill(T[n].camino, T[n].regla);
-      var px = prueba.getImageData(0, 0, R, R).data, lleno = 0;
-      for (var i = 3; i < px.length; i += 4) if (px[i] > 127) lleno++;
-      T[n].llena = lleno / (R * R);
+      var px = prueba.getImageData(0, 0, R, R).data, lleno = 0, macizo = R;
+      for (var y = 0; y < R; y++) for (var x = 0; x < R; x++) {
+        var a = px[(y * R + x) * 4 + 3] > 127;
+        if (a) lleno++; else macizo = Math.min(macizo, Math.hypot(x + .5 - R / 2, y + .5 - R / 2));
+      }
+      T[n].llena = lleno / (R * R); T[n].macizo = macizo / R;
+      // Los aros de mayor a menor, para que el morph empareje el contorno grande con el grande.
+      T[n].aros.sort(function (a, b) { return Math.abs(area(b)) - Math.abs(area(a)); });
     });
     var LISTA = Object.keys(T).filter(function (n) { return T[n].llena >= .25; });
+    var CUBREN = Object.keys(T).filter(function (n) { return T[n].macizo >= .1; });
+
+    // Morph: se emparejan los contornos por tamaño; el que sobra nace o muere en un punto. Cada par se alinea por el
+    // arranque que menos recorre.
+    function centro(c) { var x = 0, y = 0; c.forEach(function (p) { x += p[0]; y += p[1]; }); return [x / c.length, y / c.length]; }
+    function emparejar(a, b) {
+      var n = Math.max(a.length, b.length), pares = [];
+      for (var k = 0; k < n; k++) {
+        var x = a[k], y = b[k];
+        if (!x) { var c = centro(y); x = y.map(function () { return c; }); }
+        if (!y) { var d = centro(x); y = x.map(function () { return d; }); }
+        if ((area(x) > 0) !== (area(y) > 0) && area(x) && area(y)) y = y.slice().reverse();
+        var mejor = 0, menor = Infinity;
+        for (var o = 0; o < P; o += 2) { var s = 0; for (var i = 0; i < P; i += 4) { var p = x[i], q = y[(i + o) % P]; s += (p[0] - q[0]) * (p[0] - q[0]) + (p[1] - q[1]) * (p[1] - q[1]); } if (s < menor) { menor = s; mejor = o; } }
+        pares.push([x, y.slice(mejor).concat(y.slice(0, mejor))]);
+      }
+      return pares;
+    }
+    function caminoMorph(pares, k) {
+      var c = new Path2D();
+      pares.forEach(function (pq) {
+        pq[0].forEach(function (p, i) { var q = pq[1][i], x = p[0] + (q[0] - p[0]) * k, y = p[1] + (q[1] - p[1]) * k; if (i) c.lineTo(x, y); else c.moveTo(x, y); });
+        c.closePath();
+      });
+      return c;
+    }
 
     function azar(a) { return a[Math.floor(Math.random() * a.length)]; }
     function otra(a, evitar) { var l = a.filter(function (x) { return x !== evitar; }); return azar(l.length ? l : a); }
+    function sortear(pesos) {
+      var total = 0, k; for (k in pesos) total += pesos[k];
+      if (total <= 0) return null;
+      var r = Math.random() * total; for (k in pesos) { r -= pesos[k]; if (r < 0) return k; }
+      return k;
+    }
 
     var W = 0, H = 0, ancho = 0, alto = 0, cols = 0, filas = 0, mos = [], dpr = Math.min(2, devicePixelRatio || 1);
     // Fondos de los vecinos (el que tienen y el que van a tener), para no repetir fondo al lado.
@@ -275,29 +338,51 @@
       });
       return v;
     }
-    function lado(n) { return Math.min(Math.sqrt(PROPORCION * ancho * alto / T[n].llena), .9 * Math.min(ancho, alto)); }
+    function lado(n, prop) { return Math.min(Math.sqrt((prop || PROP) * ancho * alto / T[n].llena), .9 * Math.min(ancho, alto)); }
 
-    // Elige el par siguiente: mismo par con otra forma, o un par vecino en el mapa de rutas que no repita fondo al lado.
+    // Elige el movimiento siguiente según los pesos y arma sus pasos.
     function planear(m, t) {
-      var cerca = vecinos(mos.indexOf(m)), opciones = Object.keys(RUTAS).filter(function (r) { return r.indexOf(m.fondo + ">") === 0 && cerca.indexOf(r.split(">")[1]) < 0; });
-      var mismo = cerca.indexOf(m.fondo) < 0, pasos;
-      if (opciones.length && (!mismo || Math.random() < .55)) { var r = azar(opciones); m.destino = r.split(">")[1]; pasos = RUTAS[r].slice(); }
-      else { m.destino = m.fondo; pasos = ["vaciar", "entrar"]; }
+      var cerca = vecinos(mos.indexOf(m)), pasos;
+      if (m.acento) {
+        // Una tríada siempre vuelve a par: sale el acento y la forma de peso se transforma en otra.
+        pasos = ["sinacento", "morph:" + otra(LISTA, m.forma) + ":" + PROP];
+        m.destino = m.fondo;
+      } else {
+        var rutas = Object.keys(RUTAS).filter(function (r) { return r.indexOf(m.fondo + ">") === 0 && cerca.indexOf(r.split(">")[1]) < 0; });
+        var libres = Object.keys(PARES).filter(function (f) { return f !== m.fondo && cerca.indexOf(f) < 0; });
+        var mov = sortear({ giro: O.mGiro, morph: O.mMorph, fondo: rutas.length ? O.mFondo : 0, par: libres.length ? O.mPar : 0, triada: TERCERA[m.fondo] ? O.mTriada : 0 }) || "giro";
+        // Si el fondo ya choca con un vecino, cambia de par sí o sí.
+        if (cerca.indexOf(m.fondo) >= 0 && (mov === "giro" || mov === "morph" || mov === "triada")) mov = rutas.length ? "fondo" : libres.length ? "par" : mov;
+        m.destino = m.fondo;
+        if (mov === "giro") pasos = ["vaciar", "entrar"];
+        if (mov === "morph") pasos = ["morph:" + otra(LISTA, m.forma) + ":" + PROP];
+        if (mov === "fondo") { var r = azar(rutas); m.destino = r.split(">")[1]; pasos = RUTAS[r].slice(); }
+        if (mov === "par") { m.destino = azar(libres); pasos = ["flip:" + m.destino]; }
+        if (mov === "triada") { var cb = azar(COMBOS); pasos = ["morph:" + cb[0] + ":" + (PROP_BASE + PROP_ACENTO), "acento:" + cb[1]]; }
+      }
       m.pasos = pasos; m.paso = null; arrancar(m, t);
     }
     function arrancar(m, t) {
-      var p = m.pasos.shift();
-      if (!p) { m.paso = null; m.destino = null; m.prox = t + O.ritmo * (.7 + Math.random() * .6); return; }
-      var tipo = p.split(":")[0];
-      m.paso = { tipo: tipo, color: p.split(":")[1], t: t, forma: tipo === "entrar" ? otra(LISTA, m.ultima) : null };
-      if (tipo === "entrar") m.paso.color = PARES[m.fondo];
+      var s = m.pasos.shift();
+      if (!s) { m.paso = null; m.destino = null; m.prox = t + O.ritmo * (.7 + Math.random() * .6) * (m.acento ? 1.6 : 1); return; }
+      var a = s.split(":"), p = { tipo: a[0], t: t };
+      if (p.tipo === "entrar") { p.forma = otra(LISTA, m.ultima); p.color = PARES[m.fondo]; }
+      if (p.tipo === "cubrir") { p.color = a[1]; p.forma = azar(CUBREN); p.escala = Math.hypot(ancho, alto) / 2 / T[p.forma].macizo; }
+      if (p.tipo === "morph") { p.forma = a[1]; p.prop = +a[2]; p.desde = m.prop; p.pares = emparejar(T[m.forma].aros, T[p.forma].aros); }
+      if (p.tipo === "flip") { p.fondo = a[1]; p.forma = otra(LISTA, m.forma); }
+      if (p.tipo === "acento") p.forma = a[1];
+      m.paso = p;
     }
     // Cierra el paso en curso: deja el estado quieto que corresponde.
     function cerrar(m) {
       var p = m.paso;
       if (p.tipo === "cubrir") { m.fondo = p.color; m.forma = null; }
       if (p.tipo === "vaciar") m.forma = null;
-      if (p.tipo === "entrar") { m.forma = p.forma; m.ultima = p.forma; }
+      if (p.tipo === "entrar") { m.forma = p.forma; m.ultima = p.forma; m.prop = PROP; }
+      if (p.tipo === "morph") { m.forma = p.forma; m.ultima = p.forma; m.prop = p.prop; }
+      if (p.tipo === "flip") { m.fondo = p.fondo; m.forma = p.forma; m.ultima = p.forma; m.prop = PROP; }
+      if (p.tipo === "acento") m.acento = p.forma;
+      if (p.tipo === "sinacento") m.acento = null;
     }
     function avanzar(m, t) {
       if (m.paso && t - m.paso.t >= DURA[m.paso.tipo]) { var sig = m.paso.t + DURA[m.paso.tipo] + PAUSA; cerrar(m); arrancar(m, t - sig > 500 ? t : sig); }
@@ -308,7 +393,7 @@
 
     function nuevo(i, t) {
       var cerca = vecinos(i), libres = Object.keys(PARES).filter(function (f) { return cerca.indexOf(f) < 0; }), fondo = azar(libres.length ? libres : Object.keys(PARES)), forma = azar(LISTA);
-      mos[i] = { fondo: fondo, forma: forma, ultima: forma, paso: null, pasos: [], destino: null, prox: quieto ? Infinity : t + Math.random() * O.ritmo * 1.6 };
+      mos[i] = { fondo: fondo, forma: forma, ultima: forma, prop: PROP, acento: null, paso: null, pasos: [], destino: null, prox: quieto ? Infinity : t + Math.random() * O.ritmo * 1.6 };
     }
 
     function medir() {
@@ -321,22 +406,36 @@
       mos.length = cols * filas;
     }
 
-    function forma(n, c, escala, giro) {
+    function pintar(camino, regla, c, escala, giro) {
       if (escala <= 0) return;
-      ctx.save(); ctx.rotate(giro); ctx.scale(escala, escala); ctx.fillStyle = color(c); ctx.fill(T[n].camino, T[n].regla); ctx.restore();
+      ctx.save(); ctx.rotate(giro); ctx.scale(escala, escala); ctx.fillStyle = color(c); ctx.fill(camino, regla); ctx.restore();
     }
+    function forma(n, c, escala, giro) { pintar(T[n].camino, T[n].regla, c, escala, giro); }
     function dibujar(t) {
       ctx.clearRect(0, 0, W, H);
-      var radio = Math.sqrt(ancho * ancho + alto * alto) / 2;
       mos.forEach(function (m, i) {
-        var x = (i % cols) * ancho, y = Math.floor(i / cols) * alto, p = m.paso, k = p ? Math.min(1, Math.max(0, (t - p.t) / DURA[p.tipo])) : 0;
+        var x = (i % cols) * ancho, y = Math.floor(i / cols) * alto, p = m.paso, k = p ? Math.min(1, Math.max(0, (t - p.t) / DURA[p.tipo])) : 0, tipo = p && p.tipo;
         ctx.save(); ctx.beginPath(); ctx.rect(x, y, ancho + .5, alto + .5); ctx.clip();
-        ctx.fillStyle = color(m.fondo); ctx.fillRect(x, y, ancho + 1, alto + 1);
         ctx.translate(x + ancho / 2, y + alto / 2);
-        var giro = p && p.tipo === "vaciar" ? GIRO * VISTA(k) : 0, achica = p && p.tipo === "vaciar" ? 1 - VISTA(k) : 1;
-        if (m.forma) forma(m.forma, PARES[m.fondo], lado(m.forma) * achica, giro);
-        if (p && p.tipo === "cubrir") { ctx.beginPath(); ctx.arc(0, 0, radio * VISTA(k), 0, Math.PI * 2); ctx.fillStyle = color(p.color); ctx.fill(); }
-        if (p && p.tipo === "entrar") { var e = BASE(k); forma(p.forma, p.color, lado(p.forma) * e, -GIRO * (1 - e)); }
+        // Giro de par: el mosaico entero se da vuelta como una carta; a mitad de camino ya muestra el par nuevo.
+        var fondo = m.fondo, fn = m.forma, flip = 1;
+        if (tipo === "flip") { var e = CAMBIO(k); flip = Math.abs(Math.cos(Math.PI * e)); if (e >= .5) { fondo = p.fondo; fn = p.forma; } ctx.scale(Math.max(flip, .001), 1); }
+        ctx.fillStyle = color(fondo); ctx.fillRect(-ancho / 2 - .5, -alto / 2 - .5, ancho + 1, alto + 1);
+        var tinta = PARES[fondo];
+        if (tipo === "morph") {
+          var e2 = CAMBIO(k), s = lado(m.forma, p.desde) + (lado(p.forma, p.prop) - lado(m.forma, p.desde)) * e2;
+          pintar(caminoMorph(p.pares, e2), e2 < .5 ? T[m.forma].regla : T[p.forma].regla, tinta, s, 0);
+        } else if (fn) {
+          var vacia = tipo === "vaciar" ? CAMBIO(k) : 0;
+          forma(fn, tinta, lado(fn, tipo === "flip" && e >= .5 ? PROP : m.prop) * (1 - vacia), GIRO * vacia);
+        }
+        if (m.acento || tipo === "acento" || tipo === "sinacento") {
+          var ac = m.acento || p.forma, ea = tipo === "acento" ? ENTRA(k) : tipo === "sinacento" ? 1 - CAMBIO(k) : 1;
+          forma(ac, TERCERA[fondo], lado(ac, PROP_ACENTO) * Math.min(1, ea), -GIRO * (1 - ea));
+        }
+        // Desde el fondo: el color nuevo crece girando con la silueta de una forma hasta llenar el mosaico.
+        if (tipo === "cubrir") { var ec = CAMBIO(k); forma(p.forma, p.color, p.escala * ec, -GIRO * (1 - ec)); }
+        if (tipo === "entrar") { var en = ENTRA(k); forma(p.forma, p.color, lado(p.forma) * en, -GIRO * (1 - en)); }
         ctx.restore();
       });
     }
@@ -373,7 +472,7 @@
       ["trigo", "Con trigo", "Fondo tiza y el trigo del sistema en amarillo pleno, a la izquierda, que sube más lento que la página."],
       ["vida", "Vida para nuestra tierra", "Alto de pantalla completa con un video de campo en loop de fondo y un filtro negro parejo. La frase va abajo a la izquierda, a tamaño de título, y entra con el animador Ventana."],
       ["formas", "Formas que caen", "Experimento. Alto de pantalla completa en marfil: arriba logo, links y línea ética; abajo caen las formas del sistema con física, se apilan hasta la mitad y se pueden agarrar y tirar."],
-      ["flores", "Flores", "Experimento. Alto de pantalla completa en marfil: arriba logo, links y línea ética; abajo una banda de mosaicos, cada uno un par secundario del Master: fondo y forma en 70/30. Cambian solos; una tercera forma aparece solo para armar o desarmar el cambio, y siempre forma una terciaria. Al pasar el puntero o tocar, cambian en el acto."]
+      ["flores", "Flores", "Experimento. Alto de pantalla completa en marfil: arriba logo, links y línea ética; abajo una banda de mosaicos, cada uno un par secundario del Master: fondo y forma en 70/30. Cambian solos con cinco movimientos que se mezclan por peso (giro y escala, morph, desde el fondo, giro de par y tríada); cuando aparece un tercer color, siempre forma una terciaria. Al pasar el puntero o tocar, cambian en el acto."]
     ],
     tamano: "media",
     claves: ["La línea ética va siempre en el pie, con su propio llamado, en una sola línea discreta.", "Los fondos de color son solo los del Master (azul, verde, terra, amarillo); sobre amarillo el texto va en azul.", "El logo va siempre completo: no se recorta ni se separa el símbolo de la palabra.", "Las columnas repiten el menú principal: si cambia la arquitectura, cambia el pie.", "Con trigo y Vida para nuestra tierra tienen parallax: el trigo y la foto se mueven a otra velocidad que la página mientras el pie entra en pantalla.", "Vida para nuestra tierra ocupa una pantalla entera. La frase va alineada a la izquierda junto a la línea ética, y entra con el animador Ventana, palabra por palabra.", "Nunca degradados sobre la foto (ni de color ni de tinta). Si hace falta contraste, un filtro negro parejo.", "Formas que caen es un experimento: las 18 formas del Master en los 7 colores de marca, sin dos del mismo color tocándose (si se tocan, la que se mueve cambia de color). Arrancan a caer cuando el pie entra en pantalla.", "Flores es un experimento: cada mosaico encima tres formas del Master (afuera, medio y centro) sobre un fondo de los 7 colores de marca; dos capas seguidas nunca tienen el mismo color, ni dos fondos vecinos. Las capas entran de afuera hacia adentro con un resorte."],
@@ -389,6 +488,15 @@
       { id: "tamano", tipo: "rango", etiqueta: "Tamaño", solo: ["formas"], unidad: "px", min: 48, max: 280, def: 160, desc: "Lado de cada forma. En pantallas chicas no pasa del 30% del ancho." },
       { id: "mosaico", tipo: "rango", etiqueta: "Mosaico", solo: ["flores"], unidad: "px", min: 100, max: 480, def: 240, desc: "Lado aproximado de cada mosaico. Se ajusta para que entren justos en el ancho y en el alto de la banda, que llena todo lo que queda debajo del contenido." },
       { id: "ritmo", tipo: "rango", etiqueta: "Ritmo", solo: ["flores"], unidad: "ms", min: 500, max: 4000, paso: 100, def: 1800, desc: "Pausa promedio entre un cambio y el siguiente. Cada mosaico va a su tiempo." },
+      { id: "duracion", tipo: "rango", etiqueta: "Duración", solo: ["flores"], unidad: "ms", min: 300, max: 2000, paso: 50, def: 700, desc: "Duración de cada paso de un cambio. Cubrir y morph duran un poco más; vaciar, un poco menos." },
+      { id: "giro", tipo: "rango", etiqueta: "Giro", solo: ["flores"], unidad: "°", min: 0, max: 360, paso: 15, def: 90, desc: "Cuánto gira una forma al entrar, salir o crecer desde el fondo. Siempre en el mismo sentido. En 0 no gira." },
+      { id: "curvaEntra", tipo: "select", etiqueta: "Curva de entrada", solo: ["flores"], def: "base", opciones: [["base", "Base", "Web/Movimiento/Curva base: arranca rápido y frena largo."], ["vista", "Vista", "Curva vista: sale y llega suave, pareja en los dos extremos."], ["compacto", "Compacto", "Curva compacto: arranque seco, frenada corta."], ["carrusel", "Carrusel", "Curva carrusel: ida y vuelta marcada, más pesada."]], desc: "Curva con la que entran la forma y el acento de una tríada." },
+      { id: "curvaCambio", tipo: "select", etiqueta: "Curva de cambio", solo: ["flores"], def: "vista", opciones: [["base", "Base", "Web/Movimiento/Curva base: arranca rápido y frena largo."], ["vista", "Vista", "Curva vista: sale y llega suave, pareja en los dos extremos."], ["compacto", "Compacto", "Curva compacto: arranque seco, frenada corta."], ["carrusel", "Carrusel", "Curva carrusel: ida y vuelta marcada, más pesada."]], desc: "Curva de los cambios: cubrir, vaciar, morph y giro de par." },
+      { id: "mGiro", tipo: "rango", etiqueta: "Giro y escala", solo: ["flores"], unidad: "%", min: 0, max: 100, def: 30, desc: "Peso del movimiento: la forma sale girando y entra otra del mismo par." },
+      { id: "mMorph", tipo: "rango", etiqueta: "Morph", solo: ["flores"], unidad: "%", min: 0, max: 100, def: 30, desc: "Peso del movimiento: la forma se transforma en otra sin cambiar de par." },
+      { id: "mFondo", tipo: "rango", etiqueta: "Desde el fondo", solo: ["flores"], unidad: "%", min: 0, max: 100, def: 25, desc: "Peso del movimiento: el color nuevo crece girando con la silueta de una forma hasta ser el fondo, y entra la forma del par nuevo. Pasa por una terciaria." },
+      { id: "mPar", tipo: "rango", etiqueta: "Giro de par", solo: ["flores"], unidad: "%", min: 0, max: 100, def: 15, desc: "Peso del movimiento: el mosaico se da vuelta como una carta y muestra otro par. Nunca hay dos pares a la vez." },
+      { id: "mTriada", tipo: "rango", etiqueta: "Tríadas", solo: ["flores"], unidad: "%", min: 0, max: 100, def: 15, desc: "Peso del movimiento: el par suma un acento y queda un rato como terciaria (60/25/15), con una forma de peso y otra encima. Después vuelve a par. Terra no hace tríada." },
       "---",
       { id: "radio", tipo: "rango", etiqueta: "Radio de arriba", unidad: "px", min: 0, max: 56, def: 26, aplica: { var: "--radio", unidad: "px" }, desc: "Radio de las esquinas de arriba." },
       { id: "logo", tipo: "rango", etiqueta: "Logo", unidad: "px", min: 80, max: 260, def: 150, aplica: { var: "--logo", unidad: "px" }, desc: "Ancho del logo completo." },
@@ -509,7 +617,7 @@
     },
     js: function (s) {
       if (s.variante === "institucional") return "";
-      if (s.variante === "flores") return "(" + FLORES.toString() + ")(" + JSON.stringify({ tamano: +s.mosaico, ritmo: +s.ritmo }) + ");";
+      if (s.variante === "flores") return "(" + FLORES.toString() + ")(" + JSON.stringify({ tamano: +s.mosaico, ritmo: +s.ritmo, duracion: +s.duracion, giro: +s.giro, curvaEntra: s.curvaEntra, curvaCambio: s.curvaCambio, mGiro: +s.mGiro, mMorph: +s.mMorph, mFondo: +s.mFondo, mPar: +s.mPar, mTriada: +s.mTriada }) + ");";
       if (s.variante === "formas") return "(" + FISICA.toString() + ")(" + JSON.stringify({ cantidad: +s.cantidad, tamano: +s.tamano }) + ");";
       return "(" + function () {
         // El pie avisa cuánto entró en pantalla (--p de 0 a 1): con eso se mueven el trigo, la foto y la frase.
