@@ -134,10 +134,10 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
 .pf-n-rel__cab h2 { margin: 0; font: 600 var(--texto-subtitulo)/1.1 var(--f-display); letter-spacing: -0.02em; color: var(--azul); }
 .pf-n-rel__fila { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
 
-/* Tarjeta: la de Novedades sin el fondo. El arte con la etiqueta adentro, arriba a la izquierda; abajo la fecha y el título. */
+/* Tarjeta: la de Novedades sin el fondo. La foto (o el arte) con la etiqueta adentro, arriba a la izquierda; abajo la fecha y el título. */
 .pf-n-mini { display: grid; gap: 14px; align-content: start; text-decoration: none; }
-.pf-n-mini__img { position: relative; border-radius: var(--radio-media); overflow: hidden; line-height: 0; transition: transform 320ms var(--ease); }
-.pf-n-mini__img > svg { display: block; width: 100%; height: auto; }
+.pf-n-mini__img { position: relative; aspect-ratio: 4 / 3; border-radius: var(--radio-media); overflow: hidden; background: var(--card); line-height: 0; transition: transform 320ms var(--ease); }
+.pf-n-mini__img > :is(img, svg) { display: block; width: 100%; height: 100%; object-fit: cover; }
 .pf-n-mini__img .pf-etiqueta { position: absolute; top: 12px; left: 12px; max-width: calc(100% - 24px); }
 .pf-n-mini__img .pf-etiqueta__rotulo { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .pf-n-mini__txt { display: grid; gap: 8px; padding: 0 2px; }
@@ -371,9 +371,11 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
   var ta;
   function avisar(txt) { var a = $("pf-aviso"); a.textContent = txt; a.classList.add("pf-on"); clearTimeout(ta); ta = setTimeout(function () { a.classList.remove("pf-on"); }, 2000); }
 
-  // Tarjeta: la de Novedades sin el fondo. Arte 4:3 con la etiqueta y el año adentro; fecha y título abajo.
+  // Tarjeta: la de Novedades sin el fondo. Foto de la nota 4:3 (si no tiene, el arte) con la etiqueta y el año adentro; fecha y título abajo.
   function mini(x) {
-    return '<a class="pf-n-mini" href="' + url(x) + '"><div class="pf-n-mini__img">' + arte(x, 240, 180, x.id * 7919 + 13) + etq(x.tp, { dato: x.anio }) + "</div>" +
+    var img = x.imgL ? "../" + x.imgL : x.img;
+    var m = img ? '<img src="' + esc(img) + '" alt="" loading="lazy" decoding="async">' : arte(x, 240, 180, x.id * 7919 + 13);
+    return '<a class="pf-n-mini" href="' + url(x) + '"><div class="pf-n-mini__img">' + m + etq(x.tp, { dato: x.anio }) + "</div>" +
       '<div class="pf-n-mini__txt"><p class="pf-when">' + fecha(x.f) + '</p><p class="pf-ttl">' + esc(x.t) + "</p></div></a>";
   }
 

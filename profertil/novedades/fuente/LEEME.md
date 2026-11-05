@@ -80,7 +80,8 @@ nota lo lee al abrir de `../notas/<ar>.json`.
 - Hasta 1100 px de ancho queda una columna: título, foto, datos y texto; el
   índice se va. En celular los datos van en una sola línea, con la fecha corta.
 - Cierra con tres relacionadas y nada más: la tarjeta de Novedades sin el
-  fondo, para que pese menos. El arte 4:3 con la etiqueta y el año adentro,
+  fondo, para que pese menos. La foto de la nota en 4:3 (si no tiene, el arte
+  de Novedades) con la etiqueta y el año adentro,
   arriba a la izquierda, y abajo la fecha y el título; en celular,
   una fila que se desliza con encastre. Comparten temas, cultivo, pilar o tipo; a igual puntaje,
   la más cercana en el tiempo.
