@@ -55,8 +55,8 @@
 <style>
 /* ==========================================================================
    Nota Profertil: la plantilla de una nota de Novedades.
-   Sobria, sin cabecera de color: título centrado con la etiqueta del tipo y,
-   abajo, tres columnas: el índice numerado, la foto principal entera (sin
+   Sobria, sin cabecera de color: título a la izquierda con la etiqueta del tipo y,
+   abajo, tres columnas: el índice de secciones, la foto principal entera (sin
    recorte) con radio, y fecha, tiempo de lectura, compartir y modo lectura. Sigue el texto y cierra con tres relacionadas. Cierra con la nota anterior y
    la siguiente, las relacionadas y el pie.
    Los datos son una copia fija del sitio actual: ../notas/<nota>.json.
@@ -88,8 +88,8 @@ button, a { touch-action: manipulation; }
 .pf-n-grilla { width: min(100% - 32px, 1268px); margin-inline: auto; display: grid; grid-template-columns: 220px minmax(0, 700px) 220px; justify-content: center; gap: 0 64px; padding-top: calc(140px + env(safe-area-inset-top, 0px)); }
 
 /* --- Cabecera: centrada, sin caja. La etiqueta completa (forma, rótulo y año) va solo junto al título. */
-.pf-n-cab { grid-column: 1 / -1; grid-row: 1; }
-.pf-n-in { display: grid; gap: 18px; justify-items: center; text-align: center; max-width: 900px; margin-inline: auto; }
+.pf-n-cab { grid-column: 2 / -1; grid-row: 1; }
+.pf-n-in { display: grid; gap: 18px; justify-items: start; max-width: 900px; }
 .pf-n-volver { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-3); font-size: var(--texto-chico); text-decoration: none; transition: color 200ms ease; }
 @media (hover: hover) and (pointer: fine) { .pf-n-volver:hover { color: var(--azul); } }
 .pf-n-in .pf-etiqueta { --s: var(--etq-m); margin-top: 14px; }
@@ -108,9 +108,11 @@ button, a { touch-action: manipulation; }
 /* --- Datos, a la derecha de la foto: rótulo y valor por fila. */
 .pf-n-datos { grid-column: 3; grid-row: 2; align-self: start; margin: 56px 0 0; display: grid; justify-items: start; gap: 14px; font-size: var(--texto-chico); }
 .pf-n-fecha { margin: 0; color: var(--ink-2); }
-.pf-n-tiempo { margin: 0; display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 11px 0 8px; border-radius: 999px; background: var(--card); color: var(--ink-2); font-size: var(--texto-mini); font-variant-numeric: tabular-nums; }
+/* Minutos de lectura y modo lectura, pegados y en azul. */
+.pf-n-par { display: flex; gap: 4px; }
+.pf-n-tiempo { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px 0 9px; border-radius: 999px; background: var(--azul); color: var(--tiza); font-size: var(--texto-mini); font-variant-numeric: tabular-nums; }
 .pf-n-tiempo svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.pf-n-compartir { display: flex; gap: 6px; margin-top: 6px; }
+.pf-n-compartir { display: flex; gap: 6px; }
 .pf-n-compartir > *, .pf-n-foco { display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--ink-2); cursor: pointer; text-decoration: none; transition: color 200ms ease, border-color 200ms ease, background 200ms ease; }
 @media (hover: hover) and (pointer: fine) { .pf-n-compartir > *:hover { color: var(--azul); border-color: var(--azul); } }
 .pf-n-compartir svg, .pf-n-foco svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -120,15 +122,39 @@ button, a { touch-action: manipulation; }
 .pf-n-foco svg { width: 17px; height: 17px; stroke-width: 1.8; }
 @media (hover: hover) and (pointer: fine) { .pf-n-foco:hover { background: var(--ink); } }
 
+/* --- Texto ------------------------------------------------------------------ */
+.pf-n-texto { grid-column: 2; grid-row: 3; margin-top: 56px; min-width: 0; font-size: var(--texto-destacado); line-height: 1.68; color: var(--ink); overflow-wrap: break-word; }
+.pf-n-texto > :first-child { margin-top: 0; }
+.pf-n-texto p { margin: 0 0 1.1em; }
+.pf-n-texto h2, .pf-n-texto h3, .pf-n-texto h4 { margin: 1.9em 0 .6em; font-family: var(--f-display); font-weight: 600; color: var(--azul); letter-spacing: -0.02em; line-height: 1.15; text-wrap: balance; scroll-margin-top: 110px; }
+.pf-n-texto h2 { font-size: calc(var(--texto-subtitulo) * 1.3); }
+.pf-n-texto h3 { font-size: calc(var(--texto-subtitulo) * 1.15); }
+.pf-n-texto h4 { font-size: var(--texto-subtitulo); }
+.pf-n-texto :is(h2, h3, h4) strong { font-weight: inherit; }
+.pf-n-texto strong { font-weight: 600; }
+.pf-n-texto a { color: var(--azul); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--celeste) 60%, transparent); text-decoration-thickness: 1.5px; text-underline-offset: 3px; transition: text-decoration-color 200ms ease; }
+@media (hover: hover) and (pointer: fine) { .pf-n-texto a:hover { text-decoration-color: var(--azul); } }
+.pf-n-texto ul, .pf-n-texto ol { margin: 0 0 1.2em; padding-left: 1.3em; }
+.pf-n-texto li { margin: .35em 0; padding-left: .2em; }
+.pf-n-texto li::marker { color: var(--verde); font-weight: 600; }
+.pf-n-texto blockquote { margin: 1.6em 0; padding: 4px 0 4px 24px; border-left: 3px solid var(--verde); font: 500 calc(var(--texto-subtitulo) * 1.05)/1.35 var(--f-display); letter-spacing: -0.015em; color: var(--azul); }
+.pf-n-texto figure { margin: 2em 0; }
+.pf-n-texto figure img { display: block; width: auto; max-width: 100%; height: auto; border-radius: var(--radio-media); background: var(--card); }
+.pf-n-texto figcaption { margin-top: 10px; font-size: var(--texto-chico); line-height: 1.45; color: var(--ink-3); }
+.pf-n-texto .video iframe { display: block; width: 100%; aspect-ratio: 16 / 9; height: auto; border: 0; border-radius: var(--radio-media); background: var(--ink); }
+.pf-n-tabla { margin: 1.6em 0; overflow-x: auto; }
+.pf-n-tabla table { width: 100%; border-collapse: collapse; font-size: var(--texto-chico); line-height: 1.45; }
+.pf-n-tabla :is(td, th) { padding: 12px 16px 12px 0; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+.pf-n-tabla th { font-weight: 600; color: var(--azul); }
+.pf-n-vacio { color: var(--ink-3); }
+
 /* Sin foto, el texto sube a la fila de los costados. */
 .pf-n-grilla:not(.pf-con-foto) .pf-n-texto { grid-row: 2; }
 
-/* --- Índice, a la izquierda: numerado, fijo al bajar. Solo si la nota tiene dos subtítulos o más. */
+/* --- Índice, a la izquierda: las secciones, fijo al bajar. Solo si la nota tiene dos subtítulos o más. */
 .pf-n-indice { grid-column: 1; grid-row: 2 / span 2; align-self: start; position: sticky; top: 112px; margin-top: 56px; font-size: var(--texto-chico); }
-.pf-n-indice ol { position: relative; margin: 0; padding: 0 0 0 18px; list-style: none; display: grid; gap: 10px; counter-reset: pf-i; }
-.pf-n-indice li { counter-increment: pf-i; }
-.pf-n-indice a { display: grid; grid-template-columns: 26px minmax(0, 1fr); color: var(--ink-3); line-height: 1.35; text-decoration: none; transition: color 200ms ease, translate var(--punto-dura, 320ms) var(--punto-curva, var(--ease)); }
-.pf-n-indice a::before { content: counter(pf-i, decimal-leading-zero); font-variant-numeric: tabular-nums; }
+.pf-n-indice ol { position: relative; margin: 0; padding: 0 0 0 18px; list-style: none; display: grid; gap: 10px; }
+.pf-n-indice a { display: block; color: var(--ink-3); line-height: 1.35; text-decoration: none; transition: color 200ms ease, translate var(--punto-dura, 320ms) var(--punto-curva, var(--ease)); }
 .pf-n-indice a.pf-on { color: var(--azul); translate: 4px 0; }
 @media (hover: hover) and (pointer: fine) { .pf-n-indice a:hover { color: var(--azul); translate: 4px 0; } }
 /* El punto azul viaja con un resorte hasta la sección que se está leyendo (el mismo de la librería). */
@@ -590,7 +616,8 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
   function datos(d) {
     // Sin rótulos: la fecha, el tiempo de lectura en un chip, compartir y el modo lectura.
     var h = '<p class="pf-n-fecha">' + fecha(n.f, true) + "</p>" +
-      '<p class="pf-n-tiempo">' + RELOJ + Math.max(1, Math.round(n.w / 200)) + " min</p>";
+      '<div class="pf-n-par"><span class="pf-n-tiempo">' + RELOJ + Math.max(1, Math.round(n.w / 200)) + " min</span>" +
+      '<button class="pf-n-foco" type="button" id="pf-foco" aria-pressed="false" aria-label="Modo lectura" title="Modo lectura">' + OJO + "</button></div>";
     var aqui = encodeURIComponent(location.href), ttl = encodeURIComponent(n.t);
     h += '<div class="pf-n-compartir">' +
       '<button type="button" id="pf-copiar" aria-label="Copiar el link"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></button>' +
@@ -598,7 +625,6 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
       '<a href="https://www.linkedin.com/sharing/share-offsite/?url=' + aqui + '" target="_blank" rel="noopener" aria-label="Compartir en LinkedIn"><svg class="pf-relleno" viewBox="0 0 24 24" aria-hidden="true"><path d="M5.3 8.6h3v10.1h-3V8.6Zm1.5-4.9a1.8 1.8 0 1 1 0 3.5 1.8 1.8 0 0 1 0-3.5Zm3.4 4.9h2.9v1.4c.4-.8 1.4-1.6 2.9-1.6 3.1 0 3.7 2 3.7 4.7v5.6h-3v-5c0-1.2 0-2.7-1.6-2.7s-1.9 1.3-1.9 2.6v5.1h-3V8.6Z"/></svg></a>' +
       '<a href="mailto:?subject=' + ttl + "&body=" + aqui + '" aria-label="Compartir por mail"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="3"/><path d="m4.5 7.5 7.5 5.5 7.5-5.5"/></svg></a>' +
       "</div>";
-    h += '<button class="pf-n-foco" type="button" id="pf-foco" aria-pressed="false" aria-label="Modo lectura" title="Modo lectura">' + OJO + "</button>";
     $("pf-datos").innerHTML = h;
     $("pf-foco").addEventListener("click", function () { foco(!document.body.classList.contains("pf-foco")); });
     $("pf-copiar").addEventListener("click", function () {
