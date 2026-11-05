@@ -14,8 +14,19 @@ aj=json.loads(open('assets.json').read()); aj.pop('iconos',None)
 n=open('notas.json').read().replace('</','<\\/')
 a=json.dumps(aj,ensure_ascii=False,separators=(',',':')).replace('</','<\\/')
 t=t.replace('/*__NOTAS__*/[]',n).replace('/*__ASSETS__*/{}',a)
+# Transición entre páginas (componente "Transiciones de página" de la librería) y su panel:
+# el CSS y el script del head van antes de pintar; el paño, al principio del body.
+TR_CSS = open('transicion.css', encoding='utf-8').read()
+TR_CAB = open('transicion-cabeza.js', encoding='utf-8').read()
+TR_JS = open('transicion.js', encoding='utf-8').read()
+TR_VELO = '<div class="pf-tr-velo" id="pf-tr-velo" aria-hidden="true"><svg viewBox="0 0 1458 1021"><use href="#pf-logo-blanco"/></svg></div>\n'
+def armar(head, rest):
+    return ('<!DOCTYPE html>\n<html lang="es">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
+            + head + '\n' + TR_CSS + '</style>\n<script>\n' + TR_CAB + '</script>\n</head>\n<body>\n' + TR_VELO + rest
+            + '<script>\n' + TR_JS + '</script>\n</body>\n</html>\n')
+
 head,rest=t.split('</style>',1)
-doc='<!DOCTYPE html>\n<html lang="es">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'+head+'</style>\n</head>\n<body>\n'+rest+'</body>\n</html>\n'
+doc=armar(head,rest)
 open(os.path.join(AQUI,'..','index.html'),'w').write(doc)
 print(len(t))
 
@@ -60,7 +71,7 @@ nt = nt.replace('/*__COMUN__*/', comun).replace('/*__LOGOS__*/', sym('logo-blanc
 nt = nt.replace('/*__NOTAS__*/[]', n).replace('/*__ASSETS__*/{}', json.dumps(aj2, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/'))
 nt = nt.replace('/*__PIE_CSS__*/', pie['css']).replace('/*__PIE_HTML__*/', pie['html'])
 head, rest = nt.split('</style>', 1)
-doc = '<!DOCTYPE html>\n<html lang="es">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n' + head + '</style>\n</head>\n<body>\n' + rest + '</body>\n</html>\n'
+doc = armar(head, rest)
 os.makedirs(os.path.join(AQUI, '..', 'nota'), exist_ok=True)
 salida = os.path.join(AQUI, '..', 'nota', 'index.html')
 open(salida, 'w', encoding='utf-8').write(doc)

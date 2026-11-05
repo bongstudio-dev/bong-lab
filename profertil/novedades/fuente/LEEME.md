@@ -126,6 +126,16 @@ subtitulos, listas, citas, links, fotos con epigrafe, tablas y videos), sin
 clases ni estilos del theme actual. Es una copia fija del sitio, no se
 conecta en vivo. `SIN_FOTOS=1` saltea la bajada de fotos.
 
+## Transición entre páginas
+
+Entre Novedades y cada Nota (y de una Nota a otra) corre el componente "Transiciones de página" de la librería: persiana de color con el logo o fundido. Vive en tres archivos que `build.py` mete en las dos páginas:
+
+- `transicion.css`: el paño, el fundido y el panel.
+- `transicion-cabeza.js`: va en el head, antes de pintar. Lee la elección, pone las variables y, si se llega con la persiana, deja el paño tapando para que siga de largo.
+- `transicion.js`: intercepta los links internos de Novedades, tapa y recién ahí cambia de página. Arma el panel.
+
+El panel (abajo a la izquierda) elige Persiana, Fundido o Ninguna, el color del paño, la duración de cada tramo y la curva (Base o Fuerte, las de la librería). La elección queda guardada en el navegador de quien prueba. El fundido usa las View Transitions entre páginas del navegador; donde no las hay, hace el mismo gesto con clases. Con movimiento reducido no hay transición.
+
 ## Tokens: Figma manda
 
 Los valores del sistema (colores, alto de etiqueta y boton, tiempos y curvas

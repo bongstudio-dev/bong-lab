@@ -4,17 +4,16 @@
 
   Libreria.sumar({
     id: "transicion-seccion", nombre: "Transiciones de sección", grupo: "Transiciones", alto: 680,
-    bajada: "El paso de una sección a la otra: por una forma del sistema, con una cortina de color o apilando.",
-    nota: "Scrolleá dentro del escenario. La máscara con forma sale de las pruebas de máscaras del Lab, resuelta solo con CSS.",
-    variantes: [["forma", "Por una forma", "La sección siguiente aparece adentro de una forma oficial que crece hasta cubrir todo."], ["cortina", "Cortina de color", "Un paño del color de la paleta sube, tapa y se retira destapando la siguiente."], ["apila", "Se apila", "La siguiente sube con las esquinas redondeadas y la anterior se achica y oscurece atrás."]],
+    bajada: "El paso de una sección a la otra: con una cortina de color o apilando.",
+    nota: "Scrolleá dentro del escenario.",
+    variantes: [["cortina", "Cortina de color", "Un paño del color de la paleta sube, tapa y se retira destapando la siguiente."], ["apila", "Se apila", "La siguiente sube con las esquinas redondeadas y la anterior se achica y oscurece atrás."]],
     tamano: "media", previa: .32,
-    claves: ["La transición está atada al scroll: si se vuelve para atrás, vuelve.", "La máscara es una forma del sistema como mask-image de CSS (sin WebGL), centrada.", "La forma crece con una curva lenta al principio para que se lea su silueta antes de cubrir.", "El texto de la sección nueva entra recién cuando la forma ya cubrió todo."],
-    accesibilidad: "Con movimiento reducido no hay máscara: la sección siguiente aparece entera.",
+    claves: ["La transición está atada al scroll: si se vuelve para atrás, vuelve.", "La cortina sube en la primera mitad del tramo y se retira en la segunda."],
+    accesibilidad: "Las dos variantes siguen al scroll: no corren solas, así que no suman movimiento propio.",
     controles: [
-      { id: "forma", tipo: "select", etiqueta: "Forma", solo: ["forma"], def: "flor", opciones: Object.keys(FORMAS).map(function (k) { return [k, k.charAt(0).toUpperCase() + k.slice(1)]; }), desc: "Forma oficial de la máscara." },
       { id: "color", tipo: "seg", etiqueta: "Color", solo: ["cortina"], def: "azul", aplica: { attr: "data-color" }, opciones: [["azul", "Azul"], ["verde", "Verde"], ["amarillo", "Amarillo"], ["terra", "Terra"]], desc: "Color del paño." },
       { id: "radio", tipo: "rango", etiqueta: "Radio", solo: ["apila"], unidad: "px", min: 0, max: 64, def: 32, aplica: { var: "--radio", unidad: "px" }, desc: "Radio de las esquinas de la sección que sube." },
-      { id: "tramo", tipo: "rango", etiqueta: "Largo del tramo", solo: ["forma", "cortina"], unidad: "vh", min: 120, max: 320, paso: 10, def: 200, desc: "Cuánto scroll dura la transición." }
+      { id: "tramo", tipo: "rango", etiqueta: "Largo del tramo", solo: ["cortina"], unidad: "vh", min: 120, max: 320, paso: 10, def: 200, desc: "Cuánto scroll dura la transición." }
     ],
     css: function (s) {
       return [
@@ -32,21 +31,13 @@
         ".pf-ts__fijo { position: sticky; top: 0; height: 100vh; overflow: hidden; isolation: isolate; }",
         ".pf-ts__sigue { padding: 18vh clamp(20px, 6vw, 96px); background: var(--tiza); }",
         "",
-        "/* Por una forma: la sección siguiente aparece adentro de una forma oficial que crece hasta cubrir todo. */",
-        ".pf-ts__mascara { position: absolute; inset: 0; isolation: isolate;",
-        "  -webkit-mask: var(--forma) center / calc(var(--m, 0) * 900%) no-repeat; mask: var(--forma) center / calc(var(--m, 0) * 900%) no-repeat; }",
-        ".pf-ts__mascara .pf-ts__b { opacity: 1; }",
-        ".pf-ts__mascara .pf-ts__b > :not(img) { opacity: var(--txt, 0); transform: translateY(calc((1 - var(--txt, 0)) * 24px)); }",
-        "",
         "/* Cortina de color: un paño del color de la paleta sube, tapa y se va revelando la siguiente. */",
         ".pf-ts__panio { position: absolute; inset: 0; background: var(--cortina); clip-path: inset(calc((1 - var(--sube, 0)) * 100%) 0 calc(var(--baja, 0) * 100%) 0); z-index: 2; }",
         ".pf-ts__cortina .pf-ts__b { clip-path: inset(calc((1 - var(--sube, 0)) * 100%) 0 0 0); }",
         "",
         "/* Se apila: la siguiente sube con las esquinas redondeadas y la anterior se achica atrás. */",
         ".pf-ts__apila .pf-ts__a { position: sticky; top: 0; height: 100vh; transform: scale(calc(1 - var(--q, 0) * .08)); transform-origin: 50% 0; filter: brightness(calc(1 - var(--q, 0) * .35)); }",
-        ".pf-ts__apila .pf-ts__b { position: relative; inset: auto; height: 100vh; overflow: hidden; border-radius: calc((1 - var(--q, 0)) * var(--radio)) calc((1 - var(--q, 0)) * var(--radio)) 0 0; box-shadow: 0 -30px 60px -30px color-mix(in srgb, var(--ink) 50%, transparent); isolation: isolate; z-index: 1; }",
-        "",
-        "@media (prefers-reduced-motion: reduce) { .pf-ts__mascara { -webkit-mask: none; mask: none; } }"
+        ".pf-ts__apila .pf-ts__b { position: relative; inset: auto; height: 100vh; overflow: hidden; border-radius: calc((1 - var(--q, 0)) * var(--radio)) calc((1 - var(--q, 0)) * var(--radio)) 0 0; box-shadow: 0 -30px 60px -30px color-mix(in srgb, var(--ink) 50%, transparent); isolation: isolate; z-index: 1; }"
       ].join("\n");
     },
     html: function (s) {
@@ -54,7 +45,6 @@
       var a = '<div class="pf-ts__a"><h2>Una sección termina</h2><p>Lo que viene ocupa la pantalla con el scroll, sin cortes.</p></div>';
       var b = '<div class="pf-ts__b"><img src="../novedades/fotos/demo-1.webp" alt=""><h2>Y empieza la siguiente</h2><p>La transición acompaña el gesto: si volvés para atrás, vuelve.</p></div>';
       var h = '<section class="pf-ts" data-c="transicion-seccion">\n';
-      if (v === "forma") h += '  <div class="pf-ts__tramo" style="height: ' + s.tramo + 'vh"><div class="pf-ts__fijo">\n    ' + a + '\n    <div class="pf-ts__mascara" style="--forma: ' + formaURI(s.forma).replace(/"/g, "'") + '">\n      ' + b + '\n    </div>\n  </div></div>\n';
       if (v === "cortina") h += '  <div class="pf-ts__tramo pf-ts__cortina" style="height: ' + s.tramo + 'vh"><div class="pf-ts__fijo">\n    ' + a + '\n    ' + b + '\n    <div class="pf-ts__panio" aria-hidden="true"></div>\n  </div></div>\n';
       if (v === "apila") h += '  <div class="pf-ts__apila">\n    ' + a + '\n    ' + b + '\n  </div>\n';
       return h + '  <div class="pf-ts__sigue"><h2>Sigue el resto</h2></div>\n</section>';
@@ -69,9 +59,6 @@
         "    var H = innerHeight;",
         "    if (tramo) {",
         "      var r = tramo.getBoundingClientRect(), p = lim(-r.top / (r.height - H));",
-        "      // Por una forma: la máscara crece en el primer 80% del tramo; el texto entra al final.",
-        "      tramo.style.setProperty('--m', Math.pow(lim(p / .8), 2.2).toFixed(4));",
-        "      tramo.style.setProperty('--txt', lim((p - .7) / .25).toFixed(4));",
         "      // Cortina: sube en la primera mitad y se retira en la segunda, destapando la siguiente.",
         "      tramo.style.setProperty('--sube', suave(lim(p / .45)).toFixed(4));",
         "      tramo.style.setProperty('--baja', suave(lim((p - .5) / .45)).toFixed(4));",

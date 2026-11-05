@@ -1,0 +1,43 @@
+/* Transición entre páginas: el componente "Transiciones de página" de la librería
+   (persiana con logo o fundido), usado entre Novedades y cada Nota. La elección vive
+   en el navegador de quien prueba y se cambia con el panel de abajo a la izquierda. */
+:root { --pf-tr-dur: 700ms; --pf-tr-curva: cubic-bezier(.67, 0, .24, .99); --pf-tr-color: var(--azul); }
+.pf-tr-velo { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; background: var(--pf-tr-color); color: var(--tiza); pointer-events: none; transform: translateY(100%); }
+:root[data-tr-color="amarillo"] .pf-tr-velo { color: var(--azul); }
+.pf-tr-velo svg { fill: currentColor; width: min(28vw, 180px); height: auto; opacity: 0; transform: translateY(14px); }
+.pf-tr-velo.pf-entra { transition: transform var(--pf-tr-dur) var(--pf-tr-curva); transform: none; }
+.pf-tr-velo.pf-entra svg { transition: opacity calc(var(--pf-tr-dur) * .6) var(--pf-tr-curva) calc(var(--pf-tr-dur) * .45), transform calc(var(--pf-tr-dur) * .8) var(--pf-tr-curva) calc(var(--pf-tr-dur) * .45); opacity: 1; transform: none; }
+/* Al llegar a la página nueva el paño ya está arriba (lo pone el script del head) y sigue de largo. */
+:root.pf-tr-tapa .pf-tr-velo { transform: none; }
+:root.pf-tr-tapa .pf-tr-velo svg { opacity: 1; transform: none; }
+.pf-tr-velo.pf-sale { transition: transform var(--pf-tr-dur) var(--pf-tr-curva); transform: translateY(-100%); }
+.pf-tr-velo.pf-sale svg { opacity: 1; transform: none; }
+
+/* Fundido: la página vieja se va hacia arriba y la nueva sube. */
+@keyframes pf-tr-sale { to { opacity: 0; transform: translateY(-24px); } }
+@keyframes pf-tr-entra { from { opacity: 0; transform: translateY(40px); } }
+::view-transition-old(root) { animation: pf-tr-sale calc(var(--pf-tr-dur) * .7) var(--pf-tr-curva) both; }
+::view-transition-new(root) { animation: pf-tr-entra var(--pf-tr-dur) var(--pf-tr-curva) calc(var(--pf-tr-dur) * .25) both; }
+/* Sin View Transitions entre páginas: el mismo gesto con clases. */
+:root.pf-tr-fuera body { animation: pf-tr-sale calc(var(--pf-tr-dur) * .7) var(--pf-tr-curva) both; }
+:root.pf-tr-llega body { animation: pf-tr-entra var(--pf-tr-dur) var(--pf-tr-curva) both; }
+
+/* Panel para elegir la transición. */
+.pf-tr-panel { position: fixed; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 80; font: 400 var(--texto-chico)/1.3 var(--f-body); color: var(--ink); }
+.pf-tr-abrir { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px 0 11px; border: 0; border-radius: 999px; background: var(--ink); color: var(--tiza); font: inherit; cursor: pointer; }
+.pf-tr-abrir svg { width: 16px; height: 16px; }
+.pf-tr-caja { position: absolute; left: 0; bottom: 44px; width: 296px; max-width: calc(100vw - 32px); padding: 16px; border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent); border-radius: 20px; background: var(--color-blanco, #fff); display: grid; gap: 14px; transform-origin: 0 100%; transition: opacity 180ms ease, scale 260ms var(--pf-tr-curva); }
+.pf-tr-caja[hidden] { display: grid; opacity: 0; scale: .96; pointer-events: none; visibility: hidden; }
+.pf-tr-fila { display: grid; gap: 6px; }
+.pf-tr-fila > span { color: var(--ink-3); font-size: var(--texto-mini); }
+.pf-tr-seg { display: flex; flex-wrap: wrap; gap: 4px; }
+.pf-tr-seg button { height: 30px; padding: 0 11px; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--azul) 8%, transparent); color: var(--ink); font: inherit; cursor: pointer; }
+.pf-tr-seg button[aria-pressed="true"] { background: var(--azul); color: var(--tiza); }
+.pf-tr-seg .pf-tr-punto { width: 30px; padding: 0; background: var(--c); }
+.pf-tr-seg .pf-tr-punto[aria-pressed="true"] { background: var(--c); outline: 2px solid var(--ink); outline-offset: 2px; }
+.pf-tr-fila input[type="range"] { width: 100%; accent-color: var(--azul); }
+.pf-tr-fila output { font-variant-numeric: tabular-nums; color: var(--ink); }
+.pf-tr-probar { height: 34px; border: 0; border-radius: 999px; background: var(--azul); color: var(--tiza); font: inherit; cursor: pointer; }
+.pf-tr-panel [data-solo][hidden] { display: none; }
+@media (max-width: 760px) { .pf-tr-panel { bottom: calc(76px + env(safe-area-inset-bottom, 0px)); } .pf-tr-abrir span { display: none; } .pf-tr-abrir { width: 36px; padding: 0; justify-content: center; } }
+@media (prefers-reduced-motion: reduce) { .pf-tr-velo { display: none; } ::view-transition-old(root), ::view-transition-new(root), :root.pf-tr-fuera body, :root.pf-tr-llega body { animation: none; } }
