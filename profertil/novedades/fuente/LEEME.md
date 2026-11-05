@@ -61,19 +61,21 @@ pie de la librería (componente Pie de página, variante Institucional, que
 `build.py` arma con node desde `../../componentes/c/pie.js`). El texto de cada
 nota lo lee al abrir de `../notas/<ar>.json`.
 
-- Sobria, sobre el fondo y sin cabecera de color. Columna central de 700 px: vuelta a Novedades, la etiqueta del
-  tipo con el año (la etiqueta completa, con forma, va solo junto al título),
-  antetítulo, título, bajada y dos o tres bloques de datos (Publicada,
-  Lectura y Cultivo si tiene). Abajo, una franja entre líneas con compartir y
-  "Ver la nota original".
-- Foto principal entera, sin recorte, con radio, dentro de la columna. Una
-  foto chica no se estira más de 1,5 veces. Si la nota no tiene foto, sigue el
-  texto.
-- A la izquierda, a la altura del texto y fijo al bajar: el índice "En esta
-  nota" (solo si tiene dos subtítulos o más; muchos h4 del sitio actual son
-  firmas o fuentes y se descartan) y los temas (etiquetas de WordPress, cada
-  una lleva a Novedades con esa búsqueda: `../#q=tema`). Hasta 1100 px de
-  ancho queda una columna: el índice se va y los temas pasan abajo del texto.
+- Sobria, sobre el fondo y sin cabecera de color. Arriba, centrados: vuelta a
+  Novedades, la etiqueta del tipo con el año (la etiqueta completa, con forma,
+  va solo junto al título), antetítulo, título y bajada.
+- Abajo, tres columnas. Al centro la foto principal, entera, sin recorte, con
+  radio (una foto chica no se estira más de 1,5 veces). A la izquierda el
+  índice numerado de la nota, fijo al bajar, que marca la sección que se está
+  leyendo; aparece solo si la nota tiene dos subtítulos o más (muchos h4 del
+  sitio actual son firmas o fuentes y se descartan). A la derecha los datos,
+  rótulo y valor: Publicada, Lectura, Cultivo, Temas (cada uno lleva a
+  Novedades con esa búsqueda: `../#q=tema`), Compartir, Original y el botón
+  Modo lectura. Sin foto, el texto sube a esa fila.
+- Modo lectura: deja solo título, foto y texto; se sale con el mismo botón, el
+  de arriba a la derecha o Esc, sin perder el punto de lectura.
+- Hasta 1100 px de ancho queda una columna: título, foto, datos y texto; el
+  índice se va.
 - Cierra con tres relacionadas y nada más: tarjetas con miniatura cuadrada
   (la foto de la nota o el arte de Novedades), etiqueta con el año y título;
   en celular, lista. Comparten temas, cultivo, pilar o tipo; a igual puntaje,

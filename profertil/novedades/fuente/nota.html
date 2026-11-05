@@ -8,10 +8,10 @@
 <style>
 /* ==========================================================================
    Nota Profertil: la plantilla de una nota de Novedades.
-   Sobria, sin cabecera de color: etiqueta del tipo, título y dos o tres
-   bloques de datos; una franja para compartir; la foto principal entera (sin
-   recorte) con radio y el texto. A la izquierda, el índice de la nota y los
-   temas, fijos al bajar. Cierra con tres relacionadas. Cierra con la nota anterior y
+   Sobria, sin cabecera de color: título centrado con la etiqueta del tipo y,
+   abajo, tres columnas: el índice numerado, la foto principal entera (sin
+   recorte) con radio, y los datos (fecha, lectura, temas, compartir y modo
+   lectura). Sigue el texto y cierra con tres relacionadas. Cierra con la nota anterior y
    la siguiente, las relacionadas y el pie.
    Los datos son una copia fija del sitio actual: ../notas/<nota>.json.
    ========================================================================== */
@@ -36,44 +36,46 @@ button, a { touch-action: manipulation; }
 .pf-progreso { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; }
 .pf-progreso i { display: block; height: 100%; background: var(--tiza); transform: scaleX(var(--p, 0)); transform-origin: left; }
 
-/* --- Grilla: índice a la izquierda, la nota al centro y un aire igual a la derecha. */
+/* --- Grilla de tres columnas: índice, nota y datos.
+   Fila 1 el título (de lado a lado), fila 2 la foto con el índice y los datos a los costados, fila 3 el texto. */
 .pf-n-col { width: min(100% - 32px, 1120px); margin-inline: auto; }
 .pf-n-grilla { width: min(100% - 32px, 1268px); margin-inline: auto; display: grid; grid-template-columns: 220px minmax(0, 700px) 220px; justify-content: center; gap: 0 64px; padding-top: calc(140px + env(safe-area-inset-top, 0px)); }
-.pf-n-centro { grid-column: 2; min-width: 0; }
 
-/* --- Cabecera: sin caja. La etiqueta completa (forma, rótulo y año) va solo junto al título. */
-.pf-n-in { display: grid; gap: 18px; justify-items: start; }
+/* --- Cabecera: centrada, sin caja. La etiqueta completa (forma, rótulo y año) va solo junto al título. */
+.pf-n-cab { grid-column: 1 / -1; grid-row: 1; }
+.pf-n-in { display: grid; gap: 18px; justify-items: center; text-align: center; max-width: 900px; margin-inline: auto; }
 .pf-n-volver { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-3); font-size: var(--texto-chico); text-decoration: none; transition: color 200ms ease; }
 @media (hover: hover) and (pointer: fine) { .pf-n-volver:hover { color: var(--azul); } }
 .pf-n-in .pf-etiqueta { --s: var(--etq-m); margin-top: 14px; }
 .pf-n-in .pf-etiqueta__rotulo { outline: 1px solid var(--line); outline-offset: -1px; }
-.pf-n-ante { margin: 0 0 -6px; font: 500 var(--texto-destacado)/1.3 var(--f-display); color: var(--ink-2); }
-.pf-n-in h1 { margin: 0; font: 600 clamp(32px, 3.6vw, 48px)/1.04 var(--f-display); letter-spacing: -0.03em; color: var(--azul); text-wrap: balance; overflow-wrap: break-word; }
-.pf-n-in h1.pf-largo { font-size: clamp(28px, 3vw, 38px); line-height: 1.08; }
-.pf-n-bajada { margin: 0; font-size: var(--texto-destacado); line-height: 1.5; color: var(--ink-2); }
-/* Dos o tres bloques de datos: rótulo chico y valor. */
-.pf-n-bloques { display: flex; flex-wrap: wrap; gap: 12px 48px; margin: 10px 0 0; }
-.pf-n-bloques div { display: grid; gap: 4px; }
-.pf-n-bloques dt { font-size: var(--texto-mini); color: var(--ink-3); }
-.pf-n-bloques dd { margin: 0; font-size: var(--texto-chico); color: var(--ink); }
-/* Franja de acciones: compartir y la nota original, entre dos líneas. */
-.pf-n-acciones { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 28px; padding: 12px 0; border-block: 1px solid var(--line); }
-.pf-n-compartir { display: flex; gap: 6px; }
-.pf-n-compartir > * { display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--ink-2); cursor: pointer; text-decoration: none; transition: color 200ms ease, border-color 200ms ease; }
-@media (hover: hover) and (pointer: fine) { .pf-n-compartir > *:hover { color: var(--azul); border-color: var(--azul); } }
-.pf-n-compartir svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.pf-n-compartir svg.pf-relleno { fill: currentColor; stroke: none; }
-.pf-n-original { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 14px; border-radius: 999px; background: var(--azul); color: var(--tiza); font-size: var(--texto-chico); text-decoration: none; }
-.pf-n-original svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.pf-n-ante { margin: 0 0 -6px; font: 500 var(--texto-destacado)/1.3 var(--f-display); color: var(--ink-2); max-width: 60ch; }
+.pf-n-in h1 { margin: 0; font: 600 clamp(36px, 4.4vw, 60px)/1.02 var(--f-display); letter-spacing: -0.035em; color: var(--azul); text-wrap: balance; overflow-wrap: break-word; }
+.pf-n-in h1.pf-largo { font-size: clamp(30px, 3.4vw, 44px); line-height: 1.06; }
+.pf-n-bajada { margin: 0; max-width: 60ch; font-size: var(--texto-destacado); line-height: 1.5; color: var(--ink-2); }
 
 /* --- Foto principal: entera, sin recorte, con radio. Una foto chica no se estira más de 1,5 veces. */
-.pf-n-foto { margin: 40px 0 0; width: min(100%, var(--ancho-foto, 100%)); }
+.pf-n-foto { grid-column: 2; grid-row: 2; margin: 56px auto 0; width: min(100%, var(--ancho-foto, 100%)); }
 .pf-n-foto__hoja { overflow: hidden; border-radius: var(--radio-media); background: var(--card); line-height: 0; }
 .pf-n-foto img { display: block; width: 100%; height: auto; opacity: 0; transition: opacity 600ms ease; }
 .pf-n-foto img.pf-lista { opacity: 1; }
 
+/* --- Datos, a la derecha de la foto: rótulo y valor por fila. */
+.pf-n-datos { grid-column: 3; grid-row: 2; align-self: start; margin: 56px 0 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px 16px; font-size: var(--texto-chico); }
+.pf-n-datos dt { color: var(--ink-3); }
+.pf-n-datos dd { margin: 0; color: var(--ink); }
+.pf-n-temas { display: grid; gap: 4px; }
+.pf-n-temas a, .pf-n-original { color: var(--ink-2); text-decoration: none; transition: color 200ms ease; }
+@media (hover: hover) and (pointer: fine) { .pf-n-temas a:hover, .pf-n-original:hover { color: var(--azul); } }
+.pf-n-compartir { display: flex; gap: 6px; }
+.pf-n-compartir > * { display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--ink-2); cursor: pointer; text-decoration: none; transition: color 200ms ease, border-color 200ms ease; }
+@media (hover: hover) and (pointer: fine) { .pf-n-compartir > *:hover { color: var(--azul); border-color: var(--azul); } }
+.pf-n-compartir svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.pf-n-compartir svg.pf-relleno { fill: currentColor; stroke: none; }
+.pf-n-original { display: inline-flex; align-items: center; gap: 4px; }
+.pf-n-original svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
 /* --- Texto ------------------------------------------------------------------ */
-.pf-n-texto { margin-top: 40px; min-width: 0; font-size: var(--texto-destacado); line-height: 1.68; color: var(--ink); overflow-wrap: break-word; }
+.pf-n-texto { grid-column: 2; grid-row: 3; margin-top: 56px; min-width: 0; font-size: var(--texto-destacado); line-height: 1.68; color: var(--ink); overflow-wrap: break-word; }
 .pf-n-texto > :first-child { margin-top: 0; }
 .pf-n-texto p { margin: 0 0 1.1em; }
 .pf-n-texto h2, .pf-n-texto h3, .pf-n-texto h4 { margin: 1.9em 0 .6em; font-family: var(--f-display); font-weight: 600; color: var(--azul); letter-spacing: -0.02em; line-height: 1.15; text-wrap: balance; scroll-margin-top: 110px; }
@@ -98,13 +100,30 @@ button, a { touch-action: manipulation; }
 .pf-n-tabla th { font-weight: 600; color: var(--azul); }
 .pf-n-vacio { color: var(--ink-3); }
 
-/* --- Costado izquierdo: índice de la nota (si tiene subtítulos) y temas. Fijo al bajar. */
-.pf-n-indice { grid-column: 1; grid-row: 1; align-self: start; position: sticky; top: 112px; margin-top: var(--indice-top, 0px); display: grid; gap: 28px; font-size: var(--texto-chico); }
-.pf-n-indice h2 { margin: 0 0 10px; font: 400 var(--texto-mini)/1 var(--f-body); color: var(--ink-3); }
-.pf-n-indice ul { margin: 0; padding: 0; list-style: none; display: grid; }
-.pf-n-indice li a { display: block; padding: 6px 0 6px 14px; border-left: 1px solid var(--line); color: var(--ink-3); line-height: 1.3; text-decoration: none; transition: color 200ms ease, border-color 200ms ease; }
-.pf-n-indice li a.pf-on { color: var(--azul); border-color: var(--azul); }
-@media (hover: hover) and (pointer: fine) { .pf-n-indice li a:hover { color: var(--azul); } }
+/* Sin foto, el texto sube a la fila de los costados. */
+.pf-n-grilla:not(.pf-con-foto) .pf-n-texto { grid-row: 2; }
+
+/* --- Índice, a la izquierda: numerado, fijo al bajar. Solo si la nota tiene dos subtítulos o más. */
+.pf-n-indice { grid-column: 1; grid-row: 2 / span 2; align-self: start; position: sticky; top: 112px; margin-top: 56px; font-size: var(--texto-chico); }
+.pf-n-indice ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; counter-reset: pf-i; }
+.pf-n-indice li { counter-increment: pf-i; }
+.pf-n-indice a { display: grid; grid-template-columns: 26px minmax(0, 1fr); color: var(--ink-3); line-height: 1.35; text-decoration: none; transition: color 200ms ease; }
+.pf-n-indice a::before { content: counter(pf-i, decimal-leading-zero); font-variant-numeric: tabular-nums; }
+.pf-n-indice a.pf-on { color: var(--azul); }
+@media (hover: hover) and (pointer: fine) { .pf-n-indice a:hover { color: var(--azul); } }
+/* Modo lectura. */
+.pf-n-lectura { grid-column: 1 / -1; margin-top: 8px !important; }
+.pf-n-lectura button { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 16px 0 12px; border: 0; border-radius: 999px; background: var(--azul); color: var(--tiza); font-size: var(--texto-chico); cursor: pointer; transition: background 200ms ease; }
+.pf-n-lectura svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+@media (hover: hover) and (pointer: fine) { .pf-n-lectura button:hover { background: var(--ink); } }
+body.pf-foco :is(.pf-barra, .pf-n-indice, .pf-n-datos, .pf-n-sigue, .pf-pie, .pf-n-volver) { display: none; }
+body.pf-foco .pf-n-grilla { grid-template-columns: minmax(0, 700px); padding-top: 96px; }
+body.pf-foco :is(.pf-n-cab, .pf-n-foto, .pf-n-texto) { grid-column: 1; }
+body.pf-foco .pf-n-texto { padding-bottom: 160px; }
+.pf-n-salir { position: fixed; top: calc(20px + env(safe-area-inset-top, 0px)); right: 20px; z-index: 60; display: inline-flex; align-items: center; gap: 10px; height: 38px; padding: 0 8px 0 16px; border: 1px solid var(--line); border-radius: 999px; background: var(--bg); color: var(--ink-2); font-size: var(--texto-chico); cursor: pointer; transition: color 200ms ease, border-color 200ms ease; }
+.pf-n-salir kbd { padding: 3px 7px; border-radius: 999px; background: var(--card); font: inherit; font-size: var(--texto-mini); color: var(--ink-3); }
+@media (hover: hover) and (pointer: fine) { .pf-n-salir:hover { color: var(--azul); border-color: var(--azul); } }
+@media (hover: none) { .pf-n-salir kbd { display: none; } }
 .pf-aviso { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 60; transform: translate(-50%, 16px); padding: 12px 18px; border-radius: 999px; background: var(--ink); color: var(--tiza); font-size: var(--texto-chico); opacity: 0; pointer-events: none; transition: opacity 220ms ease, transform 320ms var(--ease); }
 .pf-aviso.pf-on { opacity: 1; transform: translate(-50%, 0); }
 
@@ -129,11 +148,13 @@ button, a { touch-action: manipulation; }
 /* --- Pantallas medianas y celular: una columna; el índice se va y los temas pasan abajo del texto. */
 @media (max-width: 1100px) {
   .pf-n-grilla { grid-template-columns: minmax(0, 700px); }
-  .pf-n-centro { grid-column: 1; }
-  .pf-n-indice { grid-column: 1; grid-row: 2; position: static; margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--line); }
-  .pf-n-indice .pf-n-indice__nota { display: none; }
-  .pf-n-indice .pf-n-temas ul { display: flex; flex-wrap: wrap; gap: 6px; }
-  .pf-n-indice .pf-n-temas li a { padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink-2); }
+  .pf-n-cab, .pf-n-foto, .pf-n-datos, .pf-n-texto { grid-column: 1; }
+  .pf-n-datos { grid-row: 3; margin-top: 32px; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+  .pf-n-texto { grid-row: 4; margin-top: 40px; }
+  .pf-n-grilla:not(.pf-con-foto) .pf-n-datos { grid-row: 2; }
+  .pf-n-grilla:not(.pf-con-foto) .pf-n-texto { grid-row: 3; }
+  .pf-n-indice { display: none; }
+  .pf-n-temas { display: flex; flex-wrap: wrap; gap: 4px 12px; }
 }
 @media (max-width: 640px) {
   .pf-n-grilla { padding-top: calc(108px + env(safe-area-inset-top, 0px)); }
@@ -141,10 +162,8 @@ button, a { touch-action: manipulation; }
   .pf-n-in .pf-etiqueta { margin-top: 10px; }
   .pf-n-in h1 { font-size: 2.1rem; }
   .pf-n-in h1.pf-largo { font-size: 1.7rem; }
-  .pf-n-bloques { gap: 12px 28px; }
-  .pf-n-original { padding: 0 12px; }
   .pf-n-foto { margin-top: 28px; }
-  .pf-n-texto { margin-top: 32px; font-size: 17px; line-height: 1.62; }
+  .pf-n-texto { font-size: 17px; line-height: 1.62; }
   .pf-n-sigue { margin-top: 80px; }
   .pf-n-rel__fila { grid-template-columns: 1fr; gap: 16px; }
   .pf-n-mini { grid-template-columns: 104px minmax(0, 1fr); gap: 6px 14px; }
@@ -179,13 +198,12 @@ button, a { touch-action: manipulation; }
 </header>
 
 <main id="pf-nota" aria-busy="true">
-  <div class="pf-n-grilla">
-    <div class="pf-n-centro">
-      <header class="pf-n-cab" id="pf-cab"><div class="pf-n-in" id="pf-cabIn"></div><div class="pf-n-acciones" id="pf-acciones"></div></header>
-      <figure class="pf-n-foto" id="pf-foto" hidden><div class="pf-n-foto__hoja" id="pf-fotoHoja"></div></figure>
-      <article class="pf-n-texto" id="pf-texto"></article>
-    </div>
-    <aside class="pf-n-indice" id="pf-indice" aria-label="En esta nota"></aside>
+  <div class="pf-n-grilla" id="pf-grilla">
+    <header class="pf-n-cab" id="pf-cab"><div class="pf-n-in" id="pf-cabIn"></div></header>
+    <nav class="pf-n-indice" id="pf-indice" aria-label="En esta nota" hidden></nav>
+    <figure class="pf-n-foto" id="pf-foto" hidden><div class="pf-n-foto__hoja" id="pf-fotoHoja"></div></figure>
+    <dl class="pf-n-datos" id="pf-datos"></dl>
+    <article class="pf-n-texto" id="pf-texto"></article>
   </div>
   <section class="pf-n-sigue pf-n-col" aria-label="Notas relacionadas">
     <div class="pf-n-rel__cab"><h2>Notas relacionadas</h2></div>
@@ -194,6 +212,8 @@ button, a { touch-action: manipulation; }
 </main>
 
 /*__PIE_HTML__*/
+
+<button class="pf-n-salir" id="pf-focoSalir" type="button" hidden>Salir del modo lectura <kbd>Esc</kbd></button>
 
 <div class="pf-aviso" id="pf-aviso" role="status" aria-live="polite"></div>
 
@@ -223,10 +243,6 @@ button, a { touch-action: manipulation; }
     if (d.ante) h += '<p class="pf-n-ante">' + esc(d.ante) + "</p>";
     h += "<h1" + (n.t.length > 80 ? ' class="pf-largo"' : "") + ">" + esc(n.t) + "</h1>";
     if (d.b) h += '<p class="pf-n-bajada">' + esc(d.b) + "</p>";
-    // Dos o tres bloques de datos.
-    var bl = [["Publicada", fecha(n.f, true)], ["Lectura", lectura(n.w)]];
-    if (n.c.length) bl.push(["Cultivo", n.c.map(function (c) { return POR[c].nombre; }).join(", ")]);
-    h += '<dl class="pf-n-bloques">' + bl.map(function (b) { return "<div><dt>" + b[0] + "</dt><dd>" + b[1] + "</dd></div>"; }).join("") + "</dl>";
     $("pf-cabIn").innerHTML = h;
     document.title = n.t + " · Novedades Profertil";
   }
@@ -235,6 +251,7 @@ button, a { touch-action: manipulation; }
     var src = d.imgG || d.img;
     if (!src) return;
     var fig = $("pf-foto"), img = new Image();
+    $("pf-grilla").classList.add("pf-con-foto");
     img.alt = ""; img.decoding = "async"; img.fetchPriority = "high";
     $("pf-fotoHoja").appendChild(img);
     fig.hidden = false;
@@ -242,9 +259,8 @@ button, a { touch-action: manipulation; }
       // Una foto chica no se estira más de 1,5 veces su tamaño.
       fig.style.setProperty("--ancho-foto", Math.round(img.naturalWidth * 1.5) + "px");
       img.classList.add("pf-lista");
-      alinear();
     });
-    img.addEventListener("error", function () { fig.hidden = true; });
+    img.addEventListener("error", function () { fig.hidden = true; $("pf-grilla").classList.remove("pf-con-foto"); });
     img.src = src;
   }
 
@@ -261,52 +277,59 @@ button, a { touch-action: manipulation; }
     [].forEach.call(t.querySelectorAll("figure img"), function (im) { im.addEventListener("error", function () { var f = im.closest("figure"); if (f) f.remove(); }); });
   }
 
-  // Franja de acciones: compartir y la nota original.
-  function acciones() {
-    var h = "";
+  // Datos, a la derecha de la foto: rótulo y valor por fila.
+  var OJO = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="2.8"/></svg>';
+  function datos(d) {
+    var fila = function (r, v) { return "<dt>" + r + "</dt><dd>" + v + "</dd>"; };
+    var h = fila("Publicada", fecha(n.f, true)) + fila("Lectura", lectura(n.w));
+    if (n.c.length) h += fila("Cultivo", n.c.map(function (c) { return POR[c].nombre; }).join(", "));
+    if (d.et && d.et.length) h += fila("Temas", '<span class="pf-n-temas">' + d.et.map(function (e) {
+      return '<a href="../#q=' + encodeURIComponent(e) + '">' + esc(e) + "</a>";
+    }).join("") + "</span>");
     var aqui = encodeURIComponent(location.href), ttl = encodeURIComponent(n.t);
-    h += '<div class="pf-n-compartir">' +
+    h += "<dt>Compartir</dt><dd>" + '<div class="pf-n-compartir">' +
       '<button type="button" id="pf-copiar" aria-label="Copiar el link"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></button>' +
       '<a href="https://api.whatsapp.com/send?text=' + ttl + "%20" + aqui + '" target="_blank" rel="noopener" aria-label="Compartir por WhatsApp"><svg class="pf-relleno" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a9.5 9.5 0 0 0-8.2 14.3L2.5 21.5l4.8-1.3A9.5 9.5 0 1 0 12 2.5Zm0 17.2c-1.5 0-2.9-.4-4.1-1.1l-.3-.2-2.9.8.8-2.8-.2-.3A7.7 7.7 0 1 1 12 19.7Zm4.3-5.8c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.5.1l-.7.9c-.1.2-.3.2-.5.1a6.3 6.3 0 0 1-3.1-2.7c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.7-1.7c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.7.3 2.8 2.8 0 0 0-.9 2.1 4.9 4.9 0 0 0 1 2.6 11.2 11.2 0 0 0 4.3 3.8c1.6.7 2.2.7 3 .6.5-.1 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1l-.5-.3Z"/></svg></a>' +
       '<a href="https://www.linkedin.com/sharing/share-offsite/?url=' + aqui + '" target="_blank" rel="noopener" aria-label="Compartir en LinkedIn"><svg class="pf-relleno" viewBox="0 0 24 24" aria-hidden="true"><path d="M5.3 8.6h3v10.1h-3V8.6Zm1.5-4.9a1.8 1.8 0 1 1 0 3.5 1.8 1.8 0 0 1 0-3.5Zm3.4 4.9h2.9v1.4c.4-.8 1.4-1.6 2.9-1.6 3.1 0 3.7 2 3.7 4.7v5.6h-3v-5c0-1.2 0-2.7-1.6-2.7s-1.9 1.3-1.9 2.6v5.1h-3V8.6Z"/></svg></a>' +
       '<a href="mailto:?subject=' + ttl + "&body=" + aqui + '" aria-label="Compartir por mail"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="3"/><path d="m4.5 7.5 7.5 5.5 7.5-5.5"/></svg></a>' +
-      "</div>";
-    h += '<a class="pf-n-original" href="https://www.profertil.com.ar/index.php/' + esc(n.u) + '" target="_blank" rel="noopener">Ver la nota original ' + FLECHA_AFUERA + "</a>";
-    $("pf-acciones").innerHTML = h;
+      "</div></dd>";
+    h += "<dt>Original</dt><dd>" + '<a class="pf-n-original" href="https://www.profertil.com.ar/index.php/' + esc(n.u) + '" target="_blank" rel="noopener">En profertil.com.ar ' + FLECHA_AFUERA + "</a></dd>";
+    h += '<dd class="pf-n-lectura"><button type="button" id="pf-foco" aria-pressed="false">' + OJO + "Modo lectura</button></dd>";
+    $("pf-datos").innerHTML = h;
+    $("pf-foco").addEventListener("click", function () { foco(!document.body.classList.contains("pf-foco")); });
     $("pf-copiar").addEventListener("click", function () {
       var ok = function () { avisar("Link copiado"); };
       if (navigator.clipboard) navigator.clipboard.writeText(location.href).then(ok, function () { avisar("No se pudo copiar"); });
       else avisar("No se pudo copiar");
     });
   }
-  // Costado izquierdo: índice (si la nota tiene dos subtítulos o más) y temas.
+  // Índice, a la izquierda: solo si la nota tiene dos subtítulos o más.
   var titulos = [];
-  function indice(d) {
-    var h = "";
+  function indice() {
     // En el sitio actual muchos h4 no son subtítulos: firmas ("Por ..."), fuentes o la primera frase en negrita.
     titulos = [].slice.call($("pf-texto").querySelectorAll("h2, h3, h4")).filter(function (t) {
       var x = t.textContent.trim();
       return x.length > 3 && x.length <= 80 && !/^(por|fuente|prensa|foto)\b/i.test(x) && !/\.(com|ar)\b/i.test(x);
     });
-    if (titulos.length >= 2) {
-      h += '<nav class="pf-n-indice__nota"><h2>En esta nota</h2><ul>' + titulos.map(function (t, i) {
-        t.id = "pf-s" + (i + 1);
-        return '<li><a href="#' + t.id + '">' + esc(t.textContent) + "</a></li>";
-      }).join("") + "</ul></nav>";
-    } else titulos = [];
-    if (d.et && d.et.length) {
-      h += '<div class="pf-n-temas"><h2>Temas</h2><ul>' + d.et.map(function (e) {
-        return '<li><a href="../#q=' + encodeURIComponent(e) + '">' + esc(e) + "</a></li>";
-      }).join("") + "</ul></div>";
-    }
-    $("pf-indice").innerHTML = h;
-    $("pf-indice").hidden = !h;
+    if (titulos.length < 2) { titulos = []; return; }
+    $("pf-indice").innerHTML = "<ol>" + titulos.map(function (t, i) {
+      t.id = "pf-s" + (i + 1);
+      return '<li><a href="#' + t.id + '">' + esc(t.textContent) + "</a></li>";
+    }).join("") + "</ol>";
+    $("pf-indice").hidden = false;
   }
-  // El costado arranca a la altura del texto.
-  function alinear() {
-    var g = $("pf-texto").closest(".pf-n-grilla"), pt = parseFloat(getComputedStyle(g).paddingTop);
-    $("pf-indice").style.setProperty("--indice-top", Math.round($("pf-texto").getBoundingClientRect().top - g.getBoundingClientRect().top - pt) + "px");
+
+  // Modo lectura: quedan el título, la foto y el texto. Se sale con el mismo botón, el de arriba o Esc.
+  function foco(on) {
+    var y = $("pf-texto").getBoundingClientRect().top;
+    document.body.classList.toggle("pf-foco", on);
+    $("pf-foco").setAttribute("aria-pressed", on);
+    $("pf-focoSalir").hidden = !on;
+    // Mantiene el punto de lectura al cambiar.
+    window.scrollBy(0, $("pf-texto").getBoundingClientRect().top - y);
   }
+  $("pf-focoSalir").addEventListener("click", function () { foco(false); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && document.body.classList.contains("pf-foco")) foco(false); });
 
   var ta;
   function avisar(txt) { var a = $("pf-aviso"); a.textContent = txt; a.classList.add("pf-on"); clearTimeout(ta); ta = setTimeout(function () { a.classList.remove("pf-on"); }, 2000); }
@@ -345,18 +368,17 @@ button, a { touch-action: manipulation; }
     if (!titulos.length) return;
     var act = 0;
     titulos.forEach(function (t, i) { if (t.getBoundingClientRect().top < 160) act = i; });
-    [].forEach.call($("pf-indice").querySelectorAll(".pf-n-indice__nota a"), function (a, i) { a.classList.toggle("pf-on", i === act); });
+    [].forEach.call($("pf-indice").querySelectorAll("a"), function (a, i) { a.classList.toggle("pf-on", i === act); });
   }
   window.addEventListener("scroll", function () { alScroll(); marcar(); }, { passive: true });
-  window.addEventListener("resize", function () { alinear(); });
   window.addEventListener("resize", alScroll);
 
   var base = { ante: "", b: n.b, lg: n.lg, img: n.img, imgG: n.imgG, et: n.et };
   cabecera(base); seguir(); alScroll();
   fetch("../notas/" + encodeURIComponent(n.ar) + ".json")
     .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-    .then(function (d) { cabecera(d); acciones(); foto(d); cuerpo(d); indice(d); })
-    .catch(function () { acciones(); foto(base); indice(base); $("pf-texto").innerHTML = '<p class="pf-n-vacio">No se pudo cargar el texto de esta nota.</p>'; })
-    .then(function () { $("pf-nota").removeAttribute("aria-busy"); alinear(); alScroll(); marcar(); });
+    .then(function (d) { cabecera(d); datos(d); foto(d); cuerpo(d); indice(); })
+    .catch(function () { datos(base); foto(base); $("pf-texto").innerHTML = '<p class="pf-n-vacio">No se pudo cargar el texto de esta nota.</p>'; })
+    .then(function () { $("pf-nota").removeAttribute("aria-busy"); alScroll(); marcar(); });
 })();
 </script>
