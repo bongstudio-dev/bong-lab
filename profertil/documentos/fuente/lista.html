@@ -1,0 +1,648 @@
+<title>Documentos Profertil</title>
+<meta name="description" content="Maqueta de la lista de documentos de profertil.com.ar sobre el concepto web del manual de marca: los boletines, ensayos, hojas de seguridad e informes reales del sitio actual, con buscador, filtros y visor de PDF.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=DM+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../componentes/tokens.css">
+<link rel="stylesheet" href="../componentes/base.css">
+<style>
+/* Documentos Profertil: la lista de documentos del sitio actual (boletines, ensayos, hojas de seguridad, informes).
+   Misma lógica que Novedades (barra, filtros en el dock, buscador en la lupa, ancla); en vez de tarjetas, filas. */
+:root {
+  color-scheme: light;
+  /* Los tokens del sistema salen de ../componentes/tokens.css (generado desde el Figma Master) y las
+     piezas compartidas (Barra, Selector, Pastilla, Chip, Etiqueta, Botón) de ../componentes/base.css:
+     las mismas que usan la librería de componentes y el resto del Lab. Acá solo lo propio de la página. */
+  --shadow: var(--sombra-tarjeta);
+  --f-mono: "DM Mono", ui-monospace, Menlo, monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { background: var(--bg); }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+button { font: inherit; color: inherit; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--celeste); outline-offset: 2px; }
+.pf-wrap { width: min(100% - 32px, 1320px); margin-inline: auto; }
+.pf-ico { display: block; width: 100%; height: 100%; }
+
+/* --- Tacto -----------------------------------------------------------------
+   Los :hover van todos dentro de (hover: hover) and (pointer: fine): en el
+   celular el primer toque deja el hover puesto hasta tocar otra cosa. Sin el
+   destello gris de Safari al tocar; en su lugar, cada control responde al
+   apoyar el dedo (:active) con el mismo cambio que el hover. */
+html { -webkit-tap-highlight-color: transparent; }
+button, a, [role="button"] { touch-action: manipulation; }
+button, [role="button"] { -webkit-user-select: none; user-select: none; }
+
+/* --- Barra superior: la pieza "barra" de base.css (transparente sobre el carrusel, sólida al bajar). */
+
+/* --- Resultado ------------------------------------------------------------ */
+.pf-result-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; padding-block: 22px 16px; }
+.pf-result-text { margin: 0; color: var(--ink-2); min-width: 0; }
+.pf-result-text b { color: var(--azul); font-weight: 600; font-variant-numeric: tabular-nums; }
+.pf-herramientas { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+
+/* --- Grilla --------------------------------------------------------------- */
+.pf-sentinel { height: 1px; }
+
+/* --- Pastillas de categoría y chips de año: piezas "pastilla" y "chip" de base.css. */
+
+/* --- Panel de filtros: barra fija full rounded con "Todas" y las tres
+   categorias con mas notas; arriba se despliega el panel con las demas y el
+   año. En mobile la barra se reduce a un boton "Filtros" y el panel trae
+   todas las categorias. Abre y cierra animando el alto del panel (medido en
+   JS: animar 0fr a 1fr en un contenedor de alto automatico falla en Chrome)
+   y, en mobile, el ancho. */
+.pf-filters {
+  /* left y right en 0 con margen auto: con left 50% el ancho se calcula sobre
+     media pantalla y las pastillas quedan cortadas. */
+  position: fixed; left: 0; right: 0; margin-inline: auto;
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  z-index: 40;
+  width: fit-content; max-width: min(100% - 24px, 980px);
+  max-height: calc(100% - 110px);
+  display: flex; flex-direction: column;
+  border-radius: 24px;
+  transition: width var(--f-cerrar) var(--f-curva), border-radius var(--f-cerrar) var(--f-curva), transform 520ms var(--ease), opacity 300ms ease;
+  background: var(--glass);
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  box-shadow: 0 24px 60px -24px rgba(10, 30, 74, 0.5);
+  backdrop-filter: blur(22px) saturate(1.4);
+  -webkit-backdrop-filter: blur(22px) saturate(1.4);
+  overflow: hidden;
+}
+.pf-filters.pf-abierto { border-radius: 26px; transition-duration: var(--f-abrir), var(--f-abrir), 520ms, 300ms; }
+/* Mientras el carrusel ocupa la pantalla el dock baja y no tapa los
+   indicadores; vuelve cuando aparecen las tarjetas. */
+/* El panel no ensancha la barra: los años se acomodan al ancho que ya tiene.
+   Cerrado queda invisible (fuera del tab) recien cuando termina de bajar. */
+.pf-f-body {
+  contain: inline-size; flex: 0 1 auto; min-height: 0; height: 0; overflow: hidden;
+  border-bottom: 1px solid transparent;
+  visibility: hidden; opacity: 0;
+  transition: height var(--f-cerrar) var(--f-curva), opacity calc(var(--f-fundido) * 0.7) ease, border-color 260ms ease, visibility 0s linear var(--f-cerrar);
+}
+.pf-filters.pf-abierto .pf-f-body { visibility: visible; opacity: 1; border-bottom-color: var(--line); transition: height var(--f-abrir) var(--f-curva), opacity var(--f-fundido) ease var(--f-fundido-retraso), border-color 260ms ease; }
+/* Mientras anima no hay scroll (si no, aparece la barra a mitad de camino):
+   se habilita recien con .pf-listo, cuando el panel termino de abrir. */
+.pf-filters.pf-abierto.pf-listo .pf-f-body { height: auto; overflow-y: auto; }
+.pf-f-bar { flex: none; }
+.pf-f-in { padding: 18px 20px 14px; display: grid; gap: 14px; }
+.pf-filters .pf-f-cats { display: grid; }
+.pf-f-group { display: grid; gap: 8px; }
+.pf-f-label { margin: 0; font-size: 0.74rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+.pf-f-row { display: flex; flex-wrap: wrap; gap: 7px; padding: 3px; }
+.pf-f-bar { display: flex; align-items: center; gap: 4px; padding: 5px 5px 5px 6px; }
+.pf-f-main { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; flex: 1; min-width: 0; padding: 3px; }
+.pf-f-main::-webkit-scrollbar { display: none; }
+.pf-f-toggle {
+  position: relative; flex: none;
+  width: 36px; height: 36px; border: 0; border-radius: 999px;
+  background: transparent; color: var(--ink-2); cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.pf-f-txt { display: none; }
+@media (hover: hover) and (pointer: fine) { .pf-f-toggle:hover { background: var(--line); } }
+.pf-f-toggle svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform var(--f-flecha) var(--f-curva); }
+.pf-filters.pf-abierto .pf-f-toggle svg { transform: rotate(180deg); }
+.pf-f-count { position: absolute; top: 2px; right: 2px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 999px; background: var(--verde); color: #fff; display: grid; place-items: center; font-size: 0.66rem; font-variant-numeric: tabular-nums; }
+.pf-f-clear { justify-self: start; border: 0; background: transparent; cursor: pointer; padding: 4px 0; color: var(--azul); font-size: 0.88rem; text-decoration: underline; text-underline-offset: 3px; }
+
+/* --- Vacio ---------------------------------------------------------------- */
+.pf-empty { padding: 60px 0 200px; display: grid; justify-items: center; gap: 14px; text-align: center; }
+.pf-empty svg { width: 64px; height: 76px; }
+.pf-empty p { margin: 0; max-width: 42ch; color: var(--ink-2); font-size: 1.05rem; }
+
+
+@media (max-width: 640px) {
+  /* Vista y orden tienen que entrar en una línea (en 375 sobran pocos px). */
+  .pf-herramientas { gap: 8px; }
+  /* Mobile: como la historia. Texto arriba y la foto abajo, a todo el ancho. */
+  .pf-f-in { padding: 16px 14px 12px; }
+  .pf-pastilla { --h: 30px; }
+  /* Mobile: la barra es solo el boton "Filtros"; el panel trae categorias y año. */
+  /* Cerrado y abierto ocupan la columna del contenido (.pf-wrap deja 16 px por
+     lado): el ancho no se anima. El tweak puede probar un cerrado mas angosto
+     con --f-ancho-cerrado. */
+  .pf-filters { width: var(--f-ancho-cerrado, calc(100% - 32px)); border-radius: 28px; }
+  .pf-filters.pf-abierto { width: calc(100% - 32px); transition-duration: var(--f-abrir), var(--f-abrir), var(--f-abrir), 520ms, 300ms; }
+  .pf-f-main { display: none; }
+  .pf-f-bar { justify-content: center; padding: 4px; }
+  .pf-f-toggle { width: auto; height: 46px; padding: 0 22px 0 26px; color: var(--ink); font-family: var(--f-display); font-size: 1.04rem; transition: height var(--f-chica) var(--f-chica-curva), padding var(--f-chica) var(--f-chica-curva), gap var(--f-chica) var(--f-chica-curva), font-size var(--f-chica) var(--f-chica-curva); }
+  .pf-f-toggle svg { transition: transform var(--f-flecha) var(--f-curva), width var(--f-chica) var(--f-chica-curva), height var(--f-chica) var(--f-chica-curva); }
+  /* Bajando, la pastilla se compacta como la barra de direcciones de Safari:
+     angosta, mas baja, con el texto y la flecha mas chicos y pegada al borde.
+     Subiendo (o al llegar al final) vuelve. Abierta nunca esta chica. El ancho
+     del cerrado y el abierto es el mismo, asi que esta transicion solo corre
+     al compactar y al volver. */
+  .pf-filters { transition: width var(--f-chica) var(--f-chica-curva), bottom var(--f-chica) var(--f-chica-curva), border-radius var(--f-cerrar) var(--f-curva), transform 520ms var(--ease), opacity 300ms ease; }
+  .pf-filters.pf-chica:not(.pf-abierto) { width: 104px; bottom: calc(6px + env(safe-area-inset-bottom, 0px)); }
+  .pf-filters.pf-chica:not(.pf-abierto):has(.pf-f-count:not([hidden])) { width: 128px; }
+  .pf-filters.pf-chica:not(.pf-abierto) .pf-f-toggle { height: 30px; padding: 0 12px 0 15px; gap: 5px; font-size: 0.82rem; }
+  .pf-filters.pf-chica:not(.pf-abierto) .pf-f-toggle svg { width: 13px; height: 13px; }
+  .pf-filters.pf-chica:not(.pf-abierto) .pf-f-count { transform: scale(0.85); }
+  .pf-f-toggle:hover { background: transparent; }
+  .pf-f-txt { display: inline; }
+  .pf-f-count { position: static; order: 2; }
+}
+/* --- Ancla: la accion principal, afuera del dock -------------------------
+   Un circulo azul con la flecha, pegado a la derecha del dock pero separado
+   de el. Es lo unico saturado de la barra. Baja o
+   vuelve al principio de la lista; la mueve el JS (ver "Ancla" abajo).
+   --a es el alto del dock cerrado: en desktop 30 de pastilla + 2 x 3 de
+   f-main + 2 x 5 de f-bar + 2 de borde + 1 del borde del f-body = 49. La
+   separacion y los resortes son tokens del Figma (--ancla-*, ver "Ancla" en
+   el JS). */
+:root { --a: 49px; }
+.pf-filters { right: calc(var(--a) + var(--ancla-gap)); max-width: min(100% - 32px - var(--a), 980px); }
+/* Abajo se ancla con el mismo bottom que el dock (y la misma transicion al
+   compactarse): asi Safari, al mostrar o esconder su barra, mueve los dos
+   juntos. Si la altura la pusiera el JS desde arriba, la bola llegaria un
+   cuadro tarde y saltaria. En mobile la x y el alto tambien salen del CSS,
+   con la transicion del dock: su borde derecho es lineal en su ancho, asi
+   que los dos se mueven juntos cuadro a cuadro. En desktop la x la pone el JS
+   (--ancla-x: ahi el dock no se compacta). El JS solo pone la escala. */
+.pf-ancla {
+  position: fixed; left: var(--ancla-x, -200px); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 41;
+  width: var(--a); height: var(--a);
+  padding: 0; border: 0; background: none; cursor: pointer;
+  will-change: transform; transform: scale(0);
+  transform-origin: left bottom; /* al compactarse no se abre el hueco con el dock */
+}
+.pf-ancla-cuerpo {
+  display: grid; place-items: center; width: 100%; height: 100%;
+  border-radius: 50%; background: var(--azul); color: var(--tiza);
+  will-change: transform;
+}
+.pf-ancla svg { width: 44%; height: 44%; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; will-change: transform; }
+.pf-ancla:focus-visible { outline: none; }
+.pf-ancla:focus-visible .pf-ancla-cuerpo { outline: 2px solid var(--celeste); outline-offset: 3px; }
+@media (max-width: 640px) {
+  .pf-filters { width: var(--f-ancho-cerrado, calc(100% - 32px - var(--ancla-gap) - var(--a))); }
+  .pf-filters.pf-abierto { width: calc(100% - 32px - var(--ancla-gap) - var(--a)); }
+  /* Mobile: --a es 57, toggle 46 + 2 x 4 de f-bar + 2 de borde + 1 del
+     f-body. El dock (ancho w) va centrado entre 0 y 100% - --a - gap: su borde
+     derecho es (100% - --a - gap + w) / 2 y la bola arranca un gap despues.
+     Con w = 100% - 32 - gap - --a da 100% - 16 - --a. Compacto, w es 104
+     (128 con contador) y el alto 41: toggle 30 + 2 x 4 de f-bar + 2 de
+     borde + 1 del borde del f-body. */
+  :root { --a: 57px; }
+  .pf-ancla {
+    left: calc(100% - 16px - var(--a));
+    transition: bottom var(--f-chica) var(--f-chica-curva), left var(--f-chica) var(--f-chica-curva), width var(--f-chica) var(--f-chica-curva), height var(--f-chica) var(--f-chica-curva);
+  }
+  .pf-filters.pf-chica:not(.pf-abierto) ~ .pf-ancla {
+    bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+    left: calc((100% - var(--a) + var(--ancla-gap) + 104px) / 2);
+    width: 41px; height: 41px;
+  }
+  .pf-filters.pf-chica:not(.pf-abierto):has(.pf-f-count:not([hidden])) ~ .pf-ancla { left: calc((100% - var(--a) + var(--ancla-gap) + 128px) / 2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+
+/* --- Columna: más angosta que la grilla de Novedades, para que el título y el año queden cerca. */
+.pf-col { width: min(100% - 32px, 1120px); margin-inline: auto; }
+
+/* --- Encabezado chico: título e intro, sin foto ni Forma. La lista es lo primero que se ve. */
+.pf-dh { padding-top: calc(128px + env(safe-area-inset-top, 0px)); }
+.pf-dh h1 { margin: 0; font: 600 clamp(34px, 4vw, 52px)/1.02 var(--f-display); letter-spacing: -0.035em; color: var(--azul); text-wrap: balance; }
+.pf-dh p { margin: 14px 0 0; max-width: 58ch; font-size: var(--texto-destacado); line-height: 1.5; color: var(--ink-2); }
+
+/* --- Filas: una por documento, separadas por una línea (sin cajas ni sombras). */
+.pf-docs { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.pf-doc { position: relative; display: grid; grid-template-columns: 172px minmax(0, 1fr) 52px 36px; align-items: center; column-gap: 20px; padding: 15px 0; border-bottom: 1px solid var(--line); animation: pf-entra 380ms var(--ease) backwards; }
+@keyframes pf-entra { from { opacity: 0; transform: translateY(6px); } }
+.pf-doc .pf-etiqueta { --s: var(--etq-s); }
+.pf-doc__t { margin: 0; font: 500 1.2rem/1.2 var(--f-display); letter-spacing: -0.012em; color: var(--azul); text-wrap: pretty; overflow-wrap: break-word; transition: translate 320ms var(--ease); }
+.pf-doc__t a { color: inherit; text-decoration: none; }
+/* Toda la fila es el enlace; el botón de descarga queda por encima. */
+.pf-doc__t a::after { content: ""; position: absolute; inset: 0; }
+.pf-doc__y { font-size: var(--texto-chico); color: var(--ink-3); font-variant-numeric: tabular-nums; text-align: right; }
+.pf-doc__d { position: relative; z-index: 1; display: grid; place-items: center; width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink-2); text-decoration: none; transition: color 200ms ease, border-color 200ms ease, background 200ms ease; }
+.pf-doc__d svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+@media (hover: hover) and (pointer: fine) {
+  .pf-doc:hover .pf-doc__t { translate: 4px 0; }
+  .pf-doc__d:hover { background: var(--azul); border-color: var(--azul); color: var(--tiza); }
+}
+.pf-doc:active .pf-doc__t { translate: 2px 0; }
+.pf-doc__d:active { scale: .94; }
+.pf-doc:has(a:focus-visible) { outline: 2px solid var(--celeste); outline-offset: 2px; border-radius: 6px; }
+@media (max-width: 640px) {
+  .pf-dh { padding-top: calc(104px + env(safe-area-inset-top, 0px)); }
+  .pf-doc { grid-template-columns: minmax(0, 1fr) 36px; row-gap: 10px; padding: 16px 0; }
+  .pf-doc .pf-etiqueta { grid-column: 1; grid-row: 1; justify-self: start; }
+  .pf-doc__t { grid-column: 1; grid-row: 2; font-size: 1.08rem; }
+  .pf-doc__y { grid-column: 1; grid-row: 3; text-align: left; margin-top: -2px; }
+  .pf-doc__y:empty { display: none; }
+  .pf-doc__d { grid-column: 2; grid-row: 1 / span 3; align-self: start; }
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="pf-defs">
+  /*__LOGOS__*/
+  <symbol id="pf-badge-bg" viewBox="0 0 100 100"><path d="M32 0H68C76.4869 0 84.6263 3.37142 90.6274 9.37258C96.6286 15.3737 100 23.5131 100 32V68C100 76.4869 96.6286 84.6263 90.6274 90.6274C84.6263 96.6286 76.4869 100 68 100H32C23.5131 100 15.3737 96.6286 9.37258 90.6274C3.37142 84.6263 0 76.4869 0 68V32C0 23.5131 3.37142 15.3737 9.37258 9.37258C15.3737 3.37142 23.5131 0 32 0Z"/></symbol>
+</defs></svg>
+
+<header class="pf-barra pf-barra--solida" id="pf-top">
+  <div class="pf-barra__in">
+    <nav class="pf-barra__nav" id="pf-nav" aria-label="Sitio">
+      <a class="pf-barra__logo" href="https://www.profertil.com.ar/" aria-label="Profertil">
+        <svg viewBox="0 0 1458 1021" aria-hidden="true"><use href="#pf-logo-blanco"/></svg>
+      </a>
+      <div class="pf-barra__menu" aria-hidden="true">
+        <span>Home</span><span>Empresa</span><span>Sostenibilidad</span><span>Productos y Servicios</span><span>Novedades</span><span>Compliance</span>
+      </div>
+      <span class="pf-barra__menu-mobile" aria-hidden="true"><i><b></b><b></b><b></b><b></b></i>Menú</span>
+      <div class="pf-barra__busca" id="pf-busca" role="search">
+        <button class="pf-barra__lupa" id="pf-goSearch" type="button" aria-label="Buscar documentos" aria-expanded="false" aria-controls="pf-q"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></button>
+        <input id="pf-q" type="search" autocomplete="off" placeholder="Buscá: soja, boletín, urea…" aria-label="Buscar documentos" tabindex="-1">
+        <span class="pf-barra__cuenta" id="pf-qCount">0</span>
+      </div>
+      <button class="pf-barra__cerrar" id="pf-qClose" type="button" aria-label="Cerrar buscador" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </nav>
+  </div>
+</header>
+
+<section class="pf-dh pf-col">
+  <h1>Documentos</h1>
+  <p>Boletines técnicos, ensayos de fertilización, hojas de seguridad e informes para inversores.</p>
+</section>
+
+<main class="pf-col">
+  <div class="pf-result-row">
+    <p class="pf-result-text" id="pf-resultText" aria-live="polite"></p>
+    <div class="pf-herramientas">
+      <div class="pf-selector pf-orden" role="group" aria-label="Orden">
+        <span class="pf-selector__ind" aria-hidden="true"></span>
+        <button type="button" id="pf-sortAz" aria-pressed="true">A a Z</button>
+        <button type="button" id="pf-sortAnio" aria-pressed="false">Por año</button>
+      </div>
+    </div>
+  </div>
+  <ul class="pf-docs" id="pf-docs"></ul>
+  <div class="pf-empty" id="pf-empty" hidden>
+    <svg viewBox="0 0 555 662" aria-hidden="true"><use href="#pf-simbolo"/></svg>
+    <p id="pf-emptyText"></p>
+    <button class="pf-boton pf-boton--verde" id="pf-emptyReset" type="button">Ver todos los documentos</button>
+  </div>
+  <div class="pf-sentinel" id="pf-sentinel"></div>
+</main>
+
+<section class="pf-filters" id="pf-filters" aria-label="Filtros">
+  <div class="pf-f-body" id="pf-fBody"><div class="pf-f-in">
+    <div class="pf-f-group pf-f-cats"><p class="pf-f-label">Categoría</p><div class="pf-f-row" id="pf-fCatsTodas"></div></div>
+    <div class="pf-f-group"><p class="pf-f-label">Año</p><div class="pf-f-row" id="pf-fAnios"></div></div>
+    <button class="pf-f-clear" id="pf-fClear" type="button" hidden>Limpiar filtros</button>
+  </div></div>
+  <div class="pf-f-bar">
+    <div class="pf-f-main" id="pf-fCats" role="group" aria-label="Categoría"></div>
+    <button class="pf-f-toggle" id="pf-fToggle" type="button" aria-expanded="false" aria-controls="pf-fBody" aria-label="Más filtros"><span class="pf-f-txt">Filtros</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg><span class="pf-f-count" id="pf-fCount" hidden>0</span></button>
+  </div>
+</section>
+
+<button class="pf-ancla" id="pf-ancla" type="button" aria-label="Bajar"><span class="pf-ancla-cuerpo"><svg viewBox="0 0 24 24" aria-hidden="true" style="transform: rotate(90deg)"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
+
+<script>
+(function () {
+  "use strict";
+
+  /* Datos reales: los documentos (título + PDF) de las secciones de biblioteca del sitio actual, del crawl
+     (urls.csv). Por documento: id, título (t), categoría (c) = la sección de la URL, año (y) = el que dice el
+     título (o el de publicación, salvo la carga masiva de 2020), PDF original (u) y, en la muestra, copia local (l). */
+  var DOCS = /*__DOCS__*/[];
+  var A = /*__ASSETS__*/{};
+  var $ = function (id) { return document.getElementById(id); };
+
+  var defs = $("pf-defs"), simbolos = "";
+  Object.keys(A.formas).forEach(function (k) { simbolos += '<symbol id="pf-forma-' + k + '" viewBox="' + A.formas[k].vb + '">' + A.formas[k].d + "</symbol>"; });
+  defs.insertAdjacentHTML("beforeend", simbolos);
+
+  /* @comun: etiquetas por categoría (la pieza Etiqueta del Master). */
+  var FAM = {
+    azul: { bg: "#003DA5", fo: "#4086FF", tx: "#003DA5" },
+    verde: { bg: "#2D8035", fo: "#5EB53A", tx: "#2D8035" },
+    amarillo: { bg: "#EABA2C", fo: "#E57F19", tx: "#E57F19" },
+    naranja: { bg: "#E57F19", fo: "#8A4818", tx: "#E57F19" }
+  };
+  function fam(nombre, inv) { var f = FAM[nombre]; return inv ? { bg: f.fo, fo: f.bg, tx: f.tx } : f; }
+  var CATS = [
+    { id: "cereales", nombre: "Cereales", forma: "trigo", f: fam("verde", true) },
+    { id: "oleaginosas", nombre: "Oleaginosas", forma: "capas", f: fam("amarillo") },
+    { id: "pasturas", nombre: "Pasturas", forma: "ondas", f: fam("verde") },
+    { id: "industriales", nombre: "Industriales", forma: "industria", f: fam("naranja") },
+    { id: "msds", nombre: "Hojas de seguridad", forma: "casco", f: fam("amarillo", true) },
+    { id: "inversores", nombre: "Inversores", forma: "grafico", f: fam("azul", true) },
+    { id: "biblioteca", nombre: "Biblioteca", forma: "lupa", f: fam("azul") }
+  ];
+  var POR = {};
+  CATS.forEach(function (x) { POR[x.id] = x; });
+  function badge(x) {
+    return '<svg class="pf-etiqueta__badge" viewBox="0 0 100 100" aria-hidden="true"><use href="#pf-badge-bg" width="100" height="100" fill="' + x.f.bg + '"/>' +
+      '<use href="#pf-forma-' + x.forma + '" x="21" y="21" width="58" height="58" fill="' + x.f.fo + '"/></svg>';
+  }
+  function vars(x) { return "--eb:" + x.f.bg + ";--fo:" + x.f.fo + ";--tx:" + x.f.tx; }
+  function etq(id, dato) {
+    var x = POR[id];
+    return '<span class="pf-etiqueta" style="' + vars(x) + '">' + badge(x) + '<span class="pf-etiqueta__rotulo">' + x.nombre + "</span>" + (dato ? '<span class="pf-etiqueta__dato">' + dato + "</span>" : "") + "</span>";
+  }
+  /* @fin-comun */
+
+  function plano(s) { return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(); }
+  function esc(s) { return s.replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function resaltar(texto, q) {
+    if (!q) return esc(texto);
+    var norm = "";
+    for (var i = 0; i < texto.length; i++) norm += plano(texto[i]).charAt(0) || texto[i];
+    var out = "", desde = 0, at;
+    while ((at = norm.indexOf(q, desde)) !== -1) {
+      out += esc(texto.slice(desde, at)) + "<mark>" + esc(texto.slice(at, at + q.length)) + "</mark>";
+      desde = at + q.length;
+    }
+    return out + esc(texto.slice(desde));
+  }
+  DOCS.forEach(function (d, k) {
+    d.k = k;
+    d.n = plano(d.t);
+    d.buscable = plano([d.t, POR[d.c].nombre, d.y].join(" "));
+  });
+
+  /* --- Estado ------------------------------------------------------------- */
+  var estado = { q: "", cats: {}, anios: {}, orden: "az" };
+  var lista = [], pintadas = 0, TANDA = 60;
+  var docs = $("pf-docs");
+  var esMobile = window.matchMedia("(max-width: 640px)");
+  function activos(o) { return Object.keys(o).filter(function (k) { return o[k]; }); }
+  function pasa(d, salvo) {
+    var q = plano(estado.q.trim());
+    if (q && d.buscable.indexOf(q) === -1) return false;
+    var cs = activos(estado.cats), as = activos(estado.anios);
+    if (salvo !== "cat" && cs.length && cs.indexOf(d.c) === -1) return false;
+    if (salvo !== "anio" && as.length && as.indexOf(d.y || "sin") === -1) return false;
+    return true;
+  }
+  function filtrar() {
+    lista = DOCS.filter(function (d) { return pasa(d); });
+    if (estado.orden === "anio") lista.sort(function (a, b) {
+      if (a.y !== b.y) { if (!a.y) return 1; if (!b.y) return -1; return a.y < b.y ? 1 : -1; }
+      return a.n < b.n ? -1 : a.n > b.n ? 1 : 0;
+    });
+    else lista.sort(function (a, b) { return a.n < b.n ? -1 : a.n > b.n ? 1 : 0; });
+  }
+
+  /* --- Filas ---------------------------------------------------------------- */
+  var BAJAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v13M6 13l6 6 6-6"/></svg>';
+  function fila(d) {
+    var q = plano(estado.q.trim());
+    var li = document.createElement("li");
+    li.className = "pf-doc";
+    var bajar = d.l ? 'href="pdf/' + encodeURIComponent(d.l) + '" download' : 'href="' + esc(d.u) + '" target="_blank" rel="noopener"';
+    li.innerHTML = etq(d.c) +
+      '<h3 class="pf-doc__t"><a href="ver/?d=' + encodeURIComponent(d.id) + '">' + resaltar(d.t, q) + "</a></h3>" +
+      '<span class="pf-doc__y">' + (d.y || "") + "</span>" +
+      '<a class="pf-doc__d" ' + bajar + ' aria-label="Descargar PDF: ' + esc(d.t) + '">' + BAJAR + "</a>";
+    return li;
+  }
+  function pintarTanda() {
+    var hasta = Math.min(pintadas + TANDA, lista.length), f = document.createDocumentFragment();
+    for (var i = pintadas; i < hasta; i++) f.appendChild(fila(lista[i]));
+    docs.appendChild(f);
+    pintadas = hasta;
+  }
+  function repintar() {
+    docs.innerHTML = ""; pintadas = 0; pintarTanda();
+    $("pf-empty").hidden = lista.length > 0;
+  }
+
+  /* --- Filtros ------------------------------------------------------------ */
+  var ANIOS = [];
+  DOCS.forEach(function (d) { if (d.y && ANIOS.indexOf(d.y) === -1) ANIOS.push(d.y); });
+  ANIOS.sort().reverse();
+  ANIOS.push("sin");
+  var PRINCIPALES = CATS.map(function (x) { return { id: x.id, n: DOCS.filter(function (d) { return d.c === x.id; }).length }; })
+    .sort(function (a, b) { return b.n - a.n; }).slice(0, 3).map(function (x) { return x.id; });
+  function contar(campo, v) {
+    return DOCS.reduce(function (s, d) {
+      if (!pasa(d, campo)) return s;
+      return s + ((campo === "cat" ? d.c === v : (d.y || "sin") === v) ? 1 : 0);
+    }, 0);
+  }
+  function pintarFiltros() {
+    var ninguna = !activos(estado.cats).length;
+    var todas = '<button type="button" class="pf-pastilla pf-pastilla--todas" data-f="todas" aria-pressed="' + ninguna + '">Todos</button>';
+    function pill(x) {
+      return '<button type="button" class="pf-pastilla" style="--pc:' + x.f.bg + '" data-f="cat" data-v="' + x.id + '" aria-pressed="' + !!estado.cats[x.id] + '">' + x.nombre + "</button>";
+    }
+    var barra = CATS.filter(function (x) { return PRINCIPALES.indexOf(x.id) !== -1 || estado.cats[x.id]; });
+    $("pf-fCats").innerHTML = todas + barra.map(pill).join("");
+    $("pf-fCatsTodas").innerHTML = todas + CATS.map(pill).join("");
+    $("pf-fAnios").innerHTML = ANIOS.map(function (a) {
+      return '<button type="button" class="pf-chip" data-f="anio" data-v="' + a + '" aria-pressed="' + !!estado.anios[a] + '">' + (a === "sin" ? "Sin año" : a) + '<b class="pf-chip__n">' + contar("anio", a) + "</b></button>";
+    }).join("");
+  }
+  function resumen() {
+    var partes = [];
+    var a = activos(estado.cats).map(function (k) { return POR[k].nombre; });
+    if (a.length) partes.push(a.join(", "));
+    var as = activos(estado.anios).sort().map(function (x) { return x === "sin" ? "Sin año" : x; });
+    if (as.length) partes.push(as.join(", "));
+    var q = estado.q.trim();
+    var t = "<b>" + lista.length + "</b> " + (lista.length === 1 ? "documento" : "documentos");
+    if (q) t += " con «" + esc(q) + "»";
+    if (partes.length) t += " · " + esc(partes.join(" · "));
+    if (!q && !partes.length) t = "Todos los documentos · <b>" + lista.length + "</b>";
+    $("pf-resultText").innerHTML = t;
+    $("pf-qCount").textContent = lista.length;
+    var nf = activos(estado.cats).length + as.length;
+    var nsub = esMobile.matches ? nf : as.length;
+    $("pf-fCount").hidden = nsub === 0; $("pf-fCount").textContent = nsub;
+    $("pf-fClear").hidden = nf === 0;
+    $("pf-emptyText").textContent = q
+      ? "Ningún documento coincide con «" + q + "»" + (nf ? " con esos filtros" : "") + ". Probá con otra palabra o limpiá los filtros."
+      : "Ningún documento cumple esa combinación de filtros. Sacá alguno para ver más.";
+  }
+  function aplicar() { filtrar(); resumen(); pintarFiltros(); repintar(); }
+
+  /* --- Selector (indicador) -------------------------------------------------- */
+  function moverInd(seg, animar) {
+    var ind = seg.querySelector(".pf-selector__ind"), b = seg.querySelector('button[aria-pressed="true"]');
+    if (!b || !b.offsetWidth) return;
+    if (!animar) ind.classList.add("pf-quieto");
+    ind.style.width = b.offsetWidth + "px";
+    ind.style.transform = "translateX(" + b.offsetLeft + "px)";
+    if (!animar) { void ind.offsetWidth; ind.classList.remove("pf-quieto"); }
+  }
+  function moverInds() { document.querySelectorAll(".pf-selector").forEach(function (s) { moverInd(s, false); }); }
+  function ordenar(o) {
+    estado.orden = o;
+    $("pf-sortAz").setAttribute("aria-pressed", String(o === "az")); $("pf-sortAnio").setAttribute("aria-pressed", String(o === "anio"));
+    moverInd(document.querySelector(".pf-selector.pf-orden"), true); aplicar();
+  }
+  $("pf-sortAz").addEventListener("click", function () { ordenar("az"); });
+  $("pf-sortAnio").addEventListener("click", function () { ordenar("anio"); });
+
+  /* --- Buscador en la lupa ---------------------------------------------------- */
+  esMobile.addEventListener("change", function () { resumen(); pintarFiltros(); });
+  var tq;
+  $("pf-q").addEventListener("input", function (e) { clearTimeout(tq); tq = setTimeout(function () { estado.q = e.target.value; aplicar(); }, 120); });
+  function cerrarBusca() { $("pf-q").value = ""; estado.q = ""; aplicar(); abrirBusca(false); $("pf-goSearch").focus(); }
+  $("pf-qClose").addEventListener("click", cerrarBusca);
+  function abrirBusca(si) {
+    $("pf-busca").classList.toggle("pf-abierto", si);
+    $("pf-nav").classList.toggle("pf-buscando", si);
+    $("pf-goSearch").setAttribute("aria-expanded", String(si));
+    $("pf-q").tabIndex = si ? 0 : -1;
+    $("pf-qClose").tabIndex = si ? 0 : -1;
+    if (si) setTimeout(function () { $("pf-q").focus(); }, 60);
+  }
+  $("pf-goSearch").addEventListener("click", function () {
+    var abierta = $("pf-busca").classList.contains("pf-abierto");
+    if (!abierta) abrirBusca(true);
+    else if (!$("pf-q").value) abrirBusca(false);
+    else $("pf-q").focus();
+  });
+  $("pf-q").addEventListener("blur", function () { setTimeout(function () { if (!$("pf-q").value && document.activeElement !== $("pf-q")) abrirBusca(false); }, 180); });
+  $("pf-q").addEventListener("keydown", function (e) { if (e.key === "Escape") cerrarBusca(); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "/" && document.activeElement !== $("pf-q") && !/^(input|textarea)$/i.test(document.activeElement.tagName)) { e.preventDefault(); abrirBusca(true); }
+  });
+
+  /* --- Dock de filtros ---------------------------------------------------------- */
+  // Mobile: el dock se achica al bajar y vuelve al subir (umbral para que el rebote no lo haga titilar).
+  var yAntes = window.scrollY;
+  window.addEventListener("scroll", function () {
+    var y = window.scrollY, dy = y - yAntes;
+    if (Math.abs(dy) < 8) return;
+    yAntes = y;
+    var f = $("pf-filters");
+    if (!esMobile.matches || f.classList.contains("pf-abierto")) { f.classList.remove("pf-chica"); return; }
+    var alFinal = y + window.innerHeight >= document.documentElement.scrollHeight - 4;
+    f.classList.toggle("pf-chica", dy > 0 && y > 40 && !alFinal);
+  }, { passive: true });
+  $("pf-filters").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-f]"); if (!b) return;
+    if (b.dataset.f === "todas") { estado.cats = {}; aplicar(); return; }
+    // Categoría: una sola a la vez (tocar la activa vuelve a "Todos"). Año: varios.
+    if (b.dataset.f === "cat") { var on = !estado.cats[b.dataset.v]; estado.cats = {}; if (on) estado.cats[b.dataset.v] = true; }
+    else estado.anios[b.dataset.v] = !estado.anios[b.dataset.v];
+    aplicar();
+  });
+  function limpiar() { estado.cats = {}; estado.anios = {}; estado.q = ""; $("pf-q").value = ""; aplicar(); }
+  $("pf-fClear").addEventListener("click", limpiar);
+  $("pf-emptyReset").addEventListener("click", limpiar);
+  // El panel anima su alto en px: se mide el alto final (con el ancho final, sin transiciones y sin pintar),
+  // se arranca desde el actual y al terminar queda en auto con scroll (.listo).
+  var tListo;
+  function abrirFiltros(si) {
+    var f = $("pf-filters"), b = $("pf-fBody");
+    clearTimeout(tListo);
+    var desde = b.offsetHeight, anchoAhora = b.firstElementChild.offsetWidth;
+    f.style.transition = b.style.transition = "none";
+    f.classList.remove("pf-listo");
+    f.classList.toggle("pf-abierto", si);
+    b.style.height = "";
+    var hasta = si ? (f.classList.add("pf-listo"), b.offsetHeight) : 0;
+    var ancho = si ? b.clientWidth : anchoAhora;
+    b.firstElementChild.style.width = ancho + "px";
+    f.classList.remove("pf-listo");
+    f.classList.toggle("pf-abierto", !si);
+    b.style.height = desde + "px";
+    void f.offsetWidth;
+    f.style.transition = b.style.transition = "";
+    f.classList.toggle("pf-abierto", si);
+    b.style.height = hasta + "px";
+    $("pf-fToggle").setAttribute("aria-expanded", String(si));
+    var dur = parseFloat(getComputedStyle(document.documentElement).getPropertyValue(si ? "--f-abrir" : "--f-cerrar")) || 420;
+    tListo = setTimeout(terminar, dur + 60);
+  }
+  function terminar() {
+    var f = $("pf-filters");
+    clearTimeout(tListo);
+    $("pf-fBody").style.height = "";
+    $("pf-fBody").firstElementChild.style.width = "";
+    if (f.classList.contains("pf-abierto")) f.classList.add("pf-listo");
+  }
+  $("pf-fBody").addEventListener("transitionend", function (e) { if (e.target === this && e.propertyName === "height") terminar(); });
+  $("pf-fToggle").addEventListener("click", function () { abrirFiltros(!$("pf-filters").classList.contains("pf-abierto")); });
+  abrirFiltros(false);
+
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(function (en) { if (en[0].isIntersecting && pintadas < lista.length) pintarTanda(); }, { rootMargin: "900px 0px" }).observe($("pf-sentinel"));
+  } else { TANDA = 2000; }
+  window.addEventListener("resize", moverInds);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(moverInds);
+  moverInds();
+
+  /* --- Ancla ----------------------------------------------------------------
+     Una sola acción que cambia de sentido: arriba de la lista apunta abajo y baja una pantalla; más abajo
+     apunta arriba y vuelve al principio de la lista. El rebote vive solo en el giro de la flecha. */
+  var ancla = $("pf-ancla"), cuerpo = ancla.firstElementChild, flecha = cuerpo.firstElementChild;
+  var quieto = matchMedia("(prefers-reduced-motion: reduce)");
+  var raiz = getComputedStyle(document.documentElement);
+  function tk(n) { return parseFloat(raiz.getPropertyValue("--" + n)); }
+  var GAP = tk("ancla-gap"), APRETAR = tk("ancla-apretar"), BAJAR_P = tk("ancla-bajar"), CAMBIO = tk("ancla-cambio");
+  function R(x, k, c) { return { x: x, v: 0, t: x, k: k, c: c }; }
+  var M = {
+    s: R(0, tk("ancla-aparecer-k"), tk("ancla-aparecer-c")),
+    q: R(1, tk("ancla-apretar-k"), tk("ancla-apretar-c")),
+    r: R(90, tk("ancla-giro-k"), tk("ancla-giro-c"))
+  };
+  function inicioLista() { return Math.max(0, document.querySelector("main").offsetTop - $("pf-top").offsetHeight - 8); }
+  function arriba() { return window.scrollY > inicioLista() + window.innerHeight * CAMBIO; }
+  function medir() {
+    var r = $("pf-filters").getBoundingClientRect();
+    M.s.t = !lista.length ? 0 : 1;
+    var sube = arriba();
+    M.r.t = sube ? -90 : 90;
+    ancla.setAttribute("aria-label", sube ? "Volver al principio de la lista" : "Bajar");
+    ancla.tabIndex = M.s.t ? 0 : -1;
+    if (!esMobile.matches) document.documentElement.style.setProperty("--ancla-x", (r.right + GAP).toFixed(2) + "px");
+  }
+  function paso(s, dt) { var ac = -s.k * (s.x - s.t) - s.c * s.v; s.v += ac * dt; s.x += s.v * dt; }
+  var tAntes = performance.now();
+  function anim(now) {
+    var dt = Math.min(0.05, (now - tAntes) / 1000); tAntes = now;
+    medir();
+    if (quieto.matches) { for (var k in M) { M[k].x = M[k].t; M[k].v = 0; } }
+    else { var n = Math.ceil(dt / 0.004); for (var j = 0; j < n; j++) for (var k2 in M) paso(M[k2], dt / n); }
+    ancla.style.transform = "scale(" + (Math.max(0, M.s.x) * M.q.x).toFixed(4) + ")";
+    flecha.style.transform = "rotate(" + M.r.x.toFixed(2) + "deg)";
+    requestAnimationFrame(anim);
+  }
+  requestAnimationFrame(anim);
+  ancla.addEventListener("pointerdown", function () { M.q.t = APRETAR; });
+  function soltarAncla() { M.q.t = 1; }
+  ancla.addEventListener("pointerup", soltarAncla);
+  ancla.addEventListener("pointercancel", soltarAncla);
+  ancla.addEventListener("pointerleave", soltarAncla);
+  ancla.addEventListener("click", function () {
+    if ($("pf-filters").classList.contains("pf-abierto")) abrirFiltros(false);
+    var suave = quieto.matches ? "auto" : "smooth";
+    if (arriba()) window.scrollTo({ top: inicioLista(), behavior: suave });
+    else window.scrollBy({ top: Math.round(window.innerHeight * BAJAR_P), behavior: suave });
+  });
+
+  aplicar();
+  // Desde el visor: #buscar abre el buscador; #q=texto lo abre con esa búsqueda; #cat=id filtra por categoría.
+  var pedido = decodeURIComponent(location.hash.slice(1));
+  if (pedido === "buscar") abrirBusca(true);
+  else if (pedido.indexOf("q=") === 0 && pedido.length > 2) {
+    $("pf-q").value = estado.q = pedido.slice(2);
+    aplicar(); abrirBusca(true);
+  } else if (pedido.indexOf("cat=") === 0 && POR[pedido.slice(4)]) { estado.cats[pedido.slice(4)] = true; aplicar(); }
+})();
+</script>

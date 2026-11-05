@@ -1,2 +1,6 @@
 # Copia fija de las notas del sitio de Profertil: es su texto publicado, no texto nuestro.
 profertil/novedades/notas/*
+# Copias de PDF del sitio de Profertil (su contenido publicado) y pdf.js (Apache 2.0, de Mozilla).
+profertil/documentos/pdf/*
+profertil/documentos/vendor/*
+profertil/documentos/fuente/docs.json

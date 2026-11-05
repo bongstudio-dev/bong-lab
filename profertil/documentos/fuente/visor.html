@@ -1,0 +1,415 @@
+<title>Documento · Profertil</title>
+<meta name="description" content="Visor de documentos de profertil.com.ar sobre el concepto web del manual de marca: el PDF a lo largo de la página, con índice de páginas y modo lectura.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../componentes/tokens.css">
+<link rel="stylesheet" href="../../componentes/base.css">
+<style>
+/* ==========================================================================
+   Visor de documentos Profertil: la página de un documento (boletín, ensayo, hoja de seguridad, informe).
+   Misma estructura que la Nota: título arriba a la izquierda y, abajo, tres columnas: el índice de páginas,
+   el PDF (todas las páginas una debajo de otra, con scroll continuo) y los datos. Cierra con documentos
+   de la misma categoría y el pie.
+   Los datos son una copia fija del sitio actual (docs.json); el PDF se dibuja con pdf.js.
+   ========================================================================== */
+/* Sin sombras: las páginas se separan del fondo por el color y una línea. */
+:root { color-scheme: light; }
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { background: var(--bg); -webkit-tap-highlight-color: transparent; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: var(--texto-cuerpo); line-height: 1.5; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+button { font: inherit; color: inherit; }
+a { color: inherit; }
+button, a { touch-action: manipulation; }
+:focus-visible { outline: 2px solid var(--celeste); outline-offset: 2px; }
+.pf-flecha { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.pf-col { width: min(100% - 32px, 1120px); margin-inline: auto; }
+
+/* --- Barra: la pieza "barra" de base.css, azul desde arriba. Abajo, una línea que se llena con la lectura. */
+.pf-barra__menu > a { text-decoration: none; }
+.pf-barra--solida { box-shadow: none; }
+.pf-barra__busca { text-decoration: none; }
+.pf-progreso { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; }
+.pf-progreso i { display: block; height: 100%; background: var(--amarillo); transform: scaleX(var(--p, 0)); transform-origin: left; }
+
+/* --- Grilla de tres columnas: índice de páginas, documento y datos. Fila 1 el título, fila 2 el resto. */
+.pf-v-grilla { width: min(100% - 32px, 1280px); margin-inline: auto; display: grid; grid-template-columns: 190px minmax(0, 780px) 190px; justify-content: center; gap: 0 56px; padding-top: calc(140px + env(safe-area-inset-top, 0px)); }
+
+/* --- Cabecera: sin caja. La etiqueta completa (forma, rótulo y año) va junto al título. */
+.pf-v-cab { grid-column: 2 / -1; grid-row: 1; }
+.pf-v-in { display: grid; gap: 18px; justify-items: start; max-width: 900px; }
+.pf-v-volver { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-3); font-size: var(--texto-chico); text-decoration: none; transition: color 200ms ease; }
+@media (hover: hover) and (pointer: fine) { .pf-v-volver:hover { color: var(--azul); } }
+.pf-v-in .pf-etiqueta { --s: var(--etq-m); margin-top: 14px; }
+.pf-v-in .pf-etiqueta__rotulo { outline: 1px solid var(--line); outline-offset: -1px; }
+.pf-v-in h1 { margin: 0; font: 600 clamp(32px, 3.8vw, 52px)/1.04 var(--f-display); letter-spacing: -0.03em; color: var(--azul); text-wrap: balance; overflow-wrap: break-word; }
+.pf-v-in h1.pf-largo { font-size: clamp(28px, 3vw, 40px); line-height: 1.08; }
+
+/* --- Documento: las páginas una debajo de otra, con el ancho de la columna. Cada una reserva su lugar con la proporción del PDF y muestra un brillo que pasa mientras se dibuja. */
+.pf-v-doc { grid-column: 2; grid-row: 2; margin-top: 56px; min-width: 0; display: grid; gap: 16px; align-content: start; }
+.pf-v-pag { position: relative; width: 100%; aspect-ratio: var(--r, 0.7071); overflow: hidden; border-radius: 6px; background: var(--color-blanco); outline: 1px solid var(--line); outline-offset: -1px; scroll-margin-top: 96px; }
+.pf-v-pag canvas { display: block; width: 100%; height: 100%; opacity: 0; transition: opacity 400ms ease; }
+.pf-v-pag.pf-lista canvas { opacity: 1; }
+.pf-v-pag.pf-esqueleto { background: linear-gradient(100deg, transparent 35%, color-mix(in srgb, var(--color-blanco) 70%, transparent) 50%, transparent 65%) var(--card); background-size: 250% 100%; animation: pf-brillo 1.5s linear infinite; }
+@keyframes pf-brillo { from { background-position: 125% 0; } to { background-position: -25% 0; } }
+@media (prefers-reduced-motion: reduce) { .pf-esqueleto { animation: none !important; } .pf-v-pag canvas { transition: none; } }
+.pf-v-num { position: absolute; right: 10px; bottom: 8px; padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--ink) 62%, transparent); color: var(--tiza); font-size: var(--texto-mini); font-variant-numeric: tabular-nums; opacity: 0; transition: opacity 200ms ease; pointer-events: none; }
+@media (hover: hover) and (pointer: fine) { .pf-v-pag:hover .pf-v-num { opacity: 1; } }
+
+/* Cuando el PDF no está en la maqueta o no se pudo leer: un aviso en el lugar del documento. */
+.pf-v-aviso { display: grid; justify-items: start; gap: 14px; padding: 28px; border-radius: var(--radio-tarjeta); background: var(--card); }
+.pf-v-aviso p { margin: 0; max-width: 52ch; font-size: var(--texto-destacado); line-height: 1.5; color: var(--ink-2); }
+.pf-v-aviso strong { color: var(--azul); font-weight: 600; }
+
+/* --- Datos, a la derecha: sin rótulos. Páginas y modo lectura pegados y en azul, descarga y compartir. */
+.pf-v-datos { grid-column: 3; grid-row: 2; align-self: start; position: sticky; top: 112px; margin: 56px 0 0; display: grid; justify-items: start; gap: 14px; font-size: var(--texto-chico); }
+.pf-v-par { display: flex; gap: 4px; }
+.pf-v-pags { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px 0 9px; border-radius: 999px; background: var(--azul); color: var(--tiza); font-size: var(--texto-mini); font-variant-numeric: tabular-nums; }
+.pf-v-pags svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.pf-v-foco, .pf-v-copiar { display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border-radius: 999px; cursor: pointer; transition: color 200ms ease, border-color 200ms ease, background 200ms ease; }
+.pf-v-foco { border: 0; background: var(--azul); color: var(--tiza); }
+.pf-v-foco svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.pf-v-copiar { border: 1px solid var(--line); background: transparent; color: var(--ink-2); }
+.pf-v-copiar svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+@media (hover: hover) and (pointer: fine) { .pf-v-foco:hover { background: var(--ink); } .pf-v-copiar:hover { color: var(--azul); border-color: var(--azul); } }
+.pf-v-bajar { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+.pf-v-bajar svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* --- Índice de páginas, a la izquierda: fijo al bajar. El punto azul viaja con un resorte (el de la librería) hasta la página que se está leyendo. */
+.pf-v-indice { grid-column: 1; grid-row: 2; align-self: start; position: sticky; top: 112px; margin-top: 56px; max-height: calc(100vh - 150px); overflow-y: auto; scrollbar-width: none; font-size: var(--texto-chico); }
+.pf-v-indice::-webkit-scrollbar { display: none; }
+.pf-v-indice ol { position: relative; margin: 0; padding: 0 0 0 18px; list-style: none; display: grid; gap: 8px; }
+.pf-v-indice a { display: block; color: var(--ink-3); line-height: 1.35; text-decoration: none; font-variant-numeric: tabular-nums; transition: color 200ms ease, translate var(--punto-dura, 320ms) var(--punto-curva, var(--ease)); }
+.pf-v-indice a.pf-on { color: var(--azul); translate: 4px 0; }
+@media (hover: hover) and (pointer: fine) { .pf-v-indice a:hover { color: var(--azul); translate: 4px 0; } }
+.pf-v-indice__punto { position: absolute; left: 0; top: 0; width: 7px; height: 7px; border-radius: 999px; background: var(--azul); translate: 0 var(--y, 0px); transition: translate var(--punto-dura, 420ms) var(--punto-curva, var(--ease)); }
+@media (prefers-reduced-motion: reduce) { .pf-v-indice a, .pf-v-indice__punto { transition: none; } }
+
+/* --- Modo lectura: queda el documento, con más ancho. Se sale con el mismo botón, el de arriba a la derecha o Esc. */
+body.pf-foco :is(.pf-barra, .pf-v-indice, .pf-v-datos, .pf-v-cab, .pf-v-sigue, .pf-pie) { display: none; }
+body.pf-foco .pf-v-grilla { grid-template-columns: minmax(0, 860px); padding-top: 40px; }
+body.pf-foco .pf-v-doc { grid-column: 1; grid-row: 1; margin-top: 0; padding-bottom: 120px; }
+.pf-v-salir { position: fixed; top: calc(20px + env(safe-area-inset-top, 0px)); right: 20px; z-index: 60; display: inline-flex; align-items: center; gap: 10px; height: 38px; padding: 0 8px 0 16px; border: 1px solid var(--line); border-radius: 999px; background: var(--bg); color: var(--ink-2); font-size: var(--texto-chico); cursor: pointer; }
+.pf-v-salir kbd { padding: 3px 7px; border-radius: 999px; background: var(--card); font: inherit; font-size: var(--texto-mini); color: var(--ink-3); }
+@media (hover: hover) and (pointer: fine) { .pf-v-salir:hover { color: var(--azul); border-color: var(--azul); } }
+@media (hover: none) { .pf-v-salir kbd { display: none; } }
+.pf-aviso { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 60; transform: translate(-50%, 16px); padding: 12px 18px; border-radius: 999px; background: var(--ink); color: var(--tiza); font-size: var(--texto-chico); opacity: 0; pointer-events: none; transition: opacity 240ms ease, transform 320ms var(--ease); }
+.pf-aviso.pf-on { opacity: 1; transform: translate(-50%, 0); }
+
+/* --- Más documentos: filas, las mismas de la lista. */
+.pf-v-sigue { margin-top: 128px; }
+.pf-v-sigue__cab { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 20px; margin-bottom: 20px; }
+.pf-v-sigue__cab h2 { margin: 0; font: 600 var(--texto-subtitulo)/1.1 var(--f-display); letter-spacing: -0.02em; color: var(--azul); }
+.pf-v-sigue__cab a { display: inline-flex; align-items: center; gap: 6px; color: var(--azul); font-size: var(--texto-chico); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, var(--celeste) 60%, transparent); }
+.pf-docs { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.pf-doc { position: relative; display: grid; grid-template-columns: 172px minmax(0, 1fr) 52px 36px; align-items: center; column-gap: 20px; padding: 15px 0; border-bottom: 1px solid var(--line); }
+.pf-doc .pf-etiqueta { --s: var(--etq-s); }
+.pf-doc__t { margin: 0; font: 500 1.2rem/1.2 var(--f-display); letter-spacing: -0.012em; color: var(--azul); text-wrap: pretty; overflow-wrap: break-word; transition: translate 320ms var(--ease); }
+.pf-doc__t a { color: inherit; text-decoration: none; }
+.pf-doc__t a::after { content: ""; position: absolute; inset: 0; }
+.pf-doc__y { font-size: var(--texto-chico); color: var(--ink-3); font-variant-numeric: tabular-nums; text-align: right; }
+.pf-doc__d { position: relative; z-index: 1; display: grid; place-items: center; width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink-2); text-decoration: none; transition: color 200ms ease, border-color 200ms ease, background 200ms ease; }
+.pf-doc__d svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+@media (hover: hover) and (pointer: fine) { .pf-doc:hover .pf-doc__t { translate: 4px 0; } .pf-doc__d:hover { background: var(--azul); border-color: var(--azul); color: var(--tiza); } }
+.pf-doc:active .pf-doc__t { translate: 2px 0; }
+.pf-doc:has(a:focus-visible) { outline: 2px solid var(--celeste); outline-offset: 2px; border-radius: 6px; }
+
+.pf-pie { margin-top: 120px; }
+
+/* --- Pantallas medianas y celular: una columna; el índice se va y los datos pasan arriba del documento. */
+@media (max-width: 1100px) {
+  .pf-v-grilla { grid-template-columns: minmax(0, 780px); }
+  .pf-v-cab, .pf-v-datos, .pf-v-doc { grid-column: 1; }
+  .pf-v-datos { grid-row: 2; position: static; margin: 28px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .pf-v-doc { grid-row: 3; margin-top: 28px; }
+  .pf-v-indice { display: none; }
+}
+@media (max-width: 640px) {
+  .pf-v-grilla { padding-top: calc(108px + env(safe-area-inset-top, 0px)); }
+  .pf-v-in { gap: 14px; }
+  .pf-v-in .pf-etiqueta { margin-top: 10px; }
+  /* Descarga, páginas, modo lectura y link en una sola línea. */
+  .pf-v-datos { flex-wrap: nowrap; gap: 6px; }
+  .pf-v-pdf { display: none; }
+  .pf-v-datos .pf-boton { padding-inline: 14px; }
+  .pf-v-in h1 { font-size: 2rem; }
+  .pf-v-in h1.pf-largo { font-size: 1.65rem; }
+  .pf-v-sigue { margin-top: 80px; }
+  .pf-v-aviso { padding: 20px; }
+  .pf-doc { grid-template-columns: minmax(0, 1fr) 36px; row-gap: 10px; padding: 16px 0; }
+  .pf-doc .pf-etiqueta { grid-column: 1; grid-row: 1; justify-self: start; }
+  .pf-doc__t { grid-column: 1; grid-row: 2; font-size: 1.08rem; }
+  .pf-doc__y { grid-column: 1; grid-row: 3; text-align: left; margin-top: -2px; }
+  .pf-doc__y:empty { display: none; }
+  .pf-doc__d { grid-column: 2; grid-row: 1 / span 3; align-self: start; }
+  .pf-pie { margin-top: 80px; }
+}
+/*__PIE_CSS__*/
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="pf-defs">
+  /*__LOGOS__*/
+  /*__BADGE__*/
+</defs></svg>
+
+<header class="pf-barra pf-barra--solida" id="pf-top">
+  <div class="pf-barra__in">
+    <nav class="pf-barra__nav" id="pf-nav" aria-label="Sitio">
+      <a class="pf-barra__logo" href="../" aria-label="Profertil, ir a Documentos">
+        <svg viewBox="0 0 1458 1021" aria-hidden="true"><use href="#pf-logo-blanco"/></svg>
+      </a>
+      <div class="pf-barra__menu">
+        <span>Home</span><span>Empresa</span><span>Sostenibilidad</span><span>Productos y Servicios</span><span>Novedades</span><span>Compliance</span>
+      </div>
+      <span class="pf-barra__menu-mobile" aria-hidden="true"><i><b></b><b></b><b></b><b></b></i>Menú</span>
+      <a class="pf-barra__busca" href="../#buscar" aria-label="Buscar en Documentos">
+        <span class="pf-barra__lupa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></span>
+      </a>
+    </nav>
+  </div>
+  <div class="pf-progreso" aria-hidden="true"><i id="pf-progreso"></i></div>
+</header>
+
+<main id="pf-visor" aria-busy="true">
+  <div class="pf-v-grilla" id="pf-grilla">
+    <header class="pf-v-cab"><div class="pf-v-in" id="pf-cabIn"></div></header>
+    <nav class="pf-v-indice" id="pf-indice" aria-label="Páginas del documento" hidden></nav>
+    <div class="pf-v-doc" id="pf-doc"></div>
+    <div class="pf-v-datos" id="pf-datos"></div>
+  </div>
+  <section class="pf-v-sigue pf-col" aria-label="Más documentos">
+    <div class="pf-v-sigue__cab"><h2 id="pf-sigueT">Más documentos</h2><a id="pf-sigueTodos" href="../">Ver todos los documentos</a></div>
+    <ul class="pf-docs" id="pf-rel"></ul>
+  </section>
+</main>
+
+/*__PIE_HTML__*/
+
+<button class="pf-v-salir" id="pf-focoSalir" type="button" hidden>Salir del modo lectura <kbd>Esc</kbd></button>
+<div class="pf-aviso" id="pf-aviso" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  "use strict";
+  var DOCS = /*__DOCS__*/[];
+  var A = /*__ASSETS__*/{};
+  function $(id) { return document.getElementById(id); }
+  function plano(s) { return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(); }
+  function esc(s) { return s.replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+  var defs = $("pf-defs"), simbolos = "";
+  Object.keys(A.formas).forEach(function (k) { simbolos += '<symbol id="pf-forma-' + k + '" viewBox="' + A.formas[k].vb + '">' + A.formas[k].d + "</symbol>"; });
+  defs.insertAdjacentHTML("beforeend", simbolos);
+
+/*__COMUN__*/
+
+  var FLECHA_IZQ = '<svg class="pf-flecha" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 12H7M11 8l-4 4 4 4"/></svg>';
+  var FLECHA_DER = '<svg class="pf-flecha" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12h10M13 8l4 4-4 4"/></svg>';
+  var BAJAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v13M6 13l6 6 6-6"/></svg>';
+
+  // Qué documento: ?d=<id>. Sin parámetro, el primero de la lista.
+  var pedido = new URLSearchParams(location.search).get("d");
+  var d = DOCS.filter(function (x) { return x.id === pedido; })[0] || DOCS[0];
+  var cat = POR[d.c];
+  var url = d.l ? "../pdf/" + encodeURIComponent(d.l) : null;   // copia local (solo la muestra); la original no se puede leer desde otro dominio
+  document.title = d.t + " · Documentos Profertil";
+
+  /* --- Cabecera y datos -------------------------------------------------------------- */
+  $("pf-cabIn").innerHTML =
+    '<a class="pf-v-volver" href="../#cat=' + d.c + '">' + FLECHA_IZQ + "Documentos</a>" + etq(d.c, d.y || "") +
+    "<h1" + (d.t.length > 90 ? ' class="pf-largo"' : "") + ">" + esc(d.t) + "</h1>";
+  var bajarHref = url || d.u;
+  function datos(paginas) {
+    $("pf-datos").innerHTML =
+      '<a class="pf-boton pf-boton--verde pf-v-bajar" href="' + esc(bajarHref) + '"' + (url ? " download" : ' target="_blank" rel="noopener"') + ">" + BAJAR + 'Descargar<span class="pf-v-pdf">&nbsp;PDF</span></a>' +
+      '<div class="pf-v-par">' +
+      (paginas ? '<span class="pf-v-pags"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7zM14 3v5h5"/></svg>' + paginas + (paginas === 1 ? " página" : " páginas") + "</span>" : "") +
+      (paginas ? '<button class="pf-v-foco" id="pf-foco" type="button" aria-pressed="false" aria-label="Modo lectura" title="Modo lectura"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button>' : "") +
+      "</div>" +
+      '<button class="pf-v-copiar" id="pf-copiar" type="button" aria-label="Copiar el link" title="Copiar el link"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></button>';
+    if (paginas) $("pf-foco").addEventListener("click", function () { foco(!document.body.classList.contains("pf-foco")); });
+    $("pf-copiar").addEventListener("click", function () {
+      var ok = function () { avisar("Link copiado"); };
+      if (navigator.clipboard) navigator.clipboard.writeText(location.href).then(ok, function () { avisar("No se pudo copiar"); });
+      else avisar("No se pudo copiar");
+    });
+  }
+  datos(0);
+
+  var ta;
+  function avisar(txt) { var a = $("pf-aviso"); a.textContent = txt; a.classList.add("pf-on"); clearTimeout(ta); ta = setTimeout(function () { a.classList.remove("pf-on"); }, 2000); }
+
+  // Modo lectura: queda el documento. Se sale con el mismo botón, el de arriba o Esc, sin perder el punto de lectura.
+  function foco(on) {
+    var ref = paginas[Math.max(0, actual)], y = ref ? ref.el.getBoundingClientRect().top : 0;
+    document.body.classList.toggle("pf-foco", on);
+    $("pf-foco").setAttribute("aria-pressed", on);
+    $("pf-focoSalir").hidden = !on;
+    anchoCambio();
+    if (ref) window.scrollBy(0, ref.el.getBoundingClientRect().top - y);
+  }
+  $("pf-focoSalir").addEventListener("click", function () { foco(false); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && document.body.classList.contains("pf-foco")) foco(false); });
+
+  /* --- Documentos de la misma categoría ----------------------------------------------- */
+  function fila(x) {
+    var li = document.createElement("li");
+    li.className = "pf-doc";
+    var bajar = x.l ? 'href="../pdf/' + encodeURIComponent(x.l) + '" download' : 'href="' + esc(x.u) + '" target="_blank" rel="noopener"';
+    li.innerHTML = etq(x.c) + '<h3 class="pf-doc__t"><a href="?d=' + encodeURIComponent(x.id) + '">' + esc(x.t) + "</a></h3>" +
+      '<span class="pf-doc__y">' + (x.y || "") + "</span>" +
+      '<a class="pf-doc__d" ' + bajar + ' aria-label="Descargar PDF: ' + esc(x.t) + '">' + BAJAR + "</a>";
+    return li;
+  }
+  (function () {
+    // Mismo año primero (si tiene), después los que tienen copia en la maqueta; el resto, por cercanía en el orden alfabético.
+    var otros = DOCS.filter(function (x) { return x.c === d.c && x.id !== d.id; });
+    var pos = DOCS.indexOf(d);
+    otros.sort(function (a, b) {
+      var pa = (d.y && a.y === d.y ? 0 : 2) + (a.l ? 0 : 1), pb = (d.y && b.y === d.y ? 0 : 2) + (b.l ? 0 : 1);
+      if (pa !== pb) return pa - pb;
+      return Math.abs(DOCS.indexOf(a) - pos) - Math.abs(DOCS.indexOf(b) - pos);
+    });
+    otros.slice(0, 4).forEach(function (x) { $("pf-rel").appendChild(fila(x)); });
+    $("pf-sigueT").textContent = "Más de " + cat.nombre.toLowerCase();
+    $("pf-sigueTodos").href = "../#cat=" + d.c;
+    $("pf-sigueTodos").innerHTML = "Ver los " + DOCS.filter(function (x) { return x.c === d.c; }).length + " documentos " + FLECHA_DER;
+  })();
+
+  /* --- Curva del punto: un resorte apenas subamortiguado, muestreado como linear(). --------- */
+  (function () {
+    if (!CSS.supports || !CSS.supports("transition-timing-function", "linear(0, 1)")) return;
+    var k = 230, c = 25, x = 0, v = 0, dt = 1 / 1000, pts = [], t = 0;
+    while (t < 2) {
+      for (var i = 0; i < 16; i++) { v += (-k * (x - 1) - c * v) * dt; x += v * dt; t += dt; }
+      pts.push(x.toFixed(4));
+      if (Math.abs(x - 1) < .0015 && Math.abs(v) < .02) break;
+    }
+    pts[pts.length - 1] = "1";
+    var raiz = document.documentElement.style;
+    raiz.setProperty("--punto-curva", "linear(0, " + pts.join(", ") + ")");
+    raiz.setProperty("--punto-dura", Math.round(t * 1000) + "ms");
+  })();
+
+  /* --- El documento ------------------------------------------------------------------------ */
+  var paginas = [];   // { el, canvas, n, ratio, pdf, ancho }
+  var actual = -1, pdfDoc = null, lib = null;
+
+  function sinCopia(msg) {
+    $("pf-doc").innerHTML = '<div class="pf-v-aviso"><p>' + msg + '</p><a class="pf-boton pf-boton--verde pf-v-bajar" href="' + esc(d.u) + '" target="_blank" rel="noopener">Abrir el PDF</a></div>';
+    $("pf-visor").removeAttribute("aria-busy");
+  }
+
+  // Dibuja una página al ancho de su caja (con la densidad de la pantalla, hasta 2x).
+  function dibujar(p) {
+    if (p.dibujando) return;
+    var w = p.el.clientWidth; if (!w) return;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    if (p.ancho && Math.abs(p.ancho - w) < 24 && p.hecha) return;
+    p.dibujando = true;
+    pdfDoc.getPage(p.n).then(function (pg) {
+      var base = pg.getViewport({ scale: 1 });
+      var vp = pg.getViewport({ scale: (w * dpr) / base.width });
+      var c = document.createElement("canvas");
+      c.width = Math.floor(vp.width); c.height = Math.floor(vp.height);
+      return pg.render({ canvasContext: c.getContext("2d"), viewport: vp, canvas: c }).promise.then(function () {
+        if (p.canvas) p.canvas.remove();
+        p.canvas = c; p.el.insertBefore(c, p.el.firstChild);
+        p.ancho = w; p.hecha = true;
+        p.el.classList.remove("pf-esqueleto"); void c.offsetWidth; p.el.classList.add("pf-lista");
+      });
+    }).catch(function () {}).then(function () { p.dibujando = false; });
+  }
+  var vigia = "IntersectionObserver" in window ? new IntersectionObserver(function (en) {
+    en.forEach(function (e) { if (e.isIntersecting) dibujar(e.target.__p); });
+  }, { rootMargin: "1400px 0px" }) : null;
+
+  var tAncho;
+  function anchoCambio() { clearTimeout(tAncho); tAncho = setTimeout(function () { paginas.forEach(function (p) { if (p.hecha) { p.hecha = false; if (p.el.getBoundingClientRect().top < innerHeight * 3 && p.el.getBoundingClientRect().bottom > -innerHeight * 2) dibujar(p); } }); }, 160); }
+  window.addEventListener("resize", anchoCambio);
+
+  function armar(pdf) {
+    pdfDoc = pdf;
+    var n = pdf.numPages;
+    datos(n);
+    $("pf-doc").innerHTML = "";
+    for (var i = 1; i <= n; i++) {
+      var el = document.createElement("div");
+      el.className = "pf-v-pag pf-esqueleto"; el.id = "pf-p" + i;
+      el.setAttribute("role", "img"); el.setAttribute("aria-label", "Página " + i + " de " + n);
+      el.insertAdjacentHTML("beforeend", '<span class="pf-v-num" aria-hidden="true">' + i + " / " + n + "</span>");
+      var p = { el: el, n: i, canvas: null }; el.__p = p; paginas.push(p);
+      $("pf-doc").appendChild(el);
+    }
+    // La proporción de cada página, para reservar su lugar sin saltos (las páginas pueden tener tamaños distintos).
+    var ratios = paginas.map(function (p) {
+      return pdf.getPage(p.n).then(function (pg) { var v = pg.getViewport({ scale: 1 }); p.el.style.setProperty("--r", (v.width / v.height).toFixed(5)); });
+    });
+    paginas.forEach(function (p) { if (vigia) vigia.observe(p.el); else dibujar(p); });
+    indice(n);
+    $("pf-visor").removeAttribute("aria-busy");
+    Promise.all(ratios).then(function () { alScroll(); irAHash(); });
+  }
+
+  // Índice de páginas, a la izquierda: solo si el documento tiene más de una.
+  function indice(n) {
+    if (n < 2) return;
+    var h = "<ol>";
+    for (var i = 1; i <= n; i++) h += '<li><a href="#p-' + i + '" data-p="' + i + '">Página ' + i + "</a></li>";
+    $("pf-indice").innerHTML = h + "</ol>";
+    $("pf-indice").firstChild.insertAdjacentHTML("afterbegin", '<span class="pf-v-indice__punto" aria-hidden="true"></span>');
+    $("pf-indice").hidden = false;
+    $("pf-indice").addEventListener("click", function (e) {
+      var a = e.target.closest("a"); if (!a) return;
+      e.preventDefault(); ir(Number(a.dataset.p));
+    });
+  }
+  function ir(n) {
+    var p = paginas[n - 1]; if (!p) return;
+    p.el.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    history.replaceState(null, "", "#p-" + n);
+  }
+  function irAHash() {
+    var m = /^#p-(\d+)$/.exec(location.hash);
+    if (m && paginas[Number(m[1]) - 1]) paginas[Number(m[1]) - 1].el.scrollIntoView({ behavior: "auto" });
+  }
+  function marcar() {
+    if (!paginas.length || $("pf-indice").hidden) return;
+    var act = 0, corte = innerHeight * 0.4;
+    for (var i = 0; i < paginas.length; i++) { if (paginas[i].el.getBoundingClientRect().top < corte) act = i; else break; }
+    if (act === actual) return;
+    actual = act;
+    var links = $("pf-indice").querySelectorAll("a");
+    [].forEach.call(links, function (a, i) { a.classList.toggle("pf-on", i === act); });
+    var a = links[act], ol = a.closest("ol");
+    ol.style.setProperty("--y", Math.round(a.offsetTop + a.offsetHeight / 2 - 3.5) + "px");
+    // En documentos largos el índice se desplaza para dejar a la vista la página activa.
+    var ind = $("pf-indice"), top = a.offsetTop, bajo = top + a.offsetHeight;
+    if (top < ind.scrollTop + 8) ind.scrollTo({ top: Math.max(0, top - 24), behavior: "smooth" });
+    else if (bajo > ind.scrollTop + ind.clientHeight - 8) ind.scrollTo({ top: bajo - ind.clientHeight + 24, behavior: "smooth" });
+  }
+  // Progreso de lectura del documento (la línea de la barra).
+  function alScroll() {
+    var r = $("pf-doc").getBoundingClientRect();
+    var ini = window.scrollY + r.top - 120, fin = window.scrollY + r.bottom - innerHeight;
+    $("pf-progreso").style.setProperty("--p", Math.min(1, Math.max(0, (window.scrollY - ini) / Math.max(1, fin - ini))).toFixed(4));
+  }
+  window.addEventListener("scroll", function () { alScroll(); marcar(); }, { passive: true });
+
+  /* --- Carga ------------------------------------------------------------------------------- */
+  if (!url) {
+    sinCopia("Este documento no está copiado en la maqueta: el sitio actual no permite leer sus PDF desde otro dominio, así que se abre en su dirección original. La maqueta trae una muestra de " + DOCS.filter(function (x) { return x.l; }).length + " documentos de todas las categorías.");
+  } else {
+    // Mientras llega, un lugar con la proporción de una hoja A4 y el brillo.
+    $("pf-doc").innerHTML = '<div class="pf-v-pag pf-esqueleto"></div>';
+    import("../vendor/pdf.min.mjs").then(function (m) {
+      lib = m;
+      lib.GlobalWorkerOptions.workerSrc = new URL("../vendor/pdf.worker.min.mjs", location.href).href;
+      return lib.getDocument({ url: url }).promise;
+    }).then(armar).catch(function () {
+      sinCopia("No se pudo abrir el documento en la página. Se puede descargar o abrir desde su dirección original.");
+    }).then(function () { alScroll(); });
+  }
+})();
+</script>
