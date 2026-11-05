@@ -520,12 +520,10 @@ a.pf-card, a.pf-d-cta { text-decoration: none; }
   .pf-d-desliz { transform: none; }
 }
 
-/* Transición entre páginas: el componente "Transiciones de página" de la librería
-   (persiana con logo o fundido), usado entre Novedades y cada Nota. La elección vive
-   en el navegador de quien prueba y se cambia con el panel de abajo a la izquierda. */
-:root { --pf-tr-dur: 700ms; --pf-tr-curva: cubic-bezier(.67, 0, .24, .99); --pf-tr-color: var(--azul); }
-.pf-tr-velo { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; background: var(--pf-tr-color); color: var(--tiza); pointer-events: none; transform: translateY(100%); }
-:root[data-tr-color="amarillo"] .pf-tr-velo { color: var(--azul); }
+/* Transición entre páginas: el componente "Transiciones de página" de la librería,
+   variante Persiana con logo, azul, 700 ms por tramo, curva Fuerte. */
+:root { --pf-tr-dur: 700ms; --pf-tr-curva: cubic-bezier(.67, 0, .24, .99); }
+.pf-tr-velo { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; background: var(--azul); color: var(--tiza); pointer-events: none; transform: translateY(100%); }
 .pf-tr-velo svg { fill: currentColor; width: min(28vw, 180px); height: auto; opacity: 0; transform: translateY(14px); }
 .pf-tr-velo.pf-entra { transition: transform var(--pf-tr-dur) var(--pf-tr-curva); transform: none; }
 .pf-tr-velo.pf-entra svg { transition: opacity calc(var(--pf-tr-dur) * .6) var(--pf-tr-curva) calc(var(--pf-tr-dur) * .45), transform calc(var(--pf-tr-dur) * .8) var(--pf-tr-curva) calc(var(--pf-tr-dur) * .45); opacity: 1; transform: none; }
@@ -534,59 +532,15 @@ a.pf-card, a.pf-d-cta { text-decoration: none; }
 :root.pf-tr-tapa .pf-tr-velo svg { opacity: 1; transform: none; }
 .pf-tr-velo.pf-sale { transition: transform var(--pf-tr-dur) var(--pf-tr-curva); transform: translateY(-100%); }
 .pf-tr-velo.pf-sale svg { opacity: 1; transform: none; }
-
-/* Fundido: la página vieja se va hacia arriba y la nueva sube. */
-@keyframes pf-tr-sale { to { opacity: 0; transform: translateY(-24px); } }
-@keyframes pf-tr-entra { from { opacity: 0; transform: translateY(40px); } }
-::view-transition-old(root) { animation: pf-tr-sale calc(var(--pf-tr-dur) * .7) var(--pf-tr-curva) both; }
-::view-transition-new(root) { animation: pf-tr-entra var(--pf-tr-dur) var(--pf-tr-curva) calc(var(--pf-tr-dur) * .25) both; }
-/* Sin View Transitions entre páginas: el mismo gesto con clases. */
-:root.pf-tr-fuera body { animation: pf-tr-sale calc(var(--pf-tr-dur) * .7) var(--pf-tr-curva) both; }
-:root.pf-tr-llega body { animation: pf-tr-entra var(--pf-tr-dur) var(--pf-tr-curva) both; }
-
-/* Panel para elegir la transición. */
-.pf-tr-panel { position: fixed; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 80; font: 400 var(--texto-chico)/1.3 var(--f-body); color: var(--ink); }
-.pf-tr-abrir { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px 0 11px; border: 0; border-radius: 999px; background: var(--ink); color: var(--tiza); font: inherit; cursor: pointer; }
-.pf-tr-abrir svg { width: 16px; height: 16px; }
-.pf-tr-caja { position: absolute; left: 0; bottom: 44px; width: 296px; max-width: calc(100vw - 32px); padding: 16px; border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent); border-radius: 20px; background: var(--color-blanco, #fff); display: grid; gap: 14px; transform-origin: 0 100%; transition: opacity 180ms ease, scale 260ms var(--pf-tr-curva); }
-.pf-tr-caja[hidden] { display: grid; opacity: 0; scale: .96; pointer-events: none; visibility: hidden; }
-.pf-tr-fila { display: grid; gap: 6px; }
-.pf-tr-fila > span { color: var(--ink-3); font-size: var(--texto-mini); }
-.pf-tr-seg { display: flex; flex-wrap: wrap; gap: 4px; }
-.pf-tr-seg button { height: 30px; padding: 0 11px; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--azul) 8%, transparent); color: var(--ink); font: inherit; cursor: pointer; }
-.pf-tr-seg button[aria-pressed="true"] { background: var(--azul); color: var(--tiza); }
-.pf-tr-seg .pf-tr-punto { width: 30px; padding: 0; background: var(--c); }
-.pf-tr-seg .pf-tr-punto[aria-pressed="true"] { background: var(--c); outline: 2px solid var(--ink); outline-offset: 2px; }
-.pf-tr-fila input[type="range"] { width: 100%; accent-color: var(--azul); }
-.pf-tr-fila output { font-variant-numeric: tabular-nums; color: var(--ink); }
-.pf-tr-probar { height: 34px; border: 0; border-radius: 999px; background: var(--azul); color: var(--tiza); font: inherit; cursor: pointer; }
-.pf-tr-panel [data-solo][hidden] { display: none; }
-@media (max-width: 760px) { .pf-tr-panel { bottom: calc(76px + env(safe-area-inset-bottom, 0px)); } .pf-tr-abrir span { display: none; } .pf-tr-abrir { width: 36px; padding: 0; justify-content: center; } }
-@media (prefers-reduced-motion: reduce) { .pf-tr-velo { display: none; } ::view-transition-old(root), ::view-transition-new(root), :root.pf-tr-fuera body, :root.pf-tr-llega body { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .pf-tr-velo { display: none; } }
 </style>
 <script>
-/* Corre en el head, antes de pintar: lee la transición elegida, deja las variables
-   puestas y, si se llega desde otra página con la persiana, la deja tapando. */
+/* Corre en el head, antes de pintar: si se llega desde otra página con la persiana,
+   la deja tapando para que siga de largo. */
 (function () {
-  var d = document.documentElement, c = null, llega = null;
-  try { c = JSON.parse(localStorage.getItem("pf-transicion") || "null"); } catch (e) {}
-  c = Object.assign({ v: "persiana", color: "azul", dur: 700, curva: "fuerte" }, c || {});
-  var CURVAS = { base: "cubic-bezier(.22, 1, .36, 1)", fuerte: "cubic-bezier(.67, 0, .24, .99)" };
-  d.style.setProperty("--pf-tr-dur", c.dur + "ms");
-  d.style.setProperty("--pf-tr-curva", CURVAS[c.curva] || CURVAS.fuerte);
-  d.style.setProperty("--pf-tr-color", "var(--" + c.color + ")");
-  d.setAttribute("data-tr-color", c.color);
-  var vt = !!window.CSSViewTransitionRule;
-  if (c.v === "fundido" && vt) {
-    var s = document.createElement("style"); s.id = "pf-tr-vt"; s.textContent = "@view-transition { navigation: auto; }";
-    document.head.appendChild(s);
-  }
+  var llega = null;
   try { llega = sessionStorage.getItem("pf-tr-llega"); sessionStorage.removeItem("pf-tr-llega"); } catch (e) {}
-  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    if (llega === "persiana" && c.v === "persiana") d.classList.add("pf-tr-tapa");
-    if (llega === "fundido" && c.v === "fundido" && !vt) d.classList.add("pf-tr-llega");
-  }
-  window.PF_TR = { c: c, vt: vt, curvas: CURVAS };
+  if (llega && !matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("pf-tr-tapa");
 })();
 </script>
 </head>
@@ -1393,46 +1347,19 @@ a.pf-card, a.pf-d-cta { text-decoration: none; }
 })();
 </script>
 <script>
-/* Transición entre Novedades y las Notas, más el panel para elegirla. */
+/* Persiana entre Novedades y las Notas: tapa, cambia de página y en la nueva sigue de largo. */
 (function () {
-  var d = document.documentElement, T = window.PF_TR, c = T.c;
-  var quieto = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var velo = document.getElementById("pf-tr-velo");
-  var NOMBRES = { persiana: "Persiana", fundido: "Fundido", ninguna: "Ninguna" };
-  var ocupado = false;
-  function espera(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
-  function guardar() { try { localStorage.setItem("pf-transicion", JSON.stringify(c)); } catch (e) {} }
+  var d = document.documentElement, velo = document.getElementById("pf-tr-velo");
+  var quieto = matchMedia("(prefers-reduced-motion: reduce)").matches, ocupado = false;
+  function dur() { return parseFloat(getComputedStyle(d).getPropertyValue("--pf-tr-dur")) || 700; }
 
-  function aplicar() {
-    d.style.setProperty("--pf-tr-dur", c.dur + "ms");
-    d.style.setProperty("--pf-tr-curva", T.curvas[c.curva]);
-    d.style.setProperty("--pf-tr-color", "var(--" + c.color + ")");
-    d.setAttribute("data-tr-color", c.color);
-    // El fundido entre páginas lo hace el navegador: hay que avisarle en las dos.
-    var s = document.getElementById("pf-tr-vt");
-    if (c.v === "fundido" && T.vt && !s) {
-      s = document.createElement("style"); s.id = "pf-tr-vt"; s.textContent = "@view-transition { navigation: auto; }";
-      document.head.appendChild(s);
-    } else if (c.v !== "fundido" && s) s.remove();
+  if (d.classList.contains("pf-tr-tapa")) {
+    requestAnimationFrame(function () { requestAnimationFrame(function () {
+      velo.className = "pf-tr-velo pf-sale"; d.classList.remove("pf-tr-tapa");
+      setTimeout(function () { velo.className = "pf-tr-velo"; }, dur() + 40);
+    }); });
   }
 
-  /* Llegada: la persiana sigue de largo; el fundido sin View Transitions termina de subir. */
-  function llegar() {
-    if (d.classList.contains("pf-tr-tapa")) {
-      requestAnimationFrame(function () { requestAnimationFrame(function () {
-        velo.className = "pf-tr-velo pf-sale"; d.classList.remove("pf-tr-tapa");
-        setTimeout(function () { velo.className = "pf-tr-velo"; }, c.dur + 40);
-      }); });
-    }
-    if (d.classList.contains("pf-tr-llega")) setTimeout(function () { d.classList.remove("pf-tr-llega"); }, c.dur + 40);
-  }
-  llegar();
-
-  /* Salida: se tapa (o se funde) y recién ahí se cambia de página. */
-  async function tapar() {
-    if (c.v === "persiana") { velo.className = "pf-tr-velo pf-entra"; await espera(c.dur * 1.45); }
-    else { d.classList.add("pf-tr-fuera"); await espera(c.dur * .7); }
-  }
   document.addEventListener("click", function (e) {
     if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     var a = e.target.closest("a[href]");
@@ -1440,76 +1367,19 @@ a.pf-card, a.pf-d-cta { text-decoration: none; }
     var u = new URL(a.href, location.href);
     if (u.origin !== location.origin || !/\/novedades\//.test(u.pathname)) return;
     if (u.pathname === location.pathname && u.search === location.search) return;
-    if (c.v === "ninguna" || quieto || ocupado) return;
-    if (c.v === "fundido" && T.vt) return;
+    if (quieto || ocupado) return;
     e.preventDefault(); ocupado = true;
-    tapar().then(function () {
-      try { sessionStorage.setItem("pf-tr-llega", c.v); } catch (err) {}
+    velo.className = "pf-tr-velo pf-entra";
+    setTimeout(function () {
+      try { sessionStorage.setItem("pf-tr-llega", "1"); } catch (err) {}
       location.href = u.href;
-    });
+    }, dur() * 1.45);
   });
+
   // Al volver con el botón del navegador la página puede venir congelada tal cual quedó.
   addEventListener("pageshow", function (e) {
-    if (!e.persisted) return;
-    ocupado = false; velo.className = "pf-tr-velo"; d.classList.remove("pf-tr-fuera", "pf-tr-llega", "pf-tr-tapa");
+    if (e.persisted) { ocupado = false; velo.className = "pf-tr-velo"; d.classList.remove("pf-tr-tapa"); }
   });
-
-  /* Probar sin cambiar de página. */
-  async function probar() {
-    if (ocupado || c.v === "ninguna" || quieto) return; ocupado = true;
-    if (c.v === "persiana") {
-      velo.className = "pf-tr-velo pf-entra"; await espera(c.dur * 1.45);
-      velo.className = "pf-tr-velo pf-sale"; await espera(c.dur);
-      velo.className = "pf-tr-velo";
-    } else {
-      d.classList.add("pf-tr-fuera"); await espera(c.dur * .7);
-      d.classList.remove("pf-tr-fuera"); d.classList.add("pf-tr-llega"); await espera(c.dur);
-      d.classList.remove("pf-tr-llega");
-    }
-    ocupado = false;
-  }
-
-  /* Panel. */
-  var ICONO = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v6H4V5Zm0 8h16v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6Z" opacity=".45"/><path fill="currentColor" d="M4 11h16v2H4z"/></svg>';
-  function seg(id, ops) {
-    return '<div class="pf-tr-seg" data-k="' + id + '">' + ops.map(function (o) {
-      return '<button type="button" data-v="' + o[0] + '"' + (o[2] ? ' class="pf-tr-punto" style="--c: var(--' + o[0] + ')" aria-label="' + o[1] + '"' : '') + ">" + (o[2] ? "" : o[1]) + "</button>";
-    }).join("") + "</div>";
-  }
-  var p = document.createElement("div");
-  p.className = "pf-tr-panel";
-  p.innerHTML =
-    '<button type="button" class="pf-tr-abrir" aria-expanded="false" aria-controls="pf-tr-caja">' + ICONO + '<span id="pf-tr-nombre"></span></button>' +
-    '<div class="pf-tr-caja" id="pf-tr-caja" role="group" aria-label="Transición entre páginas" hidden>' +
-      '<div class="pf-tr-fila"><span>Transición</span>' + seg("v", [["persiana", "Persiana"], ["fundido", "Fundido"], ["ninguna", "Ninguna"]]) + "</div>" +
-      '<div class="pf-tr-fila" data-solo="persiana"><span>Color</span>' + seg("color", [["azul", "Azul", 1], ["verde", "Verde", 1], ["amarillo", "Amarillo", 1], ["terra", "Terra", 1]]) + "</div>" +
-      '<label class="pf-tr-fila" data-solo="persiana fundido"><span>Duración <output id="pf-tr-dur"></output></span><input type="range" min="300" max="1400" step="20" id="pf-tr-rango"></label>' +
-      '<div class="pf-tr-fila" data-solo="persiana fundido"><span>Curva</span>' + seg("curva", [["base", "Base"], ["fuerte", "Fuerte"]]) + "</div>" +
-      '<button type="button" class="pf-tr-probar" data-solo="persiana fundido">Probar</button>' +
-    "</div>";
-  document.body.appendChild(p);
-  var caja = p.querySelector(".pf-tr-caja"), abrir = p.querySelector(".pf-tr-abrir"), rango = p.querySelector("#pf-tr-rango");
-
-  function pintar() {
-    document.getElementById("pf-tr-nombre").textContent = NOMBRES[c.v];
-    p.querySelectorAll(".pf-tr-seg").forEach(function (g) {
-      g.querySelectorAll("button").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.v === c[g.dataset.k]); });
-    });
-    p.querySelectorAll("[data-solo]").forEach(function (el) { el.hidden = el.dataset.solo.split(" ").indexOf(c.v) < 0; });
-    rango.value = c.dur; document.getElementById("pf-tr-dur").textContent = c.dur + " ms";
-  }
-  pintar();
-
-  function mostrar(si) { caja.hidden = !si; abrir.setAttribute("aria-expanded", si); }
-  abrir.addEventListener("click", function () { mostrar(caja.hidden); });
-  p.addEventListener("click", function (e) {
-    var b = e.target.closest(".pf-tr-seg button"); if (!b) return;
-    c[b.parentNode.dataset.k] = b.dataset.v; aplicar(); guardar(); pintar();
-  });
-  rango.addEventListener("input", function () { c.dur = +rango.value; aplicar(); guardar(); pintar(); });
-  p.querySelector(".pf-tr-probar").addEventListener("click", probar);
-  document.addEventListener("click", function (e) { if (!caja.hidden && !p.contains(e.target)) mostrar(false); });
-  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !caja.hidden) { mostrar(false); abrir.focus(); } });
 })();
 </script>
 </body>
