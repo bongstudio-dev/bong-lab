@@ -55,14 +55,14 @@
 <style>
 /* ==========================================================================
    Nota Profertil: la plantilla de una nota de Novedades.
-   Cabecera de color con las Flores del sistema, la foto principal entera
-   (sin recorte) montada sobre el borde, el cuerpo a una columna de lectura y
-   al costado los datos, los temas y compartir. Cierra con la nota anterior y
+   Sobria: título sobre el fondo con la etiqueta del tipo, la foto principal
+   entera (sin recorte) con radio, el cuerpo a una columna de lectura y a la
+   izquierda los datos sueltos, los temas y compartir. Cierra con la nota anterior y
    la siguiente, las relacionadas y el pie.
    Los datos son una copia fija del sitio actual: ../notas/<nota>.json.
    ========================================================================== */
 /* Sin sombras: las cajas se separan del fondo por el color. */
-:root { color-scheme: light; --lectura: 700px; --costado: 280px; }
+:root { color-scheme: light; }
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html { background: var(--bg); -webkit-tap-highlight-color: transparent; }
@@ -74,58 +74,39 @@ button, a { touch-action: manipulation; }
 .pf-wrap { width: min(100% - 32px, 1320px); margin-inline: auto; }
 .pf-flecha { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-/* --- Barra: la pieza "barra" de base.css, transparente sobre la cabecera y azul al bajar.
+/* --- Barra: la pieza "barra" de base.css, azul desde arriba (la nota va sobre el fondo).
    Abajo, una línea tiza que se llena con la lectura. */
 .pf-barra__menu > a { text-decoration: none; }
 .pf-barra--solida { box-shadow: none; }
 .pf-barra__busca { text-decoration: none; }
-.pf-progreso { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: transparent; opacity: 0; transition: opacity 260ms ease; }
+.pf-progreso { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; }
 .pf-progreso i { display: block; height: 100%; background: var(--tiza); transform: scaleX(var(--p, 0)); transform-origin: left; }
-.pf-barra--solida .pf-progreso { opacity: 1; }
 
-/* --- Cabecera --------------------------------------------------------------
-   Fondo, Flor de atrás y Flor de adelante salen del tipo de nota (FONDOS, en el JS):
-   solo los fondos del Master (azul, verde, terra) y el texto en tiza. */
-.pf-n-cab { --fondo: var(--azul); --atras: var(--verde); --frente: var(--celeste); position: relative; overflow: hidden; background: var(--fondo); color: var(--tiza); padding: calc(132px + env(safe-area-inset-top, 0px)) 0 var(--cab-abajo, 112px); }
-/* Cabecera, foto y cuerpo arrancan en la misma columna. */
+/* Todo arranca en la misma columna. */
 .pf-n-col { width: min(100% - 32px, 1120px); margin-inline: auto; }
-.pf-n-cab.pf-con-foto { --cab-abajo: clamp(150px, 16vw, 240px); }
-.pf-n-flor { position: absolute; display: block; color: var(--c); pointer-events: none; }
-.pf-n-flor svg { display: block; width: 100%; height: auto; }
-.pf-n-flor--atras { --c: var(--atras); width: clamp(520px, 58vw, 980px); right: clamp(-420px, -18vw, -160px); top: clamp(-360px, -16vw, -120px); transform: rotate(18deg); }
-.pf-n-flor--frente { --c: var(--frente); width: clamp(300px, 30vw, 520px); right: clamp(40px, 12vw, 260px); bottom: clamp(-300px, -15vw, -120px); transform: rotate(-24deg); }
-@supports (animation-timeline: scroll()) {
-  .pf-n-flor { animation: pf-n-prof linear both; animation-timeline: scroll(root block); animation-range: 0px 900px; }
-  .pf-n-flor--atras { --v: 160px; } .pf-n-flor--frente { --v: -90px; }
-  @keyframes pf-n-prof { to { translate: 0 var(--v); } }
-}
-@media (prefers-reduced-motion: reduce) { .pf-n-flor { animation: none; } }
-.pf-n-cab .pf-n-col { position: relative; z-index: 1; }
-.pf-n-in { display: grid; gap: 22px; justify-items: start; max-width: 860px; }
-.pf-n-volver { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px 8px 10px; border-radius: 999px; background: var(--foto-fondo); border: 1px solid var(--foto-borde); color: var(--foto-texto); font: 400 var(--texto-chico)/1 var(--f-body); text-decoration: none; transition: background 200ms ease, color 200ms ease; text-box: trim-both cap alphabetic; }
-@media (hover: hover) and (pointer: fine) { .pf-n-volver:hover { background: var(--tiza); color: var(--azul); } }
-.pf-n-volver:active { background: var(--tiza); color: var(--azul); }
-.pf-n-kick { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.pf-n-kick .pf-etiqueta { --s: var(--etq-l); }
-.pf-n-ante { margin: 0; font: 500 var(--texto-destacado)/1.3 var(--f-display); letter-spacing: -0.01em; color: var(--foto-texto); max-width: 60ch; }
-.pf-n-cab h1 { margin: 0; font: 600 clamp(40px, 6vw, 84px)/0.96 var(--f-display); letter-spacing: -0.04em; text-wrap: balance; overflow-wrap: break-word; }
-.pf-n-cab h1.pf-largo { font-size: clamp(34px, 4.6vw, 60px); line-height: 1; }
-.pf-n-bajada { margin: 0; max-width: 58ch; font-size: clamp(17px, 1.5vw, 20px); line-height: 1.5; color: var(--foto-texto); }
-.pf-n-linea { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 4px 0 0; padding: 0; list-style: none; font-size: var(--texto-chico); color: var(--foto-texto); }
-.pf-n-linea li { display: inline-flex; align-items: center; gap: 7px; }
-.pf-n-linea svg { width: 15px; height: 15px; fill: currentColor; opacity: .85; }
 
-/* --- Foto principal: entera, sin recorte, con las esquinas de hoja del sistema.
-   Sube sobre la cabecera. Si la foto es chica, no se estira más de 1,5 veces. */
-.pf-n-foto { position: relative; z-index: 2; margin: calc(var(--cab-abajo) * -1 + 40px) 0 0; width: min(100%, var(--ancho-foto, 100%)); }
-.pf-n-foto__hoja { overflow: hidden; border-radius: 0 clamp(44px, 9%, 120px) 0 clamp(44px, 9%, 120px); background: var(--card); line-height: 0; }
+/* --- Cabecera: sobre el fondo, sin caja. La etiqueta completa (forma, rótulo y año) va solo acá. */
+.pf-n-cab { padding: calc(140px + env(safe-area-inset-top, 0px)) 0 0; }
+.pf-n-in { display: grid; gap: 20px; justify-items: start; max-width: 880px; }
+.pf-n-volver { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-3); font-size: var(--texto-chico); text-decoration: none; transition: color 200ms ease; }
+@media (hover: hover) and (pointer: fine) { .pf-n-volver:hover { color: var(--azul); } }
+.pf-n-in .pf-etiqueta { --s: var(--etq-m); margin-top: 20px; }
+.pf-n-in .pf-etiqueta__rotulo { outline: 1px solid var(--line); outline-offset: -1px; }
+.pf-n-ante { margin: 0 0 -8px; font: 500 var(--texto-destacado)/1.3 var(--f-display); letter-spacing: -0.01em; color: var(--ink-2); max-width: 60ch; }
+.pf-n-cab h1 { margin: 0; font: 600 clamp(38px, 5.2vw, 68px)/1 var(--f-display); letter-spacing: -0.035em; color: var(--azul); text-wrap: balance; overflow-wrap: break-word; }
+.pf-n-cab h1.pf-largo { font-size: clamp(32px, 4vw, 52px); line-height: 1.04; }
+.pf-n-bajada { margin: 0; max-width: 60ch; font-size: clamp(17px, 1.4vw, 20px); line-height: 1.5; color: var(--ink-2); }
+.pf-n-linea { margin: 4px 0 0; font-size: var(--texto-chico); color: var(--ink-3); }
+
+/* --- Foto principal: entera, sin recorte, con radio. Una foto chica no se estira más de 1,5 veces. */
+.pf-n-foto { margin: 48px 0 0; width: min(100%, var(--ancho-foto, 100%)); }
+.pf-n-foto__hoja { overflow: hidden; border-radius: var(--radio-tarjeta); background: var(--card); line-height: 0; }
 .pf-n-foto img { display: block; width: 100%; height: auto; opacity: 0; transition: opacity 600ms ease; }
 .pf-n-foto img.pf-lista { opacity: 1; }
-.pf-n-foto figcaption { margin-top: 12px; font-size: var(--texto-chico); color: var(--ink-3); }
 
-/* --- Cuerpo ---------------------------------------------------------------- */
-.pf-n-cuerpo { display: grid; grid-template-columns: minmax(0, var(--lectura)) var(--costado); justify-content: space-between; gap: 48px; margin-top: 64px; align-items: start; }
-.pf-n-texto { min-width: 0; font-size: var(--texto-destacado); line-height: 1.68; color: var(--ink); overflow-wrap: break-word; }
+/* --- Cuerpo: los datos a la izquierda, sueltos y fijos al bajar; el texto a una columna. */
+.pf-n-cuerpo { display: grid; grid-template-columns: 220px minmax(0, 700px); justify-content: space-between; gap: 64px; margin-top: 64px; align-items: start; }
+.pf-n-texto { grid-column: 2; grid-row: 1; min-width: 0; font-size: var(--texto-destacado); line-height: 1.68; color: var(--ink); overflow-wrap: break-word; }
 .pf-n-texto > :first-child { margin-top: 0; }
 .pf-n-texto p { margin: 0 0 1.1em; }
 .pf-n-texto h2, .pf-n-texto h3, .pf-n-texto h4 { margin: 1.9em 0 .6em; font-family: var(--f-display); font-weight: 600; color: var(--azul); letter-spacing: -0.02em; line-height: 1.15; text-wrap: balance; }
@@ -139,102 +120,85 @@ button, a { touch-action: manipulation; }
 .pf-n-texto ul, .pf-n-texto ol { margin: 0 0 1.2em; padding-left: 1.3em; }
 .pf-n-texto li { margin: .35em 0; padding-left: .2em; }
 .pf-n-texto li::marker { color: var(--verde); font-weight: 600; }
-.pf-n-texto blockquote { margin: 1.6em 0; padding: 4px 0 4px 24px; border-left: 4px solid var(--verde); border-radius: 2px; font: 500 calc(var(--texto-subtitulo) * 1.05)/1.35 var(--f-display); letter-spacing: -0.015em; color: var(--azul); }
+.pf-n-texto blockquote { margin: 1.6em 0; padding: 4px 0 4px 24px; border-left: 3px solid var(--verde); font: 500 calc(var(--texto-subtitulo) * 1.05)/1.35 var(--f-display); letter-spacing: -0.015em; color: var(--azul); }
 .pf-n-texto figure { margin: 2em 0; }
 .pf-n-texto figure img { display: block; width: auto; max-width: 100%; height: auto; border-radius: var(--radio-media); background: var(--card); }
 .pf-n-texto figcaption { margin-top: 10px; font-size: var(--texto-chico); line-height: 1.45; color: var(--ink-3); }
 .pf-n-texto .video iframe { display: block; width: 100%; aspect-ratio: 16 / 9; height: auto; border: 0; border-radius: var(--radio-media); background: var(--ink); }
-.pf-n-tabla { margin: 1.6em 0; overflow-x: auto; border-radius: var(--radio-aviso); background: var(--card); }
+.pf-n-tabla { margin: 1.6em 0; overflow-x: auto; }
 .pf-n-tabla table { width: 100%; border-collapse: collapse; font-size: var(--texto-chico); line-height: 1.45; }
-.pf-n-tabla :is(td, th) { padding: 12px 16px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
-.pf-n-tabla tr:last-child :is(td, th) { border-bottom: 0; }
+.pf-n-tabla :is(td, th) { padding: 12px 16px 12px 0; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
 .pf-n-tabla th { font-weight: 600; color: var(--azul); }
-.pf-n-vacio { padding: 22px 24px; border-radius: var(--radio-aviso); background: var(--card); color: var(--ink-2); font-size: var(--texto-cuerpo); }
+.pf-n-vacio { color: var(--ink-3); }
 
-/* --- Costado: datos, temas, compartir. Queda fijo mientras se lee. */
-.pf-n-costado { position: sticky; top: 104px; display: grid; gap: 14px; }
-.pf-n-caja { padding: 20px 22px 22px; border-radius: var(--radio-tarjeta); background: var(--card); }
-.pf-n-caja h2 { margin: 0 0 14px; font: 500 var(--texto-mini)/1 var(--f-body); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
-.pf-n-datos { margin: 0; display: grid; gap: 12px; }
-.pf-n-datos div { display: grid; gap: 2px; }
-.pf-n-datos dt { font-size: var(--texto-mini); color: var(--ink-3); }
-.pf-n-datos dd { margin: 0; font-size: var(--texto-chico); color: var(--ink); }
-.pf-n-datos .pf-etiqueta { --s: var(--etq-s); margin-top: 4px; }
-.pf-n-datos .pf-etiqueta__rotulo { outline: 1px solid var(--line); outline-offset: -1px; }
-.pf-n-temas { display: flex; flex-wrap: wrap; gap: 6px; }
-.pf-n-temas .pf-chip { --h: 30px; text-decoration: none; font-weight: 400; }
-.pf-n-compartir { display: flex; gap: 8px; flex-wrap: wrap; }
-.pf-n-compartir .pf-boton-icono { text-decoration: none; }
+/* Costado: cada dato con su rótulo chico, separados por una línea. */
+.pf-n-costado { grid-column: 1; grid-row: 1; position: sticky; top: 112px; display: grid; }
+.pf-n-dato { padding: 16px 0; border-top: 1px solid var(--line); display: grid; gap: 8px; font-size: var(--texto-chico); color: var(--ink); }
+.pf-n-dato:first-child { padding-top: 0; border-top: 0; }
+.pf-n-dato > span { font-size: var(--texto-mini); color: var(--ink-3); }
+.pf-n-temas { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.pf-n-temas a, .pf-n-original { color: var(--ink-2); text-decoration: none; transition: color 200ms ease; }
+@media (hover: hover) and (pointer: fine) { .pf-n-temas a:hover, .pf-n-original:hover { color: var(--azul); } }
+.pf-n-compartir { display: flex; gap: 6px; }
+.pf-n-compartir > * { display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--ink-2); cursor: pointer; text-decoration: none; transition: color 200ms ease, border-color 200ms ease; }
+@media (hover: hover) and (pointer: fine) { .pf-n-compartir > *:hover { color: var(--azul); border-color: var(--azul); } }
+.pf-n-compartir svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .pf-n-compartir svg.pf-relleno { fill: currentColor; stroke: none; }
-.pf-n-original { width: 100%; }
+.pf-n-original { display: inline-flex; align-items: center; gap: 4px; }
+.pf-n-original svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .pf-aviso { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 60; transform: translate(-50%, 16px); padding: 12px 18px; border-radius: 999px; background: var(--ink); color: var(--tiza); font-size: var(--texto-chico); opacity: 0; pointer-events: none; transition: opacity 220ms ease, transform 320ms var(--ease); }
 .pf-aviso.pf-on { opacity: 1; transform: translate(-50%, 0); }
 
-/* --- Seguí leyendo: anterior y siguiente, y relacionadas ------------------- */
-.pf-n-sigue { margin-top: 96px; display: grid; gap: 56px; }
-.pf-n-pasos { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.pf-n-paso { display: grid; gap: 14px; align-content: start; padding: 22px 24px 24px; border-radius: var(--radio-tarjeta); background: var(--card); text-decoration: none; transition: transform 320ms var(--ease); }
+/* --- Seguí leyendo: anterior y siguiente, y relacionadas. Sin cajas. */
+.pf-n-sigue { margin-top: 104px; display: grid; gap: 72px; }
+.pf-n-pasos { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; padding-top: 24px; border-top: 1px solid var(--line); }
+.pf-n-paso { display: grid; gap: 8px; align-content: start; text-decoration: none; }
 .pf-n-paso--sig { text-align: right; justify-items: end; }
-.pf-n-paso__dir { display: inline-flex; align-items: center; gap: 8px; font-size: var(--texto-chico); color: var(--ink-3); }
-.pf-n-paso .pf-etiqueta { --s: var(--etq-s); }
-.pf-n-paso .pf-etiqueta__rotulo { outline: 1px solid var(--line); outline-offset: -1px; }
-.pf-n-paso b { font: 600 var(--texto-subtitulo)/1.15 var(--f-display); letter-spacing: -0.02em; color: var(--azul); text-wrap: balance; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-@media (hover: hover) and (pointer: fine) { .pf-n-paso:hover { transform: translateY(-3px); } }
-.pf-n-paso:active { transform: scale(.985); }
-.pf-n-rel__cab { display: flex; align-items: end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
-.pf-n-rel__cab h2 { margin: 0; font: 600 var(--texto-titulo)/1 var(--f-display); letter-spacing: -0.035em; color: var(--azul); }
-.pf-n-rel__grilla { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.pf-n-paso__dir { display: inline-flex; align-items: center; gap: 6px; font-size: var(--texto-chico); color: var(--ink-3); }
+.pf-n-paso b { max-width: 34ch; font: 500 var(--texto-destacado)/1.3 var(--f-display); letter-spacing: -0.01em; color: var(--azul); text-wrap: balance; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+@media (hover: hover) and (pointer: fine) { .pf-n-paso:hover b { text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 3px; } }
+.pf-n-rel__cab { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.pf-n-rel__cab h2 { margin: 0; font: 600 var(--texto-subtitulo)/1.1 var(--f-display); letter-spacing: -0.02em; color: var(--azul); }
+.pf-n-rel__cab a { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); font-size: var(--texto-chico); text-decoration: none; }
+@media (hover: hover) and (pointer: fine) { .pf-n-rel__cab a:hover { color: var(--azul); } }
+.pf-n-rel__fila { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
 
-/* Tarjeta de nota: la misma de Novedades (Web/Tarjeta nota). */
-.pf-card { position: relative; display: grid; text-align: left; text-decoration: none; background: var(--card); border-radius: var(--radio-tarjeta); transition: transform 320ms var(--ease); container-type: inline-size; }
-@media (hover: hover) and (pointer: fine) { .pf-card:hover { transform: translateY(-3px); } }
-.pf-card:active { transform: scale(.985); }
-.pf-media { position: relative; margin: 8px 8px 0; border-radius: var(--radio-media); overflow: hidden; line-height: 0; }
-.pf-media > svg { display: block; width: 100%; height: auto; }
-.pf-media .pf-etiqueta { position: absolute; top: 10px; left: 10px; max-width: calc(100% - 20px); }
-.pf-lead { padding: 18px 18px 2px; display: grid; gap: 14px; justify-items: start; }
-.pf-lead h3 { margin: 0; font: 600 1.36rem/1.06 var(--f-display); letter-spacing: -0.025em; color: var(--azul); text-wrap: balance; }
-.pf-lead .pf-etiqueta .pf-etiqueta__rotulo { outline: 1px solid var(--line); outline-offset: -1px; }
-.pf-meta { padding: 12px 18px 18px; display: grid; gap: 8px; min-width: 0; }
-.pf-when { margin: 0; font-size: 0.84rem; color: var(--ink-3); }
-.pf-when b { font-weight: 500; color: var(--ink-2); }
-.pf-ttl { margin: 0; font: 500 1.1rem/1.2 var(--f-display); letter-spacing: -0.015em; color: var(--azul); display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
-.pf-card .pf-etiqueta .pf-etiqueta__rotulo { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+/* Tarjeta chica: miniatura 3:2 (foto de la nota o el arte de Novedades), etiqueta y título. */
+.pf-n-mini { display: grid; gap: 14px; align-content: start; text-decoration: none; }
+.pf-n-mini__img { aspect-ratio: 3 / 2; border-radius: var(--radio-media); overflow: hidden; background: var(--card); line-height: 0; transition: transform 320ms var(--ease); }
+.pf-n-mini__img > :is(img, svg) { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pf-n-mini .pf-etiqueta { --s: var(--etq-s); }
+.pf-n-mini .pf-etiqueta__rotulo { outline: 1px solid var(--line); outline-offset: -1px; }
+.pf-n-mini b { font: 500 1.06rem/1.25 var(--f-display); letter-spacing: -0.01em; color: var(--azul); text-wrap: balance; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+@media (hover: hover) and (pointer: fine) { .pf-n-mini:hover .pf-n-mini__img { transform: translateY(-3px); } }
+.pf-n-mini:active .pf-n-mini__img { transform: scale(.985); }
 
 .pf-pie { margin-top: 120px; }
 
 /* --- Mobile ---------------------------------------------------------------- */
 @media (max-width: 900px) {
-  .pf-n-cuerpo { grid-template-columns: minmax(0, 1fr); gap: 40px; margin-top: 44px; }
-  .pf-n-costado { position: static; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
-  .pf-n-rel__grilla { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .pf-n-rel__grilla > :nth-child(3) { display: none; }
+  .pf-n-cuerpo { grid-template-columns: minmax(0, 1fr); gap: 48px; margin-top: 44px; }
+  .pf-n-texto { grid-column: 1; }
+  .pf-n-costado { grid-column: 1; grid-row: 2; position: static; padding-top: 24px; border-top: 1px solid var(--line); }
+  .pf-n-dato:first-child { padding-top: 0; }
 }
 @media (max-width: 640px) {
-  .pf-n-cab { padding-top: calc(108px + env(safe-area-inset-top, 0px)); }
-  .pf-n-cab.pf-con-foto { --cab-abajo: 120px; }
+  .pf-n-cab { padding-top: calc(112px + env(safe-area-inset-top, 0px)); }
   .pf-n-in { gap: 16px; }
-  .pf-n-kick .pf-etiqueta { --s: var(--etq-m); }
-  .pf-n-cab h1 { font-size: 2.4rem; line-height: 1; }
-  .pf-n-cab h1.pf-largo { font-size: 1.9rem; }
-  .pf-n-flor--atras { width: 520px; right: -300px; top: -240px; }
-  .pf-n-flor--frente { width: 260px; right: -60px; bottom: -150px; }
-  .pf-n-foto { margin-top: calc(var(--cab-abajo) * -1 + 40px); }
-  .pf-n-foto__hoja { border-radius: 0 40px 0 40px; }
+  .pf-n-in .pf-etiqueta { margin-top: 12px; }
+  .pf-n-cab h1 { font-size: 2.3rem; line-height: 1.02; }
+  .pf-n-cab h1.pf-largo { font-size: 1.85rem; }
+  .pf-n-foto { margin-top: 32px; }
+  .pf-n-foto__hoja { border-radius: var(--radio-media); }
   .pf-n-texto { font-size: 17px; line-height: 1.62; }
-  .pf-n-sigue { margin-top: 64px; gap: 44px; }
-  .pf-n-pasos { grid-template-columns: 1fr; }
+  .pf-n-sigue { margin-top: 72px; gap: 56px; }
+  .pf-n-pasos { grid-template-columns: 1fr; gap: 20px; }
   .pf-n-paso--sig { text-align: left; justify-items: start; }
-  .pf-n-paso b { font-size: 1.15rem; }
-  .pf-n-rel__grilla { gap: 10px; }
-  .pf-card { border-radius: 20px; }
-  .pf-media { margin: 6px 6px 0; border-radius: 15px; }
-  .pf-media .pf-etiqueta { top: 7px; left: 7px; --s: var(--etq-s); }
-  .pf-lead { padding: 13px 12px 2px; gap: 10px; }
-  .pf-lead h3 { font-size: 1.08rem; }
-  .pf-lead .pf-etiqueta { --s: var(--etq-s); }
-  .pf-meta { padding: 9px 12px 13px; gap: 6px; }
-  .pf-ttl { font-size: .98rem; }
+  /* Relacionadas en lista: miniatura a la izquierda. */
+  .pf-n-rel__fila { grid-template-columns: 1fr; gap: 16px; }
+  .pf-n-mini { grid-template-columns: 112px minmax(0, 1fr); gap: 6px 14px; align-items: start; }
+  .pf-n-mini__img { grid-row: span 2; border-radius: 12px; }
+  .pf-n-mini b { font-size: 1rem; }
   .pf-pie { margin-top: 80px; }
 }
 .pf-pie { --radio: var(--radio-tarjeta); --logo: 150px; --par: 22; --p: 1;
@@ -353,7 +317,7 @@ button, a { touch-action: manipulation; }
   <symbol id="pf-badge-bg" viewBox="0 0 100 100"><path d="M32 0H68C76.4869 0 84.6263 3.37142 90.6274 9.37258C96.6286 15.3737 100 23.5131 100 32V68C100 76.4869 96.6286 84.6263 90.6274 90.6274C84.6263 96.6286 76.4869 100 68 100H32C23.5131 100 15.3737 96.6286 9.37258 90.6274C3.37142 84.6263 0 76.4869 0 68V32C0 23.5131 3.37142 15.3737 9.37258 9.37258C15.3737 3.37142 23.5131 0 32 0Z"/></symbol>
 </defs></svg>
 
-<header class="pf-barra" id="pf-top">
+<header class="pf-barra pf-barra--solida" id="pf-top">
   <div class="pf-barra__in">
     <nav class="pf-barra__nav" id="pf-nav" aria-label="Sitio">
       <a class="pf-barra__logo" href="../" aria-label="Profertil, ir a Novedades">
@@ -372,21 +336,17 @@ button, a { touch-action: manipulation; }
 </header>
 
 <main id="pf-nota" aria-busy="true">
-  <section class="pf-n-cab" id="pf-cab">
-    <span class="pf-n-flor pf-n-flor--atras" aria-hidden="true"><svg viewBox="0 0 10 10"><use href="#pf-forma-flor" fill="currentColor"/></svg></span>
-    <span class="pf-n-flor pf-n-flor--frente" aria-hidden="true"><svg viewBox="0 0 10 10"><use href="#pf-forma-flor" fill="currentColor"/></svg></span>
-    <div class="pf-n-col"><div class="pf-n-in" id="pf-cabIn"></div></div>
-  </section>
+  <header class="pf-n-cab pf-n-col" id="pf-cab"><div class="pf-n-in" id="pf-cabIn"></div></header>
   <div class="pf-n-col"><figure class="pf-n-foto" id="pf-foto" hidden><div class="pf-n-foto__hoja" id="pf-fotoHoja"></div></figure></div>
   <div class="pf-n-cuerpo pf-n-col">
     <article class="pf-n-texto" id="pf-texto"></article>
-    <aside class="pf-n-costado" id="pf-costado" aria-label="Sobre esta nota"></aside>
+    <aside class="pf-n-costado" id="pf-costado" aria-label="Datos de la nota"></aside>
   </div>
   <section class="pf-n-sigue pf-n-col" aria-label="Seguí leyendo">
     <nav class="pf-n-pasos" id="pf-pasos" aria-label="Nota anterior y siguiente"></nav>
     <div class="pf-n-rel">
-      <div class="pf-n-rel__cab"><h2>Notas relacionadas</h2><a class="pf-boton" href="../">Ver todas las novedades <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12h10M13 8l4 4-4 4"/></svg></a></div>
-      <div class="pf-n-rel__grilla" id="pf-rel"></div>
+      <div class="pf-n-rel__cab"><h2>Notas relacionadas</h2><a href="../">Ver todas <svg class="pf-flecha" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12h10M13 8l4 4-4 4"/></svg></a></div>
+      <div class="pf-n-rel__fila" id="pf-rel"></div>
     </div>
   </section>
 </main>
@@ -586,19 +546,6 @@ button, a { touch-action: manipulation; }
   var FLECHA_DER = '<svg class="pf-flecha" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12h10M13 8l4 4-4 4"/></svg>';
   var FLECHA_AFUERA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 16l8-8M10 8h6v6"/></svg>';
 
-  // Las Flores toman el viewBox oficial de la forma.
-  [].forEach.call(document.querySelectorAll(".pf-n-flor svg"), function (s) { s.setAttribute("viewBox", A.formas.flor.vb); });
-
-  // Cabecera por tipo de nota: fondo, Flor de atrás y Flor de adelante. Solo fondos del Master.
-  var FONDOS = {
-    institucional: ["var(--azul)", "var(--verde)", "var(--celeste)"],
-    financiera: ["var(--azul)", "var(--celeste)", "var(--verde-claro)"],
-    comercial: ["var(--terra)", "var(--naranja)", "var(--amarillo)"],
-    aviso: ["var(--terra)", "var(--amarillo)", "var(--naranja)"],
-    somos: ["var(--verde)", "var(--amarillo)", "var(--verde-claro)"],
-    tecnico: ["var(--verde)", "var(--verde-claro)", "var(--celeste)"]
-  };
-
   // Qué nota: ?n=<archivo>. Sin parámetro, la más reciente.
   var pedida = new URLSearchParams(location.search).get("n");
   var n = NOTAS.filter(function (x) { return x.ar === pedida; })[0] || NOTAS[NOTAS.length - 1];
@@ -608,15 +555,12 @@ button, a { touch-action: manipulation; }
   var ICO_CAL = A.iconos && A.iconos.calendario ? '<svg viewBox="' + A.iconos.calendario.vb + '" aria-hidden="true">' + A.iconos.calendario.d + "</svg>" : "";
 
   function cabecera(d) {
-    var c = FONDOS[n.tp] || FONDOS.institucional;
-    var cab = $("pf-cab");
-    cab.style.setProperty("--fondo", c[0]); cab.style.setProperty("--atras", c[1]); cab.style.setProperty("--frente", c[2]);
     var h = '<a class="pf-n-volver" href="../">' + FLECHA_IZQ + "Novedades</a>";
-    h += '<div class="pf-n-kick">' + etq(n.tp, { dato: fechaDato(n.f) }) + "</div>";
+    h += etq(n.tp, { dato: n.anio });
     if (d.ante) h += '<p class="pf-n-ante">' + esc(d.ante) + "</p>";
     h += "<h1" + (n.t.length > 80 ? ' class="pf-largo"' : "") + ">" + esc(n.t) + "</h1>";
     if (d.b) h += '<p class="pf-n-bajada">' + esc(d.b) + "</p>";
-    h += '<ul class="pf-n-linea">' + (d.lg ? "<li>" + esc(d.lg) + "</li>" : "") + "<li>" + lectura(n.w) + "</li>" + (n.v ? "<li>Con video</li>" : "") + "</ul>";
+    h += '<p class="pf-n-linea">' + [fecha(n.f, true), d.lg ? esc(d.lg) : "", lectura(n.w), n.v ? "Con video" : ""].filter(Boolean).join(" · ") + "</p>";
     $("pf-cabIn").innerHTML = h;
     document.title = n.t + " · Novedades Profertil";
   }
@@ -627,14 +571,13 @@ button, a { touch-action: manipulation; }
     var fig = $("pf-foto"), img = new Image();
     img.alt = ""; img.decoding = "async"; img.fetchPriority = "high";
     $("pf-fotoHoja").appendChild(img);
-    $("pf-cab").classList.add("pf-con-foto");
     fig.hidden = false;
     img.addEventListener("load", function () {
       // Una foto chica no se estira más de 1,5 veces su tamaño.
       fig.style.setProperty("--ancho-foto", Math.round(img.naturalWidth * 1.5) + "px");
       img.classList.add("pf-lista");
     });
-    img.addEventListener("error", function () { fig.hidden = true; $("pf-cab").classList.remove("pf-con-foto"); });
+    img.addEventListener("error", function () { fig.hidden = true; });
     img.src = src;
   }
 
@@ -652,25 +595,21 @@ button, a { touch-action: manipulation; }
   }
 
   function costado(d) {
-    var h = '<div class="pf-n-caja"><h2>Sobre esta nota</h2><dl class="pf-n-datos">' +
-      "<div><dt>Publicada</dt><dd>" + fecha(n.f, true) + "</dd></div>" +
-      (d.lg ? "<div><dt>Lugar</dt><dd>" + esc(d.lg) + "</dd></div>" : "") +
-      "<div><dt>Categoría</dt><dd>" + etq(n.tp) + "</dd></div>" +
-      (n.c.length ? "<div><dt>Cultivo</dt><dd>" + n.c.map(function (c) { return POR[c].nombre; }).join(", ") + "</dd></div>" : "") +
-      "<div><dt>Lectura</dt><dd>" + lectura(n.w) + "</dd></div></dl></div>";
+    var h = '<div class="pf-n-dato"><span>Categoría</span>' + POR[n.tp].nombre + "</div>";
+    if (n.c.length) h += '<div class="pf-n-dato"><span>Cultivo</span>' + n.c.map(function (c) { return POR[c].nombre; }).join(", ") + "</div>";
     if (d.et && d.et.length) {
-      h += '<div class="pf-n-caja"><h2>Temas</h2><div class="pf-n-temas">' + d.et.map(function (e) {
-        return '<a class="pf-chip" href="../#q=' + encodeURIComponent(e) + '">' + esc(e) + "</a>";
+      h += '<div class="pf-n-dato"><span>Temas</span><div class="pf-n-temas">' + d.et.map(function (e) {
+        return '<a href="../#q=' + encodeURIComponent(e) + '">' + esc(e) + "</a>";
       }).join("") + "</div></div>";
     }
     var aqui = encodeURIComponent(location.href), ttl = encodeURIComponent(n.t);
-    h += '<div class="pf-n-caja"><h2>Compartir</h2><div class="pf-n-compartir">' +
-      '<button class="pf-boton-icono" type="button" id="pf-copiar" aria-label="Copiar el link"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></button>' +
-      '<a class="pf-boton-icono" href="https://api.whatsapp.com/send?text=' + ttl + "%20" + aqui + '" target="_blank" rel="noopener" aria-label="Compartir por WhatsApp"><svg class="pf-relleno" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a9.5 9.5 0 0 0-8.2 14.3L2.5 21.5l4.8-1.3A9.5 9.5 0 1 0 12 2.5Zm0 17.2c-1.5 0-2.9-.4-4.1-1.1l-.3-.2-2.9.8.8-2.8-.2-.3A7.7 7.7 0 1 1 12 19.7Zm4.3-5.8c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.5.1l-.7.9c-.1.2-.3.2-.5.1a6.3 6.3 0 0 1-3.1-2.7c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.7-1.7c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.7.3 2.8 2.8 0 0 0-.9 2.1 4.9 4.9 0 0 0 1 2.6 11.2 11.2 0 0 0 4.3 3.8c1.6.7 2.2.7 3 .6.5-.1 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1l-.5-.3Z"/></svg></a>' +
-      '<a class="pf-boton-icono" href="https://www.linkedin.com/sharing/share-offsite/?url=' + aqui + '" target="_blank" rel="noopener" aria-label="Compartir en LinkedIn"><svg class="pf-relleno" viewBox="0 0 24 24" aria-hidden="true"><path d="M5.3 8.6h3v10.1h-3V8.6Zm1.5-4.9a1.8 1.8 0 1 1 0 3.5 1.8 1.8 0 0 1 0-3.5Zm3.4 4.9h2.9v1.4c.4-.8 1.4-1.6 2.9-1.6 3.1 0 3.7 2 3.7 4.7v5.6h-3v-5c0-1.2 0-2.7-1.6-2.7s-1.9 1.3-1.9 2.6v5.1h-3V8.6Z"/></svg></a>' +
-      '<a class="pf-boton-icono" href="mailto:?subject=' + ttl + "&body=" + aqui + '" aria-label="Compartir por mail"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="3"/><path d="m4.5 7.5 7.5 5.5 7.5-5.5"/></svg></a>' +
+    h += '<div class="pf-n-dato"><span>Compartir</span><div class="pf-n-compartir">' +
+      '<button type="button" id="pf-copiar" aria-label="Copiar el link"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></button>' +
+      '<a href="https://api.whatsapp.com/send?text=' + ttl + "%20" + aqui + '" target="_blank" rel="noopener" aria-label="Compartir por WhatsApp"><svg class="pf-relleno" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a9.5 9.5 0 0 0-8.2 14.3L2.5 21.5l4.8-1.3A9.5 9.5 0 1 0 12 2.5Zm0 17.2c-1.5 0-2.9-.4-4.1-1.1l-.3-.2-2.9.8.8-2.8-.2-.3A7.7 7.7 0 1 1 12 19.7Zm4.3-5.8c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.5.1l-.7.9c-.1.2-.3.2-.5.1a6.3 6.3 0 0 1-3.1-2.7c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.7-1.7c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.7.3 2.8 2.8 0 0 0-.9 2.1 4.9 4.9 0 0 0 1 2.6 11.2 11.2 0 0 0 4.3 3.8c1.6.7 2.2.7 3 .6.5-.1 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1l-.5-.3Z"/></svg></a>' +
+      '<a href="https://www.linkedin.com/sharing/share-offsite/?url=' + aqui + '" target="_blank" rel="noopener" aria-label="Compartir en LinkedIn"><svg class="pf-relleno" viewBox="0 0 24 24" aria-hidden="true"><path d="M5.3 8.6h3v10.1h-3V8.6Zm1.5-4.9a1.8 1.8 0 1 1 0 3.5 1.8 1.8 0 0 1 0-3.5Zm3.4 4.9h2.9v1.4c.4-.8 1.4-1.6 2.9-1.6 3.1 0 3.7 2 3.7 4.7v5.6h-3v-5c0-1.2 0-2.7-1.6-2.7s-1.9 1.3-1.9 2.6v5.1h-3V8.6Z"/></svg></a>' +
+      '<a href="mailto:?subject=' + ttl + "&body=" + aqui + '" aria-label="Compartir por mail"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="3"/><path d="m4.5 7.5 7.5 5.5 7.5-5.5"/></svg></a>' +
       "</div></div>";
-    h += '<a class="pf-boton pf-boton--verde pf-n-original" href="https://www.profertil.com.ar/index.php/' + esc(n.u) + '" target="_blank" rel="noopener">Ver la nota original ' + FLECHA_AFUERA + "</a>";
+    h += '<div class="pf-n-dato"><a class="pf-n-original" href="https://www.profertil.com.ar/index.php/' + esc(n.u) + '" target="_blank" rel="noopener">Ver la nota original ' + FLECHA_AFUERA + "</a></div>";
     $("pf-costado").innerHTML = h;
     $("pf-copiar").addEventListener("click", function () {
       var ok = function () { avisar("Link copiado"); };
@@ -685,21 +624,14 @@ button, a { touch-action: manipulation; }
     if (!x) return "<span></span>";
     return '<a class="pf-n-paso' + (sig ? " pf-n-paso--sig" : "") + '" href="' + url(x) + '">' +
       '<span class="pf-n-paso__dir">' + (sig ? "Nota siguiente " + FLECHA_DER : FLECHA_IZQ + " Nota anterior") + "</span>" +
-      etq(x.tp, { dato: fecha(x.f) }) + "<b>" + esc(x.t) + "</b></a>";
+      "<b>" + esc(x.t) + "</b></a>";
   }
 
-  // Tarjeta: la misma de Novedades, con o sin arte según la nota.
-  function conArte(x) { return x.v || ((x.id * 2654435761) >>> 0) % 100 < 46; }
-  function tarjeta(x) {
-    var when = '<p class="pf-when"><b>' + fecha(x.f) + "</b></p>", h;
-    if (conArte(x)) {
-      var pr = PROP[x.id % PROP.length];
-      h = '<div class="pf-media">' + arte(x, pr[0] * 60, pr[1] * 60, x.id * 7919 + 13) + etq(x.tp, { dato: x.anio }) + "</div>" +
-        '<div class="pf-meta">' + when + '<p class="pf-ttl">' + esc(x.t) + "</p></div>";
-    } else {
-      h = '<div class="pf-lead">' + etq(x.tp, { dato: x.anio }) + "<h3>" + esc(x.t) + '</h3></div><div class="pf-meta">' + when + "</div>";
-    }
-    return '<a class="pf-card" href="' + url(x) + '">' + h + "</a>";
+  // Tarjeta chica: la foto de la nota o, si no tiene, el arte de Novedades; etiqueta con el año y título.
+  function mini(x) {
+    var img = x.imgL ? "../" + x.imgL : x.img;
+    var m = img ? '<img src="' + esc(img) + '" alt="" loading="lazy" decoding="async">' : arte(x, 180, 120, x.id * 7919 + 13);
+    return '<a class="pf-n-mini" href="' + url(x) + '"><div class="pf-n-mini__img">' + m + "</div>" + etq(x.tp, { dato: x.anio }) + "<b>" + esc(x.t) + "</b></a>";
   }
 
   // Relacionadas: comparten temas de WordPress, cultivo, pilar o tipo; a igual puntaje, la más cercana en el tiempo.
@@ -718,12 +650,11 @@ button, a { touch-action: manipulation; }
 
   function seguir() {
     $("pf-pasos").innerHTML = paso(NOTAS[n.id - 1], false) + paso(NOTAS[n.id + 1], true);
-    $("pf-rel").innerHTML = relacionadas().map(tarjeta).join("");
+    $("pf-rel").innerHTML = relacionadas().map(mini).join("");
   }
 
   // La barra toma el azul al terminar la cabecera; la línea de abajo sigue la lectura del cuerpo.
   function alScroll() {
-    $("pf-top").classList.toggle("pf-barra--solida", window.scrollY > $("pf-cab").offsetHeight - 80);
     var t = $("pf-texto"), ini = t.offsetTop - window.innerHeight * 0.4, fin = t.offsetTop + t.offsetHeight - window.innerHeight * 0.6;
     $("pf-progreso").style.setProperty("--p", Math.min(1, Math.max(0, (window.scrollY - ini) / Math.max(1, fin - ini))).toFixed(4));
   }

@@ -61,18 +61,22 @@ pie de la librería (componente Pie de página, variante Institucional, que
 `build.py` arma con node desde `../../componentes/c/pie.js`). El texto de cada
 nota lo lee al abrir de `../notas/<ar>.json`.
 
-- Cabecera de color por tipo de nota (solo fondos del Master: azul, verde,
-  terra) con dos Flores del sistema, etiqueta con fecha, antetítulo, título,
-  bajada, lugar y tiempo de lectura.
-- Foto principal entera, sin recorte, con esquinas de hoja, montada sobre el
-  borde de la cabecera. Una foto chica no se estira más de 1,5 veces. Si la
-  nota no tiene foto, la cabecera cierra antes y sigue el texto.
-- Cuerpo a una columna de lectura; al costado (fijo al bajar) los datos, los
-  temas (etiquetas de WordPress, cada una lleva a Novedades con esa búsqueda:
-  `../#q=tema`), compartir y "Ver la nota original".
-- Nota anterior y siguiente (por fecha) y tres relacionadas: comparten temas,
-  cultivo, pilar o tipo; a igual puntaje, la más cercana en el tiempo.
-- Sin sombras: las cajas se separan del fondo por el color.
+- Sobria, sobre el fondo y sin cajas: la barra azul desde arriba, la vuelta a
+  Novedades, la etiqueta del tipo con el año (la etiqueta completa, con forma,
+  va solo junto al título), antetítulo, título, bajada y una línea con fecha,
+  lugar y tiempo de lectura.
+- Foto principal entera, sin recorte, con radio. Una foto chica no se estira
+  más de 1,5 veces. Si la nota no tiene foto, sigue el texto.
+- Cuerpo a una columna de lectura; a la izquierda (fijo al bajar) los datos
+  sueltos con su rótulo chico y una línea entre cada uno: categoría y cultivo
+  en texto, temas (etiquetas de WordPress, cada una lleva a Novedades con esa
+  búsqueda: `../#q=tema`), compartir y "Ver la nota original". En celular van
+  después del texto.
+- Nota anterior y siguiente (por fecha) como dos links, y tres relacionadas en
+  fila de tarjetas chicas (miniatura 3:2 con la foto de la nota o el arte de
+  Novedades, etiqueta con el año y título; en celular, lista). Comparten
+  temas, cultivo, pilar o tipo; a igual puntaje, la más cercana en el tiempo.
+- Sin sombras.
 
 Regenerar la página:
 
