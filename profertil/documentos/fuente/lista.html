@@ -19,7 +19,7 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
-html { background: var(--bg); overflow-y: scroll; } /* la barra siempre está: si aparece y desaparece según el largo de la lista, el contenido se corre de costado */
+html { background: var(--bg); scrollbar-gutter: stable; } /* el lugar de la barra de scroll queda reservado: si aparece y desaparece según el largo de la lista, el contenido se corre de costado */
 body {
   margin: 0;
   background: var(--bg);
@@ -227,7 +227,7 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 .pf-docs:not(:empty) { min-height: 60vh; }
 .pf-docs { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
 .pf-doc { position: relative; display: grid; grid-template-columns: 172px minmax(0, 1fr) 52px 36px; align-items: center; column-gap: 20px; padding: 15px 0; border-bottom: 1px solid var(--line); animation: pf-entra 380ms var(--ease) backwards; }
-@keyframes pf-entra { from { opacity: 0; transform: translateY(6px); } }
+@keyframes pf-entra { from { opacity: 0; } } /* solo aparece: sin desplazamiento, para que al filtrar nada parezca moverse */
 .pf-doc .pf-etiqueta { --s: var(--etq-s); }
 .pf-doc__t { margin: 0; font: 500 1.2rem/1.2 var(--f-display); letter-spacing: -0.012em; color: var(--azul); text-wrap: pretty; overflow-wrap: break-word; transition: translate 320ms var(--ease); }
 .pf-doc__t a { color: inherit; text-decoration: none; }
