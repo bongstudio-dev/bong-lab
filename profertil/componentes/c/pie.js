@@ -598,7 +598,7 @@
      semilla: las plantas están en sus surcos (orden radial, no exacto) y crecen más donde llega más urea, así el campo
      queda de tamaños distintos. El viento las mece, el puntero las aparta y, después de un rato (o con un clic), el
      campo se recoge y vuelve a llover.
-     O = { granos, zoom, velocidad, viento, pausa }. */
+     O = { granos, plantas, zoom, tamGrano, velocidad, viento, pausa }. */
   function UREA(O) {
     var pie = document.querySelector(".pf-pie"), banda = pie.querySelector(".pf-pie__urea"), lienzo = banda.querySelector("canvas"), ctx = lienzo.getContext("2d");
     var quieto = matchMedia("(prefers-reduced-motion: reduce)").matches, raiz = getComputedStyle(document.documentElement);
@@ -624,12 +624,12 @@
     function colores() { var s = getComputedStyle(pie); ["surco", "grano", "brote"].forEach(function (k) { C[k] = s.getPropertyValue("--u-" + k).trim(); }); }
     colores();
 
-    /* El mundo: el suelo es y = 0, hay una planta por unidad de superficie y los surcos son círculos separados 1.
-       ONDA es el radio que alcanza la onda de cada grano. KREF son los píxeles por unidad con zoom 100%. */
+    /* El mundo: el suelo es y = 0. ONDA es el radio que alcanza la onda de cada grano y KREF son los píxeles por unidad
+       con zoom 100%. La separación entre plantas (y entre surcos) sale de cuántas plantas hay en pantalla. */
     var RG = .19, BROTE = .62, HOJA = .3, ONDA = 1.7, CAIDA = 760, DISUELVE = 700, T_ONDA = 900, LLUEVE = 3600, CRECE = 1400, VUELVE = 1700, KREF = 50;
     // Vista isométrica: proyección paralela, 35,26° de inclinación y 45° de giro.
     var ISO = Math.atan(Math.SQRT1_2), SP = Math.sin(ISO), GIRO = Math.PI / 4;
-    var W = 0, H = 0, W0 = 0, H0 = 0, dpr = 1, cy = 0, k = 1, Rv = 1, plantas = [], granos = [], TOT = 1;
+    var W = 0, H = 0, W0 = 0, H0 = 0, dpr = 1, cy = 0, k = 1, Rv = 1, sep = 1, plantas = [], granos = [], TOT = 1;
     // Inversa de la curva base: en qué momento de la onda llega a cierta distancia.
     var INV = []; for (var q = 0; q <= 64; q++) INV.push(BASE(q / 64));
     function llega(f) { for (var i = 1; i <= 64; i++) if (INV[i] >= f) return (i - 1 + (f - INV[i - 1]) / Math.max(1e-6, INV[i] - INV[i - 1])) / 64; return 1; }
@@ -663,12 +663,16 @@
     }
     function armar() {
       cy = H * .5; k = KREF * O.zoom / 100; camara(k);
-      // Plantas: llenan un disco que pasa las cuatro esquinas de la banda.
-      Rv = Math.hypot(W / 2, Math.max(cy, H - cy) / SP) / k + 1;
-      var n = Math.min(9000, Math.round(Math.PI * Rv * Rv)), Rn = Math.sqrt(n / Math.PI), AU = Math.PI * (3 - Math.sqrt(5));
+      /* Plantas: la cantidad es para una banda de 1440 × 560 y se ajusta al área. Llenan un disco que pasa las cuatro
+         esquinas de la banda; se acomodan con separación 1 y después se escalan a la separación real. */
+      var area = W * H / (1440 * 560), mundo = (W / k) * (H / k) / SP;
+      sep = Math.sqrt(mundo / Math.max(20, O.plantas * area));
+      Rv = Math.hypot(W / 2, Math.max(cy, H - cy) / SP) / k + sep;
+      var n = Math.min(12000, Math.round(Math.PI * Rv * Rv / (sep * sep))), Rn = Math.sqrt(n / Math.PI), AU = Math.PI * (3 - Math.sqrt(5));
       var x = new Float32Array(n), z = new Float32Array(n), i, cel = new Map();
       for (i = 0; i < n; i++) { var r = Math.sqrt((i + .5) / Math.PI) + (Math.random() - .5) * .3, a = i * AU; x[i] = Math.cos(a) * r; z[i] = Math.sin(a) * r; }
       acomodar(x, z, n, Rn);
+      for (i = 0; i < n; i++) { x[i] *= sep; z[i] *= sep; }
       plantas = [];
       for (i = 0; i < n; i++) {
         plantas.push({ x: x[i], z: z[i], rn: Math.min(1, Math.hypot(x[i], z[i]) / Rn), t: .7 + .6 * Math.random(), inc: (Math.random() - .5) * .2,
@@ -678,8 +682,7 @@
       /* Granos: la cantidad es para una banda de 1440 × 560 y se ajusta al área. Caen al azar sobre lo que se ve,
          cada uno en su momento. Lo que crece una planta por onda está calculado para que, con 1000 granos, una planta
          promedio llegue a su tamaño: con más urea crecen más; con menos, quedan chicas o no salen. */
-      var area = W * H / (1440 * 560), ng = Math.max(10, Math.min(6000, Math.round(O.granos * area)));
-      var mundo = (W / k) * (H / k) / SP, aporte = 3 * mundo / (Math.PI * ONDA * ONDA * Math.max(1, 1000 * area));
+      var ng = Math.max(10, Math.min(6000, Math.round(O.granos * area))), aporte = 3 * mundo / (Math.PI * ONDA * ONDA * Math.max(1, 1000 * area));
       granos = [];
       for (var j = 0; j < ng; j++) {
         var p = suelo(-20 + Math.random() * (W + 40), -10 + Math.random() * (H + 20), k), t0 = Math.random() * LLUEVE;
@@ -735,7 +738,7 @@
 
       // Surcos: círculos concéntricos (elipses en isométrica), más presentes a medida que el campo crece.
       ctx.lineWidth = 1; ctx.strokeStyle = C.surco; ctx.globalAlpha = .16 + .26 * suave(prog); ctx.beginPath();
-      for (var m = .5; m <= Rv + 1; m++) { var rr = m * e; ctx.moveTo(W / 2 + rr, cy); ctx.ellipse(W / 2, cy, rr, rr * SP, 0, 0, 6.2832); }
+      for (var m = .5; m * sep <= Rv + sep; m++) { var rr = m * sep * e; ctx.moveTo(W / 2 + rr, cy); ctx.ellipse(W / 2, cy, rr, rr * SP, 0, 0, 6.2832); }
       ctx.stroke(); ctx.globalAlpha = 1;
 
       // Granos: caen con dos rebotes chicos; en el primer golpe sale la onda y después se disuelven.
@@ -750,7 +753,7 @@
           if (o > 0 && o < 1) { var ro = ONDA * BASE(o) * e; ctx.globalAlpha = .55 * (1 - o); ctx.beginPath(); ctx.ellipse(bx, by, ro, ro * SP, 0, 0, 6.2832); ctx.stroke(); }
           var u = lim(s / CAIDA) * 2.05, b = .3, y;
           if (u < 1) y = 1 - u * u; else if ((u -= 1) < 2 * b) y = u * (2 * b - u); else { u -= 2 * b; y = u < 2 * b * b ? u * (2 * b * b - u) : 0; }
-          var rg = RG * (1 - BASE((s - CAIDA) / DISUELVE));
+          var rg = RG * O.tamGrano / 100 * (1 - BASE((s - CAIDA) / DISUELVE));
           if (rg < .01) continue;
           proy(g.x, rg + y * g.h, g.z); aire.moveTo(S.x + rg * S.k, S.y); aire.arc(S.x, S.y, rg * S.k, 0, 6.2832);
         }
@@ -822,10 +825,10 @@
     lienzo.addEventListener("click", function () { if (fase === "campo") ir("vuelve"); });
     new MutationObserver(function () { colores(); if (!corre) dibujar(); }).observe(pie, { attributes: true, attributeFilter: ["data-campo"] });
 
-    // Ajustes en vivo: la librería los manda sin recargar. Cambiar los granos o el zoom rearma el campo y vuelve a llover.
+    // Ajustes en vivo: la librería los manda sin recargar. Cambiar granos, plantas o zoom rearma el campo y vuelve a llover.
     window.pfVivo = function (N) {
       var antes = O; O = N;
-      if (N.granos !== antes.granos || N.zoom !== antes.zoom) {
+      if (N.granos !== antes.granos || N.plantas !== antes.plantas || N.zoom !== antes.zoom) {
         armar();
         if (quieto) { ir("campo"); completar(); } else if (empezo) { reiniciar(); ir("llueve"); }
       }
@@ -1047,7 +1050,7 @@
   }
 
   // Los ajustes de Urea tal como los lee UREA; también van en vivo.
-  function opcionesUrea(s) { return { granos: +s.granos, zoom: +s.zoom, velocidad: +s.velocidad, viento: +s.viento, pausa: +s.pausa * 1000 }; }
+  function opcionesUrea(s) { return { granos: +s.granos, plantas: +s.plantas, zoom: +s.zoom, tamGrano: +s.tamGrano, velocidad: +s.velocidad, viento: +s.viento, pausa: +s.pausa * 1000 }; }
   // Los de Urea 2, igual.
   function opcionesUrea2(s) { return { llenado: +s.llenado, grano: +s.grano, mano: +s.mano }; }
   // La línea ética cambia el HTML: si se prende o se apaga, la vista se rearma en vez de ir en vivo.
@@ -1096,8 +1099,10 @@
       { id: "pOrbita", tipo: "rango", etiqueta: "Órbita", solo: ["flores"], unidad: "%", min: 0, max: 100, def: 20, desc: "Peso de la familia: una forma que da vueltas alrededor del centro del mosaico, con una parada por compás." },
       { id: "pMorph", tipo: "rango", etiqueta: "Morph", solo: ["flores"], unidad: "%", min: 0, max: 100, def: 20, desc: "Peso de la familia: una forma que se transforma en otra, en cadena de tres." },
       { id: "campo", tipo: "seg", etiqueta: "Campo", solo: ["urea", "urea2"], def: "azul", aplica: { attr: "data-campo" }, opciones: [["azul", "Azul"], ["verde", "Verde"]], desc: "Azul: terciaria Azul, Celeste y Verde (fondo, surcos y brotes). Verde: secundaria Verde y Verde Claro. Los granos van siempre en tiza, como la urea." },
-      { id: "granos", tipo: "rango", etiqueta: "Granos", solo: ["urea"], unidad: "granos", min: 100, max: 3000, paso: 50, def: 1000, desc: "Cuántos granos de urea caen en una pantalla de 1440 × 900; en otros tamaños se ajusta al área. Cada grano hace una onda al caer y las plantas que alcanza crecen: con más urea el campo crece más, con menos quedan plantas chicas o huecos. Cambiarlo vuelve a empezar." },
-      { id: "zoom", tipo: "rango", etiqueta: "Zoom", solo: ["urea"], unidad: "%", min: 50, max: 250, paso: 5, def: 100, desc: "Qué tan cerca está la cámara: con más zoom, plantas y granos más grandes y menos plantas en pantalla. El campo siempre llena la banda. Cambiarlo vuelve a empezar." },
+      { id: "granos", tipo: "rango", etiqueta: "Granos", solo: ["urea"], unidad: "granos", min: 100, max: 3000, paso: 50, def: 1000, desc: "Cuántos granos de urea caen en una pantalla de 1440 × 900; en otros tamaños se ajusta al área. Cada grano hace una onda al caer y las plantas que alcanza crecen: con más urea las plantas crecen más, con menos quedan chicas o no salen. No cambia cuántas plantas hay. Cambiarlo vuelve a empezar." },
+      { id: "plantas", tipo: "rango", etiqueta: "Plantas", solo: ["urea"], unidad: "plantas", min: 100, max: 2500, paso: 50, def: 600, desc: "Cuántas plantas hay en una pantalla de 1440 × 900; en otros tamaños se ajusta al área. Define la separación entre plantas y entre surcos. No cambia cuánto crecen: eso depende de los granos. Cambiarlo vuelve a empezar." },
+      { id: "zoom", tipo: "rango", etiqueta: "Zoom", solo: ["urea"], unidad: "%", min: 50, max: 250, paso: 5, def: 100, desc: "Qué tan cerca está la cámara: con más zoom, plantas, granos y ondas se ven más grandes. La cantidad de plantas en pantalla no cambia. El campo siempre llena la banda. Cambiarlo vuelve a empezar." },
+      { id: "tamGrano", tipo: "rango", etiqueta: "Tamaño de grano", solo: ["urea"], unidad: "%", min: 40, max: 250, paso: 5, def: 100, desc: "Tamaño de cada grano de urea mientras cae, sin cambiar la onda ni lo que crecen las plantas. Se ajusta en vivo." },
       { id: "velocidad", tipo: "rango", etiqueta: "Velocidad", solo: ["urea"], unidad: "%", min: 50, max: 200, paso: 10, def: 100, desc: "Ritmo de la lluvia, las ondas y el crecimiento." },
       { id: "viento", tipo: "rango", etiqueta: "Viento", solo: ["urea"], unidad: "%", min: 0, max: 100, def: 40, desc: "Cuánto se mecen los brotes con la racha que cruza el campo. El puntero los aparta igual, haya viento o no." },
       { id: "pausa", tipo: "rango", etiqueta: "Campo crecido", solo: ["urea"], unidad: "s", min: 2, max: 20, def: 6, desc: "Cuánto se queda el campo crecido antes de recogerse y volver a llover. Un clic sobre el campo lo adelanta." },
