@@ -309,16 +309,9 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 .pf-activos .pf-chip svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
 .pf-activos__limpiar { align-self: center; border: 0; background: transparent; cursor: pointer; padding: 4px 6px; color: var(--azul); font-size: var(--texto-chico); text-decoration: underline; text-underline-offset: 3px; }
 
-/* --- Vistas: compacta, lista (la de siempre) y miniaturas. El selector es el de Novedades; al cambiar, la lista se funde (View Transitions)
-   y el indicador viaja a su lugar. */
-.pf-selector.pf-vista .pf-selector__ind { view-transition-name: pf-ind-vista; }
-.pf-selector.pf-vista [data-vista="compacta"] { view-transition-name: pf-vista-compacta; }
-.pf-selector.pf-vista [data-vista="lista"] { view-transition-name: pf-vista-lista; }
-.pf-selector.pf-vista [data-vista="mini"] { view-transition-name: pf-vista-mini; }
-::view-transition-group(*) { animation-duration: var(--t-vista); animation-timing-function: var(--curva-vista); }
-/* La lista cambia con un fundido: las filas y los cuadrados tienen formas muy distintas y un viaje de uno al otro se estira. Solo el
-   indicador del selector viaja. */
-::view-transition-group(root) { animation-duration: 240ms; }
+/* --- Vistas: compacta, lista (la de siempre) y miniaturas. El selector es el de Novedades; al cambiar, solo la lista se funde y el
+   indicador viaja a su lugar. No usa View Transitions: capturan la página entera y activarían la animación de página de
+   transicion.css (::view-transition-old/new(root)). */
 .pf-docs.pf-cambia .pf-doc { animation: none; }
 .pf-doc__arte { display: none; }
 
@@ -799,27 +792,32 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
     document.querySelectorAll(".pf-selector.pf-vista button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.vista === vista)); });
     moverInd(document.querySelector(".pf-selector.pf-vista"), animar);
   }
-  // Los documentos viajan a su lugar nuevo (View Transitions) y el indicador viaja con ellos; sin soporte, cambia directo.
+  // Cambiar de vista funde solo la lista (sale, se rearma y entra) y el indicador viaja; el resto de la página no se toca.
+  var cambiando = false;
   document.querySelector(".pf-selector.pf-vista").addEventListener("click", function (e) {
     var b = e.target.closest("[data-vista]"); if (!b || b.dataset.vista === vista) return;
     vista = b.dataset.vista;
     try { localStorage.setItem("documentos-vista", vista); } catch (err) {}
+    marcarVista(true);
+    if (cambiando) return; // otro clic en pleno fundido: ya se arma la vista que quedó marcada
     // El documento que está arriba de la pantalla queda en el mismo lugar después del cambio.
     var ref = null, tope = $("pf-top").offsetHeight + 8, filas = docs.children;
     for (var i = 0; i < filas.length; i++) { var r = filas[i].getBoundingClientRect(); if (r.bottom > tope) { ref = { k: filas[i].dataset.k, top: r.top }; break; } }
-    function cambiar(animar) {
-      marcarVista(!!animar); repintar(true);
+    function cambiar() {
+      repintar(true);
       var el = ref && docs.querySelector('[data-k="' + ref.k + '"]');
       if (el) window.scrollTo({ top: Math.max(0, window.scrollY + el.getBoundingClientRect().top - ref.top), behavior: "instant" });
     }
-    if (document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      // Si se cambia de vista de nuevo en pleno viaje, el navegador cancela la anterior: no es un error.
-      docs.classList.add("pf-cambia");
-      var vt = document.startViewTransition(cambiar);
-      [vt.ready, vt.updateCallbackDone].forEach(function (p) { p.catch(function () {}); });
-      vt.finished.catch(function () {}).then(function () { docs.classList.remove("pf-cambia"); });
-    }
-    else cambiar(true);
+    if (!docs.animate || matchMedia("(prefers-reduced-motion: reduce)").matches) { cambiar(); return; }
+    cambiando = true; docs.classList.add("pf-cambia");
+    var sale = docs.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 110, easing: "ease-out", fill: "forwards" }), entra;
+    sale.finished.then(function () {
+      cambiando = false; cambiar();
+      entra = docs.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, easing: "ease-out", fill: "forwards" });
+      return entra.finished;
+    }).catch(function () {}).then(function () {
+      cambiando = false; sale.cancel(); if (entra) entra.cancel(); docs.classList.remove("pf-cambia");
+    });
   });
   marcarVista(false);
   $("pf-sortAz").addEventListener("click", function () { ordenar("az"); });
