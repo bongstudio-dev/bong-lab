@@ -273,7 +273,7 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 /* --- Filas: una por documento, separadas por una línea (sin cajas ni sombras). */
 .pf-docs:not(:empty) { min-height: 60vh; }
 .pf-docs { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
-.pf-doc { position: relative; display: grid; grid-template-columns: 172px minmax(0, 1fr) 52px 36px; align-items: center; column-gap: 20px; padding: 15px 0; border-bottom: 1px solid var(--line); animation: pf-entra 380ms var(--ease) backwards; }
+.pf-doc { cursor: pointer; position: relative; display: grid; grid-template-columns: 172px minmax(0, 1fr) 52px 36px; align-items: center; column-gap: 20px; padding: 15px 0; border-bottom: 1px solid var(--line); animation: pf-entra 380ms var(--ease) backwards; }
 @keyframes pf-entra { from { opacity: 0; } } /* solo aparece: sin desplazamiento, para que al filtrar nada parezca moverse */
 .pf-doc .pf-etiqueta { --s: var(--etq-s); }
 .pf-doc__t { margin: 0; font: 500 1.2rem/1.2 var(--f-display); letter-spacing: -0.012em; color: var(--azul); text-wrap: pretty; overflow-wrap: break-word; transition: translate 320ms var(--ease); }
@@ -799,6 +799,14 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
     document.querySelectorAll(".pf-selector.pf-vista button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.vista === vista)); });
     moverInd(document.querySelector(".pf-selector.pf-vista"), animar);
   }
+  // Toda la tarjeta o fila es el enlace: un clic en cualquier parte (arte, etiqueta, año, espacios) abre el documento, sin depender de que el
+  // enlace del título la cubra. Con Cmd/Ctrl/Mayús se abre en otra pestaña. El botón de descarga y el título siguen siendo lo que son.
+  docs.addEventListener("click", function (e) {
+    if (e.defaultPrevented || e.target.closest("a, button")) return;
+    var li = e.target.closest(".pf-doc"), a = li && li.querySelector(".pf-doc__t a");
+    if (!a) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey) window.open(a.href, "_blank", "noopener"); else a.click();
+  });
   // Cambiar de vista: cada fila visible se arma en su lugar nuevo y se desliza desde donde estaba (solo traslación, sin estirarse ni
   // copias de la lista vieja). Las filas que no se veían antes aparecen directo en su lugar.
   document.querySelector(".pf-selector.pf-vista").addEventListener("click", function (e) {
