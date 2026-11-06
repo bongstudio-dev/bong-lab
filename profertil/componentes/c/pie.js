@@ -1,4 +1,4 @@
-/* Pie de página: tres variantes y tres experimentos. */
+/* Pie de página: tres variantes y cuatro experimentos. */
 (function () {
   var COLUMNAS = [
     ["Empresa", ["Quiénes somos", "Planta Bahía Blanca", "Sustentabilidad", "Compliance"]],
@@ -880,6 +880,202 @@
     new ResizeObserver(function () { medir(); dibujar(); }).observe(banda);
   }
 
+  /* Urea 2 (experimento): caen granos de urea desde un chorro que barre el ancho y se apilan hasta llenar el campo.
+     El puntero es una mano: al pasar aparta los granos y, apretando, arrastra todos los que agarra (y esos empujan
+     al resto). Física propia de círculos (Verlet con grilla), sin librerías, para que aguante miles de granos.
+     O = { llenado, grano, mano }. */
+  function UREA2(O) {
+    var pie = document.querySelector(".pf-pie"), banda = pie.querySelector(".pf-pie__urea2"), lienzo = banda.querySelector("canvas"), ctx = lienzo.getContext("2d");
+    var quieto = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var C = {};
+    function colores() { var s = getComputedStyle(pie); C.grano = s.getPropertyValue("--u-grano").trim(); C.mano = s.getPropertyValue("--u-surco").trim(); }
+    colores();
+
+    var MAX = 4000, X = new Float32Array(MAX), Y = new Float32Array(MAX), PX = new Float32Array(MAX), PY = new Float32Array(MAX), R = new Float32Array(MAX), QX = new Float32Array(MAX), QY = new Float32Array(MAX);
+    var n = 0, objetivo = 0, W = 0, H = 0, dpr = 1, rMax = 1, celda = 1, gc = 1, gf = 1, cab = new Int32Array(1), sig = new Int32Array(MAX);
+    var SUB = 3, G = 2200, dt = 1 / 60, h = dt / SUB;
+
+    // Cuántos granos llenan el campo hasta el porcentaje elegido (empaquetados al 80%).
+    function contar() { var r = O.grano / 2; return Math.min(MAX, Math.round(W * H * O.llenado / 100 * .8 / (Math.PI * r * r * 1.02))); }
+    function medir() {
+      var w = banda.clientWidth, hh = banda.clientHeight; if (!w || !hh) return false;
+      W = w; H = hh; dpr = Math.min(2, devicePixelRatio || 1);
+      lienzo.width = Math.round(W * dpr); lienzo.height = Math.round(H * dpr);
+      rMax = O.grano / 2 * 1.15; celda = rMax * 2; gc = Math.ceil(W / celda) + 1; gf = Math.ceil((H + 4 * celda) / celda) + 1;
+      if (cab.length < gc * gf) cab = new Int32Array(gc * gf);
+      // Los que quedaron afuera del ancho vuelven adentro; si sobran, se van los de más arriba.
+      for (var i = 0; i < n; i++) { var r = R[i]; if (X[i] > W - r) X[i] = PX[i] = W - r; if (X[i] < r) X[i] = PX[i] = r; if (Y[i] > H - r) Y[i] = PY[i] = H - r; }
+      objetivo = contar();
+      if (n > objetivo) { var orden = []; for (var j = 0; j < n; j++) orden.push(j); orden.sort(function (a, b) { return Y[b] - Y[a]; }); recortar(orden.slice(0, objetivo)); }
+      return true;
+    }
+    function recortar(quedan) {
+      var x = [], y = [], px = [], py = [], r = [];
+      quedan.forEach(function (i) { x.push(X[i]); y.push(Y[i]); px.push(PX[i]); py.push(PY[i]); r.push(R[i]); });
+      n = quedan.length; for (var i = 0; i < n; i++) { X[i] = x[i]; Y[i] = y[i]; PX[i] = px[i]; PY[i] = py[i]; R[i] = r[i]; }
+    }
+    function radio() { return O.grano / 2 * (.85 + Math.random() * .3); }
+
+    // Grilla: cada grano en su celda, para que cada uno mire solo a sus vecinos.
+    function grilla() {
+      cab.fill(-1, 0, gc * gf);
+      for (var i = 0; i < n; i++) {
+        var cx = Math.floor(X[i] / celda), cy = Math.floor((Y[i] + 4 * celda) / celda);
+        if (cx < 0) cx = 0; else if (cx >= gc) cx = gc - 1; if (cy < 0) cy = 0; else if (cy >= gf) cy = gf - 1;
+        var k = cy * gc + cx; sig[i] = cab[k]; cab[k] = i;
+      }
+    }
+
+    // La mano: dónde está el puntero ahora, dónde estaba en el cuadro anterior y si está apretando.
+    var mano = { x: 0, y: 0, lx: 0, ly: 0, dentro: false, aprieta: false };
+    var tomados = null;
+
+    function paso(s) {
+      // La mano recorre su camino en pasos chicos, así no atraviesa los granos cuando el puntero va rápido.
+      var k0 = s / SUB, k1 = (s + 1) / SUB, mx0 = mano.lx + (mano.x - mano.lx) * k0, my0 = mano.ly + (mano.y - mano.ly) * k0;
+      var mx = mano.lx + (mano.x - mano.lx) * k1, my = mano.ly + (mano.y - mano.ly) * k1, mdx = mx - mx0, mdy = my - my0;
+      var i, j, vx, vy, lim2;
+      for (i = 0; i < n; i++) {
+        vx = (X[i] - PX[i]) * .996; vy = (Y[i] - PY[i]) * .996;
+        // Tope de velocidad: un grano no avanza más de su radio por paso.
+        lim2 = R[i] * R[i]; var v2 = vx * vx + vy * vy; if (v2 > lim2) { var f = Math.sqrt(lim2 / v2); vx *= f; vy *= f; }
+        // Casi quieto: se frena del todo, así la pila se asienta y no repta.
+        else if (v2 < .005) { vx *= .4; vy *= .4; }
+        PX[i] = X[i]; PY[i] = Y[i]; X[i] += vx; Y[i] += vy + G * h * h;
+      }
+      // Apretando: los granos tomados siguen a la mano (y empujan a los demás al chocar). Al soltar, salen con su impulso.
+      if (tomados) for (j = 0; j < tomados.length; j++) { i = tomados[j]; X[i] = PX[i] + mdx + (X[i] - PX[i]) * .2; Y[i] = PY[i] + mdy + (Y[i] - PY[i]) * .2; }
+      // Sin apretar: la mano es un disco que aparta lo que toca.
+      if (mano.dentro && !mano.aprieta) {
+        var RM = O.mano * .5;
+        for (i = 0; i < n; i++) {
+          var dx = X[i] - mx, dy = Y[i] - my, rr = RM + R[i], d2 = dx * dx + dy * dy;
+          if (d2 < rr * rr) { var d = Math.sqrt(d2) || .01, e = (rr - d) / d; X[i] += dx * e; Y[i] += dy * e; PX[i] -= mdx * .35; PY[i] -= mdy * .35; }
+        }
+      }
+      // Choques entre granos: se separan lo que se pisan, con un poco de roce para que la pila no corra como agua.
+      for (var it = 0; it < 2; it++) {
+        grilla();
+        for (i = 0; i < n; i++) {
+          var cx = Math.floor(X[i] / celda), cy = Math.floor((Y[i] + 4 * celda) / celda);
+          for (var oy = -1; oy <= 1; oy++) {
+            var fy = cy + oy; if (fy < 0 || fy >= gf) continue;
+            for (var ox = -1; ox <= 1; ox++) {
+              var fx = cx + ox; if (fx < 0 || fx >= gc) continue;
+              for (j = cab[fy * gc + fx]; j !== -1; j = sig[j]) {
+                if (j <= i) continue;
+                var ddx = X[j] - X[i], ddy = Y[j] - Y[i], rs = R[i] + R[j], dd2 = ddx * ddx + ddy * ddy;
+                if (dd2 >= rs * rs || dd2 === 0) continue;
+                var dd = Math.sqrt(dd2), c = (rs - dd) / dd * .5, nx = ddx / dd, ny = ddy / dd;
+                X[i] -= ddx * c; Y[i] -= ddy * c; X[j] += ddx * c; Y[j] += ddy * c;
+                // Roce: frena el deslizamiento de uno sobre otro.
+                var rvx = (X[j] - PX[j]) - (X[i] - PX[i]), rvy = (Y[j] - PY[j]) - (Y[i] - PY[i]), t = (rvx * -ny + rvy * nx) * .05;
+                PX[i] += ny * t; PY[i] -= nx * t; PX[j] -= ny * t; PY[j] += nx * t;
+              }
+            }
+          }
+        }
+      }
+      // Bordes: piso y paredes a los lados; arriba queda abierto.
+      for (i = 0; i < n; i++) {
+        var r = R[i];
+        // Al tocar un borde pierde la velocidad contra él (si la conserva, sigue empujando a la pila).
+        if (Y[i] > H - r) { Y[i] = PY[i] = H - r; PX[i] = X[i] - (X[i] - PX[i]) * .7; }
+        if (X[i] < r) X[i] = PX[i] = r; else if (X[i] > W - r) X[i] = PX[i] = W - r;
+      }
+    }
+
+    // El chorro: barre el ancho de lado a lado y suelta granos donde hay lugar.
+    var tChorro = 0;
+    function soltar(cuantos) {
+      for (var k = 0; k < cuantos && n < objetivo; k++) {
+        var r = radio(), x = W / 2 + Math.sin(tChorro * .00055) * (W / 2 - r * 4) + (Math.random() - .5) * O.grano * 6, y = -r - Math.random() * O.grano * 3;
+        x = Math.min(W - r, Math.max(r, x));
+        X[n] = x; Y[n] = y; PX[n] = x + (Math.random() - .5) * .6; PY[n] = y - 2.2 - Math.random(); R[n] = r; n++;
+      }
+    }
+
+    function dibujar() {
+      if (!W) return;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = C.grano; ctx.beginPath();
+      for (var i = 0; i < n; i++) { if (Y[i] < -R[i]) continue; ctx.moveTo(X[i] + R[i], Y[i]); ctx.arc(X[i], Y[i], R[i], 0, 6.2832); }
+      ctx.fill();
+      // La mano se ve apenas, como un aro, mientras está sobre el campo.
+      if (mano.dentro && !quieto) {
+        ctx.strokeStyle = C.mano; ctx.globalAlpha = mano.aprieta ? .9 : .55; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.arc(mano.x, mano.y, O.mano * .5, 0, 6.2832); ctx.stroke(); ctx.globalAlpha = 1;
+      }
+    }
+
+    // Movimiento por pasos fijos, solo con el campo en pantalla; si todo queda quieto y nadie toca, se apaga.
+    var visible = false, corre = false, empezo = false, ultimo = 0, resto = 0, calma = 0;
+    function cuadro(t) {
+      if (!visible) { corre = false; return; }
+      var d = Math.min(t - ultimo, 64); ultimo = t; resto += d / 1000; tChorro += d;
+      if (n < objetivo) soltar(Math.max(2, Math.round(objetivo / 240)));
+      var hubo = false;
+      while (resto >= dt) { for (var s = 0; s < SUB; s++) paso(s); mano.lx = mano.x; mano.ly = mano.y; resto -= dt; hubo = true; }
+      dibujar();
+      if (hubo) {
+        // Cuánto se movió cada grano desde el cuadro anterior (los de abajo, apretados por la pila, tiemblan sin moverse).
+        var mov = 0, suma = 0; for (var i = 0; i < n; i++) { var a = Math.abs(X[i] - QX[i]) + Math.abs(Y[i] - QY[i]); if (a > mov) mov = a; suma += a; QX[i] = X[i]; QY[i] = Y[i]; }
+        calma = mov < .8 && suma < n * .03 && n >= objetivo && !mano.dentro ? calma + 1 : 0;
+      }
+      if (calma > 45) { corre = false; return; }
+      requestAnimationFrame(cuadro);
+    }
+    function seguir() { if (!corre && visible && !quieto && empezo) { corre = true; calma = 0; ultimo = performance.now(); requestAnimationFrame(cuadro); } }
+
+    // Puntero.
+    function punto(e) { var r = lienzo.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
+    lienzo.addEventListener("pointermove", function (e) {
+      if (quieto) return;
+      var p = punto(e); if (!mano.dentro) { mano.lx = p.x; mano.ly = p.y; }
+      mano.x = p.x; mano.y = p.y; mano.dentro = true; seguir();
+    });
+    lienzo.addEventListener("pointerleave", function () { if (!mano.aprieta) mano.dentro = false; });
+    lienzo.addEventListener("pointerdown", function (e) {
+      if (quieto || e.button) return;
+      var p = punto(e); mano.x = mano.lx = p.x; mano.y = mano.ly = p.y; mano.dentro = mano.aprieta = true;
+      // Agarra todos los granos que caen dentro de la mano.
+      var RM = O.mano * .5; tomados = [];
+      for (var i = 0; i < n; i++) { var dx = X[i] - p.x, dy = Y[i] - p.y; if (dx * dx + dy * dy < RM * RM) tomados.push(i); }
+      lienzo.setPointerCapture(e.pointerId); pie.classList.add("pf-agarra"); seguir();
+    });
+    function largar(e) {
+      if (!mano.aprieta) return; mano.aprieta = false; tomados = null; pie.classList.remove("pf-agarra");
+      if (e && e.pointerType !== "mouse") mano.dentro = false;
+    }
+    lienzo.addEventListener("pointerup", largar); lienzo.addEventListener("pointercancel", largar);
+    new MutationObserver(function () { colores(); dibujar(); }).observe(pie, { attributes: true, attributeFilter: ["data-campo"] });
+
+    // Con movimiento reducido el campo aparece ya lleno y quieto: los granos se acomodan en filas, sin simular.
+    function llenarQuieto() {
+      n = 0; var r = O.grano / 2, fila = 0, y = H - r;
+      while (n < objetivo && y > r) {
+        for (var x = r + (fila % 2 ? r : 0); x <= W - r && n < objetivo; x += r * 2) { X[n] = PX[n] = x; Y[n] = PY[n] = y; R[n] = r * (.9 + Math.random() * .1); n++; }
+        fila++; y -= r * 1.732;
+      }
+    }
+
+    // Ajustes en vivo: el tamaño del grano vacía el campo y lo vuelve a llenar; el llenado suma o saca granos; la mano va directo.
+    window.pfVivo = function (N) {
+      var antes = O; O = N;
+      if (N.grano !== antes.grano) { n = 0; medir(); if (quieto) llenarQuieto(); }
+      else if (N.llenado !== antes.llenado) medir();
+      if (quieto) dibujar(); else { calma = 0; seguir(); dibujar(); }
+    };
+
+    if (medir()) { if (quieto) llenarQuieto(); dibujar(); }
+    new IntersectionObserver(function (es) {
+      visible = es[0].isIntersecting;
+      if (visible && !empezo && es[0].intersectionRatio >= .3) empezo = true;
+      seguir();
+    }, { threshold: [0, .3] }).observe(banda);
+    new ResizeObserver(function () { if (medir()) { if (quieto) llenarQuieto(); dibujar(); seguir(); } }).observe(banda);
+  }
+
   // Los ajustes de Flores tal como los lee FLORES. La librería también los manda en vivo (vivo) sin recargar la vista.
   function opcionesFlores(s) {
     return { tamano: +s.mosaico, tempo: +s.tempo, repeticiones: +s.repeticiones, duracion: +s.duracion, giro: +s.giro, curvaEntra: s.curvaEntra, curvaCambio: s.curvaCambio,
@@ -888,27 +1084,30 @@
 
   // Los ajustes de Urea tal como los lee UREA; también van en vivo.
   function opcionesUrea(s) { return { divisiones: +s.divisiones, velocidad: +s.velocidad, viento: +s.viento, pausa: +s.pausa * 1000 }; }
+  // Los de Urea 2, igual.
+  function opcionesUrea2(s) { return { llenado: +s.llenado, grano: +s.grano, mano: +s.mano }; }
   // La línea ética cambia el HTML: si se prende o se apaga, la vista se rearma en vez de ir en vivo.
   var eticaCargada;
 
   Libreria.sumar({
     id: "footer", nombre: "Pie de página", grupo: "Navegación", alto: "auto", sangrado: true,
-    bajada: "El cierre de todas las páginas: navegación, línea ética y datos legales. Tres variantes, de la más sobria a la más osada, y tres experimentales.",
+    bajada: "El cierre de todas las páginas: navegación, línea ética y datos legales. Tres variantes, de la más sobria a la más osada, y cuatro experimentales.",
     variantes: [
       ["institucional", "Institucional", "La base: fondo de color, logo y bajada arriba, cuatro columnas, línea ética y legales."],
       ["trigo", "Con trigo", "Fondo tiza y el trigo del sistema en amarillo pleno, a la izquierda, que sube más lento que la página."],
       ["vida", "Vida para nuestra tierra", "Alto de pantalla completa con un video de campo en loop de fondo y un filtro negro parejo. La frase va abajo a la izquierda, a tamaño de título, y entra con el animador Ventana."],
       ["formas", "Formas que caen", "Experimento. Alto de pantalla completa en marfil: arriba logo, links y línea ética; abajo caen las formas del sistema con física, se apilan hasta la mitad y se pueden agarrar y tirar."],
       ["flores", "Flores", "Experimento. Alto de pantalla completa en marfil: arriba logo, links y línea ética; abajo una banda de mosaicos, cada uno un par secundario del Master: fondo y forma en 70/30. Cada mosaico muestra una sola forma a la vez y corre su propio loop (rotación, tira, salto, corte, órbita o morph); cada tanto la forma sale y entra otro movimiento, o cambia el par de colores. Dos mosaicos vecinos nunca comparten un color. Al pasar el puntero o tocar, cambian en el acto."],
-      ["urea", "Urea", "Experimento. Alto de pantalla completa en azul: arriba logo, links y línea ética; abajo cae un grano de urea sobre el campo y se parte en dos, cada mitad en dos, hasta dejar uno por surco y fila. Cada división pasa por la Forma Urea: del grano sale un brote más chico que crece y se separa. Después los granos se hunden y brotan, el viento los mece y el puntero los aparta."]
+      ["urea", "Urea", "Experimento. Alto de pantalla completa en azul: arriba logo, links y línea ética; abajo cae un grano de urea sobre el campo y se parte en dos, cada mitad en dos, hasta dejar uno por surco y fila. Cada división pasa por la Forma Urea: del grano sale un brote más chico que crece y se separa. Después los granos se hunden y brotan, el viento los mece y el puntero los aparta."],
+      ["urea2", "Urea 2", "Experimento. Alto de pantalla completa en azul: arriba logo, links y línea ética; abajo caen granos de urea desde un chorro que barre el ancho y se apilan hasta llenar el campo. Al pasar el puntero, los granos se apartan; apretando y arrastrando, se lleva todos los que agarra y con ellos empuja la pila."]
     ],
     tamano: "media",
     vivo: function (s) {
       if (s.etica !== eticaCargada) return null;
-      return s.variante === "flores" ? opcionesFlores(s) : s.variante === "urea" ? opcionesUrea(s) : null;
+      return s.variante === "flores" ? opcionesFlores(s) : s.variante === "urea" ? opcionesUrea(s) : s.variante === "urea2" ? opcionesUrea2(s) : null;
     },
-    claves: ["La línea ética va siempre en el pie, con su propio llamado, en una sola línea discreta.", "Los fondos de color son solo los del Master (azul, verde, terra, amarillo); sobre amarillo el texto va en azul.", "El logo va siempre completo: no se recorta ni se separa el símbolo de la palabra.", "Las columnas repiten el menú principal: si cambia la arquitectura, cambia el pie.", "Con trigo y Vida para nuestra tierra tienen parallax: el trigo y la foto se mueven a otra velocidad que la página mientras el pie entra en pantalla.", "Vida para nuestra tierra ocupa una pantalla entera. La frase va alineada a la izquierda junto a la línea ética, y entra con el animador Ventana, palabra por palabra.", "Nunca degradados sobre la foto (ni de color ni de tinta). Si hace falta contraste, un filtro negro parejo.", "Formas que caen es un experimento: las 18 formas del Master en los 7 colores de marca, sin dos del mismo color tocándose (si se tocan, la que se mueve cambia de color). Arrancan a caer cuando el pie entra en pantalla.", "Flores es un experimento: cada mosaico es un par secundario del Master (fondo y forma, 70/30) con su propio programa en loop. Un tercer color solo aparece si forma una terciaria. Dos mosaicos vecinos nunca comparten un color, ni siquiera mientras cambian.", "Los cambios de par pasan siempre por rutas que dejan a la vista un par o una terciaria; terra y amarillo no se tocan nunca porque comparten el naranja.", "Urea es un experimento: el grano va en tiza, como la urea, y se divide pasando por la Forma Urea del sistema. Los granos se acomodan siempre en un bloque parejo, uno por surco; la cámara se aleja a medida que se multiplican y cada división dura un poco menos que la anterior."],
-    accesibilidad: "Es un <footer> con listas de links reales. El trigo es decorativo (aria-hidden); el video es decorativo, mudo y sin controles; la frase es texto real, legible por lectores y buscadores. Con movimiento reducido no hay parallax y el video queda quieto en el primer cuadro. En Formas que caen el lienzo es decorativo (aria-hidden) y deja pasar los clics a los links; con movimiento reducido las formas aparecen ya apiladas. En Flores el lienzo también es decorativo; con movimiento reducido los mosaicos quedan quietos y solo cambian al tocarlos, sin animación. En Urea el lienzo es decorativo; con movimiento reducido el campo aparece ya crecido y quieto.",
+    claves: ["La línea ética va siempre en el pie, con su propio llamado, en una sola línea discreta.", "Los fondos de color son solo los del Master (azul, verde, terra, amarillo); sobre amarillo el texto va en azul.", "El logo va siempre completo: no se recorta ni se separa el símbolo de la palabra.", "Las columnas repiten el menú principal: si cambia la arquitectura, cambia el pie.", "Con trigo y Vida para nuestra tierra tienen parallax: el trigo y la foto se mueven a otra velocidad que la página mientras el pie entra en pantalla.", "Vida para nuestra tierra ocupa una pantalla entera. La frase va alineada a la izquierda junto a la línea ética, y entra con el animador Ventana, palabra por palabra.", "Nunca degradados sobre la foto (ni de color ni de tinta). Si hace falta contraste, un filtro negro parejo.", "Formas que caen es un experimento: las 18 formas del Master en los 7 colores de marca, sin dos del mismo color tocándose (si se tocan, la que se mueve cambia de color). Arrancan a caer cuando el pie entra en pantalla.", "Flores es un experimento: cada mosaico es un par secundario del Master (fondo y forma, 70/30) con su propio programa en loop. Un tercer color solo aparece si forma una terciaria. Dos mosaicos vecinos nunca comparten un color, ni siquiera mientras cambian.", "Los cambios de par pasan siempre por rutas que dejan a la vista un par o una terciaria; terra y amarillo no se tocan nunca porque comparten el naranja.", "Urea es un experimento: el grano va en tiza, como la urea, y se divide pasando por la Forma Urea del sistema. Los granos se acomodan siempre en un bloque parejo, uno por surco; la cámara se aleja a medida que se multiplican y cada división dura un poco menos que la anterior.", "Urea 2 es un experimento: los granos van en tiza y caen de a muchos, con física, hasta llenar el campo a la altura elegida. La mano aparta al pasar y arrastra al apretar; con la pila quieta y sin nadie tocando, la animación se apaga sola."],
+    accesibilidad: "Es un <footer> con listas de links reales. El trigo es decorativo (aria-hidden); el video es decorativo, mudo y sin controles; la frase es texto real, legible por lectores y buscadores. Con movimiento reducido no hay parallax y el video queda quieto en el primer cuadro. En Formas que caen el lienzo es decorativo (aria-hidden) y deja pasar los clics a los links; con movimiento reducido las formas aparecen ya apiladas. En Flores el lienzo también es decorativo; con movimiento reducido los mosaicos quedan quietos y solo cambian al tocarlos, sin animación. En Urea el lienzo es decorativo; con movimiento reducido el campo aparece ya crecido y quieto. En Urea 2 el lienzo es decorativo; con movimiento reducido los granos aparecen ya apilados y no responden al puntero.",
     dependencias: ["en Formas que caen, Matter.js 0.20 y poly-decomp 0.3 desde CDN, y formas.js"],
     previo: '<div style="height:80vh;display:grid;place-items:center;color:var(--ink-3);font-size:var(--texto-chico)">Final de la página</div>',
     controles: [
@@ -932,11 +1131,14 @@
       { id: "pCorte", tipo: "rango", etiqueta: "Corte", solo: ["flores"], unidad: "%", min: 0, max: 100, def: 20, desc: "Peso de la familia: una forma cortada en bandas que se desplazan fuera de fase, o una línea que barre el mosaico y deja ver la forma y después la borra." },
       { id: "pOrbita", tipo: "rango", etiqueta: "Órbita", solo: ["flores"], unidad: "%", min: 0, max: 100, def: 20, desc: "Peso de la familia: una forma que da vueltas alrededor del centro del mosaico, con una parada por compás." },
       { id: "pMorph", tipo: "rango", etiqueta: "Morph", solo: ["flores"], unidad: "%", min: 0, max: 100, def: 20, desc: "Peso de la familia: una forma que se transforma en otra, en cadena de tres." },
-      { id: "campo", tipo: "seg", etiqueta: "Campo", solo: ["urea"], def: "azul", aplica: { attr: "data-campo" }, opciones: [["azul", "Azul"], ["verde", "Verde"]], desc: "Azul: terciaria Azul, Celeste y Verde (fondo, surcos y brotes). Verde: secundaria Verde y Verde Claro. Los granos van siempre en tiza, como la urea." },
+      { id: "campo", tipo: "seg", etiqueta: "Campo", solo: ["urea", "urea2"], def: "azul", aplica: { attr: "data-campo" }, opciones: [["azul", "Azul"], ["verde", "Verde"]], desc: "Azul: terciaria Azul, Celeste y Verde (fondo, surcos y brotes). Verde: secundaria Verde y Verde Claro. Los granos van siempre en tiza, como la urea." },
       { id: "divisiones", tipo: "rango", etiqueta: "Divisiones", solo: ["urea"], unidad: "veces", min: 6, max: 12, def: 10, desc: "Cuántas veces se parte el grano. Con 10 quedan 1024 granos, uno por surco y fila. Cambiarlo rearma el campo y empieza de nuevo." },
       { id: "velocidad", tipo: "rango", etiqueta: "Velocidad", solo: ["urea"], unidad: "%", min: 50, max: 200, paso: 10, def: 100, desc: "Ritmo de la caída, las divisiones y el brote. Cada división tarda un poco menos que la anterior, así la multiplicación acelera." },
       { id: "viento", tipo: "rango", etiqueta: "Viento", solo: ["urea"], unidad: "%", min: 0, max: 100, def: 40, desc: "Cuánto se mecen los brotes con la racha que cruza el campo. El puntero los aparta igual, haya viento o no." },
       { id: "pausa", tipo: "rango", etiqueta: "Campo crecido", solo: ["urea"], unidad: "s", min: 2, max: 20, def: 6, desc: "Cuánto se queda el campo crecido antes de recogerse y dejar caer otro grano. Un clic sobre el campo lo adelanta." },
+      { id: "llenado", tipo: "rango", etiqueta: "Llenado", solo: ["urea2"], unidad: "%", min: 10, max: 80, def: 45, desc: "Hasta qué altura del campo llega la pila. La cantidad de granos sale del área: en pantallas chicas caen menos. Con granos muy chicos en pantallas grandes, el tope es de 4000." },
+      { id: "grano", tipo: "rango", etiqueta: "Grano", solo: ["urea2"], unidad: "px", min: 10, max: 40, def: 16, desc: "Diámetro de cada grano (varía un 15% para arriba o abajo). Cambiarlo vacía el campo y lo vuelve a llenar." },
+      { id: "mano", tipo: "rango", etiqueta: "Mano", solo: ["urea2"], unidad: "px", min: 40, max: 320, def: 140, desc: "Diámetro de la mano: lo que aparta al pasar y lo que agarra al apretar." },
       "---",
       { id: "radio", tipo: "rango", etiqueta: "Radio de arriba", unidad: "px", min: 0, max: 56, def: 26, aplica: { var: "--radio", unidad: "px" }, desc: "Radio de las esquinas de arriba." },
       { id: "logo", tipo: "rango", etiqueta: "Logo", unidad: "px", min: 80, max: 260, def: 150, aplica: { var: "--logo", unidad: "px" }, desc: "Ancho del logo completo." },
@@ -1032,6 +1234,17 @@
         '.pf-pie__urea { position: relative; flex: 1; min-height: 320px; }',
         '.pf-pie__urea canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }',
         "",
+        "/* Urea 2 (experimento): mismo fondo y colores que Urea; el campo de abajo se llena de granos. */",
+        '.pf-pie[data-variante="urea2"] { --u-fondo: var(--azul); --u-surco: var(--celeste); --u-grano: var(--tiza);',
+        '  --pie-tinta: var(--tiza); --pie-fondo: var(--u-fondo); display: flex; flex-direction: column; min-height: 100vh; min-height: 100svh; background: var(--u-fondo); color: var(--tiza); }',
+        '.pf-pie[data-variante="urea2"][data-campo="verde"] { --u-fondo: var(--verde); --u-surco: var(--verde-claro); }',
+        '.pf-pie[data-variante="urea2"] .pf-pie__in { display: grid; gap: 28px; width: 100%; max-width: none; }',
+        '.pf-pie[data-variante="urea2"] .pf-pie__cols { flex: 1; max-width: 760px; }',
+        '.pf-pie[data-variante="urea2"] .pf-pie__etica { justify-content: flex-end; }',
+        "/* En pantallas táctiles el dedo arrastra de lado; para arriba y abajo sigue moviendo la página. */",
+        '.pf-pie__urea2 { position: relative; flex: 1; min-height: 320px; }',
+        '.pf-pie__urea2 canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: pan-y; }',
+        "",
         "@media (max-width: 760px) {",
         "  .pf-pie__cols, .pf-pie[data-variante] .pf-pie__cols { grid-template-columns: repeat(2, minmax(0, 1fr)); flex-basis: 100%; }",
         "  .pf-pie[data-variante=\"vida\"] .pf-pie__in { gap: 22px; }",
@@ -1061,15 +1274,17 @@
       if (v === "vida") h += '  <div class="pf-pie__arriba">\n  <a class="pf-pie__logo" href="#" aria-label="Profertil">' + logo + '</a>\n' + cols + '  </div>\n' +
         '  <div class="pf-pie__abajo">\n  <p class="pf-pie__vida" data-anim="ventana">Vida para nuestra tierra</p>\n' + etica + '  </div>\n' + legal;
       if (v === "formas") h += '  <div class="pf-pie__arriba">\n  <a class="pf-pie__logo" href="#" aria-label="Profertil">' + logo + '</a>\n' + cols + '  </div>\n' + etica;
-      if (v === "flores" || v === "urea") h += '  <div class="pf-pie__arriba">\n  <a class="pf-pie__logo" href="#" aria-label="Profertil">' + logo + '</a>\n' + cols + '  </div>\n' + etica + legal;
+      if (v === "flores" || v === "urea" || v === "urea2") h += '  <div class="pf-pie__arriba">\n  <a class="pf-pie__logo" href="#" aria-label="Profertil">' + logo + '</a>\n' + cols + '  </div>\n' + etica + legal;
       h += '</div>\n';
       if (v === "flores") h += '<div class="pf-pie__flores" aria-hidden="true"><canvas></canvas></div>\n';
       if (v === "urea") h += '<div class="pf-pie__urea" aria-hidden="true"><canvas></canvas></div>\n';
+      if (v === "urea2") h += '<div class="pf-pie__urea2" aria-hidden="true"><canvas></canvas></div>\n';
       if (v === "formas") h += '<canvas class="pf-pie__fisica" aria-hidden="true"></canvas>\n' + legal;
       return h + '</footer>';
     },
     js: function (s) {
       if (s.variante === "institucional") return "";
+      if (s.variante === "urea2") return "(" + UREA2.toString() + ")(" + JSON.stringify(opcionesUrea2(s)) + ");";
       if (s.variante === "urea") return "(" + UREA.toString() + ")(" + JSON.stringify(opcionesUrea(s)) + ");";
       if (s.variante === "flores") return "(" + FLORES.toString() + ")(" + JSON.stringify(opcionesFlores(s)) + ");";
       if (s.variante === "formas") return "(" + FISICA.toString() + ")(" + JSON.stringify({ cantidad: +s.cantidad, tamano: +s.tamano }) + ");";
