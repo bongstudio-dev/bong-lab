@@ -334,10 +334,15 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 .pf-docs[data-vista="mini"] .pf-doc__y:empty { display: none; }
 .pf-docs[data-vista="mini"] .pf-doc__d { position: absolute; top: 10px; right: 10px; z-index: 2; width: 30px; height: 30px; background: var(--color-blanco); border-color: transparent; }
 @media (hover: hover) and (pointer: fine) {
-  .pf-docs[data-vista="mini"] .pf-doc:hover .pf-doc__arte { transform: translateY(-3px); }
+  .pf-docs[data-vista="mini"] .pf-doc:hover { translate: 0 -5px; }
   .pf-docs[data-vista="mini"] .pf-doc:hover .pf-doc__t { translate: 0 0; }
 }
-.pf-docs[data-vista="mini"] .pf-doc:active .pf-doc__arte { transform: scale(.985); }
+.pf-docs[data-vista="mini"] .pf-doc:active { translate: 0 -2px; }
+/* La tarjeta entera sube y toda es el enlace (la etiqueta deja pasar el clic). El enlace llega 8 px más abajo para que, al subir, el cursor
+   no quede afuera de la tarjeta y la haga titilar en el borde inferior. */
+.pf-docs[data-vista="mini"] .pf-doc { transition: translate 320ms var(--ease); }
+.pf-docs[data-vista="mini"] .pf-doc .pf-etiqueta { pointer-events: none; }
+.pf-docs[data-vista="mini"] .pf-doc__t a::after { inset: 0 0 -8px 0; }
 @media (max-width: 640px) {
   .pf-docs[data-vista="compacta"] .pf-doc { grid-template-columns: 22px minmax(0, 1fr) 30px; padding: 9px 0; row-gap: 0; }
   .pf-docs[data-vista="compacta"] .pf-doc .pf-etiqueta, .pf-docs[data-vista="compacta"] .pf-doc__t { grid-row: 1; }
