@@ -595,8 +595,9 @@
 
   /* Urea (experimento): un grano de urea cae sobre el campo y se parte en dos; cada mitad, en dos; y así hasta
      cubrirlo. Cada división pasa por la Forma Urea del sistema: del grano sale un brote más chico, crece y se separa
-     de un salto. Los granos se acomodan siempre en un bloque parejo, uno por surco y fila, y la cámara se aleja a
-     medida que se multiplican. Al final cada grano se hunde y brota; el viento los mece, el puntero los aparta y,
+     de un salto. Vista isométrica. Los granos se reparten parejo en un disco, sobre surcos circulares (orden radial,
+     no exacto), y la cámara se aleja a medida que se multiplican hasta que el campo pasa los cuatro bordes.
+     Al final cada grano se hunde y brota, cada brote de su tamaño; el viento los mece, el puntero los aparta y,
      después de un rato (o con un clic), el campo se recoge y cae otro grano.
      O = { divisiones, velocidad, viento, pausa }. */
   function UREA(O) {
@@ -624,66 +625,96 @@
     function colores() { var s = getComputedStyle(pie); ["surco", "grano", "brote"].forEach(function (k) { C[k] = s.getPropertyValue("--u-" + k).trim(); }); }
     colores();
 
-    /* El mundo: el suelo es y = 0 y la separación entre surcos vale 1. El grano mide lo mismo siempre;
-       lo que cambia es la distancia de la cámara. */
+    /* El mundo: el suelo es y = 0 y hay un grano por unidad de superficie; los surcos son círculos separados 1.
+       El grano mide lo mismo siempre; lo que cambia es la escala de la cámara. */
     var RG = .22, BROTE = .5, HOJA = .26, CAE = 1150, ESPERA = 300, BROTA = 2100, VUELVE = 1700;
-    var P0 = 18 * Math.PI / 180, P1 = 44 * Math.PI / 180;
-    var W = 0, H = 0, dpr = 1, F = 1, cy = 0, cols = 1, filas = 1, pasos = [], durs = [], dist = [], d0 = 1, dFin = 1, tzFin = 0, brotes = [];
+    // Vista isométrica: proyección paralela, 35,26° de inclinación y 45° de giro.
+    var ISO = Math.atan(Math.SQRT1_2), SP = Math.sin(ISO), GIRO = Math.PI / 4;
+    var W = 0, H = 0, dpr = 1, cy = 0, gens = [], durs = [], esc = [], kFin = 1, brotes = [];
 
-    // Divisiones: cada paso duplica el bloque a lo ancho o a lo hondo, hasta llegar a cols × filas.
-    function armar() {
-      var G = O.divisiones, n = Math.pow(2, G), ancho = W >= H;
-      cols = Math.pow(2, ancho ? Math.ceil(G / 2) : Math.floor(G / 2)); filas = n / cols;
-      pasos = []; durs = [];
-      var w = 1, h = 1;
-      for (var g = 0; g < G; g++) {
-        var ex = w / cols, ez = h / filas, enX = ex < ez || (ex === ez && ancho);
-        pasos.push({ w: w, h: h, x: enX }); if (enX) w *= 2; else h *= 2;
-        durs.push(220 + 680 * Math.pow(.75, g));
+    /* Los granos se empujan hasta quedar parejos (uno por unidad de superficie, nunca a menos de 1 de otro) y cada
+       vuelta se corren un poco hacia el surco circular más cercano: el campo sigue un orden radial, pero no exacto. */
+    function acomodar(x, z, n, R) {
+      for (var it = 0; it < 12; it++) {
+        var cel = new Map(), i, c, l;
+        for (i = 0; i < n; i++) { c = (Math.floor(x[i]) + 512) * 1024 + Math.floor(z[i]) + 512; l = cel.get(c); if (l) l.push(i); else cel.set(c, [i]); }
+        for (i = 0; i < n; i++) {
+          var cx = Math.floor(x[i]) + 512, cz = Math.floor(z[i]) + 512;
+          for (var ox = -1; ox <= 1; ox++) for (var oz = -1; oz <= 1; oz++) {
+            l = cel.get((cx + ox) * 1024 + cz + oz); if (!l) continue;
+            for (var q = 0; q < l.length; q++) {
+              var j = l[q]; if (j <= i) continue;
+              var dx = x[j] - x[i], dz = z[j] - z[i], d = Math.hypot(dx, dz);
+              if (d < 1 && d > 1e-6) { var f = (1 - d) / d * .25; x[i] -= dx * f; z[i] -= dz * f; x[j] += dx * f; z[j] += dz * f; }
+            }
+          }
+          var r = Math.hypot(x[i], z[i]);
+          if (r > .3) { var nr = Math.min(R - .25, r + (Math.floor(r) + .5 - r) * .2); x[i] *= nr / r; z[i] *= nr / r; }
+        }
       }
-      pasos.push({ w: w, h: h });
+    }
+    /* Una división: el campo se agranda (×√2) y cada grano deja dos hijos a su lado, más o menos a lo largo de su
+       surco; después se acomodan. Así cada salto es corto. El hijo más cerca del centro es el grano que se corre;
+       el otro, el brote que se separa. */
+    function dividir(P) {
+      var n = P.n * 2, x = new Float32Array(n), z = new Float32Array(n), e = Math.SQRT2, R = Math.sqrt(n / Math.PI), i;
+      for (i = 0; i < P.n; i++) {
+        var bx = P.x[i] * e, bz = P.z[i] * e, r = Math.hypot(bx, bz);
+        // La primera división va de costado en pantalla.
+        var an = r > .05 ? Math.atan2(bz, bx) + Math.PI / 2 + (Math.random() - .5) * 1.4 : -GIRO;
+        var ox = Math.cos(an) * .36, oz = Math.sin(an) * .36;
+        x[2 * i] = bx - ox; z[2 * i] = bz - oz; x[2 * i + 1] = bx + ox; z[2 * i + 1] = bz + oz;
+      }
+      if (n > 2) acomodar(x, z, n, R);
+      P.a = new Int32Array(P.n); P.b = new Int32Array(P.n);
+      for (i = 0; i < P.n; i++) {
+        var h0 = 2 * i, h1 = h0 + 1, adentro = Math.hypot(x[h0], z[h0]) <= Math.hypot(x[h1], z[h1]);
+        P.a[i] = adentro ? h0 : h1; P.b[i] = adentro ? h1 : h0;
+      }
+      return { n: n, x: x, z: z, R: R };
+    }
+    function armar() {
+      var G = O.divisiones, g;
+      gens = [{ n: 1, x: new Float32Array(1), z: new Float32Array(1), R: Math.sqrt(1 / Math.PI) }]; durs = [];
+      for (g = 0; g < G; g++) { gens.push(dividir(gens[g])); durs.push(220 + 680 * Math.pow(.75, g)); }
       // Cada grano brota con un retraso según la distancia al centro: el campo verdea de adentro hacia afuera.
-      brotes = [];
-      for (var j = 0; j < filas; j++) for (var i = 0; i < cols; i++) {
-        var x = i - cols / 2 + .5, z = j - filas / 2 + .5, rn = Math.min(1, Math.hypot(x / cols, z / filas) * 1.42);
-        brotes.push({ x: x, z: z, rn: rn, dl: rn * 750 + Math.random() * 260, b: 0, fase: Math.random() * 6.28 });
+      // Cada brote tiene su tamaño, su inclinación y su apertura de hojas.
+      var f = gens[G]; brotes = [];
+      for (var i = 0; i < f.n; i++) {
+        var rn = Math.min(1, Math.hypot(f.x[i], f.z[i]) / f.R);
+        brotes.push({ x: f.x[i], z: f.z[i], rn: rn, dl: rn * 750 + Math.random() * 260, b: 0, fase: Math.random() * 6.28,
+          t: .5 + 1.05 * Math.pow(Math.random(), 1.6), inc: (Math.random() - .5) * .2, ab: .75 + Math.random() * .5 });
       }
       encuadre();
     }
-    // Encuadre: el primer grano grande al centro; al final, el campo entero de lado a lado.
+    /* Encuadre: el primer grano grande al centro; la cámara se aleja mientras el campo entra en pantalla y, al final,
+       el campo pasa los cuatro bordes: ningún rincón queda vacío. */
     function encuadre() {
-      F = Math.max(W, H) * .85; cy = H * .48;
-      d0 = F * RG / (Math.min(W, H) * .085);
-      dFin = F * cols / (1.08 * W); tzFin = -filas * .14;
-      dist = pasos.map(function (p, g) {
-        var pt = P0 + (P1 - P0) * g / (pasos.length - 1);
-        return Math.min(dFin, Math.max(d0, F * (p.w + 1.2) / (.62 * W), F * (p.h + 1.2) * Math.sin(pt) / (.5 * H)));
-      });
-      dist[dist.length - 1] = dFin;
-      for (var g = 1; g < dist.length; g++) dist[g] = Math.max(dist[g], dist[g - 1]);
+      cy = H * .5;
+      var G = gens.length - 1, k0 = Math.min(W, H) * .085 / RG;
+      kFin = Math.hypot(W / 2, Math.max(cy, H - cy) / SP) / Math.max(1, gens[G].R - 1.2);
+      esc = gens.map(function (p) { return Math.max(kFin, Math.min(k0, Math.min(W * .42, H * .4 / SP) / (p.R + .8))); });
+      esc[G] = kFin;
+      for (var g = 1; g < esc.length; g++) esc[g] = Math.min(esc[g], esc[g - 1]);
     }
     function medir() {
       var w = banda.clientWidth, h = banda.clientHeight; if (!w || !h) return;
-      var cambia = (w >= h) !== (W >= H);
       W = w; H = h; dpr = Math.min(2, devicePixelRatio || 1);
       lienzo.width = Math.round(W * dpr); lienzo.height = Math.round(H * dpr);
-      if (cambia || !pasos.length) armar(); else encuadre();
+      if (!gens.length) armar(); else encuadre();
     }
 
-    // Cámara: mira a (0, 0, tz) desde una distancia D, con una inclinación y un giro lento.
-    var K = { px: 0, py: 0, pz: 0, fx: 0, fy: 0, fz: 0, rx: 0, rz: 0, ux: 0, uy: 0, uz: 0 };
-    function camara(D, incl, tz, giro) {
-      var cp = Math.cos(incl), sp = Math.sin(incl), cg = Math.cos(giro), sg = Math.sin(giro);
-      K.fx = sg * cp; K.fy = -sp; K.fz = cg * cp;
+    // Cámara isométrica: proyección paralela centrada en el origen; k son los píxeles por unidad.
+    var K = { k: 1, fx: 0, fy: 0, fz: 0, rx: 0, rz: 0, ux: 0, uy: 0, uz: 0 };
+    function camara(k) {
+      var cp = Math.cos(ISO), cg = Math.cos(GIRO), sg = Math.sin(GIRO);
+      K.k = k; K.fx = sg * cp; K.fy = -SP; K.fz = cg * cp;
       K.rx = cg; K.rz = -sg;
       K.ux = K.fy * K.rz; K.uy = K.fz * K.rx - K.fx * K.rz; K.uz = -K.fy * K.rx;
-      K.px = -D * K.fx; K.py = -D * K.fy; K.pz = tz - D * K.fz;
     }
     var S = { x: 0, y: 0, k: 0 };
     function proy(x, y, z) {
-      var vx = x - K.px, vy = y - K.py, vz = z - K.pz, zc = vx * K.fx + vy * K.fy + vz * K.fz;
-      if (zc < .25) return false;
-      S.k = F / zc; S.x = W / 2 + (vx * K.rx + vz * K.rz) * S.k; S.y = cy - (vx * K.ux + vy * K.uy + vz * K.uz) * S.k;
+      S.k = K.k; S.x = W / 2 + (x * K.rx + z * K.rz) * S.k; S.y = cy - (x * K.ux + y * K.uy + z * K.uz) * S.k;
       return true;
     }
 
@@ -708,46 +739,36 @@
     }
 
     // Estado del ciclo. El tiempo de animación corre a la velocidad elegida; el campo crecido y el viento, a tiempo real.
-    var fase = "nada", tf = 0, tReal = 0, dSal = 1, pSal = P1, zSal = 0, puntero = null, visible = false, corre = false, ultimo = 0, empezo = false;
+    var fase = "nada", tf = 0, tReal = 0, kSal = 1, puntero = null, visible = false, corre = false, ultimo = 0, empezo = false;
     function ir(f) { fase = f; tf = 0; }
 
     function dibujar() {
       if (!W) return;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
-      var G = pasos.length - 1, D, incl, tz, k = -1, u = 0, crece = 0;
-      // Dónde está la cámara según la fase.
-      if (fase === "nada" || fase === "cae") { D = dist[0]; incl = P0; tz = 0; }
+      var G = gens.length - 1, e, k = -1, u = 0, crece = 0;
+      // La escala de la cámara según la fase.
+      if (fase === "nada" || fase === "cae") e = esc[0];
       else if (fase === "parte") {
         var t = tf; k = 0; while (k < G - 1 && t >= durs[k]) { t -= durs[k]; k++; }
         u = lim(t / durs[k]);
-        var gc = k + suave(u); crece = gc / G;
-        D = Math.exp(Math.log(dist[k]) + (Math.log(dist[k + 1]) - Math.log(dist[k])) * suave(u));
-        incl = P0 + (P1 - P0) * suave(crece); tz = tzFin * suave(crece);
+        e = Math.exp(Math.log(esc[k]) + (Math.log(esc[k + 1]) - Math.log(esc[k])) * suave(u));
       } else if (fase === "vuelve") {
         var r = VISTA(tf / VUELVE); crece = 1 - r;
-        D = Math.exp(Math.log(dSal) + (Math.log(dist[0]) - Math.log(dSal)) * r);
-        incl = pSal + (P0 - pSal) * r; tz = zSal * (1 - r);
-      } else { D = dFin * (1 + .05 * suave((fase === "campo" ? tf + BROTA : tf) / (BROTA + O.pausa))); incl = P1; tz = tzFin; crece = 1; }
-      camara(D, incl, tz, quieto ? 0 : .09 * Math.sin(tReal * .00013));
-      dSal = D; pSal = incl; zSal = tz;
+        e = Math.exp(Math.log(kSal) + (Math.log(esc[0]) - Math.log(kSal)) * r);
+      } else { e = kFin * (1 + .05 * suave((fase === "campo" ? tf + BROTA : tf) / (BROTA + O.pausa))); crece = 1; }
+      camara(e); kSal = e;
 
-      // Surcos: todo el campo apenas marcado, y más presente donde ya llegaron los granos.
-      var bloque = fase === "parte" ? pasos[k] : (fase === "nada" || fase === "cae") ? { w: 0, h: 0 } : pasos[G];
-      var rx = fase === "parte" ? (pasos[k].w + (pasos[k + 1].w - pasos[k].w) * suave(u)) / 2 + .5 : bloque.w / 2 + .5;
-      var rz = fase === "parte" ? (pasos[k].h + (pasos[k + 1].h - pasos[k].h) * suave(u)) / 2 + .5 : bloque.h / 2 + .5;
-      if (fase === "cae") { var imp = lim((tf - CAE * .49) / 500); rx = rz = imp * 1.2; }
-      if (fase === "vuelve") { rx = cols / 2 * crece; rz = filas / 2 * crece; }
+      // Surcos: círculos concéntricos (elipses en isométrica), todo el campo apenas marcado y más presente donde ya llegaron los granos.
+      var Rm = gens[G].R + 1, alc = Rm;
+      if (fase === "nada") alc = 0;
+      else if (fase === "cae") alc = lim((tf - CAE * .49) / 500) * 1.2;
+      else if (fase === "parte") alc = gens[k].R + (gens[k + 1].R - gens[k].R) * suave(u) + .6;
+      else if (fase === "vuelve") alc = Rm * crece;
       ctx.lineWidth = 1; ctx.strokeStyle = C.surco;
-      [[cols / 2, filas / 2, .16], [Math.min(rx, cols / 2), Math.min(rz, filas / 2), .5]].forEach(function (c) {
-        if (c[0] <= 0 || c[1] <= 0) return;
-        ctx.globalAlpha = c[2]; ctx.beginPath();
-        for (var i = 0; i < cols; i++) {
-          var x = i - cols / 2 + .5; if (Math.abs(x) > c[0]) continue;
-          // El tramo se corta antes del plano de la cámara.
-          var za = -c[1], zb = c[1], zm = K.pz + .3 / Math.max(.05, K.fz);
-          if (zb < zm) continue; if (za < zm) za = zm;
-          if (proy(x, 0, za)) { ctx.moveTo(S.x, S.y); if (proy(x, 0, zb)) ctx.lineTo(S.x, S.y); }
-        }
+      [[Rm, .16], [Math.min(alc, Rm), .5]].forEach(function (c) {
+        if (c[0] < .5) return;
+        ctx.globalAlpha = c[1]; ctx.beginPath();
+        for (var m = .5; m <= c[0]; m++) { var rr = m * e; ctx.moveTo(W / 2 + rr, cy); ctx.ellipse(W / 2, cy, rr, rr * SP, 0, 0, 6.2832); }
         ctx.stroke();
       });
       ctx.globalAlpha = 1;
@@ -766,13 +787,12 @@
         }
         if (proy(0, RG + y * 3.2, 0)) { ctx.beginPath(); ctx.arc(S.x, S.y, RG * S.k, 0, 6.2832); ctx.fill(); }
       } else if (fase === "parte") {
-        var p = pasos[k], cir = new Path2D(), brote = u < .4 ? BASE(u / .4) : 1, v = VISTA((u - .4) / .6);
+        var p = gens[k], q = gens[k + 1], cir = new Path2D(), brote = u < .4 ? BASE(u / .4) : 1, v = VISTA((u - .4) / .6);
         ctx.beginPath();
-        for (var j = 0; j < p.h; j++) for (var i = 0; i < p.w; i++) {
-          var px = i - p.w / 2 + .5, pz = j - p.h / 2 + .5, ax, az, bx, bz, dx = 0, dz = 0;
-          if (p.x) { var c1 = 2 * i - p.w + .5, c2 = c1 + 1, afuera = Math.abs(c2) > Math.abs(c1); ax = afuera ? c1 : c2; bx = afuera ? c2 : c1; az = bz = pz; dx = bx > ax ? 1 : -1; }
-          else { var c3 = 2 * j - p.h + .5, c4 = c3 + 1, afz = Math.abs(c4) > Math.abs(c3); az = afz ? c3 : c4; bz = afz ? c4 : c3; ax = bx = px; dz = bz > az ? 1 : -1; }
-          // Brote: sale del grano como en la Forma Urea (52% del radio, a 1,19 radios del centro).
+        for (var i = 0; i < p.n; i++) {
+          var px = p.x[i], pz = p.z[i], ax = q.x[p.a[i]], az = q.z[p.a[i]], bx = q.x[p.b[i]], bz = q.z[p.b[i]];
+          var dl = Math.hypot(bx - px, bz - pz) || 1, dx = (bx - px) / dl, dz = (bz - pz) / dl;
+          // Brote: sale del grano hacia su hijo, como en la Forma Urea (52% del radio, a 1,19 radios del centro).
           var ox = px + dx * RG * 1.19 * brote, oz = pz + dz * RG * 1.19 * brote;
           var gx = px + (ax - px) * v, gz = pz + (az - pz) * v, hx = ox + (bx - ox) * v, hz = oz + (bz - oz) * v;
           var salto = Math.sin(Math.PI * v) * (.25 + .16 * Math.hypot(bx - px, bz - pz)), rb = RG * (.52 + .48 * v) * brote;
@@ -780,7 +800,7 @@
           var x1 = S.x, y1 = S.y, r1 = RG * S.k;
           if (!proy(hx, rb + salto, hz)) continue;
           var x2 = S.x, y2 = S.y, r2 = rb * S.k;
-          if ((x1 < -60 && x2 < -60) || (x1 > W + 60 && x2 > W + 60) || (y1 > H + 60 && y2 > H + 60)) continue;
+          if ((x1 < -60 && x2 < -60) || (x1 > W + 60 && x2 > W + 60) || (y1 > H + 60 && y2 > H + 60) || (y1 < -60 && y2 < -60)) continue;
           cir.moveTo(x1 + r1, y1); cir.arc(x1, y1, r1, 0, 6.2832);
           if (r2 > .3) { cir.moveTo(x2 + r2, y2); cir.arc(x2, y2, r2, 0, 6.2832); }
           puente(x1, y1, r1, x2, y2, r2);
@@ -796,11 +816,12 @@
       var granos = new Path2D(), tallos = new Path2D(), hojas = new Path2D(), pp = null;
       if (puntero && !quieto) {
         // Dónde toca el puntero en el suelo.
-        var sx = (puntero.x - W / 2) / F, sy = -(puntero.y - cy) / F;
-        var dx = K.fx + K.rx * sx + K.ux * sy, dy = K.fy + K.uy * sy, dz = K.fz + K.rz * sx + K.uz * sy;
-        if (dy < -.01) { var t = -K.py / dy; pp = { x: K.px + dx * t, z: K.pz + dz * t }; }
+        // Proyección paralela: todos los rayos van en la dirección de la cámara.
+        var sx = (puntero.x - W / 2) / K.k, sy = -(puntero.y - cy) / K.k;
+        var qx = K.rx * sx + K.ux * sy, qy = K.uy * sy, qz = K.rz * sx + K.uz * sy, t = -qy / K.fy;
+        pp = { x: qx + K.fx * t, z: qz + K.fz * t };
       }
-      var vi = O.viento / 100, ola = (tReal * .0042) % (cols + filas + 24) - 12 - (cols + filas) / 2;
+      var RF = gens[gens.length - 1].R, vi = O.viento / 100, ola = (tReal * .0042) % (4 * RF + 24) - 12 - 2 * RF;
       for (var n = 0; n < brotes.length; n++) {
         var b = brotes[n], gr = 1, ho = 1, hund = 1;
         if (fase === "brota") { var s = tf - b.dl; hund = BASE(s / 380); gr = BASE((s - 150) / 900); ho = BASE((s - 420) / 760); }
@@ -819,9 +840,9 @@
           if (pp) { var ddx = b.x - pp.x, ddz = b.z - pp.z, dd = Math.hypot(ddx, ddz); if (dd < 2.4) meta += (ddx >= 0 ? 1 : -1) * Math.pow(1 - dd / 2.4, 2) * .95; }
         }
         b.b += (meta - b.b) * .12;
-        var a = b.b, h = BROTE * gr * k, sa = Math.sin(a), ca = Math.cos(a);
+        var a = b.b + b.inc, h = BROTE * b.t * gr * k, sa = Math.sin(a), ca = Math.cos(a), gt = gr * (.6 + .4 * b.t);
         var tx = bx + sa * h, ty = by - ca * h, mx = bx + Math.sin(a * .35) * h * .55, my = by - h * .55;
-        var w0 = Math.max(.6, .05 * k * gr), w1 = Math.max(.4, .025 * k * gr);
+        var w0 = Math.max(.6, .05 * k * gt), w1 = Math.max(.4, .025 * k * gt);
         // Tallo: un trazo relleno que se afina, curvado hacia donde se dobla.
         tallos.moveTo(bx - w0, by);
         tallos.quadraticCurveTo(mx - (w0 + w1) / 2 * Math.cos(a * .5), my - (w0 + w1) / 2 * Math.sin(a * .5), tx - w1 * ca, ty - w1 * sa);
@@ -830,7 +851,7 @@
         tallos.closePath();
         // Dos hojas que se abren en V desde la punta.
         if (ho > 0) [-1, 1].forEach(function (l) {
-          var an = a + l * (.18 + .78 * ho), L = HOJA * k * ho, ww = L * .36, ds = Math.sin(an), dc = -Math.cos(an), ex = tx + ds * L, ey = ty + dc * L;
+          var an = a + l * (.18 + .78 * ho * b.ab), L = HOJA * (.55 + .45 * b.t) * k * ho, ww = L * .36, ds = Math.sin(an), dc = -Math.cos(an), ex = tx + ds * L, ey = ty + dc * L;
           hojas.moveTo(tx, ty);
           hojas.quadraticCurveTo(tx + ds * L * .5 - dc * ww, ty + dc * L * .5 + ds * ww, ex, ey);
           hojas.quadraticCurveTo(tx + ds * L * .5 + dc * ww, ty + dc * L * .5 - ds * ww, tx, ty);
@@ -1098,7 +1119,7 @@
       ["vida", "Vida para nuestra tierra", "Alto de pantalla completa con un video de campo en loop de fondo y un filtro negro parejo. La frase va abajo a la izquierda, a tamaño de título, y entra con el animador Ventana."],
       ["formas", "Formas que caen", "Experimento. Alto de pantalla completa en marfil: arriba logo, links y línea ética; abajo caen las formas del sistema con física, se apilan hasta la mitad y se pueden agarrar y tirar."],
       ["flores", "Flores", "Experimento. Alto de pantalla completa en marfil: arriba logo, links y línea ética; abajo una banda de mosaicos, cada uno un par secundario del Master: fondo y forma en 70/30. Cada mosaico muestra una sola forma a la vez y corre su propio loop (rotación, tira, salto, corte, órbita o morph); cada tanto la forma sale y entra otro movimiento, o cambia el par de colores. Dos mosaicos vecinos nunca comparten un color. Al pasar el puntero o tocar, cambian en el acto."],
-      ["urea", "Urea", "Experimento. Alto de pantalla completa en azul: arriba logo, links y línea ética; abajo cae un grano de urea sobre el campo y se parte en dos, cada mitad en dos, hasta dejar uno por surco y fila. Cada división pasa por la Forma Urea: del grano sale un brote más chico que crece y se separa. Después los granos se hunden y brotan, el viento los mece y el puntero los aparta."],
+      ["urea", "Urea", "Experimento. Alto de pantalla completa en azul: arriba logo, links y línea ética; abajo, en vista isométrica, cae un grano de urea sobre el campo y se parte en dos, cada mitad en dos, hasta cubrirlo de borde a borde. Cada división pasa por la Forma Urea: del grano sale un brote más chico que crece y se separa. Los granos se acomodan sobre surcos circulares, en un orden radial que no es exacto. Después se hunden y brotan, cada brote de su tamaño; el viento los mece y el puntero los aparta."],
       ["urea2", "Urea 2", "Experimento. Alto de pantalla completa en azul: arriba logo, links y línea ética; abajo caen granos de urea desde un chorro que barre el ancho y se apilan hasta llenar el campo. Al pasar el puntero, los granos se apartan; apretando y arrastrando, se lleva todos los que agarra y con ellos empuja la pila."]
     ],
     tamano: "media",
@@ -1106,7 +1127,7 @@
       if (s.etica !== eticaCargada) return null;
       return s.variante === "flores" ? opcionesFlores(s) : s.variante === "urea" ? opcionesUrea(s) : s.variante === "urea2" ? opcionesUrea2(s) : null;
     },
-    claves: ["La línea ética va siempre en el pie, con su propio llamado, en una sola línea discreta.", "Los fondos de color son solo los del Master (azul, verde, terra, amarillo); sobre amarillo el texto va en azul.", "El logo va siempre completo: no se recorta ni se separa el símbolo de la palabra.", "Las columnas repiten el menú principal: si cambia la arquitectura, cambia el pie.", "Con trigo y Vida para nuestra tierra tienen parallax: el trigo y la foto se mueven a otra velocidad que la página mientras el pie entra en pantalla.", "Vida para nuestra tierra ocupa una pantalla entera. La frase va alineada a la izquierda junto a la línea ética, y entra con el animador Ventana, palabra por palabra.", "Nunca degradados sobre la foto (ni de color ni de tinta). Si hace falta contraste, un filtro negro parejo.", "Formas que caen es un experimento: las 18 formas del Master en los 7 colores de marca, sin dos del mismo color tocándose (si se tocan, la que se mueve cambia de color). Arrancan a caer cuando el pie entra en pantalla.", "Flores es un experimento: cada mosaico es un par secundario del Master (fondo y forma, 70/30) con su propio programa en loop. Un tercer color solo aparece si forma una terciaria. Dos mosaicos vecinos nunca comparten un color, ni siquiera mientras cambian.", "Los cambios de par pasan siempre por rutas que dejan a la vista un par o una terciaria; terra y amarillo no se tocan nunca porque comparten el naranja.", "Urea es un experimento: el grano va en tiza, como la urea, y se divide pasando por la Forma Urea del sistema. Los granos se acomodan siempre en un bloque parejo, uno por surco; la cámara se aleja a medida que se multiplican y cada división dura un poco menos que la anterior.", "Urea 2 es un experimento: los granos van en tiza y caen de a muchos, con física, hasta llenar el campo a la altura elegida. La mano aparta al pasar y arrastra al apretar; con la pila quieta y sin nadie tocando, la animación se apaga sola."],
+    claves: ["La línea ética va siempre en el pie, con su propio llamado, en una sola línea discreta.", "Los fondos de color son solo los del Master (azul, verde, terra, amarillo); sobre amarillo el texto va en azul.", "El logo va siempre completo: no se recorta ni se separa el símbolo de la palabra.", "Las columnas repiten el menú principal: si cambia la arquitectura, cambia el pie.", "Con trigo y Vida para nuestra tierra tienen parallax: el trigo y la foto se mueven a otra velocidad que la página mientras el pie entra en pantalla.", "Vida para nuestra tierra ocupa una pantalla entera. La frase va alineada a la izquierda junto a la línea ética, y entra con el animador Ventana, palabra por palabra.", "Nunca degradados sobre la foto (ni de color ni de tinta). Si hace falta contraste, un filtro negro parejo.", "Formas que caen es un experimento: las 18 formas del Master en los 7 colores de marca, sin dos del mismo color tocándose (si se tocan, la que se mueve cambia de color). Arrancan a caer cuando el pie entra en pantalla.", "Flores es un experimento: cada mosaico es un par secundario del Master (fondo y forma, 70/30) con su propio programa en loop. Un tercer color solo aparece si forma una terciaria. Dos mosaicos vecinos nunca comparten un color, ni siquiera mientras cambian.", "Los cambios de par pasan siempre por rutas que dejan a la vista un par o una terciaria; terra y amarillo no se tocan nunca porque comparten el naranja.", "Urea es un experimento: el grano va en tiza, como la urea, y se divide pasando por la Forma Urea del sistema. La vista es isométrica. Los granos se reparten parejo sobre surcos circulares, sin quedar en fila; la cámara se aleja a medida que se multiplican hasta que el campo pasa los cuatro bordes, y cada división dura un poco menos que la anterior.", "Urea 2 es un experimento: los granos van en tiza y caen de a muchos, con física, hasta llenar el campo a la altura elegida. La mano aparta al pasar y arrastra al apretar; con la pila quieta y sin nadie tocando, la animación se apaga sola."],
     accesibilidad: "Es un <footer> con listas de links reales. El trigo es decorativo (aria-hidden); el video es decorativo, mudo y sin controles; la frase es texto real, legible por lectores y buscadores. Con movimiento reducido no hay parallax y el video queda quieto en el primer cuadro. En Formas que caen el lienzo es decorativo (aria-hidden) y deja pasar los clics a los links; con movimiento reducido las formas aparecen ya apiladas. En Flores el lienzo también es decorativo; con movimiento reducido los mosaicos quedan quietos y solo cambian al tocarlos, sin animación. En Urea el lienzo es decorativo; con movimiento reducido el campo aparece ya crecido y quieto. En Urea 2 el lienzo es decorativo; con movimiento reducido los granos aparecen ya apilados y no responden al puntero.",
     dependencias: ["en Formas que caen, Matter.js 0.20 y poly-decomp 0.3 desde CDN, y formas.js"],
     previo: '<div style="height:80vh;display:grid;place-items:center;color:var(--ink-3);font-size:var(--texto-chico)">Final de la página</div>',
@@ -1132,7 +1153,7 @@
       { id: "pOrbita", tipo: "rango", etiqueta: "Órbita", solo: ["flores"], unidad: "%", min: 0, max: 100, def: 20, desc: "Peso de la familia: una forma que da vueltas alrededor del centro del mosaico, con una parada por compás." },
       { id: "pMorph", tipo: "rango", etiqueta: "Morph", solo: ["flores"], unidad: "%", min: 0, max: 100, def: 20, desc: "Peso de la familia: una forma que se transforma en otra, en cadena de tres." },
       { id: "campo", tipo: "seg", etiqueta: "Campo", solo: ["urea", "urea2"], def: "azul", aplica: { attr: "data-campo" }, opciones: [["azul", "Azul"], ["verde", "Verde"]], desc: "Azul: terciaria Azul, Celeste y Verde (fondo, surcos y brotes). Verde: secundaria Verde y Verde Claro. Los granos van siempre en tiza, como la urea." },
-      { id: "divisiones", tipo: "rango", etiqueta: "Divisiones", solo: ["urea"], unidad: "veces", min: 6, max: 12, def: 10, desc: "Cuántas veces se parte el grano. Con 10 quedan 1024 granos, uno por surco y fila. Cambiarlo rearma el campo y empieza de nuevo." },
+      { id: "divisiones", tipo: "rango", etiqueta: "Divisiones", solo: ["urea"], unidad: "veces", min: 6, max: 12, def: 10, desc: "Cuántas veces se parte el grano. Con 10 quedan 1024 granos. El campo siempre llena la pantalla: con más divisiones los brotes se ven más chicos. Cambiarlo rearma el campo y empieza de nuevo." },
       { id: "velocidad", tipo: "rango", etiqueta: "Velocidad", solo: ["urea"], unidad: "%", min: 50, max: 200, paso: 10, def: 100, desc: "Ritmo de la caída, las divisiones y el brote. Cada división tarda un poco menos que la anterior, así la multiplicación acelera." },
       { id: "viento", tipo: "rango", etiqueta: "Viento", solo: ["urea"], unidad: "%", min: 0, max: 100, def: 40, desc: "Cuánto se mecen los brotes con la racha que cruza el campo. El puntero los aparta igual, haya viento o no." },
       { id: "pausa", tipo: "rango", etiqueta: "Campo crecido", solo: ["urea"], unidad: "s", min: 2, max: 20, def: 6, desc: "Cuánto se queda el campo crecido antes de recogerse y dejar caer otro grano. Un clic sobre el campo lo adelanta." },
