@@ -630,32 +630,36 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
     document.querySelectorAll(".pf-selector.pf-vista button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.vista === vista)); });
     moverInd(document.querySelector(".pf-selector.pf-vista"), animar);
   }
-  // Cambiar de vista funde solo la lista (sale, se rearma y entra) y el indicador viaja; el resto de la página no se toca.
-  var cambiando = false;
+  // Cambiar de vista: la lista nueva aparece completa y una copia de la anterior queda encima, fija, y se disuelve. Así nunca hay un
+  // momento vacío (no pestañea) y el resto de la página no se toca.
+  var fantasma = null;
+  function quitarFantasma() { if (fantasma) { fantasma.remove(); fantasma = null; } docs.classList.remove("pf-cambia"); }
   document.querySelector(".pf-selector.pf-vista").addEventListener("click", function (e) {
     var b = e.target.closest("[data-vista]"); if (!b || b.dataset.vista === vista) return;
     vista = b.dataset.vista;
     try { localStorage.setItem("documentos-vista", vista); } catch (err) {}
     marcarVista(true);
-    if (cambiando) return; // otro clic en pleno fundido: ya se arma la vista que quedó marcada
+    quitarFantasma();
     // El documento que está arriba de la pantalla queda en el mismo lugar después del cambio.
     var ref = null, tope = $("pf-top").offsetHeight + 8, filas = docs.children;
     for (var i = 0; i < filas.length; i++) { var r = filas[i].getBoundingClientRect(); if (r.bottom > tope) { ref = { k: filas[i].dataset.k, top: r.top }; break; } }
-    function cambiar() {
-      repintar(true);
-      var el = ref && docs.querySelector('[data-k="' + ref.k + '"]');
-      if (el) window.scrollTo({ top: Math.max(0, window.scrollY + el.getBoundingClientRect().top - ref.top), behavior: "instant" });
+    var animar = docs.animate && !matchMedia("(prefers-reduced-motion: reduce)").matches, copia = null;
+    if (animar) {
+      var rd = docs.getBoundingClientRect();
+      copia = docs.cloneNode(true); copia.removeAttribute("id");
+      copia.style.cssText = "position:absolute;margin:0;left:" + rd.left + "px;top:" + rd.top + "px;width:" + rd.width + "px;min-height:0";
+      fantasma = document.createElement("div"); fantasma.setAttribute("aria-hidden", "true");
+      fantasma.style.cssText = "position:fixed;inset:0;z-index:30;pointer-events:none;clip-path:inset(" + tope + "px 0 0 0)";
+      fantasma.appendChild(copia); document.body.appendChild(fantasma);
+      docs.classList.add("pf-cambia");
     }
-    if (!docs.animate || matchMedia("(prefers-reduced-motion: reduce)").matches) { cambiar(); return; }
-    cambiando = true; docs.classList.add("pf-cambia");
-    var sale = docs.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 110, easing: "ease-out", fill: "forwards" }), entra;
-    sale.finished.then(function () {
-      cambiando = false; cambiar();
-      entra = docs.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, easing: "ease-out", fill: "forwards" });
-      return entra.finished;
-    }).catch(function () {}).then(function () {
-      cambiando = false; sale.cancel(); if (entra) entra.cancel(); docs.classList.remove("pf-cambia");
-    });
+    repintar(true);
+    var el = ref && docs.querySelector('[data-k="' + ref.k + '"]');
+    if (el) window.scrollTo({ top: Math.max(0, window.scrollY + el.getBoundingClientRect().top - ref.top), behavior: "instant" });
+    if (!animar) return;
+    var mio = fantasma;
+    fantasma.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: "ease-out", fill: "forwards" }).finished
+      .catch(function () {}).then(function () { if (fantasma === mio) quitarFantasma(); });
   });
   marcarVista(false);
   $("pf-sortAz").addEventListener("click", function () { ordenar("az"); });
