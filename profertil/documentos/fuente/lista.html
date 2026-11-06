@@ -265,7 +265,7 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 /* --- Vistas: compacta, lista (la de siempre) y miniaturas. El selector es el de Novedades; al cambiar, solo la lista se funde y el
    indicador viaja a su lugar. No usa View Transitions: capturan la página entera y activarían la animación de página de
    transicion.css (::view-transition-old/new(root)). */
-.pf-docs.pf-cambia .pf-doc { animation: none; }
+.pf-doc.pf-quieta { animation: none; } /* filas que se arman al cambiar de vista: nacen sin la entrada y no la reciben después */
 .pf-doc__arte { display: none; }
 
 /* Compacta: una línea por documento, solo el ícono de la categoría. */
@@ -515,10 +515,11 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   var vista = "lista";
   try { vista = localStorage.getItem("documentos-vista") || "lista"; } catch (e) {}
   if (["compacta", "lista", "mini"].indexOf(vista) === -1) vista = "lista";
+  var sinEntrada = false;
   function fila(d) {
     var q = plano(estado.q.trim());
     var li = document.createElement("li");
-    li.className = "pf-doc";
+    li.className = "pf-doc" + (sinEntrada ? " pf-quieta" : "");
     li.dataset.k = d.k;
     var bajar = d.l ? 'href="pdf/' + encodeURIComponent(d.l) + '" download' : 'href="' + esc(d.u) + '" target="_blank" rel="noopener"';
     li.innerHTML = (vista === "mini" ? '<div class="pf-doc__arte">' + arte(d) + "</div>" : "") + etq(d.c, vista === "mini" ? "" : "").replace('class="pf-etiqueta"', 'class="pf-etiqueta" title="' + POR[d.c].nombre + '"') +
@@ -633,7 +634,7 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   // Cambiar de vista: la lista nueva aparece completa y una copia de la anterior queda encima, fija, y se disuelve. Así nunca hay un
   // momento vacío (no pestañea) y el resto de la página no se toca.
   var fantasma = null;
-  function quitarFantasma() { if (fantasma) { fantasma.remove(); fantasma = null; } docs.classList.remove("pf-cambia"); }
+  function quitarFantasma() { if (fantasma) { fantasma.remove(); fantasma = null; } }
   document.querySelector(".pf-selector.pf-vista").addEventListener("click", function (e) {
     var b = e.target.closest("[data-vista]"); if (!b || b.dataset.vista === vista) return;
     vista = b.dataset.vista;
@@ -647,13 +648,13 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
     if (animar) {
       var rd = docs.getBoundingClientRect();
       copia = docs.cloneNode(true); copia.removeAttribute("id");
+      copia.querySelectorAll(".pf-doc").forEach(function (f) { f.classList.add("pf-quieta"); }); // la copia no reproduce la entrada de sus filas
       copia.style.cssText = "position:absolute;margin:0;left:" + rd.left + "px;top:" + rd.top + "px;width:" + rd.width + "px;min-height:0";
       fantasma = document.createElement("div"); fantasma.setAttribute("aria-hidden", "true");
       fantasma.style.cssText = "position:fixed;inset:0;z-index:30;pointer-events:none;clip-path:inset(" + tope + "px 0 0 0)";
       fantasma.appendChild(copia); document.body.appendChild(fantasma);
-      docs.classList.add("pf-cambia");
     }
-    repintar(true);
+    sinEntrada = true; repintar(true); sinEntrada = false;
     var el = ref && docs.querySelector('[data-k="' + ref.k + '"]');
     if (el) window.scrollTo({ top: Math.max(0, window.scrollY + el.getBoundingClientRect().top - ref.top), behavior: "instant" });
     if (!animar) return;
