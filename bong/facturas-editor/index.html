@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Facturas Bong · Editor</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap">
+<style>
+/* Layout: barra superior · capas | lienzo con la hoja A4 | inspector. En celular: chips de secciones arriba, inspector anclado abajo. */
+:root{
+  --ui-bg:#e9ebef; --panel:#ffffff; --panel-2:#f4f5f7; --line:#dcdfe5; --ink:#15171c; --ink-2:#5d6370; --ink-3:#9298a4;
+  --sel:#2f6bff; --sel-soft:rgba(47,107,255,.10); --ok:#1f8a4c; --warn:#b26a00; --danger:#d33a2c;
+  --paper:#ffffff; --paper-ink:#111111; --paper-2:#6b6b6b; --paper-line:#e4e4e4;
+  --font:"Satoshi","Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --ui-bg:#111215; --panel:#1b1c20; --panel-2:#24262b; --line:#2e3036; --ink:#eceef2; --ink-2:#a3a8b3; --ink-3:#6f7480;
+  --sel:#5b8cff; --sel-soft:rgba(91,140,255,.16); --ok:#43c07a; --warn:#e3a33b; --danger:#ff6b5e; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --ui-bg:#111215; --panel:#1b1c20; --panel-2:#24262b; --line:#2e3036; --ink:#eceef2; --ink-2:#a3a8b3; --ink-3:#6f7480;
+  --sel:#5b8cff; --sel-soft:rgba(91,140,255,.16); --ok:#43c07a; --warn:#e3a33b; --danger:#ff6b5e; color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--ui-bg);color:var(--ink);font:14px/1.4 var(--font);-webkit-font-smoothing:antialiased;overflow:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--sel);outline-offset:2px}
+
+.app{height:100%;display:grid;grid-template-rows:auto 1fr;grid-template-columns:220px 1fr 300px;grid-template-areas:"top top top" "layers canvas insp"}
+
+/* Barra superior */
+.top{grid-area:top;display:flex;align-items:center;gap:12px;padding:8px max(12px,env(safe-area-inset-right,0px)) 8px max(12px,env(safe-area-inset-left,0px));background:var(--panel);border-bottom:1px solid var(--line);min-width:0}
+.back{display:flex;align-items:center;gap:6px;border:0;background:none;color:var(--ink-2);padding:6px 8px;border-radius:8px}
+.back:hover{background:var(--panel-2);color:var(--ink)}
+.doc-id{display:flex;flex-direction:column;min-width:0;line-height:1.2}
+.doc-id b{font-weight:700;white-space:nowrap}
+.doc-id span{color:var(--ink-2);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spacer{flex:1}
+.seg{display:inline-flex;background:var(--panel-2);border:1px solid var(--line);border-radius:9px;padding:2px;gap:2px}
+.seg button{border:0;background:none;padding:5px 10px;border-radius:7px;color:var(--ink-2);font-size:13px;font-weight:500;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.seg button[aria-pressed="true"]{background:var(--panel);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--ink-3)}
+.dot.enviada{background:var(--warn)} .dot.cobrada{background:var(--ok)}
+.saved{font-size:12px;color:var(--ink-3);white-space:nowrap;display:flex;align-items:center;gap:6px}
+.saved::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ok)}
+.saved.busy::before{background:var(--warn)}
+.ibtn{border:1px solid transparent;background:none;width:32px;height:32px;border-radius:8px;display:grid;place-items:center;color:var(--ink-2)}
+.ibtn:hover:not(:disabled){background:var(--panel-2);color:var(--ink)}
+.ibtn:disabled{opacity:.35;cursor:default}
+.btn{border:1px solid var(--line);background:var(--panel);padding:7px 12px;border-radius:9px;font-weight:500;display:flex;gap:6px;align-items:center;white-space:nowrap}
+.btn:hover{background:var(--panel-2)}
+.btn.primary{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+.btn.primary:hover{opacity:.9}
+.zoom{display:flex;align-items:center;gap:2px;color:var(--ink-2);font-size:12px;font-variant-numeric:tabular-nums}
+.zoom output{min-width:40px;text-align:center}
+
+/* Capas */
+.layers{grid-area:layers;background:var(--panel);border-right:1px solid var(--line);overflow:auto;padding:12px 8px}
+.ptitle{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:700;padding:4px 8px 8px}
+.layer{display:flex;align-items:center;gap:8px;width:100%;border:0;background:none;text-align:left;padding:6px 8px;border-radius:7px;color:var(--ink-2);font-size:13px}
+.layer:hover{background:var(--panel-2);color:var(--ink)}
+.layer.on{background:var(--sel-soft);color:var(--sel);font-weight:500}
+.layer.child{padding-left:28px}
+.layer svg{flex:none;opacity:.7}
+.layer span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hint{margin:16px 8px 0;padding:10px;border-radius:8px;background:var(--panel-2);color:var(--ink-2);font-size:12px;line-height:1.5}
+.hint kbd{font:11px var(--mono);background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:0 4px}
+
+/* Lienzo */
+.canvas{grid-area:canvas;overflow:auto;position:relative;min-width:0;padding:32px 24px 120px}
+.stage{position:relative;margin:0 auto}
+.sheet-wrap{transform-origin:0 0;position:absolute;left:0;top:0}
+
+/* Hoja */
+.sheet{width:794px;min-height:1123px;background:var(--paper);color:var(--paper-ink);padding:64px 64px 56px;font-family:var(--font);box-shadow:0 1px 2px rgba(0,0,0,.08),0 12px 40px rgba(0,0,0,.10);display:flex;flex-direction:column;gap:40px;font-size:13px;line-height:1.5;color-scheme:light}
+.s-head{display:flex;justify-content:space-between;align-items:flex-start}
+.brand{font-weight:900;font-size:34px;letter-spacing:-.04em;line-height:1}
+.brand small{display:block;font-size:10px;letter-spacing:.14em;font-weight:500;text-transform:uppercase;color:var(--paper-2);margin-top:8px}
+.s-title{text-align:right}
+.s-title h1{margin:0;font-size:44px;font-weight:700;letter-spacing:-.03em;line-height:1}
+.s-title .num{font:500 14px var(--font);color:var(--paper-2);margin-top:8px;font-variant-numeric:tabular-nums}
+.s-meta{display:grid;grid-template-columns:repeat(3,1fr);border-top:1.5px solid var(--paper-ink);border-bottom:1px solid var(--paper-line)}
+.s-meta>div{padding:12px 0;display:flex;flex-direction:column;gap:2px}
+.lbl{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--paper-2);font-weight:500}
+.s-parties{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+.party{display:flex;flex-direction:column;gap:4px}
+.party .name{font-weight:700;font-size:16px}
+.party .det{white-space:pre-wrap;color:#333}
+table.items{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.items th{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--paper-2);font-weight:500;text-align:left;padding:0 0 10px;border-bottom:1.5px solid var(--paper-ink)}
+.items th.r,.items td.r{text-align:right}
+.items td{padding:14px 0;border-bottom:1px solid var(--paper-line);vertical-align:top}
+.items td+td,.items th+th{padding-left:16px}
+.items .c-desc{width:58%;position:relative}
+.items .d1{font-weight:500;display:block}
+.items .d2{display:block;color:var(--paper-2);white-space:pre-wrap;margin-top:2px}
+.items tr.on td{background:rgba(47,107,255,.04)}
+.handle{position:absolute;left:-42px;top:12px;width:24px;height:28px;border-radius:6px;display:grid;place-items:center;color:#9aa0aa;cursor:grab;opacity:0;touch-action:none;border:0;background:none}
+.items tr:hover .handle,.items tr.on .handle{opacity:1}
+.handle:hover{background:#f0f2f5;color:#333}
+.add-row{margin-top:10px;width:100%;border:1px dashed #c9ced8;background:none;border-radius:8px;padding:9px;color:#6b7280;font-size:13px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:6px}
+.add-row:hover{border-color:var(--sel);color:var(--sel);background:rgba(47,107,255,.04)}
+.s-totals{display:flex;justify-content:flex-end}
+.s-totals dl{margin:0;width:300px;display:grid;grid-template-columns:1fr auto;row-gap:8px;font-variant-numeric:tabular-nums}
+.s-totals dt{color:var(--paper-2)} .s-totals dd{margin:0;text-align:right}
+.s-totals .grand{border-top:1.5px solid var(--paper-ink);padding-top:12px;margin-top:4px;font-size:22px;font-weight:700;letter-spacing:-.01em}
+.s-foot{margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:32px;border-top:1px solid var(--paper-line);padding-top:20px}
+.s-foot .txt{white-space:pre-wrap;color:#333}
+.s-sign{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--paper-2);display:flex;justify-content:space-between}
+
+/* Campos editables en la hoja */
+.f{outline:none;border-radius:3px;cursor:text;min-width:1ch;display:inline-block;position:relative;transition:background .12s}
+.f[data-type="choice"],.f[data-type="date"]{cursor:pointer}
+.f.empty::before{content:attr(data-ph);color:#b5bac3;font-weight:400;pointer-events:none}
+.f:focus{background:rgba(47,107,255,.06)}
+.f input[type="date"]{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;border:0;padding:0}
+.calc{cursor:default}
+
+/* Superposiciones tipo Framer */
+.ov{position:absolute;pointer-events:none;border-radius:3px;z-index:5}
+#hov{border:1px solid var(--sel);display:none}
+#selb{border:2px solid var(--sel);display:none;margin:-1px}
+.tag{position:absolute;left:-2px;bottom:100%;margin-bottom:4px;background:var(--sel);color:#fff;font:600 11px var(--font);padding:2px 6px;border-radius:4px;white-space:nowrap;letter-spacing:.01em}
+#hov .tag{background:var(--sel);opacity:.85}
+.ov.below .tag{bottom:auto;top:100%;margin:4px 0 0}
+#tb{position:absolute;z-index:6;display:none;background:var(--ink);color:var(--panel);border-radius:10px;padding:4px;gap:2px;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.25);white-space:nowrap}
+#tb button{border:0;background:none;color:inherit;height:30px;min-width:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:500}
+#tb button:hover{background:rgba(255,255,255,.14)}
+#tb button[aria-pressed="true"]{background:var(--sel);color:#fff}
+#tb button.danger:hover{background:var(--danger);color:#fff}
+#tb .sep{width:1px;height:18px;background:rgba(127,127,127,.4);margin:0 4px}
+#tb .lab{font-size:12px;opacity:.65;padding:0 6px 0 8px}
+#drop{height:2px;background:var(--sel);display:none;border-radius:2px}
+
+/* Inspector */
+.insp{grid-area:insp;background:var(--panel);border-left:1px solid var(--line);overflow:auto;display:flex;flex-direction:column}
+.insp-head{display:flex;align-items:center;gap:8px;padding:14px 16px 10px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--panel);z-index:1}
+.insp-head h2{margin:0;font-size:14px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.insp-head .crumb{font-size:12px;color:var(--ink-3);font-weight:500}
+.insp-toggle{display:none}
+.insp-body{padding:12px 16px 24px;display:flex;flex-direction:column;gap:16px}
+.grp{display:flex;flex-direction:column;gap:8px}
+.grp>.gt{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:700}
+.row{display:grid;grid-template-columns:84px 1fr;gap:8px;align-items:center}
+.row>label{color:var(--ink-2);font-size:12.5px}
+.row.top{align-items:start}.row.top>label{padding-top:7px}
+.in{width:100%;min-width:0;border:1px solid var(--line);background:var(--panel-2);border-radius:8px;padding:6px 9px;outline:none;font-size:13px}
+.in:focus{border-color:var(--sel);background:var(--panel);box-shadow:0 0 0 3px var(--sel-soft)}
+textarea.in{resize:vertical;min-height:64px;line-height:1.45}
+.in.num{text-align:right;font-variant-numeric:tabular-nums}
+.ro{padding:6px 9px;font-variant-numeric:tabular-nums;text-align:right;color:var(--ink-2)}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.actions .btn{font-size:12.5px;padding:6px 10px}
+.btn.danger{color:var(--danger)}
+.note{font-size:12px;color:var(--ink-3);line-height:1.5}
+.seg.full{display:flex}.seg.full button{flex:1;justify-content:center}
+.chips{display:none}
+
+/* Celular y tablet */
+@media (max-width:1100px){.app{grid-template-columns:0 1fr 300px}.layers{display:none}}
+@media (max-width:760px){
+  .app{grid-template-columns:1fr;grid-template-rows:auto auto 1fr auto;grid-template-areas:"top" "chips" "canvas" "insp"}
+  .top{gap:6px;flex-wrap:nowrap}
+  .doc-id span{display:none}
+  .hide-m{display:none!important}
+  .seg button{padding:5px 8px}
+  .chips{grid-area:chips;display:flex;gap:6px;overflow-x:auto;padding:8px max(12px,env(safe-area-inset-right,0px)) 8px max(12px,env(safe-area-inset-left,0px));background:var(--panel);border-bottom:1px solid var(--line);scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chips button{flex:none;border:1px solid var(--line);background:var(--panel-2);border-radius:99px;padding:5px 12px;font-size:12.5px;color:var(--ink-2)}
+  .chips button[data-zoom]{background:var(--ink);border-color:var(--ink);color:var(--panel)}
+  .chips button.on{background:var(--sel);border-color:var(--sel);color:#fff}
+  .canvas{padding:16px max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px))}
+  .insp{border-left:0;border-top:1px solid var(--line);max-height:46vh;padding-bottom:env(safe-area-inset-bottom,0px);box-shadow:0 -8px 24px rgba(0,0,0,.08)}
+  .insp.collapsed{max-height:none}
+  .insp.collapsed .insp-body{display:none}
+  .insp-toggle{display:grid}
+  .row{grid-template-columns:76px 1fr}
+  .handle{left:-36px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* Impresión: solo la hoja */
+@page{size:A4;margin:0}
+@media print{
+  html,body{height:auto;overflow:visible;background:#fff}
+  .top,.layers,.insp,.chips,.ov,#tb,#drop,.add-row,.handle{display:none!important}
+  .app{display:block}
+  .canvas{padding:0;overflow:visible}
+  .stage{width:auto!important;height:auto!important}
+  .sheet-wrap{position:static;transform:none!important}
+  .sheet{box-shadow:none;width:210mm;min-height:297mm}
+  .f.empty,.opt-empty{display:none!important}
+  .f:focus{background:none}
+  .items tr.on td{background:none}
+}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <header class="top">
+    <button class="back" type="button" title="Volver a la lista" aria-label="Volver a la lista">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3 5 8l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="hide-m">Facturas</span>
+    </button>
+    <div class="doc-id"><b id="t-num"></b><span id="t-cli"></span></div>
+    <div class="spacer"></div>
+    <div class="seg" id="estado" role="group" aria-label="Estado">
+      <button type="button" data-v="borrador"><i class="dot"></i><span class="hide-m">Borrador</span></button>
+      <button type="button" data-v="enviada"><i class="dot enviada"></i><span class="hide-m">Enviada</span></button>
+      <button type="button" data-v="cobrada"><i class="dot cobrada"></i><span class="hide-m">Cobrada</span></button>
+    </div>
+    <span class="saved hide-m" id="saved">Guardado</span>
+    <div class="zoom hide-m">
+      <button class="ibtn" type="button" id="z-out" aria-label="Alejar">−</button>
+      <output id="z-val">100%</output>
+      <button class="ibtn" type="button" id="z-in" aria-label="Acercar">+</button>
+      <button class="ibtn" type="button" id="z-fit" title="Ajustar a la ventana" aria-label="Ajustar a la ventana"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 6V2h4M14 6V2h-4M2 10v4h4M14 10v4h-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+    </div>
+    <button class="ibtn" type="button" id="undo" title="Deshacer (⌘Z)" aria-label="Deshacer"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M5 4 2 7l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.5 7H10a4 4 0 0 1 0 8H7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+    <button class="ibtn" type="button" id="redo" title="Rehacer (⇧⌘Z)" aria-label="Rehacer"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="m11 4 3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.5 7H6a4 4 0 0 0 0 8h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+    <button class="btn primary" type="button" id="pdf"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 2v8m0 0 3-3M8 10 5 7M3 13h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="hide-m">Descargar PDF</span></button>
+  </header>
+
+  <nav class="chips" id="chips" aria-label="Secciones"></nav>
+
+  <aside class="layers" aria-label="Capas">
+    <div class="ptitle">Capas</div>
+    <div id="layers"></div>
+    <div class="hint">Hacé clic en cualquier texto de la hoja y escribí encima. <kbd>Tab</kbd> pasa al siguiente campo, <kbd>Enter</kbd> confirma y <kbd>Esc</kbd> descarta.</div>
+  </aside>
+
+  <main class="canvas" id="canvas">
+    <div class="stage" id="stage">
+      <div class="sheet-wrap" id="wrap"><article class="sheet" id="sheet"></article></div>
+      <div class="ov" id="hov"><span class="tag"></span></div>
+      <div class="ov" id="selb"><span class="tag"></span></div>
+      <div class="ov" id="drop"></div>
+      <div id="tb" role="toolbar" aria-label="Acciones del elemento"></div>
+    </div>
+  </main>
+
+  <aside class="insp" id="insp" aria-label="Propiedades">
+    <div class="insp-head">
+      <h2 id="i-title">Documento</h2><span class="crumb" id="i-crumb"></span>
+      <button class="ibtn insp-toggle" id="i-toggle" type="button" aria-label="Mostrar u ocultar propiedades"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="m4 10 4-4 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+    <div class="insp-body" id="i-body"></div>
+  </aside>
+</div>
+
+<script>
+/* ===== Datos de ejemplo (no son datos reales del estudio) ===== */
+const MUESTRA = {
+  numero: "INT-2026-07", fecha: "2026-11-11", vencimiento: "2026-11-26",
+  idioma: "es", moneda: "USD", estado: "borrador",
+  emisor: { nombre: "Bong Studio", detalle: "Estudio de branding\nCórdoba, Argentina\nCUIT 00-00000000-0 (ejemplo)\nbongstudio.ar" },
+  cliente: { nombre: "Northwind Botanicals LLC", detalle: "Attn. Jane Doe\n1200 Example Ave, Portland, OR 97201\nEstados Unidos" },
+  items: [
+    { desc: "Estrategia y fundamentos de marca", detalle: "Workshop, territorio y plataforma verbal", cant: 1, precio: 1800 },
+    { desc: "Identidad visual · Fase A", detalle: "Logotipo, paleta, tipografía y sistema gráfico", cant: 1, precio: 2600 },
+    { desc: "Piezas de lanzamiento", detalle: "Adaptaciones para redes", cant: 6, precio: 150 },
+  ],
+  pago: "Titular: Bong Studio (ejemplo)\nBanco: Banco de Ejemplo\nCuenta: 0000000000\nSWIFT: EXAMPLEXX",
+  notas: "Pago a 15 días desde la fecha de emisión. Gracias por confiar en el estudio.",
+};
+const PERFILES = {
+  emisor: [{ nombre: "Bong Studio", detalle: MUESTRA.emisor.detalle }],
+  cliente: [
+    { nombre: "Northwind Botanicals LLC", detalle: MUESTRA.cliente.detalle },
+    { nombre: "Atelier Ejemplo SARL", detalle: "12 rue de l'Exemple\n75011 París\nFrancia" },
+  ],
+};
+
+const T = {
+  es: { titulo:"Factura", fecha:"Fecha de emisión", venc:"Vencimiento", moneda:"Moneda", de:"De", para:"Para", desc:"Descripción", cant:"Cant.", precio:"Precio unit.", importe:"Importe", subtotal:"Subtotal", total:"Total", pago:"Datos de pago", notas:"Notas", sign:"Brutally Clear Branding" },
+  en: { titulo:"Invoice", fecha:"Issue date", venc:"Due date", moneda:"Currency", de:"From", para:"Bill to", desc:"Description", cant:"Qty", precio:"Unit price", importe:"Amount", subtotal:"Subtotal", total:"Total", pago:"Payment details", notas:"Notes", sign:"Brutally Clear Branding" },
+};
+const ETIQ = { numero:"Número", fecha:"Fecha", vencimiento:"Vencimiento", moneda:"Moneda", idioma:"Idioma", "emisor.nombre":"Proveedor", "emisor.detalle":"Datos del proveedor", "cliente.nombre":"Cliente", "cliente.detalle":"Datos del cliente", pago:"Datos de pago", notas:"Notas", desc:"Descripción", detalle:"Detalle", cant:"Cantidad", precio:"Precio unitario" };
+const OPC = { moneda:["USD","EUR","ARS"], idioma:[["es","Español"],["en","English"]] };
+
+/* ===== Estado ===== */
+const KEY = "bong-facturas-editor-v1";
+const store = { get(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } }, set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} } };
+let S = store.get(KEY) || structuredClone(MUESTRA);
+let perfiles = store.get(KEY + ":perfiles") || structuredClone(PERFILES);
+let sel = null;              // ruta del campo seleccionado, ej. "items.1.precio"
+let hist = [], fut = [];
+let antes = null;            // estado al empezar a editar un campo
+let zoom = null;             // null = ajustar
+const $ = s => document.querySelector(s);
+const CE = (() => { const d = document.createElement("div"); try { d.contentEditable = "plaintext-only"; } catch(e) {} return d.contentEditable === "plaintext-only" ? "plaintext-only" : "true"; })();
+const sheet = $("#sheet"), stage = $("#stage"), wrap = $("#wrap"), canvas = $("#canvas");
+
+const get = p => p.split(".").reduce((o,k) => o == null ? o : o[k], S);
+const set = (p,v) => { const ks = p.split("."), last = ks.pop(); ks.reduce((o,k) => o[k], S)[last] = v; };
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" })[c]);
+const loc = () => S.idioma === "es" ? "es-AR" : "en-US";
+const money = n => new Intl.NumberFormat(loc(), { minimumFractionDigits:2, maximumFractionDigits:2 }).format(n || 0);
+const qty = n => new Intl.NumberFormat(loc(), { maximumFractionDigits:2 }).format(n || 0);
+const fdate = d => { if(!d) return ""; const [y,m,dd] = d.split("-").map(Number); return new Date(y, m-1, dd).toLocaleDateString(loc(), { day:"2-digit", month:"short", year:"numeric" }); };
+const total = () => S.items.reduce((a,it) => a + (+it.cant||0) * (+it.precio||0), 0);
+function parseNum(s){
+  s = String(s).replace(/[^\d.,-]/g, "");
+  if (/^-?\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, "");
+  else if (s.includes(",") && s.includes(".")) s = s.lastIndexOf(",") > s.lastIndexOf(".") ? s.replace(/\./g,"").replace(",",".") : s.replace(/,/g,"");
+  else if (s.includes(",")) s = s.replace(",", ".");
+  const n = parseFloat(s); return isFinite(n) ? n : 0;
+}
+function etiqueta(p){
+  const m = p.match(/^items\.(\d+)\.(\w+)$/);
+  if (m) return `Ítem ${+m[1]+1} · ${ETIQ[m[2]]}`;
+  return ETIQ[p] || p;
+}
+function tipo(p){
+  if (/^(fecha|vencimiento)$/.test(p)) return "date";
+  if (/^(moneda|idioma)$/.test(p)) return "choice";
+  if (/\.(cant|precio)$/.test(p)) return "num";
+  if (/(detalle|pago|notas)$/.test(p)) return "multi";
+  return "text";
+}
+function mostrar(p){
+  const v = get(p), t = tipo(p);
+  if (t === "date") return fdate(v);
+  if (p.endsWith(".precio")) return money(v);
+  if (p.endsWith(".cant")) return qty(v);
+  if (p === "idioma") return v === "es" ? "Español" : "English";
+  return v ?? "";
+}
+
+/* ===== Render de la hoja ===== */
+function campo(p, ph, extra=""){
+  const t = tipo(p), v = mostrar(p);
+  const editable = (t === "text" || t === "multi" || t === "num") ? ` contenteditable="${CE}" spellcheck="false"` : ` tabindex="0" role="button"`;
+  const fecha = t === "date" ? `<input type="date" tabindex="-1" aria-label="${esc(etiqueta(p))}" value="${esc(get(p))}">` : "";
+  return `<span class="f${v === "" ? " empty" : ""}${extra}" data-k="${p}" data-type="${t}" data-ph="${esc(ph)}"${editable}>${esc(v)}</span>${fecha ? "" : ""}`.replace("</span>", fecha + "</span>");
+}
+function renderSheet(){
+  const L = T[S.idioma];
+  sheet.lang = S.idioma;
+  sheet.innerHTML = `
+  <div class="s-head" data-sec="encabezado">
+    <div class="brand">bong<small>Studio</small></div>
+    <div class="s-title"><h1>${L.titulo}</h1><div class="num">${campo("numero","INT-AAAA-NN")}</div></div>
+  </div>
+  <div class="s-meta" data-sec="encabezado">
+    <div><span class="lbl">${L.fecha}</span>${campo("fecha","Elegir fecha")}</div>
+    <div><span class="lbl">${L.venc}</span>${campo("vencimiento","Sin vencimiento")}</div>
+    <div><span class="lbl">${L.moneda}</span>${campo("moneda","")}</div>
+  </div>
+  <div class="s-parties">
+    <div class="party" data-sec="emisor"><span class="lbl">${L.de}</span><span class="name">${campo("emisor.nombre","Nombre del proveedor")}</span><span class="det">${campo("emisor.detalle","Dirección, identificación fiscal, contacto")}</span></div>
+    <div class="party" data-sec="cliente"><span class="lbl">${L.para}</span><span class="name">${campo("cliente.nombre","Nombre del cliente")}</span><span class="det">${campo("cliente.detalle","Dirección y contacto")}</span></div>
+  </div>
+  <div data-sec="items">
+    <table class="items">
+      <thead><tr><th>${L.desc}</th><th class="r">${L.cant}</th><th class="r">${L.precio}</th><th class="r">${L.importe}</th></tr></thead>
+      <tbody>${S.items.map((it,i) => `
+        <tr data-i="${i}">
+          <td class="c-desc"><button class="handle" type="button" data-drag="${i}" aria-label="Mover ítem ${i+1}" title="Arrastrar para reordenar"><svg width="10" height="16" viewBox="0 0 10 16" fill="currentColor"><circle cx="3" cy="3" r="1.4"/><circle cx="7" cy="3" r="1.4"/><circle cx="3" cy="8" r="1.4"/><circle cx="7" cy="8" r="1.4"/><circle cx="3" cy="13" r="1.4"/><circle cx="7" cy="13" r="1.4"/></svg></button>
+            <span class="d1">${campo(`items.${i}.desc`,"Descripción del trabajo")}</span><span class="d2">${campo(`items.${i}.detalle`,"Detalle (opcional)")}</span></td>
+          <td class="r">${campo(`items.${i}.cant`,"0")}</td>
+          <td class="r">${campo(`items.${i}.precio`,"0")}</td>
+          <td class="r"><span class="calc" data-calc="${i}" data-label="Importe · se calcula solo">${money(it.cant*it.precio)}</span></td>
+        </tr>`).join("")}
+      </tbody>
+    </table>
+    <button class="add-row" type="button" id="add"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Agregar ítem</button>
+  </div>
+  <div class="s-totals" data-sec="totales"><dl>
+    <dt>${L.subtotal}</dt><dd><span class="calc" id="c-sub" data-label="Subtotal · se calcula solo">${money(total())}</span></dd>
+    <dt class="grand">${L.total}</dt><dd class="grand"><span class="calc" id="c-tot" data-label="Total · se calcula solo">${S.moneda} ${money(total())}</span></dd>
+  </dl></div>
+  <div class="s-foot">
+    <div data-sec="pago" class="${S.pago ? "" : "opt-empty"}"><span class="lbl">${L.pago}</span><div class="txt">${campo("pago","Banco, cuenta, SWIFT o enlace de pago")}</div></div>
+    <div data-sec="notas" class="${S.notas ? "" : "opt-empty"}"><span class="lbl">${L.notas}</span><div class="txt">${campo("notas","Condiciones, agradecimiento, referencia de la orden")}</div></div>
+  </div>
+  <div class="s-sign"><span>Bong Studio · ${L.sign}</span><span>${esc(S.numero)}</span></div>`;
+  marcarSeleccion();
+  ajustarStage();
+}
+function actualizarCalculos(){
+  S.items.forEach((it,i) => { const c = sheet.querySelector(`[data-calc="${i}"]`); if (c) c.textContent = money((+it.cant||0)*(+it.precio||0)); });
+  const sub = $("#c-sub"), tot = $("#c-tot");
+  if (sub) sub.textContent = money(total());
+  if (tot) tot.textContent = `${S.moneda} ${money(total())}`;
+  $("#t-num").textContent = S.numero || "Sin número";
+  $("#t-cli").textContent = `${S.cliente.nombre || "Sin cliente"} · ${S.moneda} ${money(total())}`;
+  document.querySelectorAll("#estado button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === S.estado));
+  $("#undo").disabled = !hist.length; $("#redo").disabled = !fut.length;
+}
+
+/* ===== Capas y chips ===== */
+const SECCIONES = [
+  ["encabezado","Encabezado","numero"], ["emisor","Proveedor","emisor.nombre"], ["cliente","Cliente","cliente.nombre"],
+  ["items","Ítems","items.0.desc"], ["totales","Totales",null], ["pago","Datos de pago","pago"], ["notas","Notas","notas"],
+];
+const ICO = {
+  encabezado:'<path d="M3 4h10M3 8h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>',
+  emisor:'<circle cx="8" cy="6" r="2.5" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M3.5 13c.8-2.2 2.5-3.2 4.5-3.2s3.7 1 4.5 3.2" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/>',
+  items:'<path d="M3 4h10M3 8h10M3 12h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>',
+  item:'<rect x="3" y="5" width="10" height="6" rx="1.5" stroke="currentColor" stroke-width="1.4" fill="none"/>',
+  totales:'<path d="M4 4h8L8 8l4 4H4" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round"/>',
+  pago:'<rect x="2.5" y="4" width="11" height="8" rx="1.5" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M2.5 7h11" stroke="currentColor" stroke-width="1.4"/>',
+  notas:'<path d="M4 3h8v10H4zM6 6h4M6 9h3" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round"/>',
+};
+ICO.cliente = ICO.emisor;
+function seccionDe(p){ if (!p) return null; if (p.startsWith("items.")) return "items"; if (/^(numero|fecha|vencimiento|moneda|idioma)$/.test(p)) return "encabezado"; return p.split(".")[0]; }
+function renderLayers(){
+  const sec = seccionDe(sel), m = sel && sel.match(/^items\.(\d+)/);
+  let h = "";
+  for (const [id,nombre,first] of SECCIONES){
+    h += `<button class="layer${sec === id && !m ? " on" : ""}" type="button" data-go="${first ?? ""}" data-sec="${id}"><svg width="16" height="16" viewBox="0 0 16 16">${ICO[id]}</svg><span>${nombre}</span></button>`;
+    if (id === "items") S.items.forEach((it,i) => {
+      h += `<button class="layer child${m && +m[1] === i ? " on" : ""}" type="button" data-go="items.${i}.desc"><svg width="16" height="16" viewBox="0 0 16 16">${ICO.item}</svg><span>${esc(it.desc || "Ítem sin nombre")}</span></button>`;
+    });
+  }
+  $("#layers").innerHTML = h;
+  $("#chips").innerHTML = `<button type="button" data-zoom aria-pressed="${!!zoom}">${zoom ? "Ajustar" : "Acercar"}</button>` + SECCIONES.map(([id,nombre,first]) => `<button type="button" class="${sec === id ? "on" : ""}" data-go="${first ?? ""}" data-sec="${id}">${nombre}</button>`).join("");
+}
+function irA(btn){
+  const go = btn.dataset.go, el = go ? sheet.querySelector(`[data-k="${go}"]`) : sheet.querySelector(`[data-sec="${btn.dataset.sec}"]`);
+  if (!el) return;
+  el.scrollIntoView({ block:"center", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  if (go) seleccionar(go, true);
+}
+$("#layers").addEventListener("click", e => { const b = e.target.closest("[data-sec],[data-go]"); if (b) irA(b); });
+$("#chips").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.hasAttribute("data-zoom")){ zoom = zoom ? null : 0.85; ajustarStage(); renderLayers(); (sheet.querySelector(`[data-k="${sel}"]`) || sheet).scrollIntoView({ block:"center", inline:"center" }); return; }
+  irA(b);
+});
+
+/* ===== Inspector ===== */
+function inp(p, kind="text"){
+  const v = get(p), id = "i-" + p.replace(/\./g,"-");
+  if (kind === "multi") return `<textarea class="in" id="${id}" data-k="${p}" rows="3">${esc(v)}</textarea>`;
+  if (kind === "num") return `<input class="in num" id="${id}" data-k="${p}" inputmode="decimal" value="${esc(v)}">`;
+  if (kind === "date") return `<input class="in" id="${id}" type="date" data-k="${p}" value="${esc(v)}">`;
+  return `<input class="in" id="${id}" data-k="${p}" value="${esc(v)}">`;
+}
+const fila = (p, kind, lab) => `<div class="row${kind === "multi" ? " top" : ""}"><label for="i-${p.replace(/\./g,"-")}">${lab || ETIQ[p.split(".").pop()] || ETIQ[p]}</label>${inp(p, kind)}</div>`;
+function segmento(p){
+  const ops = p === "moneda" ? OPC.moneda.map(m => [m,m]) : OPC.idioma;
+  return `<div class="seg full" data-seg="${p}">${ops.map(([v,l]) => `<button type="button" data-v="${v}" aria-pressed="${get(p) === v}">${l}</button>`).join("")}</div>`;
+}
+function renderInspector(){
+  const sec = seccionDe(sel), m = sel && sel.match(/^items\.(\d+)/), body = $("#i-body");
+  let titulo = "Documento", crumb = "", h = "";
+  if (m){
+    const i = +m[1], it = S.items[i];
+    titulo = it.desc || "Ítem sin nombre"; crumb = `Ítem ${i+1} de ${S.items.length}`;
+    h = `<div class="grp"><div class="gt">Contenido</div>${fila(`items.${i}.desc`,"text","Descripción")}${fila(`items.${i}.detalle`,"multi","Detalle")}</div>
+      <div class="grp"><div class="gt">Importe</div>${fila(`items.${i}.cant`,"num","Cantidad")}${fila(`items.${i}.precio`,"num","Precio")}
+      <div class="row"><label>Importe</label><div class="ro" id="i-imp">${S.moneda} ${money(it.cant*it.precio)}</div></div></div>
+      <div class="grp"><div class="gt">Ítem</div><div class="actions">
+        <button class="btn" type="button" data-act="up" ${i===0?"disabled":""}>Subir</button>
+        <button class="btn" type="button" data-act="down" ${i===S.items.length-1?"disabled":""}>Bajar</button>
+        <button class="btn" type="button" data-act="dup">Duplicar</button>
+        <button class="btn danger" type="button" data-act="del">Quitar</button></div></div>`;
+  } else if (sec === "emisor" || sec === "cliente"){
+    const quien = sec, lista = perfiles[quien];
+    titulo = quien === "emisor" ? "Proveedor" : "Cliente"; crumb = "Perfil";
+    h = `<div class="grp"><div class="gt">Perfil guardado</div>
+        <select class="in" id="i-perfil" data-perfil="${quien}"><option value="">Elegir un perfil…</option>${lista.map((p,k) => `<option value="${k}">${esc(p.nombre)}</option>`).join("")}</select>
+        <div class="actions"><button class="btn" type="button" data-act="guardar-perfil" data-quien="${quien}">Guardar como perfil</button></div></div>
+      <div class="grp"><div class="gt">Datos</div>${fila(`${quien}.nombre`,"text","Nombre")}${fila(`${quien}.detalle`,"multi","Datos")}</div>`;
+  } else if (sec === "pago" || sec === "notas"){
+    titulo = sec === "pago" ? "Datos de pago" : "Notas";
+    h = `<div class="grp">${fila(sec,"multi",titulo)}<p class="note">Si lo dejás vacío, la sección no sale en el PDF.</p></div>`;
+  } else {
+    crumb = sel ? ETIQ[sel] : "";
+    h = `<div class="grp"><div class="gt">Comprobante</div>${fila("numero","text","Número")}${fila("fecha","date","Fecha")}${fila("vencimiento","date","Vencimiento")}</div>
+      <div class="grp"><div class="gt">Moneda</div>${segmento("moneda")}</div>
+      <div class="grp"><div class="gt">Idioma del comprobante</div>${segmento("idioma")}</div>
+      <div class="grp"><div class="gt">Resumen</div>
+        <div class="row"><label>Ítems</label><div class="ro">${S.items.length}</div></div>
+        <div class="row"><label>Total</label><div class="ro" id="i-tot">${S.moneda} ${money(total())}</div></div></div>
+      <p class="note">Hacé clic en cualquier texto de la hoja para editarlo ahí mismo. Lo que cambies acá también se ve en la hoja.</p>`;
+  }
+  $("#i-title").textContent = titulo; $("#i-crumb").textContent = crumb;
+  body.innerHTML = h;
+}
+function refrescarInspector(){
+  // Actualiza los valores sin rehacer el panel (no pierde el foco)
+  document.querySelectorAll("#i-body [data-k]").forEach(el => { if (el !== document.activeElement) el.value = get(el.dataset.k) ?? ""; });
+  const m = sel && sel.match(/^items\.(\d+)/);
+  if (m && $("#i-imp")){ const it = S.items[+m[1]]; $("#i-imp").textContent = `${S.moneda} ${money(it.cant*it.precio)}`; }
+  if ($("#i-tot")) $("#i-tot").textContent = `${S.moneda} ${money(total())}`;
+  if (m && $("#i-title")) $("#i-title").textContent = S.items[+m[1]].desc || "Ítem sin nombre";
+}
+const ib = $("#i-body");
+ib.addEventListener("focusin", e => { if (e.target.dataset.k) antes = JSON.stringify(S); });
+ib.addEventListener("input", e => {
+  const el = e.target, p = el.dataset.k; if (!p) return;
+  set(p, tipo(p) === "num" ? parseNum(el.value) : el.value);
+  const f = sheet.querySelector(`[data-k="${p}"]`);
+  if (f){ if (tipo(p) === "date") renderSheet(); else { f.textContent = mostrar(p); f.classList.toggle("empty", !f.textContent); } }
+  cambio();
+});
+ib.addEventListener("change", e => { if (e.target.dataset.k){ cerrarEdicion(); renderSheet(); } });
+ib.addEventListener("click", e => {
+  const s = e.target.closest("[data-seg] button");
+  if (s){ const p = s.parentElement.dataset.seg; aplicar(() => set(p, s.dataset.v)); return; }
+  const a = e.target.closest("[data-act]"); if (!a) return;
+  if (a.dataset.act === "guardar-perfil"){
+    const q = a.dataset.quien, nuevo = structuredClone(S[q]), k = perfiles[q].findIndex(p => p.nombre === nuevo.nombre);
+    if (k >= 0) perfiles[q][k] = nuevo; else perfiles[q].push(nuevo);
+    store.set(KEY + ":perfiles", perfiles); a.textContent = "Perfil guardado"; setTimeout(renderInspector, 1200); return;
+  }
+  accionItem(a.dataset.act);
+});
+ib.addEventListener("change", e => {
+  if (!e.target.dataset.perfil || e.target.value === "") return;
+  const q = e.target.dataset.perfil, p = perfiles[q][+e.target.value];
+  aplicar(() => { S[q] = structuredClone(p); });
+});
+
+/* ===== Edición en la hoja ===== */
+function cambio(){ actualizarCalculos(); refrescarInspector(); posicionar(); guardar(); renderLayersLazy(); }
+let lt; function renderLayersLazy(){ clearTimeout(lt); lt = setTimeout(renderLayers, 150); }
+function aplicar(fn){ hist.push(JSON.stringify(S)); fut = []; fn(); renderSheet(); renderInspector(); renderLayers(); actualizarCalculos(); guardar(); }
+function cerrarEdicion(){ if (antes && antes !== JSON.stringify(S)){ hist.push(antes); if (hist.length > 100) hist.shift(); fut = []; } antes = null; actualizarCalculos(); }
+
+function seleccionar(p, enfocar){
+  const grupo = x => x ? (x.match(/^items\.\d+/)?.[0] || seccionDe(x)) : null;
+  const cambioSec = grupo(p) !== grupo(sel);
+  sel = p;
+  marcarSeleccion();
+  if (cambioSec || !p) renderInspector();
+  renderLayers();
+  if (enfocar && p){
+    const el = sheet.querySelector(`[data-k="${p}"]`);
+    if (el){ el.focus({ preventScroll:true }); if (el.isContentEditable) seleccionarTodo(el); }
+  }
+  if (!p) $("#insp").classList.add("collapsed"); else if (enfocar !== false) $("#insp").classList.remove("collapsed");
+}
+function seleccionarTodo(el){ const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+function marcarSeleccion(){
+  sheet.querySelectorAll("tr.on").forEach(t => t.classList.remove("on"));
+  const m = sel && sel.match(/^items\.(\d+)/);
+  if (m) sheet.querySelector(`tr[data-i="${m[1]}"]`)?.classList.add("on");
+  posicionar();
+}
+
+sheet.addEventListener("focusin", e => {
+  const f = e.target.closest(".f"); if (!f) return;
+  const p = f.dataset.k;
+  if (sel !== p) seleccionar(p, false);
+  antes = JSON.stringify(S);
+  if (f.dataset.type === "num"){ f.textContent = String(get(p) ?? ""); f.classList.remove("empty"); requestAnimationFrame(() => seleccionarTodo(f)); }
+});
+sheet.addEventListener("focusout", e => {
+  const f = e.target.closest(".f"); if (!f) return;
+  const p = f.dataset.k;
+  if (f.isContentEditable){
+    if (tipo(p) !== "num") set(p, f.innerText.replace(/\n$/, ""));
+    f.textContent = mostrar(p); f.classList.toggle("empty", !f.textContent);
+    if (p === "pago" || p === "notas") f.closest("[data-sec]").classList.toggle("opt-empty", !get(p));
+  }
+  cerrarEdicion(); refrescarInspector(); posicionar();
+});
+sheet.addEventListener("input", e => {
+  const f = e.target.closest(".f"); if (!f || !f.isContentEditable) return;
+  const p = f.dataset.k, txt = f.innerText.replace(/\n$/, "");
+  set(p, tipo(p) === "num" ? parseNum(txt) : txt);
+  f.classList.toggle("empty", txt === "");
+  cambio();
+});
+sheet.addEventListener("paste", e => {
+  const f = e.target.closest(".f"); if (!f) return;
+  e.preventDefault();
+  let t = (e.clipboardData || window.clipboardData).getData("text/plain");
+  if (f.dataset.type !== "multi") t = t.replace(/\s*\n\s*/g, " ");
+  document.execCommand("insertText", false, t);
+});
+sheet.addEventListener("keydown", e => {
+  const f = e.target.closest(".f"); if (!f) return;
+  if (e.key === "Enter" && !(f.dataset.type === "multi" && e.shiftKey)){
+    if (f.dataset.type === "choice"){ e.preventDefault(); return; }
+    if (f.dataset.type === "multi" && !e.metaKey && !e.ctrlKey) return; // Enter = salto de línea en textos largos
+    e.preventDefault(); f.blur(); seleccionar(f.dataset.k, false);
+  } else if (e.key === "Escape"){
+    e.preventDefault(); e.stopPropagation();
+    if (antes){ S = JSON.parse(antes); antes = null; }
+    f.textContent = mostrar(f.dataset.k);
+    f.blur(); renderSheet(); refrescarInspector(); actualizarCalculos(); guardar();
+  } else if (e.key === "Tab"){
+    e.preventDefault();
+    const todos = [...sheet.querySelectorAll(".f")], i = todos.indexOf(f), sig = todos[(i + (e.shiftKey ? -1 : 1) + todos.length) % todos.length];
+    seleccionar(sig.dataset.k, true);
+  }
+});
+sheet.addEventListener("click", e => {
+  if (e.target.closest("#add")){ agregarItem(); return; }
+  const f = e.target.closest(".f");
+  if (f){
+    if (f.dataset.type === "date"){ seleccionar(f.dataset.k, false); const i = f.querySelector("input"); try { i.showPicker(); } catch(_) { i.focus(); i.click(); } }
+    else if (f.dataset.type === "choice") seleccionar(f.dataset.k, false);
+    return;
+  }
+  const tr = e.target.closest("tr[data-i]");
+  if (tr && !e.target.closest(".handle")){ seleccionar(`items.${tr.dataset.i}.desc`, true); return; }
+});
+sheet.addEventListener("change", e => {
+  if (e.target.type !== "date") return;
+  const p = e.target.closest(".f").dataset.k;
+  aplicar(() => set(p, e.target.value)); seleccionar(p, false);
+});
+canvas.addEventListener("pointerdown", e => {
+  if (!e.target.closest(".sheet") && !e.target.closest("#tb")){ document.activeElement?.blur(); seleccionar(null); }
+});
+
+/* Hover y selección (cajas superpuestas, como en Framer) */
+function rel(el){ const r = el.getBoundingClientRect(), s = stage.getBoundingClientRect(); return { x:r.left - s.left, y:r.top - s.top, w:r.width, h:r.height }; }
+function caja(box, el, label){
+  if (!el){ box.style.display = "none"; return; }
+  const r = rel(el), pad = 3;
+  Object.assign(box.style, { display:"block", left:(r.x-pad)+"px", top:(r.y-pad)+"px", width:(r.w+pad*2)+"px", height:(r.h+pad*2)+"px" });
+  box.querySelector(".tag").textContent = label;
+  box.classList.toggle("below", r.y < 28);
+}
+const hov = $("#hov"), selb = $("#selb"), tb = $("#tb");
+let hovEl = null;
+sheet.addEventListener("pointerover", e => {
+  if (e.pointerType === "touch") return;
+  const el = e.target.closest(".f,.calc");
+  hovEl = el && el.dataset.k !== sel ? el : null;
+  caja(hov, hovEl, hovEl ? (hovEl.dataset.label || etiqueta(hovEl.dataset.k)) : "");
+});
+sheet.addEventListener("pointerleave", () => { hovEl = null; hov.style.display = "none"; });
+
+function posicionar(){
+  const el = sel && sheet.querySelector(`[data-k="${sel}"]`);
+  caja(selb, el, sel ? etiqueta(sel) : "");
+  if (hovEl && (!hovEl.isConnected || hovEl.dataset.k === sel)){ hovEl = null; hov.style.display = "none"; }
+  barra(el);
+}
+function barra(el){
+  if (!el){ tb.style.display = "none"; return; }
+  const m = sel.match(/^items\.(\d+)/), t = tipo(sel);
+  let h = "";
+  if (t === "choice"){
+    const ops = sel === "moneda" ? OPC.moneda.map(v => [v,v]) : OPC.idioma;
+    h = `<span class="lab">${ETIQ[sel]}</span>` + ops.map(([v,l]) => `<button type="button" data-set="${v}" aria-pressed="${get(sel) === v}">${l}</button>`).join("");
+    if (sel === "moneda") h += `<span class="sep"></span><span class="lab">Idioma</span>` + OPC.idioma.map(([v,l]) => `<button type="button" data-lang="${v}" aria-pressed="${S.idioma === v}">${v.toUpperCase()}</button>`).join("");
+  } else if (m){
+    const i = +m[1];
+    h = `<span class="lab">Ítem ${i+1}</span>
+      <button type="button" data-act="up" title="Subir" aria-label="Subir" ${i===0?"disabled":""}><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 13V3m0 0L4 7m4-4 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button type="button" data-act="down" title="Bajar" aria-label="Bajar" ${i===S.items.length-1?"disabled":""}><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 3v10m0 0 4-4m-4 4-4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button type="button" data-act="dup" title="Duplicar" aria-label="Duplicar"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M3 10.5V4a1 1 0 0 1 1-1h6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+      <button type="button" data-act="add" title="Agregar ítem debajo" aria-label="Agregar ítem debajo"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+      <span class="sep"></span>
+      <button type="button" class="danger" data-act="del" title="Quitar ítem" aria-label="Quitar ítem"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.6 8.5h5.8l.6-8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
+  } else if (t === "date"){
+    h = `<span class="lab">${ETIQ[sel]}</span><button type="button" data-hoy>Hoy</button>` + (sel === "vencimiento" ? `<button type="button" data-plazo="15">+15 días</button><button type="button" data-plazo="30">+30 días</button>` : "");
+  } else { tb.style.display = "none"; return; }
+  tb.innerHTML = h; tb.style.display = "flex";
+  const r = rel(el), w = tb.offsetWidth, sw = stage.offsetWidth;
+  let x = Math.max(0, Math.min(r.x, sw - w)), y = r.y + r.h + 10;
+  tb.style.left = x + "px"; tb.style.top = y + "px";
+}
+tb.addEventListener("pointerdown", e => e.preventDefault()); // no quita el foco del texto
+tb.addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.set){ const p = sel; aplicar(() => set(p, b.dataset.set)); seleccionar(p, false); }
+  else if (b.dataset.lang){ aplicar(() => { S.idioma = b.dataset.lang; }); seleccionar("moneda", false); }
+  else if (b.hasAttribute("data-hoy")){ const p = sel, d = new Date(); aplicar(() => set(p, iso(d))); seleccionar(p, false); }
+  else if (b.dataset.plazo){ const [y,m,dd] = S.fecha.split("-").map(Number), d = new Date(y, m-1, dd + +b.dataset.plazo); aplicar(() => set("vencimiento", iso(d))); seleccionar("vencimiento", false); }
+  else if (b.dataset.act) accionItem(b.dataset.act);
+});
+const iso = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+
+/* ===== Ítems ===== */
+function accionItem(act){
+  const m = sel && sel.match(/^items\.(\d+)\.(\w+)/); if (!m) return;
+  let i = +m[1], campo = m[2];
+  document.activeElement?.blur?.();
+  if (act === "up" && i > 0){ aplicar(() => S.items.splice(i-1, 0, ...S.items.splice(i,1))); i--; }
+  else if (act === "down" && i < S.items.length-1){ aplicar(() => S.items.splice(i+1, 0, ...S.items.splice(i,1))); i++; }
+  else if (act === "dup"){ aplicar(() => S.items.splice(i+1, 0, structuredClone(S.items[i]))); i++; }
+  else if (act === "add"){ aplicar(() => S.items.splice(i+1, 0, { desc:"", detalle:"", cant:1, precio:0 })); seleccionar(`items.${i+1}.desc`, true); renderInspector(); return; }
+  else if (act === "del"){
+    aplicar(() => S.items.splice(i,1));
+    if (!S.items.length){ seleccionar(null); return; }
+    i = Math.min(i, S.items.length-1);
+  } else return;
+  sel = null; seleccionar(`items.${i}.${campo}`, false); renderInspector();
+}
+function agregarItem(){
+  aplicar(() => S.items.push({ desc:"", detalle:"", cant:1, precio:0 }));
+  seleccionar(`items.${S.items.length-1}.desc`, true); renderInspector();
+}
+/* Arrastrar para reordenar */
+let drag = null;
+sheet.addEventListener("pointerdown", e => {
+  const h = e.target.closest("[data-drag]"); if (!h) return;
+  e.preventDefault(); h.setPointerCapture(e.pointerId);
+  drag = { from: +h.dataset.drag, to: +h.dataset.drag, h };
+  h.style.cursor = "grabbing";
+});
+sheet.addEventListener("pointermove", e => {
+  if (!drag) return;
+  const filas = [...sheet.querySelectorAll("tbody tr")];
+  let to = filas.length;
+  for (let k = 0; k < filas.length; k++){ const r = filas[k].getBoundingClientRect(); if (e.clientY < r.top + r.height/2){ to = k; break; } }
+  drag.to = to;
+  const ref = filas[Math.min(to, filas.length-1)], r = rel(ref), d = $("#drop");
+  Object.assign(d.style, { display:"block", left:r.x+"px", width:r.w+"px", top:(to >= filas.length ? r.y + r.h : r.y) - 1 + "px" });
+});
+sheet.addEventListener("pointerup", () => {
+  if (!drag) return;
+  const { from } = drag; let to = drag.to; drag = null; $("#drop").style.display = "none";
+  if (to > from) to--;
+  if (to !== from){ aplicar(() => S.items.splice(to, 0, ...S.items.splice(from,1))); sel = null; seleccionar(`items.${to}.desc`, false); renderInspector(); }
+});
+
+/* ===== Estado, deshacer, guardado ===== */
+$("#estado").addEventListener("click", e => { const b = e.target.closest("button"); if (b && b.dataset.v !== S.estado) aplicar(() => { S.estado = b.dataset.v; }); });
+function deshacer(){ document.activeElement?.blur?.(); if (!hist.length) return; fut.push(JSON.stringify(S)); S = JSON.parse(hist.pop()); restaurar(); }
+function rehacer(){ document.activeElement?.blur?.(); if (!fut.length) return; hist.push(JSON.stringify(S)); S = JSON.parse(fut.pop()); restaurar(); }
+function restaurar(){ if (sel && get(sel) === undefined) sel = null; renderSheet(); renderInspector(); renderLayers(); actualizarCalculos(); guardar(); }
+$("#undo").onclick = deshacer; $("#redo").onclick = rehacer;
+document.addEventListener("keydown", e => {
+  const mod = e.metaKey || e.ctrlKey;
+  if (mod && e.key.toLowerCase() === "z"){ e.preventDefault(); e.shiftKey ? rehacer() : deshacer(); }
+  else if (mod && e.key.toLowerCase() === "y"){ e.preventDefault(); rehacer(); }
+  else if (e.key === "Escape" && sel && !e.target.closest(".in")) seleccionar(null);
+});
+let gt;
+function guardar(){
+  const s = $("#saved"); s.textContent = "Guardando…"; s.classList.add("busy");
+  clearTimeout(gt);
+  gt = setTimeout(() => { store.set(KEY, S); s.textContent = "Guardado"; s.classList.remove("busy"); }, 500); // en la app real: PUT /api/facturas/<id>
+}
+
+/* ===== Zoom y tamaño ===== */
+function escala(){
+  if (zoom) return zoom;
+  const disp = canvas.clientWidth - parseFloat(getComputedStyle(canvas).paddingLeft) - parseFloat(getComputedStyle(canvas).paddingRight);
+  return Math.min(1, disp / 794);
+}
+function ajustarStage(){
+  const s = escala();
+  wrap.style.transform = `scale(${s})`;
+  stage.style.width = 794*s + "px"; stage.style.height = sheet.offsetHeight*s + "px";
+  $("#z-val").textContent = Math.round(s*100) + "%";
+  posicionar();
+}
+$("#z-in").onclick = () => { zoom = Math.min(2, Math.round((escala()+.1)*10)/10); ajustarStage(); };
+$("#z-out").onclick = () => { zoom = Math.max(.3, Math.round((escala()-.1)*10)/10); ajustarStage(); };
+$("#z-fit").onclick = () => { zoom = null; ajustarStage(); };
+new ResizeObserver(ajustarStage).observe(canvas);
+new ResizeObserver(ajustarStage).observe(sheet);
+
+/* ===== PDF ===== */
+$("#pdf").onclick = () => {
+  document.activeElement?.blur?.(); seleccionar(null);
+  const prev = document.title, cli = (S.cliente.nombre || "Cliente").replace(/[\\/:*?"<>|.,]/g, "").trim();
+  document.title = `${S.fecha} ${cli} ${S.numero} ${S.moneda} ${money(total())}`;
+  setTimeout(() => { window.print(); document.title = prev; }, 50);
+};
+$("#i-toggle").onclick = () => $("#insp").classList.toggle("collapsed");
+document.querySelector(".back").onclick = () => { location.href = "../../"; };
+
+/* ===== Inicio ===== */
+if (matchMedia("(max-width:760px)").matches) $("#insp").classList.add("collapsed");
+renderSheet(); renderInspector(); renderLayers(); actualizarCalculos();
+document.fonts?.ready.then(ajustarStage);
+</script>
+</body>
+</html>
