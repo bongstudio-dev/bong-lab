@@ -3,9 +3,9 @@
    <link rel="stylesheet" href="../buscador/alcance.css">
    <script src="../buscador/alcance.js" data-seccion="documentos" data-nombre="Documentos" defer></script>
 
-   data-seccion es el id del grupo del índice que corresponde a la página; data-nombre, cómo se nombra en el chip.
-   La página conserva su buscador: con el chip puesto, cada letra la filtra en el lugar como siempre. Sin el chip
-   el componente toma el campo, busca en ../buscador/indice.json y muestra el panel por tipo.
+   data-seccion es el id del grupo del índice que corresponde a la página; data-nombre, cómo se nombra en el interruptor.
+   La página conserva su buscador: con el interruptor en la sección, cada letra la filtra en el lugar como siempre.
+   En "Todo el sitio" el componente toma el campo, busca en ../buscador/indice.json y muestra el panel por tipo.
    Usa los ids de la barra: pf-busca, pf-q, pf-nav, pf-goSearch, pf-qClose y, si está, pf-empty.
    La dirección guarda el alcance amplio: #en=sitio&q=texto. */
 (function () {
@@ -14,7 +14,6 @@
   var SECCION = yo.dataset.seccion || "", NOMBRE = yo.dataset.nombre || "esta sección";
   var BASE = new URL("../", yo.src);
   var POR_GRUPO = 5;
-  var X = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2 2 10"/></svg>';
   var FLECHA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12h10M13 8l4 4-4 4"/></svg>';
 
   function $(id) { return document.getElementById(id); }
@@ -50,14 +49,22 @@
     var placeholder = input.placeholder;
 
     /* --- Piezas ---------------------------------------------------------------------------------------- */
-    var chip = document.createElement("button");
-    chip.type = "button";
-    chip.className = "pf-chip pf-alc__chip";
-    chip.setAttribute("aria-pressed", "true");
-    chip.setAttribute("aria-label", "Buscando solo en " + NOMBRE + ". Quitar para buscar en todo el sitio");
-    chip.innerHTML = '<span><span class="pf-alc__en">En: </span>' + esc(NOMBRE) + "</span>" + X;
-    chip.tabIndex = caja.classList.contains("pf-abierto") ? 0 : -1;
-    caja.insertBefore(chip, input);
+    // Interruptor de alcance al final del campo: la sección (por defecto) o todo el sitio.
+    var sw = document.createElement("div");
+    sw.className = "pf-alc__sw";
+    sw.setAttribute("role", "group");
+    sw.setAttribute("aria-label", "Dónde buscar");
+    sw.innerHTML = '<button type="button" data-alc-sw="seccion" aria-pressed="true">' + esc(NOMBRE) + "</button>" +
+      '<button type="button" data-alc-sw="sitio" aria-pressed="false" aria-label="Todo el sitio"><span class="pf-alc__largo">Todo el sitio</span><span class="pf-alc__corto" aria-hidden="true">Sitio</span></button>';
+    var swBtns = sw.querySelectorAll("button");
+    function swTab(n) { swBtns.forEach(function (b) { b.tabIndex = n; }); }
+    swTab(caja.classList.contains("pf-abierto") ? 0 : -1);
+    var cuentaCampo = $("pf-qCount");
+    caja.insertBefore(sw, cuentaCampo && cuentaCampo.parentNode === caja ? cuentaCampo : null);
+    function swPintar() {
+      swBtns[0].setAttribute("aria-pressed", !amplio); swBtns[1].setAttribute("aria-pressed", amplio);
+      sw.classList.toggle("pf-alc__sw--sitio", amplio);
+    }
 
     var panel = document.createElement("div");
     panel.className = "pf-alc__panel";
@@ -128,7 +135,7 @@
     function pintar() {
       if (!amplio) return;
       var q = input.value.trim(), ts = terminos(q);
-      var volver = '<button type="button" class="pf-alc__volver" data-alc="seccion">Buscar solo en ' + esc(NOMBRE) + "</button>";
+      var volver = ""; // volver a la sección es el interruptor del campo
       if (!ts.length) {
         panel.innerHTML = '<div class="pf-alc__cab"><p class="pf-alc__titulo">En todo el sitio</p>' + volver + "</div>" +
           '<p class="pf-alc__nada">Escribí para buscar en documentos, notas y páginas.</p>';
@@ -175,7 +182,7 @@
     function ampliar() {
       if (amplio) return;
       amplio = true;
-      chip.hidden = true;
+      swPintar();
       caja.classList.add("pf-alc--amplio");
       input.placeholder = "Buscá en todo el sitio";
       input.focus();
@@ -187,7 +194,7 @@
       if (!amplio) return;
       amplio = false;
       abiertos = {};
-      chip.hidden = false;
+      swPintar();
       caja.classList.remove("pf-alc--amplio");
       input.placeholder = placeholder;
       mostrarPanel(false);
@@ -206,33 +213,35 @@
       t = setTimeout(function () { pintar(); aHash(); }, 80);
     }, true);
 
-    // Pasar del campo al chip o al panel no cuenta como salir del buscador.
+    // Pasar del campo al interruptor o al panel no cuenta como salir del buscador.
     window.addEventListener("blur", function (e) {
       if (e.target !== input) return;
       var r = e.relatedTarget;
       if (r && (caja.contains(r) || panel.contains(r))) e.stopImmediatePropagation();
     }, true);
-    // Y salir desde el chip o el panel sí: la página cierra el buscador si quedó vacío.
+    // Y salir desde el interruptor o el panel sí: la página cierra el buscador si quedó vacío.
     function salida(e) {
       var r = e.relatedTarget;
       if (r && (caja.contains(r) || panel.contains(r) || r === cerrar)) return;
       if (r) mostrarPanel(false);
       if (!input.value) input.dispatchEvent(new FocusEvent("blur", { relatedTarget: r }));
     }
-    chip.addEventListener("focusout", salida);
+    sw.addEventListener("focusout", salida);
     panel.addEventListener("focusout", salida);
     input.addEventListener("focus", function () { if (amplio) mostrarPanel(true); });
 
-    chip.addEventListener("click", ampliar);
-    chip.addEventListener("keydown", function (e) {
-      if (e.key === "Backspace" || e.key === "Delete") { e.preventDefault(); ampliar(); }
-      else if (e.key === "ArrowRight") { e.preventDefault(); input.focus(); }
-      else if (e.key === "Escape") { e.preventDefault(); cerrar.click(); }
+    sw.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-alc-sw]"); if (!b) return;
+      if (b.dataset.alcSw === "sitio") ampliar(); else restringir();
+    });
+    sw.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+        e.preventDefault(); var b = swBtns[e.key === "ArrowLeft" ? 0 : 1]; b.click(); b.focus();
+      } else if (e.key === "Escape") { e.preventDefault(); cerrar.click(); }
     });
 
     function enfocables() { return Array.prototype.slice.call(panel.querySelectorAll("a, button")); }
     input.addEventListener("keydown", function (e) {
-      if (e.key === "Backspace" && !amplio && input.selectionStart === 0 && input.selectionEnd === 0) { e.preventDefault(); ampliar(); return; }
       if (!amplio) return;
       if ((e.key === "ArrowDown" || e.key === "Enter") && !panel.hidden) {
         var f = enfocables().filter(function (x) { return !x.classList.contains("pf-alc__volver"); });
@@ -259,7 +268,7 @@
     // Al cerrar el buscador vuelve el alcance de la sección; al abrirlo se trae el índice.
     new MutationObserver(function () {
       var abierta = caja.classList.contains("pf-abierto");
-      chip.tabIndex = abierta ? 0 : -1;
+      swTab(abierta ? 0 : -1);
       if (abierta) cargar();
       else if (amplio) restringir(false);
     }).observe(caja, { attributes: true, attributeFilter: ["class"] });

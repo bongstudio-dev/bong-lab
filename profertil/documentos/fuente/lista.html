@@ -269,10 +269,21 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 /* --- Columna: más angosta que la grilla de Novedades, para que el título y el año queden cerca. */
 .pf-col { width: min(100% - 32px, 1120px); margin-inline: auto; }
 
-/* --- Encabezado chico: título e intro, sin foto ni Forma. La lista es lo primero que se ve. */
-.pf-dh { padding-top: calc(128px + env(safe-area-inset-top, 0px)); }
-.pf-dh h1 { margin: 0; font: 600 clamp(34px, 4vw, 52px)/1.02 var(--f-display); letter-spacing: -0.035em; color: var(--azul); text-wrap: balance; }
-.pf-dh p { margin: 14px 0 0; max-width: 58ch; font-size: var(--texto-destacado); line-height: 1.5; color: var(--ink-2); }
+/* --- Encabezado: banda azul como la portada del Lab, con la foto recortada en la Forma Lupa y la Hoja en amarillo
+   (primaria Azul, secundaria Amarillo). Más bajo que el de Novedades: la lista sigue a la vista sin scrollear mucho. */
+.pf-dh { position: relative; overflow: hidden; background: var(--azul); color: var(--tiza); padding: calc(132px + env(safe-area-inset-top, 0px)) 0 64px; }
+.pf-dh__in { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 400px); align-items: end; gap: 48px; }
+.pf-dh .pf-dh__eyebrow { margin: 0 0 14px; max-width: none; font: 500 var(--texto-mini)/1 var(--f-body); letter-spacing: .08em; text-transform: uppercase; color: color-mix(in srgb, var(--tiza) 72%, transparent); }
+.pf-dh h1 { margin: 0; font: 600 clamp(40px, 6vw, 80px)/.95 var(--f-display); letter-spacing: -0.045em; color: var(--tiza); text-wrap: balance; }
+.pf-dh p { margin: 18px 0 0; max-width: 54ch; font-size: var(--texto-destacado); line-height: 1.5; color: color-mix(in srgb, var(--tiza) 86%, transparent); text-wrap: pretty; }
+.pf-dh__arte { position: relative; aspect-ratio: 260 / 227; margin-bottom: -8px; }
+.pf-dh__foto { position: absolute; inset: 0; background: url("../novedades/fotos/demo-1.webp") 62% 40% / cover no-repeat var(--azul-oscuro, #002a73);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20260%20227%22%3E%3Cpath%20d%3D%22M106.108%200C164.71%200%20212.217%2047.5063%20212.217%20106.108C212.217%20123.332%20208.111%20139.595%20200.828%20153.978L259.268%20212.417C239.93%20231.755%20208.578%20231.755%20189.24%20212.417L168.654%20191.831C151.116%20204.65%20129.496%20212.217%20106.108%20212.217C47.5063%20212.217%200%20164.711%200%20106.108C9.43891e-05%2047.5063%2047.5063%201.07058e-05%20106.108%200Z%22/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20260%20227%22%3E%3Cpath%20d%3D%22M106.108%200C164.71%200%20212.217%2047.5063%20212.217%20106.108C212.217%20123.332%20208.111%20139.595%20200.828%20153.978L259.268%20212.417C239.93%20231.755%20208.578%20231.755%20189.24%20212.417L168.654%20191.831C151.116%20204.65%20129.496%20212.217%20106.108%20212.217C47.5063%20212.217%200%20164.711%200%20106.108C9.43891e-05%2047.5063%2047.5063%201.07058e-05%20106.108%200Z%22/%3E%3C/svg%3E") center / contain no-repeat; }
+.pf-dh__hoja { position: absolute; left: -14%; bottom: -6%; width: 34%; color: var(--amarillo); fill: currentColor; }
+.pf-result-row { margin-top: 8px; }
+@media (max-width: 900px) {
+  .pf-dh__in { grid-template-columns: minmax(0, 1fr) minmax(0, 260px); gap: 28px; }
+}
 
 /* --- Filas: una por documento, separadas por una línea (sin cajas ni sombras). */
 .pf-docs:not(:empty) { min-height: 60vh; }
@@ -300,7 +311,13 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 .pf-doc__d:active { scale: .94; }
 .pf-doc:has(a:focus-visible) { outline: 2px solid var(--celeste); outline-offset: 2px; border-radius: 6px; }
 @media (max-width: 640px) {
-  .pf-dh { padding-top: calc(104px + env(safe-area-inset-top, 0px)); }
+  /* Celular: la Lupa sube al lado del título y el texto pasa abajo a todo el ancho, para que la lista llegue rápido. */
+  .pf-dh { padding: calc(96px + env(safe-area-inset-top, 0px)) 0 32px; }
+  .pf-dh__in { display: block; }
+  .pf-dh h1 { max-width: 6.2em; font-size: 44px; }
+  .pf-dh__arte { position: absolute; top: -10px; right: -6px; width: 40%; max-width: 190px; margin: 0; }
+  .pf-dh__hoja { left: -10%; bottom: -10%; width: 30%; }
+  .pf-dh p { margin-top: 18px; font-size: var(--texto-cuerpo); }
   .pf-doc { grid-template-columns: minmax(0, 1fr) 36px; row-gap: 10px; padding: 16px 0; }
   .pf-doc .pf-etiqueta { grid-column: 1; grid-row: 1; justify-self: start; }
   .pf-doc__t { grid-column: 1; grid-row: 2; font-size: 1.08rem; }
@@ -324,8 +341,10 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   .pf-activos { flex-wrap: nowrap; flex: none; }
   .pf-activos__limpiar { flex: none; white-space: nowrap; }
 }
-.pf-activos .pf-chip { --h: 30px; gap: 8px; padding-right: 10px; }
-.pf-activos .pf-chip svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+/* Tenues y bajos: dicen qué está filtrando sin competir con la lista. El tono es el del chip sin elegir. */
+.pf-activos .pf-chip { --h: 26px; gap: 6px; padding: 0 8px 0 10px; font-size: 13px; background: var(--chip-fondo); color: var(--chip-texto); }
+@media (hover: hover) and (pointer: fine) { .pf-activos .pf-chip:hover { background: color-mix(in srgb, var(--azul) 26%, #fff); } }
+.pf-activos .pf-chip svg { width: 9px; height: 9px; opacity: .7; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
 .pf-activos__limpiar { align-self: center; border: 0; background: transparent; cursor: pointer; padding: 4px 6px; color: var(--azul); font-size: var(--texto-chico); text-decoration: underline; text-underline-offset: 3px; }
 
 /* --- Vistas: compacta, lista (la de siempre) y miniaturas. El selector es el de Novedades; al cambiar, solo la lista se funde y el
@@ -405,9 +424,18 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   </div>
 </header>
 
-<section class="pf-dh pf-col">
-  <h1>Biblioteca Virtual</h1>
-  <p>Boletines técnicos, ensayos de fertilización y trabajos de investigación sobre la nutrición de los cultivos y el cuidado del suelo.</p>
+<section class="pf-dh">
+  <div class="pf-dh__in pf-col">
+    <div>
+      <p class="pf-dh__eyebrow">Investigación y desarrollo</p>
+      <h1>Biblioteca Virtual</h1>
+      <p>Investigación sobre nutrición de cultivos, uso eficiente de los nutrientes y cuidado del suelo, el agua y el aire. La firman instituciones técnicas, el área de Investigación y Desarrollo de Profertil y especialistas de trayectoria.</p>
+    </div>
+    <div class="pf-dh__arte" aria-hidden="true">
+      <div class="pf-dh__foto"></div>
+      <svg class="pf-dh__hoja" viewBox="0 0 255 249" aria-hidden="true"><path d="M100.334 77.48C149.937 -9.94785 254.374 0.363473 254.604 0.38623C253.868 111.726 195.419 153.26 143.571 168.58C146.912 202.677 139.814 233.225 135.742 248.318C-50.3429 192.658 8.99902 30.3813 8.99902 30.3813C50.5227 41.3302 79.8541 58.0146 100.334 77.48Z"/></svg>
+    </div>
+  </div>
 </section>
 
 <main class="pf-col" id="pf-lista" tabindex="-1">

@@ -316,10 +316,21 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 /* --- Columna: más angosta que la grilla de Novedades, para que el título y el año queden cerca. */
 .pf-col { width: min(100% - 32px, 1120px); margin-inline: auto; }
 
-/* --- Encabezado chico: título e intro, sin foto ni Forma. La lista es lo primero que se ve. */
-.pf-dh { padding-top: calc(128px + env(safe-area-inset-top, 0px)); }
-.pf-dh h1 { margin: 0; font: 600 clamp(34px, 4vw, 52px)/1.02 var(--f-display); letter-spacing: -0.035em; color: var(--azul); text-wrap: balance; }
-.pf-dh p { margin: 14px 0 0; max-width: 58ch; font-size: var(--texto-destacado); line-height: 1.5; color: var(--ink-2); }
+/* --- Encabezado: banda azul como la portada del Lab, con la foto recortada en la Forma Lupa y la Hoja en amarillo
+   (primaria Azul, secundaria Amarillo). Más bajo que el de Novedades: la lista sigue a la vista sin scrollear mucho. */
+.pf-dh { position: relative; overflow: hidden; background: var(--azul); color: var(--tiza); padding: calc(132px + env(safe-area-inset-top, 0px)) 0 64px; }
+.pf-dh__in { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 400px); align-items: end; gap: 48px; }
+.pf-dh .pf-dh__eyebrow { margin: 0 0 14px; max-width: none; font: 500 var(--texto-mini)/1 var(--f-body); letter-spacing: .08em; text-transform: uppercase; color: color-mix(in srgb, var(--tiza) 72%, transparent); }
+.pf-dh h1 { margin: 0; font: 600 clamp(40px, 6vw, 80px)/.95 var(--f-display); letter-spacing: -0.045em; color: var(--tiza); text-wrap: balance; }
+.pf-dh p { margin: 18px 0 0; max-width: 54ch; font-size: var(--texto-destacado); line-height: 1.5; color: color-mix(in srgb, var(--tiza) 86%, transparent); text-wrap: pretty; }
+.pf-dh__arte { position: relative; aspect-ratio: 260 / 227; margin-bottom: -8px; }
+.pf-dh__foto { position: absolute; inset: 0; background: url("../novedades/fotos/demo-1.webp") 62% 40% / cover no-repeat var(--azul-oscuro, #002a73);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20260%20227%22%3E%3Cpath%20d%3D%22M106.108%200C164.71%200%20212.217%2047.5063%20212.217%20106.108C212.217%20123.332%20208.111%20139.595%20200.828%20153.978L259.268%20212.417C239.93%20231.755%20208.578%20231.755%20189.24%20212.417L168.654%20191.831C151.116%20204.65%20129.496%20212.217%20106.108%20212.217C47.5063%20212.217%200%20164.711%200%20106.108C9.43891e-05%2047.5063%2047.5063%201.07058e-05%20106.108%200Z%22/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20260%20227%22%3E%3Cpath%20d%3D%22M106.108%200C164.71%200%20212.217%2047.5063%20212.217%20106.108C212.217%20123.332%20208.111%20139.595%20200.828%20153.978L259.268%20212.417C239.93%20231.755%20208.578%20231.755%20189.24%20212.417L168.654%20191.831C151.116%20204.65%20129.496%20212.217%20106.108%20212.217C47.5063%20212.217%200%20164.711%200%20106.108C9.43891e-05%2047.5063%2047.5063%201.07058e-05%20106.108%200Z%22/%3E%3C/svg%3E") center / contain no-repeat; }
+.pf-dh__hoja { position: absolute; left: -14%; bottom: -6%; width: 34%; color: var(--amarillo); fill: currentColor; }
+.pf-result-row { margin-top: 8px; }
+@media (max-width: 900px) {
+  .pf-dh__in { grid-template-columns: minmax(0, 1fr) minmax(0, 260px); gap: 28px; }
+}
 
 /* --- Filas: una por documento, separadas por una línea (sin cajas ni sombras). */
 .pf-docs:not(:empty) { min-height: 60vh; }
@@ -347,7 +358,13 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 .pf-doc__d:active { scale: .94; }
 .pf-doc:has(a:focus-visible) { outline: 2px solid var(--celeste); outline-offset: 2px; border-radius: 6px; }
 @media (max-width: 640px) {
-  .pf-dh { padding-top: calc(104px + env(safe-area-inset-top, 0px)); }
+  /* Celular: la Lupa sube al lado del título y el texto pasa abajo a todo el ancho, para que la lista llegue rápido. */
+  .pf-dh { padding: calc(96px + env(safe-area-inset-top, 0px)) 0 32px; }
+  .pf-dh__in { display: block; }
+  .pf-dh h1 { max-width: 6.2em; font-size: 44px; }
+  .pf-dh__arte { position: absolute; top: -10px; right: -6px; width: 40%; max-width: 190px; margin: 0; }
+  .pf-dh__hoja { left: -10%; bottom: -10%; width: 30%; }
+  .pf-dh p { margin-top: 18px; font-size: var(--texto-cuerpo); }
   .pf-doc { grid-template-columns: minmax(0, 1fr) 36px; row-gap: 10px; padding: 16px 0; }
   .pf-doc .pf-etiqueta { grid-column: 1; grid-row: 1; justify-self: start; }
   .pf-doc__t { grid-column: 1; grid-row: 2; font-size: 1.08rem; }
@@ -371,8 +388,10 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   .pf-activos { flex-wrap: nowrap; flex: none; }
   .pf-activos__limpiar { flex: none; white-space: nowrap; }
 }
-.pf-activos .pf-chip { --h: 30px; gap: 8px; padding-right: 10px; }
-.pf-activos .pf-chip svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+/* Tenues y bajos: dicen qué está filtrando sin competir con la lista. El tono es el del chip sin elegir. */
+.pf-activos .pf-chip { --h: 26px; gap: 6px; padding: 0 8px 0 10px; font-size: 13px; background: var(--chip-fondo); color: var(--chip-texto); }
+@media (hover: hover) and (pointer: fine) { .pf-activos .pf-chip:hover { background: color-mix(in srgb, var(--azul) 26%, #fff); } }
+.pf-activos .pf-chip svg { width: 9px; height: 9px; opacity: .7; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
 .pf-activos__limpiar { align-self: center; border: 0; background: transparent; cursor: pointer; padding: 4px 6px; color: var(--azul); font-size: var(--texto-chico); text-decoration: underline; text-underline-offset: 3px; }
 
 /* --- Vistas: compacta, lista (la de siempre) y miniaturas. El selector es el de Novedades; al cambiar, solo la lista se funde y el
@@ -451,24 +470,6 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 :root.pf-tr-fuera body { animation: pf-tr-sale calc(var(--pf-tr-dur) * .7) var(--pf-tr-curva) both; }
 :root.pf-tr-llega body { animation: pf-tr-entra var(--pf-tr-dur) var(--pf-tr-curva) both; }
 
-/* Panel para elegir la transición. */
-.pf-tr-panel { position: fixed; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 80; font: 400 var(--texto-chico)/1.3 var(--f-body); color: var(--ink); }
-.pf-tr-abrir { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px 0 11px; border: 0; border-radius: 999px; background: var(--ink); color: var(--tiza); font: inherit; cursor: pointer; }
-.pf-tr-abrir svg { width: 16px; height: 16px; }
-.pf-tr-caja { position: absolute; left: 0; bottom: 44px; width: 360px; max-width: calc(100vw - 32px); padding: 16px; border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent); border-radius: 20px; background: var(--color-blanco, #fff); display: grid; gap: 14px; transform-origin: 0 100%; transition: opacity 180ms ease, scale 260ms var(--pf-tr-curva); }
-.pf-tr-caja[hidden] { display: grid; opacity: 0; scale: .96; pointer-events: none; visibility: hidden; }
-.pf-tr-fila { display: grid; gap: 6px; }
-.pf-tr-fila > span { color: var(--ink-3); font-size: var(--texto-mini); }
-.pf-tr-seg { display: flex; flex-wrap: wrap; gap: 4px; }
-.pf-tr-seg button { height: 30px; padding: 0 11px; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--azul) 8%, transparent); color: var(--ink); font: inherit; cursor: pointer; }
-.pf-tr-seg button[aria-pressed="true"] { background: var(--azul); color: var(--tiza); }
-.pf-tr-seg .pf-tr-punto { width: 30px; padding: 0; background: var(--c); }
-.pf-tr-seg .pf-tr-punto[aria-pressed="true"] { background: var(--c); outline: 2px solid var(--ink); outline-offset: 2px; }
-.pf-tr-fila input[type="range"] { width: 100%; accent-color: var(--azul); }
-.pf-tr-fila output { font-variant-numeric: tabular-nums; color: var(--ink); }
-.pf-tr-probar { height: 34px; border: 0; border-radius: 999px; background: var(--azul); color: var(--tiza); font: inherit; cursor: pointer; }
-.pf-tr-panel [data-solo][hidden] { display: none; }
-@media (max-width: 760px) { .pf-tr-panel { bottom: calc(76px + env(safe-area-inset-bottom, 0px)); } .pf-tr-abrir span { display: none; } .pf-tr-abrir { width: 36px; padding: 0; justify-content: center; } }
 @media (prefers-reduced-motion: reduce) { .pf-tr-velo { display: none; } ::view-transition-old(root), ::view-transition-new(root), :root.pf-tr-fuera body, :root.pf-tr-llega body { animation: none; } }
 
 /* Persiana con logo animado. Arranca antes de que el logo entre en pantalla, así el brote ya está creciendo cuando se ve,
@@ -567,9 +568,18 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   </div>
 </header>
 
-<section class="pf-dh pf-col">
-  <h1>Biblioteca Virtual</h1>
-  <p>Boletines técnicos, ensayos de fertilización y trabajos de investigación sobre la nutrición de los cultivos y el cuidado del suelo.</p>
+<section class="pf-dh">
+  <div class="pf-dh__in pf-col">
+    <div>
+      <p class="pf-dh__eyebrow">Investigación y desarrollo</p>
+      <h1>Biblioteca Virtual</h1>
+      <p>Investigación sobre nutrición de cultivos, uso eficiente de los nutrientes y cuidado del suelo, el agua y el aire. La firman instituciones técnicas, el área de Investigación y Desarrollo de Profertil y especialistas de trayectoria.</p>
+    </div>
+    <div class="pf-dh__arte" aria-hidden="true">
+      <div class="pf-dh__foto"></div>
+      <svg class="pf-dh__hoja" viewBox="0 0 255 249" aria-hidden="true"><path d="M100.334 77.48C149.937 -9.94785 254.374 0.363473 254.604 0.38623C253.868 111.726 195.419 153.26 143.571 168.58C146.912 202.677 139.814 233.225 135.742 248.318C-50.3429 192.658 8.99902 30.3813 8.99902 30.3813C50.5227 41.3302 79.8541 58.0146 100.334 77.48Z"/></svg>
+    </div>
+  </div>
 </section>
 
 <main class="pf-col" id="pf-lista" tabindex="-1">
@@ -1196,34 +1206,17 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 })();
 </script>
 <script>
-/* Transición entre Novedades, Documentos y sus páginas, más el panel para elegirla. */
+/* Transición entre Novedades, Documentos y sus páginas. En Documentos va fija, sin panel para elegirla:
+   usa la que dejó la cabeza (la misma que Novedades, así entrar y salir coinciden). */
 (function () {
   var d = document.documentElement, T = window.PF_TR, c = T.c;
   var quieto = matchMedia("(prefers-reduced-motion: reduce)").matches;
   var velo = document.getElementById("pf-tr-velo");
-  var NOMBRES = { persiana: "Persiana", animada: "Persiana animada", fundido: "Fundido", ninguna: "Ninguna" };
   function esPersiana() { return c.v === "persiana" || c.v === "animada"; }
   // Cuánto se queda tapando antes de cambiar: con el logo animado, hasta que termina de armarse.
   function sostiene() { return c.v === "animada" ? c.dur * .2 + c.la : c.dur * 1.45; }
   var ocupado = false;
   function espera(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
-  function guardar() { try { localStorage.setItem("pf-transicion", JSON.stringify(c)); } catch (e) {} }
-
-  function aplicar() {
-    d.style.setProperty("--pf-tr-dur", c.dur + "ms");
-    d.style.setProperty("--pf-tr-curva", T.curvas[c.curva]);
-    d.style.setProperty("--pf-tr-color", "var(--" + c.color + ")");
-    d.setAttribute("data-tr-color", c.color);
-    d.setAttribute("data-tr-v", c.v);
-    d.style.setProperty("--pf-tr-la", c.la + "ms");
-    // El fundido entre páginas lo hace el navegador: hay que avisarle en las dos.
-    var s = document.getElementById("pf-tr-vt");
-    if (c.v === "fundido" && T.vt && !s) {
-      s = document.createElement("style"); s.id = "pf-tr-vt"; s.textContent = "@view-transition { navigation: auto; }";
-      document.head.appendChild(s);
-    } else if (c.v !== "fundido" && s) s.remove();
-  }
-
   /* Llegada: la persiana sigue de largo; el fundido sin View Transitions termina de subir. */
   function llegar() {
     if (d.classList.contains("pf-tr-tapa")) {
@@ -1262,65 +1255,6 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
     ocupado = false; velo.className = "pf-tr-velo"; d.classList.remove("pf-tr-fuera", "pf-tr-llega", "pf-tr-tapa");
   });
 
-  /* Probar sin cambiar de página. */
-  async function probar() {
-    if (ocupado || c.v === "ninguna" || quieto) return; ocupado = true;
-    if (esPersiana()) {
-      velo.className = "pf-tr-velo pf-entra"; await espera(sostiene());
-      velo.className = "pf-tr-velo pf-sale"; await espera(c.dur);
-      velo.className = "pf-tr-velo";
-    } else {
-      d.classList.add("pf-tr-fuera"); await espera(c.dur * .7);
-      d.classList.remove("pf-tr-fuera"); d.classList.add("pf-tr-llega"); await espera(c.dur);
-      d.classList.remove("pf-tr-llega");
-    }
-    ocupado = false;
-  }
-
-  /* Panel. */
-  var ICONO = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v6H4V5Zm0 8h16v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6Z" opacity=".45"/><path fill="currentColor" d="M4 11h16v2H4z"/></svg>';
-  function seg(id, ops) {
-    return '<div class="pf-tr-seg" data-k="' + id + '">' + ops.map(function (o) {
-      return '<button type="button" data-v="' + o[0] + '"' + (o[2] ? ' class="pf-tr-punto" style="--c: var(--' + o[0] + ')" aria-label="' + o[1] + '"' : '') + ">" + (o[2] ? "" : o[1]) + "</button>";
-    }).join("") + "</div>";
-  }
-  var p = document.createElement("div");
-  p.className = "pf-tr-panel";
-  p.innerHTML =
-    '<button type="button" class="pf-tr-abrir" aria-expanded="false" aria-controls="pf-tr-caja">' + ICONO + '<span id="pf-tr-nombre"></span></button>' +
-    '<div class="pf-tr-caja" id="pf-tr-caja" role="group" aria-label="Transición entre páginas" hidden>' +
-      '<div class="pf-tr-fila"><span>Transición</span>' + seg("v", [["persiana", "Persiana"], ["animada", "Animada"], ["fundido", "Fundido"], ["ninguna", "Ninguna"]]) + "</div>" +
-      '<div class="pf-tr-fila" data-solo="persiana animada"><span>Color</span>' + seg("color", [["azul", "Azul", 1], ["verde", "Verde", 1], ["amarillo", "Amarillo", 1], ["terra", "Terra", 1]]) + "</div>" +
-      '<label class="pf-tr-fila" data-solo="persiana animada fundido"><span>Duración <output id="pf-tr-dur"></output></span><input type="range" min="300" max="1400" step="20" id="pf-tr-rango"></label>' +
-      '<label class="pf-tr-fila" data-solo="animada"><span>Logo <output id="pf-tr-la"></output></span><input type="range" min="700" max="1600" step="50" id="pf-tr-rango-la"></label>' +
-      '<div class="pf-tr-fila" data-solo="persiana animada fundido"><span>Curva</span>' + seg("curva", [["base", "Base"], ["fuerte", "Fuerte"]]) + "</div>" +
-      '<button type="button" class="pf-tr-probar" data-solo="persiana animada fundido">Probar</button>' +
-    "</div>";
-  document.body.appendChild(p);
-  var caja = p.querySelector(".pf-tr-caja"), abrir = p.querySelector(".pf-tr-abrir"), rango = p.querySelector("#pf-tr-rango"), rangoLa = p.querySelector("#pf-tr-rango-la");
-
-  function pintar() {
-    document.getElementById("pf-tr-nombre").textContent = NOMBRES[c.v];
-    p.querySelectorAll(".pf-tr-seg").forEach(function (g) {
-      g.querySelectorAll("button").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.v === c[g.dataset.k]); });
-    });
-    p.querySelectorAll("[data-solo]").forEach(function (el) { el.hidden = el.dataset.solo.split(" ").indexOf(c.v) < 0; });
-    rango.value = c.dur; document.getElementById("pf-tr-dur").textContent = c.dur + " ms";
-    rangoLa.value = c.la; document.getElementById("pf-tr-la").textContent = c.la + " ms";
-  }
-  pintar();
-
-  function mostrar(si) { caja.hidden = !si; abrir.setAttribute("aria-expanded", si); }
-  abrir.addEventListener("click", function () { mostrar(caja.hidden); });
-  p.addEventListener("click", function (e) {
-    var b = e.target.closest(".pf-tr-seg button"); if (!b) return;
-    c[b.parentNode.dataset.k] = b.dataset.v; aplicar(); guardar(); pintar();
-  });
-  rango.addEventListener("input", function () { c.dur = +rango.value; aplicar(); guardar(); pintar(); });
-  rangoLa.addEventListener("input", function () { c.la = +rangoLa.value; aplicar(); guardar(); pintar(); });
-  p.querySelector(".pf-tr-probar").addEventListener("click", probar);
-  document.addEventListener("click", function (e) { if (!caja.hidden && !p.contains(e.target)) mostrar(false); });
-  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !caja.hidden) { mostrar(false); abrir.focus(); } });
 })();
 </script>
 </body>

@@ -10,23 +10,23 @@ Lo usan Documentos y Novedades con el mismo componente.
 
 ## Cómo funciona
 
-- Al abrir el buscador aparece dentro del campo el chip **En: Documentos** (o **En: Novedades**), la misma pieza
-  que los chips de filtros activos. Con el chip puesto, lo que se escribe filtra la lista de la página en el lugar,
-  igual que siempre.
-- Al sacar el chip (tocarlo, o Backspace con el cursor al principio del campo, o Backspace sobre el chip) busca
-  en todo el sitio: abajo de la barra se abre un panel con los resultados por tipo (Documentos, Notas, Páginas),
+- Al abrir el buscador aparece al final del campo un interruptor chico con dos opciones: **Documentos** (o
+  **Novedades**) y **Todo el sitio**. La elegida va en el tono del chip; la otra, en texto gris.
+- En la sección (por defecto), lo que se escribe filtra la lista de la página en el lugar, igual que siempre.
+- En **Todo el sitio** abajo de la barra se abre un panel con los resultados por tipo (Documentos, Notas, Páginas),
   con el contador de cada grupo y los primeros cinco. "Ver los N" lleva a la lista de ese tipo con la búsqueda
-  aplicada; si es la sección donde uno está, vuelve al chip. Las páginas no tienen lista: el botón las despliega
-  en el panel.
-- El chip vuelve con "Buscar solo en …" (arriba del panel) y cada vez que se cierra el buscador.
+  aplicada; si es la sección donde uno está, vuelve a la sección. Las páginas no tienen lista: el botón las
+  despliega en el panel.
+- Al cerrar el buscador vuelve a la sección.
+- El campo no muestra contador: la lista de la página ya dice cuántos hay. Abierto mide 42 px de alto y hasta
+  440 px de ancho.
 - Si en la sección no hay resultados, el aviso de la página suma el botón **Buscar en todo el sitio (N)**.
-- Teclado: `/` abre, Shift+Tab llega al chip, Backspace o Supr lo sacan, flecha abajo (o Enter) entra al panel,
-  flechas arriba y abajo recorren los resultados y vuelven al campo, Esc cierra.
+- Teclado: `/` abre, Tab llega al interruptor, flechas izquierda y derecha cambian la opción, flecha abajo (o
+  Enter) entra al panel, flechas arriba y abajo recorren los resultados y vuelven al campo, Esc cierra.
 - La búsqueda no distingue tildes ni mayúsculas y usa la misma regla que las listas (el texto entero), así el
   número de "Ver los N" coincide con lo que muestra la lista.
 - La dirección guarda el alcance amplio: `#en=sitio&q=texto` abre el buscador así al recargar.
-- En celular el campo abierto ocupa el lugar del logo, el chip dice solo el nombre de la sección y el contador
-  del campo se oculta (la lista ya lo dice).
+- En celular el campo abierto ocupa el lugar del logo y "Todo el sitio" pasa a decir "Sitio".
 
 ## Sumarlo a una página
 
