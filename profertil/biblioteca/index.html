@@ -54,7 +54,7 @@
 <link rel="stylesheet" href="../componentes/tokens.css">
 <link rel="stylesheet" href="../componentes/base.css">
 <link rel="stylesheet" href="../buscador/alcance.css">
-<script src="../buscador/alcance.js" data-seccion="documentos" data-nombre="Biblioteca" defer></script>
+<script src="../buscador/alcance.js" data-seccion="documentos" data-nombre="Biblioteca" data-en="la Biblioteca" defer></script>
 <style>
 /* Biblioteca Virtual Profertil: los documentos técnicos del sitio actual (boletines, ensayos, informes de campaña).
    Misma lógica que Novedades (barra, filtros en el dock, buscador en la lupa, ancla); en vez de tarjetas, filas.
@@ -73,20 +73,6 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
    boton "Filtros" y el panel trae los cuatro grupos. Abre y cierra animando el alto del panel (medido en
    JS: animar 0fr a 1fr en un contenedor de alto automatico falla en Chrome)
    y, en mobile, el ancho. */
-/* Cruz arriba a la derecha del panel abierto (como la flecha de la barra). Va
-   afuera del cuerpo con scroll para que no se vaya al bajar; el cuerpo deja
-   lugar arriba para que no pise la flecha del primer grupo. */
-.pf-f-x {
-  position: absolute; top: 10px; right: 12px; z-index: 2;
-  width: 36px; height: 36px; padding: 0; border: 0; border-radius: 999px;
-  background: var(--glass); color: var(--ink-2); cursor: pointer;
-  display: grid; place-items: center;
-  opacity: 0; visibility: hidden; transition: opacity calc(var(--f-fundido) * 0.7) ease, visibility 0s linear var(--f-cerrar);
-}
-.pf-f-x svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
-.pf-filters.pf-abierto .pf-f-x { opacity: 1; visibility: visible; transition: opacity var(--f-fundido) ease var(--f-fundido-retraso); }
-@media (hover: hover) and (pointer: fine) { .pf-f-x:hover { background: var(--line); color: var(--ink); } }
-.pf-f-x:focus-visible { outline: 2px solid var(--celeste); outline-offset: 2px; }
 
 /* --- Grupos del panel: acordeón. Un grupo abierto por vez; cerrado muestra sus filtros activos (se sacan tocándolos).
    Dentro de un grupo las opciones suman (o); entre grupos se cruzan (y). Las que darían 0 resultados quedan atenuadas. */
@@ -101,7 +87,6 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
   .pf-filters.pf-abierto { min-width: min(100% - 32px - var(--a), 680px); transition-duration: var(--f-abrir), var(--f-abrir), 520ms, 300ms; }
 }
 .pf-f-in { gap: 10px; }
-.pf-filters .pf-f-in { padding-top: 48px; }
 .pf-f-grupos { display: grid; }
 .pf-f-gr + .pf-f-gr { border-top: 1px solid var(--line); }
 .pf-f-gr__cab { position: relative; display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 6px 2px; border: 0; background: transparent; cursor: pointer; text-align: left; }

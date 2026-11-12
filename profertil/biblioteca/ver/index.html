@@ -53,6 +53,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../componentes/tokens.css">
 <link rel="stylesheet" href="../../componentes/base.css">
+<link rel="stylesheet" href="../../buscador/alcance.css">
+<script src="../../buscador/alcance.js" data-seccion="documentos" data-nombre="Biblioteca" data-en="la Biblioteca" data-modo="previa" defer></script>
 <style>
 /* ==========================================================================
    Visor de documentos Profertil: la página de un documento (boletín, ensayo, hoja de seguridad, informe).
@@ -388,9 +390,11 @@ body.pf-foco .pf-v-doc { grid-column: 1; grid-row: 1; margin-top: 0; padding-bot
         <span>Home</span><span>Empresa</span><span>Sostenibilidad</span><span>Productos y Servicios</span><span>Novedades</span><span>Compliance</span>
       </div>
       <span class="pf-barra__menu-mobile" aria-hidden="true"><i><b></b><b></b><b></b><b></b></i>Menú</span>
-      <a class="pf-barra__busca" href="../#buscar" aria-label="Buscar en la Biblioteca">
-        <span class="pf-barra__lupa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></span>
-      </a>
+      <div class="pf-barra__busca" id="pf-busca" role="search">
+        <button class="pf-barra__lupa" id="pf-goSearch" type="button" aria-label="Buscar en la Biblioteca" aria-expanded="false" aria-controls="pf-q"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></button>
+        <input id="pf-q" name="q" type="search" autocomplete="off" spellcheck="false" enterkeyhint="search" placeholder="Buscá: soja, boletín, urea…" aria-label="Buscar en la Biblioteca" tabindex="-1">
+      </div>
+      <button class="pf-barra__cerrar" id="pf-qClose" type="button" aria-label="Cerrar buscador" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     </nav>
   </div>
   <div class="pf-progreso" aria-hidden="true"><i id="pf-progreso"></i></div>

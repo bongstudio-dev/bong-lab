@@ -42,6 +42,11 @@ aviso sin resultados, si lo hay, `pf-empty`). En el head, después de `base.css`
 En la Biblioteca va en `biblioteca/fuente/lista.html` y en Novedades en `novedades/fuente/template.html`; después,
 el `build.py` de cada una.
 
+**Páginas sin lista (Nota y visor de la Biblioteca):** van con `data-modo="previa"`. Ahí el componente abre y
+cierra el buscador de la barra él mismo; al escribir muestra una vista previa de la sección (o de todo el sitio con
+el interruptor), y Enter o el pie del panel llevan a la lista con la búsqueda hecha (`#q=` o `#en=sitio&q=`).
+`data-en` es cómo se nombra la sección dentro de una frase si lleva artículo (`la Biblioteca`).
+
 ## El índice
 
 ```bash

@@ -57,6 +57,12 @@
 .pf-alc__ver:focus-visible { outline-offset: -2px; }
 .pf-alc__ver[aria-expanded="true"] svg { transform: rotate(-90deg); }
 
+/* Vista previa (data-modo="previa"): al pie del panel, el paso a la lista con la búsqueda hecha. */
+.pf-alc__todos { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 8px 0 0; padding: 12px 10px; border-top: 1px solid var(--line); color: var(--azul); font-weight: 500; text-decoration: none; }
+.pf-alc__todos svg { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 420ms var(--ease); }
+@media (hover: hover) and (pointer: fine) { .pf-alc__todos:hover svg { transform: translateX(3px); } }
+.pf-alc__todos:focus-visible { outline-offset: -2px; }
+.pf-alc__en-sitio { padding: 0; border: 0; background: none; color: var(--azul); font: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .pf-alc__nada { margin: 0; padding: 18px 10px 20px; color: var(--ink-2); font-size: var(--texto-cuerpo); line-height: 1.5; }
 .pf-alc__nada b { color: var(--ink); font-weight: 500; }
 

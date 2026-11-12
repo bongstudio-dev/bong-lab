@@ -560,6 +560,7 @@ a.pf-card, a.pf-d-cta { text-decoration: none; }
 </main>
 
 <section class="pf-filters pf-fuera" id="pf-filters" aria-label="Filtros">
+  <button class="pf-f-x" id="pf-fX" type="button" aria-label="Cerrar filtros"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg></button>
   <div class="pf-f-body" id="pf-fBody"><div class="pf-f-in">
     <div class="pf-f-group pf-f-cats"><p class="pf-f-label" id="pf-fCatsLabel">Categoría</p><div class="pf-f-row" id="pf-fTiposTodas"></div></div>
     <div class="pf-f-group"><p class="pf-f-label">Año</p><div class="pf-f-row" id="pf-fAnios"></div></div>
@@ -986,6 +987,24 @@ a.pf-card, a.pf-d-cta { text-decoration: none; }
   }
   $("pf-fBody").addEventListener("transitionend", function (e) { if (e.target === this && e.propertyName === "height") terminar(); });
   $("pf-fToggle").addEventListener("click", function () { abrirFiltros(!$("pf-filters").classList.contains("pf-abierto")); });
+  // Se cierra con la cruz, con Escape y tocando afuera (como en la Biblioteca). El toque de afuera solo cierra: el clic
+  // que le sigue se descarta para no abrir de rebote la nota que estaba debajo (el ancla queda afuera: cierra y además baja).
+  function filtrosAbiertos() { return $("pf-filters").classList.contains("pf-abierto"); }
+  $("pf-fX").addEventListener("click", function () { abrirFiltros(false); $("pf-fToggle").focus(); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && filtrosAbiertos() && !$("pf-busca").classList.contains("pf-abierto")) { abrirFiltros(false); $("pf-fToggle").focus(); }
+  });
+  var tCerroAfuera = -1e9;
+  document.addEventListener("pointerdown", function (e) {
+    if (!filtrosAbiertos() || $("pf-filters").contains(e.target) || $("pf-ancla").contains(e.target)) return;
+    tCerroAfuera = performance.now();
+    abrirFiltros(false);
+  }, true);
+  document.addEventListener("click", function (e) {
+    if (performance.now() - tCerroAfuera > 700) return;
+    tCerroAfuera = -1e9;
+    e.preventDefault(); e.stopPropagation();
+  }, true);
   abrirFiltros(false);
   function ordenar(o) { estado.orden = o; $("pf-sortNew").setAttribute("aria-pressed", String(o === "new")); $("pf-sortOld").setAttribute("aria-pressed", String(o === "old")); moverInd(document.querySelector(".pf-selector.pf-orden"), true); aplicar(); }
   $("pf-sortNew").addEventListener("click", function () { ordenar("new"); });

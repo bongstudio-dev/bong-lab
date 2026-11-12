@@ -7,11 +7,19 @@
    La página conserva su buscador: con el interruptor en la sección, cada letra la filtra en el lugar como siempre.
    En "Todo el sitio" el componente toma el campo, busca en ../buscador/indice.json y muestra el panel por tipo.
    Usa los ids de la barra: pf-busca, pf-q, pf-nav, pf-goSearch, pf-qClose y, si está, pf-empty.
-   La dirección guarda el alcance amplio: #en=sitio&q=texto. */
+   La dirección guarda el alcance amplio: #en=sitio&q=texto.
+
+   En una página sin lista (la Nota, el visor de la Biblioteca) va con data-modo="previa": el componente abre y
+   cierra el buscador de la barra él mismo y, mientras se escribe, muestra en el panel una vista previa de la
+   sección (o de todo el sitio con el interruptor). Enter o "Ver los N" llevan a la lista con la búsqueda hecha.
+   <script src="../../buscador/alcance.js" data-seccion="notas" data-nombre="Novedades" data-modo="previa" defer></script>
+   data-en es cómo se nombra la sección dentro de una frase, si lleva artículo ("la Biblioteca"). */
 (function () {
   "use strict";
   var yo = document.currentScript;
   var SECCION = yo.dataset.seccion || "", NOMBRE = yo.dataset.nombre || "esta sección";
+  var PREVIA = yo.dataset.modo === "previa";
+  var EN = yo.dataset.en || NOMBRE; // cómo se nombra en una frase: "en la Biblioteca", "en Novedades"
   var BASE = new URL("../", yo.src);
   var POR_GRUPO = 5;
   var FLECHA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12h10M13 8l4 4-4 4"/></svg>';
@@ -129,13 +137,21 @@
     /* --- Panel ---------------------------------------------------------------------------------------- */
     // El panel aparece recién cuando hay algo escrito: vacío no tiene nada para mostrar.
     function mostrarPanel(si) {
-      si = si && amplio && !!input.value.trim();
+      si = si && (amplio || PREVIA) && !!input.value.trim();
       panel.hidden = !si;
       velo.hidden = !si;
     }
 
+    // La lista de una sección con la búsqueda hecha (en todo el sitio, la de la sección con el alcance amplio).
+    function urlResultados(q) {
+      var g = indice && indice.grupos.filter(function (x) { return x.id === SECCION; })[0];
+      if (!g || !g.lista) return null;
+      var lista = g.lista.split("#")[0];
+      return new URL(amplio ? lista + "#en=sitio&q=" + encodeURIComponent(q) : g.lista + encodeURIComponent(q), BASE).href;
+    }
+
     function pintar() {
-      if (!amplio) return;
+      if (!amplio && !PREVIA) return;
       var q = input.value.trim(), ts = terminos(q);
       var volver = ""; // volver a la sección es el interruptor del campo
       mostrarPanel(!!ts.length);
@@ -147,11 +163,13 @@
         return;
       }
       var res = buscar(q), total = 0, h = "";
+      if (!amplio) res = res.filter(function (r) { return r.g.id === SECCION; });
       res.forEach(function (r) {
         var n = r.items.length; total += n;
         if (!n) return;
         var g = r.g, todos = !!abiertos[g.id], vis = todos ? r.items : r.items.slice(0, POR_GRUPO);
-        h += '<section class="pf-alc__grupo" aria-label="' + esc(g.nombre) + '"><h2 class="pf-alc__g">' + esc(g.nombre) + '<span class="pf-alc__n">' + n + "</span></h2><ul class=\"pf-alc__lista\">";
+        // Con un solo grupo (la sección en la vista previa) el título del grupo repetiría el de la cabecera.
+        h += '<section class="pf-alc__grupo" aria-label="' + esc(g.nombre) + '">' + (amplio || !PREVIA ? '<h2 class="pf-alc__g">' + esc(g.nombre) + '<span class="pf-alc__n">' + n + "</span></h2>" : "") + "<ul class=\"pf-alc__lista\">";
         vis.forEach(function (it) {
           h += '<li><a class="pf-alc__item" href="' + esc(it.u) + '"><span class="pf-alc__t">' + resaltar(it.t, ts) + "</span>" +
             (it.r ? '<span class="pf-alc__r">' + resaltar(it.r, ts) + "</span>" : "") + "</a></li>";
@@ -159,20 +177,28 @@
         h += "</ul>";
         if (n > POR_GRUPO) {
           var texto = "Ver " + g.art + " " + n + " " + g.varios;
-          if (g.id === SECCION) h += '<button type="button" class="pf-alc__ver" data-alc="seccion">' + texto + FLECHA + "</button>";
+          if (g.id === SECCION) { if (!PREVIA) h += '<button type="button" class="pf-alc__ver" data-alc="seccion">' + texto + FLECHA + "</button>"; } // en la vista previa lo lleva el pie
           else if (g.lista) h += '<a class="pf-alc__ver" href="' + esc(new URL(g.lista + encodeURIComponent(q), BASE).href) + '">' + texto + FLECHA + "</a>";
           else h += '<button type="button" class="pf-alc__ver" data-alc="todos" data-g="' + g.id + '" aria-expanded="' + todos + '">' + (todos ? "Ver menos" : texto) + FLECHA + "</button>";
         }
         h += "</section>";
       });
-      var cab = '<div class="pf-alc__cab"><p class="pf-alc__titulo">En todo el sitio' + (total ? " · <b>" + total + "</b> " + (total === 1 ? "resultado" : "resultados") : "") + "</p>" + volver + "</div>";
-      if (!total) h = '<p class="pf-alc__nada">No encontramos nada con <b>«' + esc(q) + '»</b> en el sitio. Probá con menos palabras o con otra forma de decirlo.</p>';
+      var donde = amplio ? "todo el sitio" : EN;
+      var cab = '<div class="pf-alc__cab"><p class="pf-alc__titulo">En ' + esc(donde) + (total ? " · <b>" + total + "</b> " + (total === 1 ? "resultado" : "resultados") : "") + "</p>" + volver + "</div>";
+      if (!total) h = '<p class="pf-alc__nada">No encontramos nada con <b>«' + esc(q) + '»</b> en ' + (amplio ? "el sitio" : esc(EN)) + ". " +
+        (amplio ? "Probá con menos palabras o con otra forma de decirlo." : 'Probá con otra palabra o <button type="button" class="pf-alc__en-sitio" data-alc="sitio">buscá en todo el sitio</button>.') + "</p>";
+      // Vista previa: abajo, la lista de la sección (o la del sitio) con todos los resultados.
+      var ir = PREVIA && total ? urlResultados(q) : null;
+      var gs = res.length === 1 ? res[0].g : null;
+      if (ir) h += '<a class="pf-alc__todos" href="' + esc(ir) + '">' + (gs ? "Ver " + (total === 1 ? (gs.art === "las" ? "la " : "el ") + gs.uno : gs.art + " " + total + " " + gs.varios) + " en " + esc(EN) : "Ver todos los resultados") + FLECHA + "</a>";
+      panel.setAttribute("aria-label", "Resultados en " + donde);
       panel.innerHTML = cab + h;
-      vivo.textContent = total ? total + (total === 1 ? " resultado" : " resultados") + " en todo el sitio" : "Sin resultados en todo el sitio";
+      vivo.textContent = total ? total + (total === 1 ? " resultado" : " resultados") + " en " + donde : "Sin resultados en " + donde;
     }
 
     /* --- Alcance ------------------------------------------------------------------------------------- */
     function aHash() {
+      if (PREVIA) return; // la página de lectura conserva su dirección
       var q = input.value.trim();
       try { history.replaceState(null, "", amplio ? "#en=sitio" + (q ? "&q=" + encodeURIComponent(q) : "") : location.pathname + location.search); } catch (e) {}
     }
@@ -197,6 +223,7 @@
       input.placeholder = placeholder;
       mostrarPanel(false);
       vivo.textContent = "";
+      if (PREVIA) pintar();
       aHash();
       // La página vuelve a filtrar su lista con lo escrito.
       input.dispatchEvent(new Event("input", { bubbles: true }));
@@ -205,7 +232,7 @@
 
     // Con el alcance amplio la página no recibe lo que se escribe: su lista queda como estaba.
     window.addEventListener("input", function (e) {
-      if (e.target !== input || !amplio) return;
+      if (e.target !== input || !(amplio || PREVIA)) return;
       e.stopImmediatePropagation();
       clearTimeout(t);
       t = setTimeout(function () { pintar(); aHash(); }, 80);
@@ -240,8 +267,14 @@
 
     function enfocables() { return Array.prototype.slice.call(panel.querySelectorAll("a, button")); }
     input.addEventListener("keydown", function (e) {
-      if (!amplio) return;
-      if ((e.key === "ArrowDown" || e.key === "Enter") && !panel.hidden) {
+      if (PREVIA && e.key === "Enter") {
+        var q = input.value.trim(); if (!q) return;
+        e.preventDefault();
+        (indice ? Promise.resolve() : cargar() || Promise.resolve()).then(function () { var u = urlResultados(q); if (u) location.href = u; });
+        return;
+      }
+      if (!amplio && !PREVIA) return;
+      if ((e.key === "ArrowDown" || (e.key === "Enter" && !PREVIA)) && !panel.hidden) {
         var f = enfocables().filter(function (x) { return !x.classList.contains("pf-alc__volver"); });
         if (f.length) { e.preventDefault(); f[0].focus(); }
       }
@@ -255,6 +288,7 @@
     panel.addEventListener("click", function (e) {
       var b = e.target.closest("[data-alc]"); if (!b) return;
       if (b.dataset.alc === "seccion") restringir();
+      else if (b.dataset.alc === "sitio") ampliar();
       else if (b.dataset.alc === "todos") {
         abiertos[b.dataset.g] = !abiertos[b.dataset.g];
         pintar();
@@ -270,6 +304,32 @@
       if (abierta) cargar();
       else if (amplio) restringir(false);
     }).observe(caja, { attributes: true, attributeFilter: ["class"] });
+
+    /* --- Modo previa: el componente abre y cierra el buscador de la barra --------------------------------- */
+    if (PREVIA && lupa) {
+      var abrirB = function (si) {
+        caja.classList.toggle("pf-abierto", si);
+        if (nav) nav.classList.toggle("pf-buscando", si);
+        lupa.setAttribute("aria-expanded", String(si));
+        input.tabIndex = si ? 0 : -1;
+        cerrar.tabIndex = si ? 0 : -1;
+        if (si) setTimeout(function () { input.focus(); }, 60);
+      };
+      var cerrarB = function () { input.value = ""; mostrarPanel(false); panel.innerHTML = ""; abrirB(false); lupa.focus(); };
+      cerrar.addEventListener("click", cerrarB);
+      lupa.addEventListener("click", function () {
+        if (!caja.classList.contains("pf-abierto")) abrirB(true);
+        else if (!input.value) abrirB(false);
+        else input.focus();
+      });
+      input.addEventListener("keydown", function (e) { if (e.key === "Escape") { e.preventDefault(); cerrarB(); } });
+      input.addEventListener("blur", function () {
+        setTimeout(function () { var a = document.activeElement; if (!input.value && a !== input && !caja.contains(a) && !panel.contains(a)) abrirB(false); }, 180);
+      });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "/" && document.activeElement !== input && !/^(input|textarea)$/i.test(document.activeElement.tagName)) { e.preventDefault(); abrirB(true); }
+      });
+    }
 
     /* --- Sin resultados en la sección: ofrecer todo el sitio ------------------------------------------- */
     function vacioActual() {
