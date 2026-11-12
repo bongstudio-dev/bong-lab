@@ -1,5 +1,6 @@
 <title>Documento · Profertil</title>
 <meta name="description" content="Visor de documentos de profertil.com.ar sobre el concepto web del manual de marca: el PDF a lo largo de la página, con índice de páginas y modo lectura.">
+<meta name="theme-color" content="#003DA5">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
@@ -17,7 +18,7 @@
 :root { color-scheme: light; }
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
-html { background: var(--bg); -webkit-tap-highlight-color: transparent; }
+html { background: var(--bg); -webkit-tap-highlight-color: transparent; scroll-padding-top: 96px; }
 body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: var(--texto-cuerpo); line-height: 1.5; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 button { font: inherit; color: inherit; }
 a { color: inherit; }
@@ -25,6 +26,9 @@ button, a { touch-action: manipulation; }
 :focus-visible { outline: 2px solid var(--celeste); outline-offset: 2px; }
 .pf-flecha { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .pf-col { width: min(100% - 32px, 1120px); margin-inline: auto; }
+::selection { background: color-mix(in srgb, var(--celeste) 32%, transparent); color: var(--ink); }
+.pf-saltar { position: fixed; top: 12px; left: 12px; z-index: 90; padding: 10px 16px; border-radius: 999px; background: var(--tiza); color: var(--azul); font-size: var(--texto-chico); font-weight: 500; text-decoration: none; transform: translateY(-200%); }
+.pf-saltar:focus-visible { transform: none; }
 
 /* --- Barra: la pieza "barra" de base.css, azul desde arriba. Abajo, una línea que se llena con la lectura. */
 .pf-barra__menu > a { text-decoration: none; }
@@ -39,7 +43,7 @@ button, a { touch-action: manipulation; }
 /* --- Cabecera: sin caja. La etiqueta completa (forma, rótulo y año) va junto al título. */
 .pf-v-cab { grid-column: 2 / -1; grid-row: 1; }
 .pf-v-in { display: grid; gap: 18px; justify-items: start; max-width: 900px; }
-.pf-v-volver { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-3); font-size: var(--texto-chico); text-decoration: none; transition: color 200ms ease; }
+.pf-v-volver { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; color: var(--ink-2); font-size: var(--texto-chico); text-decoration: none; transition: color 200ms ease; }
 @media (hover: hover) and (pointer: fine) { .pf-v-volver:hover { color: var(--azul); } }
 .pf-v-in .pf-etiqueta { --s: var(--etq-m); margin-top: 14px; }
 .pf-v-in .pf-etiqueta__rotulo { outline: 1px solid var(--line); outline-offset: -1px; }
@@ -53,7 +57,7 @@ button, a { touch-action: manipulation; }
 .pf-v-pag.pf-lista canvas { opacity: 1; }
 .pf-v-pag.pf-esqueleto { background: linear-gradient(100deg, transparent 35%, color-mix(in srgb, var(--color-blanco) 70%, transparent) 50%, transparent 65%) var(--card); background-size: 250% 100%; animation: pf-brillo 1.5s linear infinite; }
 @keyframes pf-brillo { from { background-position: 125% 0; } to { background-position: -25% 0; } }
-@media (prefers-reduced-motion: reduce) { .pf-esqueleto { animation: none !important; } .pf-v-pag canvas { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .pf-esqueleto { animation: none !important; } .pf-v-pag canvas, .pf-v-cuenta, .pf-aviso { transition: none; } }
 .pf-v-num { position: absolute; right: 10px; bottom: 8px; padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--ink) 62%, transparent); color: var(--tiza); font-size: var(--texto-mini); font-variant-numeric: tabular-nums; opacity: 0; transition: opacity 200ms ease; pointer-events: none; }
 @media (hover: hover) and (pointer: fine) { .pf-v-pag:hover .pf-v-num { opacity: 1; } }
 
@@ -74,13 +78,18 @@ button, a { touch-action: manipulation; }
 .pf-v-copiar svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 @media (hover: hover) and (pointer: fine) { .pf-v-foco:hover { background: var(--ink); } .pf-v-copiar:hover { color: var(--azul); border-color: var(--azul); } }
 .pf-v-bajar { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+.pf-doc__d::after { content: ""; position: absolute; inset: -8px; border-radius: 999px; }
+/* Contador de página: donde no hay índice (pantallas medianas, celular y modo lectura) dice en qué página se está. Aparece al entrar al documento. */
+.pf-v-cuenta { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 50; translate: -50% 12px; padding: 7px 14px; border-radius: 999px; background: color-mix(in srgb, var(--ink) 86%, transparent); color: var(--tiza); font-size: var(--texto-chico); font-variant-numeric: tabular-nums; opacity: 0; pointer-events: none; transition: opacity 240ms ease, translate 320ms var(--ease); display: none; }
+.pf-v-cuenta.pf-on { opacity: 1; translate: -50% 0; }
+body.pf-foco .pf-v-cuenta { display: block; }
 .pf-v-bajar svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
 /* --- Índice de páginas, a la izquierda: fijo al bajar. El punto azul viaja con un resorte (el de la librería) hasta la página que se está leyendo. */
 .pf-v-indice { grid-column: 1; grid-row: 2; align-self: start; position: sticky; top: 112px; margin-top: 56px; max-height: calc(100vh - 150px); overflow-y: auto; scrollbar-width: none; font-size: var(--texto-chico); }
 .pf-v-indice::-webkit-scrollbar { display: none; }
 .pf-v-indice ol { position: relative; margin: 0; padding: 0 0 0 18px; list-style: none; display: grid; gap: 8px; }
-.pf-v-indice a { display: block; color: var(--ink-3); line-height: 1.35; text-decoration: none; font-variant-numeric: tabular-nums; transition: color 200ms ease, translate var(--punto-dura, 320ms) var(--punto-curva, var(--ease)); }
+.pf-v-indice a { display: block; color: var(--ink-2); line-height: 1.35; text-decoration: none; font-variant-numeric: tabular-nums; transition: color 200ms ease, translate var(--punto-dura, 320ms) var(--punto-curva, var(--ease)); }
 .pf-v-indice a.pf-on { color: var(--azul); translate: 4px 0; }
 @media (hover: hover) and (pointer: fine) { .pf-v-indice a:hover { color: var(--azul); translate: 4px 0; } }
 .pf-v-indice__punto { position: absolute; left: 0; top: 0; width: 7px; height: 7px; border-radius: 999px; background: var(--azul); translate: 0 var(--y, 0px); transition: translate var(--punto-dura, 420ms) var(--punto-curva, var(--ease)); }
@@ -91,7 +100,7 @@ body.pf-foco :is(.pf-barra, .pf-v-indice, .pf-v-datos, .pf-v-cab, .pf-v-sigue, .
 body.pf-foco .pf-v-grilla { grid-template-columns: minmax(0, 860px); padding-top: 40px; }
 body.pf-foco .pf-v-doc { grid-column: 1; grid-row: 1; margin-top: 0; padding-bottom: 120px; }
 .pf-v-salir { position: fixed; top: calc(20px + env(safe-area-inset-top, 0px)); right: 20px; z-index: 60; display: inline-flex; align-items: center; gap: 10px; height: 38px; padding: 0 8px 0 16px; border: 1px solid var(--line); border-radius: 999px; background: var(--bg); color: var(--ink-2); font-size: var(--texto-chico); cursor: pointer; }
-.pf-v-salir kbd { padding: 3px 7px; border-radius: 999px; background: var(--card); font: inherit; font-size: var(--texto-mini); color: var(--ink-3); }
+.pf-v-salir kbd { padding: 3px 7px; border-radius: 999px; background: var(--card); font: inherit; font-size: var(--texto-mini); color: var(--ink-2); }
 @media (hover: hover) and (pointer: fine) { .pf-v-salir:hover { color: var(--azul); border-color: var(--azul); } }
 @media (hover: none) { .pf-v-salir kbd { display: none; } }
 .pf-aviso { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 60; transform: translate(-50%, 16px); padding: 12px 18px; border-radius: 999px; background: var(--ink); color: var(--tiza); font-size: var(--texto-chico); opacity: 0; pointer-events: none; transition: opacity 240ms ease, transform 320ms var(--ease); }
@@ -108,7 +117,7 @@ body.pf-foco .pf-v-doc { grid-column: 1; grid-row: 1; margin-top: 0; padding-bot
 .pf-doc__t { margin: 0; font: 500 1.2rem/1.2 var(--f-display); letter-spacing: -0.012em; color: var(--azul); text-wrap: pretty; overflow-wrap: break-word; transition: translate 320ms var(--ease); }
 .pf-doc__t a { color: inherit; text-decoration: none; }
 .pf-doc__t a::after { content: ""; position: absolute; inset: 0; }
-.pf-doc__y { font-size: var(--texto-chico); color: var(--ink-3); font-variant-numeric: tabular-nums; text-align: right; }
+.pf-doc__y { font-size: var(--texto-chico); color: var(--ink-2); font-variant-numeric: tabular-nums; text-align: right; }
 .pf-doc__d { position: relative; z-index: 1; display: grid; place-items: center; width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink-2); text-decoration: none; transition: color 200ms ease, border-color 200ms ease, background 200ms ease; }
 .pf-doc__d svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 @media (hover: hover) and (pointer: fine) { .pf-doc:hover .pf-doc__t { translate: 4px 0; } .pf-doc__d:hover { background: var(--azul); border-color: var(--azul); color: var(--tiza); } }
@@ -124,6 +133,10 @@ body.pf-foco .pf-v-doc { grid-column: 1; grid-row: 1; margin-top: 0; padding-bot
   .pf-v-datos { grid-row: 2; position: static; margin: 28px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
   .pf-v-doc { grid-row: 3; margin-top: 28px; }
   .pf-v-indice { display: none; }
+  .pf-v-cuenta { display: block; }
+  /* Sin cursor fino, los controles redondos suben a 40 px (el alto del botón de descarga). */
+  .pf-v-foco, .pf-v-copiar { width: 40px; height: 40px; }
+  .pf-v-pags { height: 40px; padding: 0 14px 0 11px; }
 }
 @media (max-width: 640px) {
   .pf-v-grilla { padding-top: calc(108px + env(safe-area-inset-top, 0px)); }
@@ -153,6 +166,8 @@ body.pf-foco .pf-v-doc { grid-column: 1; grid-row: 1; margin-top: 0; padding-bot
   /*__BADGE__*/
 </defs></svg>
 
+<a class="pf-saltar" href="#pf-doc">Ir al documento</a>
+
 <header class="pf-barra pf-barra--solida" id="pf-top">
   <div class="pf-barra__in">
     <nav class="pf-barra__nav" id="pf-nav" aria-label="Sitio">
@@ -175,7 +190,7 @@ body.pf-foco .pf-v-doc { grid-column: 1; grid-row: 1; margin-top: 0; padding-bot
   <div class="pf-v-grilla" id="pf-grilla">
     <header class="pf-v-cab"><div class="pf-v-in" id="pf-cabIn"></div></header>
     <nav class="pf-v-indice" id="pf-indice" aria-label="Páginas del documento" hidden></nav>
-    <div class="pf-v-doc" id="pf-doc"></div>
+    <div class="pf-v-doc" id="pf-doc" tabindex="-1"></div>
     <div class="pf-v-datos" id="pf-datos"></div>
   </div>
   <section class="pf-v-sigue pf-col" aria-label="Más documentos">
@@ -187,6 +202,7 @@ body.pf-foco .pf-v-doc { grid-column: 1; grid-row: 1; margin-top: 0; padding-bot
 /*__PIE_HTML__*/
 
 <button class="pf-v-salir" id="pf-focoSalir" type="button" hidden>Salir del modo lectura <kbd>Esc</kbd></button>
+<div class="pf-v-cuenta" id="pf-cuenta" aria-hidden="true"></div>
 <div class="pf-aviso" id="pf-aviso" role="status" aria-live="polite"></div>
 
 <script>
@@ -210,7 +226,10 @@ body.pf-foco .pf-v-doc { grid-column: 1; grid-row: 1; margin-top: 0; padding-bot
 
   // Qué documento: ?d=<id>. Sin parámetro, el primero de la lista.
   var pedido = new URLSearchParams(location.search).get("d");
-  var d = DOCS.filter(function (x) { return x.id === pedido; })[0] || DOCS[0];
+  var d = DOCS.filter(function (x) { return x.id === pedido; })[0];
+  // Un link a un documento que no existe vuelve a la lista (antes mostraba, sin avisar, el primero de la base).
+  if (pedido && !d) { location.replace("../"); return; }
+  d = d || DOCS[0];
   var cat = POR[d.c];
   var url = d.l ? "../pdf/" + encodeURIComponent(d.l) : null;   // copia local (solo la muestra); la original no se puede leer desde otro dominio
   document.title = d.t + " · Documentos Profertil";
@@ -248,6 +267,9 @@ body.pf-foco .pf-v-doc { grid-column: 1; grid-row: 1; margin-top: 0; padding-bot
     $("pf-focoSalir").hidden = !on;
     anchoCambio();
     if (ref) window.scrollBy(0, ref.el.getBoundingClientRect().top - y);
+    // El foco del teclado acompaña: al entrar va al botón de salir (el que se apretó deja de verse) y al salir vuelve.
+    (on ? $("pf-focoSalir") : $("pf-foco")).focus({ preventScroll: true });
+    cuenta();
   }
   $("pf-focoSalir").addEventListener("click", function () { foco(false); });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && document.body.classList.contains("pf-foco")) foco(false); });
@@ -374,12 +396,19 @@ body.pf-foco .pf-v-doc { grid-column: 1; grid-row: 1; margin-top: 0; padding-bot
     var m = /^#p-(\d+)$/.exec(location.hash);
     if (m && paginas[Number(m[1]) - 1]) paginas[Number(m[1]) - 1].el.scrollIntoView({ behavior: "auto" });
   }
+  function cuenta() {
+    var c = $("pf-cuenta"); if (paginas.length < 2) { c.classList.remove("pf-on"); return; }
+    var r = $("pf-doc").getBoundingClientRect();
+    c.textContent = (Math.max(0, actual) + 1) + " / " + paginas.length;
+    c.classList.toggle("pf-on", r.top < innerHeight * 0.5 && r.bottom > innerHeight * 0.6);
+  }
   function marcar() {
-    if (!paginas.length || $("pf-indice").hidden) return;
+    if (!paginas.length) return;
     var act = 0, corte = innerHeight * 0.4;
     for (var i = 0; i < paginas.length; i++) { if (paginas[i].el.getBoundingClientRect().top < corte) act = i; else break; }
-    if (act === actual) return;
-    actual = act;
+    var cambio = act !== actual;
+    actual = act; cuenta();
+    if (!cambio || $("pf-indice").hidden) return;
     var links = $("pf-indice").querySelectorAll("a");
     [].forEach.call(links, function (a, i) { a.classList.toggle("pf-on", i === act); });
     var a = links[act], ol = a.closest("ol");
