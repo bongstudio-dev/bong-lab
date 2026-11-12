@@ -28,15 +28,15 @@ def corto(s, n=RESUMEN_MAX):
     return s[:n].rsplit(' ', 1)[0].rstrip(',.;') + '…'
 
 
-# --- Documentos: los PDF de la biblioteca (documentos/fuente/docs.json) ---
+# --- Documentos: los PDF de la biblioteca (biblioteca/fuente/docs.json) ---
 CATEGORIAS = {'cereales': 'Cereales', 'oleaginosas': 'Oleaginosas', 'pasturas': 'Pasturas', 'industriales': 'Industriales',
               'msds': 'Hojas de seguridad', 'inversores': 'Inversores', 'biblioteca': 'Biblioteca'}
 
 
 def documentos():
-    docs = leer('documentos/fuente/docs.json')['docs']
+    docs = leer('biblioteca/fuente/docs.json')['docs']
     docs.sort(key=lambda d: d['t'].lower())
-    return [[d['t'], 'documentos/ver/?d=' + d['id'], ' · '.join(x for x in [CATEGORIAS.get(d['c'], ''), d.get('y', '')] if x)]
+    return [[d['t'], 'biblioteca/ver/?d=' + d['id'], ' · '.join(x for x in [CATEGORIAS.get(d['c'], ''), d.get('y', '')] if x)]
             for d in docs]
 
 
@@ -89,7 +89,7 @@ def paginas():
 
 # id, nombre del grupo, singular, plural, artículo del plural, lista con la búsqueda aplicada (vacío: el panel muestra todos), fuente
 GRUPOS = [
-    ('documentos', 'Biblioteca', 'documento', 'documentos', 'los', 'documentos/#q=', documentos),
+    ('documentos', 'Biblioteca', 'documento', 'documentos', 'los', 'biblioteca/#q=', documentos),
     ('notas', 'Notas', 'nota', 'notas', 'las', 'novedades/#q=', notas),
     ('paginas', 'Páginas', 'página', 'páginas', 'las', '', paginas),
 ]

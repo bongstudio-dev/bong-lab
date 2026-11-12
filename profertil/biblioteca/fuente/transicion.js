@@ -31,7 +31,7 @@
     var a = e.target.closest("a[href]");
     if (!a || (a.target && a.target !== "_self") || a.hasAttribute("download")) return;
     var u = new URL(a.href, location.href);
-    if (u.origin !== location.origin || !/\/(novedades|documentos)\//.test(u.pathname)) return;
+    if (u.origin !== location.origin || !/\/(novedades|biblioteca)\//.test(u.pathname)) return;
     if (u.pathname === location.pathname && u.search === location.search) return;
     if (c.v === "ninguna" || quieto || ocupado) return;
     if (c.v === "fundido" && T.vt) return;

@@ -11,8 +11,8 @@ Qué es un documento acá: una página en español de las secciones de bibliotec
 contenido es un título y un PDF colgado (cantidad_descargas = 1). La categoría es la sección
 que declara la URL; no se inventa ninguna otra.
 
-  python3 profertil/documentos/fuente/prep-docs.py            # solo los tres .json
-  python3 profertil/documentos/fuente/prep-docs.py --bajar    # además baja los PDF que falten (conserva los ya bajados)
+  python3 profertil/biblioteca/fuente/prep-docs.py            # solo los tres .json
+  python3 profertil/biblioteca/fuente/prep-docs.py --bajar    # además baja los PDF que falten (conserva los ya bajados)
 """
 import csv, json, os, re, subprocess, sys, time, unicodedata
 from urllib.parse import urlparse, unquote

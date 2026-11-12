@@ -39,7 +39,7 @@ aviso sin resultados, si lo hay, `pf-empty`). En el head, después de `base.css`
 ```
 
 `data-seccion` es el id del grupo del índice que corresponde a la página; `data-nombre`, el texto del chip.
-En la Biblioteca va en `documentos/fuente/lista.html` y en Novedades en `novedades/fuente/template.html`; después,
+En la Biblioteca va en `biblioteca/fuente/lista.html` y en Novedades en `novedades/fuente/template.html`; después,
 el `build.py` de cada una.
 
 ## El índice
@@ -49,13 +49,13 @@ python3 profertil/buscador/fuente/indice.py            # documentos, notas y pá
 python3 profertil/buscador/fuente/indice.py --sin-red  # sin pedir el mapa: conserva las páginas que ya había
 ```
 
-Hay que correrlo cuando cambian `documentos/fuente/docs.json`, `novedades/fuente/notas.json` o el mapa de
+Hay que correrlo cuando cambian `biblioteca/fuente/docs.json`, `novedades/fuente/notas.json` o el mapa de
 arquitectura. Cada ítem es `[título, url, resumen]`, con la url relativa a `profertil/` (o absoluta si va al
 sitio actual).
 
 | Grupo | Sale de | Resumen | Lleva a |
 |---|---|---|---|
-| Biblioteca (668) | `documentos/fuente/docs.json` | categoría y año | `documentos/ver/?d=…` |
+| Biblioteca (668) | `biblioteca/fuente/docs.json` | categoría y año | `biblioteca/ver/?d=…` |
 | Notas (471) | `novedades/fuente/notas.json` | tipo, año y bajada (hasta 140 letras) | `novedades/nota/?n=…` |
 | Páginas (28) | mapa de arquitectura v0 (`/api/arquitectura`), solo nodos `pagina` | dónde está en el menú | la maqueta si existe (Novedades), si no la dirección del sitio actual |
 

@@ -6,7 +6,7 @@ lista los documentos con esa etiqueta (con paginación). Este script lee la port
 en el orden en que el sitio las muestra, recorre cada página y cruza lo que lista con docs.json por dirección.
 Las entradas que no son documentos de la Biblioteca (fichas de producto, noticias) se ignoran.
 
-  python3 profertil/documentos/fuente/prep-etiquetas.py
+  python3 profertil/biblioteca/fuente/prep-etiquetas.py
 
 Salida: etiquetas.json con
   grupos: [{id, nombre, opciones: [{id, nombre, sub?}]}]   en el orden de la portada

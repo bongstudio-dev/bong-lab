@@ -1,6 +1,6 @@
 """Arma la lista (../index.html) y el visor (../ver/index.html) desde lista.html y visor.html.
 
-  python3 profertil/documentos/fuente/build.py
+  python3 profertil/biblioteca/fuente/build.py
 
 Los datos salen de docs.json, docs-msds.json y docs-inversores.json (prep-docs.py) y de etiquetas.json
 (prep-etiquetas.py). La transición entre páginas, el pie y la firma de Bong
@@ -113,6 +113,6 @@ head, rest = v.split('</style>', 1)
 os.makedirs(os.path.join(AQUI, '..', 'ver'), exist_ok=True)
 salida = os.path.join(AQUI, '..', 'ver', 'index.html')
 open(salida, 'w', encoding='utf-8').write(armar(head, rest))
-firmar(salida, 'PROFERTIL · VISOR DE DOCUMENTOS', 'Plantilla de documento con visor de PDF, sobre documentos reales del sitio actual.',
+firmar(salida, 'PROFERTIL · VISOR DE LA BIBLIOTECA', 'Plantilla de documento con visor de PDF, sobre documentos reales del sitio actual.',
        'Prototipo de la página de documento para la web de Profertil.')
 print('visor', os.path.getsize(salida))

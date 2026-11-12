@@ -4,7 +4,7 @@
 tocar `lista.html`, `visor.html` o los datos y regenerar.
 
 ```bash
-python3 profertil/documentos/fuente/build.py
+python3 profertil/biblioteca/fuente/build.py
 ```
 
 ## Qué hay
@@ -38,9 +38,9 @@ python3 profertil/documentos/fuente/build.py
 ## Datos
 
 ```bash
-python3 profertil/documentos/fuente/prep-docs.py        # docs.json, docs-msds.json, docs-inversores.json
-python3 profertil/documentos/fuente/prep-etiquetas.py   # etiquetas.json (lee la Biblioteca Virtual del sitio actual)
-python3 profertil/documentos/fuente/build.py            # ../index.html y ../ver/index.html
+python3 profertil/biblioteca/fuente/prep-docs.py        # docs.json, docs-msds.json, docs-inversores.json
+python3 profertil/biblioteca/fuente/prep-etiquetas.py   # etiquetas.json (lee la Biblioteca Virtual del sitio actual)
+python3 profertil/biblioteca/fuente/build.py            # ../index.html y ../ver/index.html
 ```
 
 Un documento es una página en español de las secciones de biblioteca (`/cereales/`, `/oleaginosas/`,
@@ -115,8 +115,8 @@ trae una copia de cada uno en `../pdf/` y el visor lee esa copia. Con el sitio n
   los dos de Inversores: `Estatuto.pdf` y el poder de administración de 2022, que dan 404 en el sitio actual.
 
 ```bash
-python3 profertil/documentos/fuente/prep-docs.py            # rehace los tres .json y marca `l` según lo que hay en ../pdf/
-python3 profertil/documentos/fuente/prep-docs.py --bajar    # además baja los que falten
+python3 profertil/biblioteca/fuente/prep-docs.py            # rehace los tres .json y marca `l` según lo que hay en ../pdf/
+python3 profertil/biblioteca/fuente/prep-docs.py --bajar    # además baja los que falten
 ```
 
 `--bajar` conserva lo ya bajado, baja de a dos pedidos (el servidor corta si se le pide de a muchos) con reintentos,
