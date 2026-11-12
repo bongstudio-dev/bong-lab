@@ -1,0 +1,79 @@
+/* Buscador con alcance: se suma a la pieza "barra" de base.css (lupa, campo y cerrar).
+   Un chip dentro del campo ("En: Documentos") limita la búsqueda a la sección; al sacarlo, busca en todo el
+   sitio y abajo de la barra se abre el panel de resultados por tipo. Lo arma ../buscador/alcance.js.
+   Sale de los tokens (tokens.css) y de las piezas chip y barra de base.css. Sin sombras. */
+
+/* El campo abierto va sin sombra: sobre la barra azul alcanza el contraste de la tiza. */
+.pf-barra__busca.pf-abierto { box-shadow: none; }
+
+/* --- Chip de alcance: la pieza chip, igual que los chips de filtros activos. --------------------------- */
+.pf-alc__chip { --h: 30px; gap: 8px; margin-left: 2px; padding-right: 10px; max-width: 46%; opacity: 1; transition: background 160ms ease, opacity 200ms ease; }
+.pf-alc__chip svg { width: 12px; height: 12px; flex: none; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+.pf-alc__chip span { overflow: hidden; text-overflow: ellipsis; }
+.pf-alc__en { font-weight: 400; opacity: .8; }
+.pf-barra__busca:not(.pf-abierto) .pf-alc__chip { opacity: 0; pointer-events: none; }
+/* El campo recorta lo que se sale: el foco se dibuja adentro del chip, en tiza sobre el azul. */
+.pf-alc__chip:focus-visible { outline: 2px solid var(--tiza); outline-offset: -4px; }
+/* Todo el sitio: sin chip ni contador (el panel ya cuenta por tipo). */
+.pf-alc--amplio .pf-barra__cuenta { display: none; }
+
+/* --- Panel de resultados en todo el sitio ----------------------------------------------------------- */
+.pf-alc__panel { position: absolute; top: calc(100% + 4px); right: 56px; z-index: 2; width: min(560px, calc(100% - 56px));
+  max-height: calc(100vh - 110px); max-height: calc(100dvh - 110px); overflow-y: auto; overscroll-behavior: contain;
+  padding: 8px; border-radius: var(--radio-tarjeta); background: var(--tiza); border: 1px solid var(--line); color: var(--ink);
+  font-family: var(--f-body); animation: pf-alc-entra 260ms var(--ease); }
+@keyframes pf-alc-entra { from { opacity: 0; transform: translateY(-6px); } }
+.pf-alc__panel[hidden] { display: none; }
+
+/* Velo parejo debajo de la barra mientras el panel está abierto (la barra queda arriba). */
+.pf-alc__velo { position: fixed; inset: 0; z-index: 45; background: color-mix(in srgb, var(--ink) 22%, transparent); animation: pf-alc-velo 260ms ease; }
+@keyframes pf-alc-velo { from { opacity: 0; } }
+.pf-alc__velo[hidden] { display: none; }
+
+.pf-alc__cab { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 8px 10px 10px; }
+.pf-alc__titulo { margin: 0; font-size: var(--texto-chico); color: var(--ink-2); }
+.pf-alc__titulo b { color: var(--azul); font-weight: 600; font-variant-numeric: tabular-nums; }
+.pf-alc__volver { border: 0; background: transparent; cursor: pointer; padding: 4px 6px; color: var(--azul); font: 500 var(--texto-chico)/1.3 var(--f-body); text-decoration: underline; text-underline-offset: 3px; }
+.pf-alc__volver:focus-visible { outline-offset: -2px; border-radius: 6px; }
+
+.pf-alc__grupo { padding: 4px 0 8px; border-top: 1px solid var(--line); }
+.pf-alc__g { display: flex; align-items: center; gap: 8px; margin: 0; padding: 12px 10px 6px; font: 500 0.74rem/1 var(--f-body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); }
+.pf-alc__n { display: inline-grid; place-items: center; min-width: 22px; height: 20px; padding: 0 6px; border-radius: calc(20px * .32); background: var(--chip-fondo); color: var(--chip-texto); font: 500 11px/1 var(--f-body); letter-spacing: 0; font-variant-numeric: tabular-nums; }
+.pf-alc__lista { list-style: none; margin: 0; padding: 0; }
+.pf-alc__item { display: grid; gap: 2px; padding: 9px 10px; border-radius: var(--radio-control); color: inherit; text-decoration: none; transition: background 160ms ease; }
+.pf-alc__t { font: 500 var(--texto-cuerpo)/1.35 var(--f-body); color: var(--ink); }
+.pf-alc__r { font-size: var(--texto-chico); line-height: 1.4; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (hover: hover) and (pointer: fine) { .pf-alc__item:hover { background: var(--line); } }
+.pf-alc__item:active { background: var(--line); }
+.pf-alc__item:focus-visible { outline-offset: -2px; background: var(--line); }
+
+.pf-alc__ver { display: inline-flex; align-items: center; gap: 6px; margin: 4px 0 0; padding: 8px 10px; border: 0; border-radius: var(--radio-control); background: transparent; cursor: pointer;
+  color: var(--azul); font: 500 var(--texto-chico)/1.3 var(--f-body); text-decoration: none; }
+.pf-alc__ver svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 420ms var(--ease); }
+@media (hover: hover) and (pointer: fine) { .pf-alc__ver:hover svg { transform: translateX(3px); } }
+.pf-alc__ver:focus-visible { outline-offset: -2px; }
+.pf-alc__ver[aria-expanded="true"] svg { transform: rotate(-90deg); }
+
+.pf-alc__nada { margin: 0; padding: 18px 10px 20px; color: var(--ink-2); font-size: var(--texto-cuerpo); line-height: 1.5; }
+.pf-alc__nada b { color: var(--ink); font-weight: 500; }
+
+/* Sin resultados en la sección: el botón que amplía la búsqueda, junto al de la página. */
+.pf-alc__ampliar { margin-top: -4px; }
+
+/* --- Celular: el campo abierto ocupa el lugar del logo para que entren el chip y lo que se escribe. ---- */
+@media (max-width: 640px) {
+  .pf-barra__logo { transition: opacity 200ms ease; }
+  .pf-barra__nav.pf-buscando .pf-barra__logo { opacity: 0; visibility: hidden; }
+  .pf-barra__busca.pf-abierto { width: calc(100% - 56px); }
+  .pf-alc__en { display: none; }
+  /* Con el chip no entra el contador: la lista ya dice cuántos hay. */
+  .pf-barra__busca .pf-barra__cuenta { display: none; }
+  .pf-alc__chip { max-width: 52%; }
+  .pf-alc__panel { left: 0; right: 0; width: auto; max-height: calc(100dvh - 90px - env(safe-area-inset-top, 0px)); }
+  .pf-alc__item { padding-block: 11px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pf-alc__panel, .pf-alc__velo { animation: none; }
+  .pf-alc__ver svg { transition: none; }
+}

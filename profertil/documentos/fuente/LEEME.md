@@ -17,6 +17,8 @@ python3 profertil/documentos/fuente/build.py
   lista y miniaturas (cuadrados con el arte de las Formas del sistema según la categoría, determinista por documento).
   Los filtros activos (cultivo, zona, año, nutriente y búsqueda) aparecen como chips que se sacan de a uno.
   Ver "Filtros" abajo.
+- Buscador: con el chip **En: Documentos** filtra la lista; sin el chip busca en todo el sitio. Es el componente
+  compartido de `../../buscador/` (ver su `LEEME.md`), que se carga en el head de `lista.html`.
 - `visor.html`: la página de un documento, `ver/?d=<id>`, para los 668 (Biblioteca, hojas de seguridad e
   inversores). En los de la Biblioteca, el link de vuelta va a la lista; en los otros no hay link de vuelta porque su
   página no está en esta maqueta. Título arriba a la izquierda y tres columnas: índice de

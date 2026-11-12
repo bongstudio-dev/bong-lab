@@ -51,6 +51,12 @@
   filtros") y componente interactivo `Web/Ancla` (seccion Filtros), con sus
   estados y transiciones; esta puesto en los prototipos de Novedades.
 
+## Buscador
+
+Con el chip **En: Novedades** filtra las notas; sin el chip busca en todo el sitio (documentos, notas y
+páginas). Es el componente compartido de `../../buscador/` (ver su `LEEME.md`), cargado en el head de
+`template.html`.
+
 ## Página de Nota
 
 Desde Novedades se llega por enlace directo: cada tarjeta de la grilla y el
