@@ -2,10 +2,11 @@
 
   python3 profertil/documentos/fuente/build.py
 
-Los datos salen de docs.json (python3 prep-docs.py). La transición entre páginas, el pie y la firma de Bong
+Los datos salen de docs.json, docs-msds.json y docs-inversores.json (prep-docs.py) y de etiquetas.json
+(prep-etiquetas.py). La transición entre páginas, el pie y la firma de Bong
 se toman de las mismas fuentes que Novedades.
 """
-import json, os, re, subprocess
+import json, os, re, subprocess, unicodedata
 AQUI = os.path.dirname(os.path.abspath(__file__))
 os.chdir(AQUI)
 NOV = os.path.join(AQUI, '..', '..', 'novedades', 'fuente')
@@ -17,7 +18,27 @@ def sym(f, i):
     return '<symbol id="%s" viewBox="%s">%s</symbol>' % (i, vb, inner)
 LOGOS = sym('logo-blanco.svg', 'pf-logo-blanco') + sym('simbolo-color.svg', 'pf-simbolo')
 
-docs = json.dumps(json.load(open('docs.json', encoding='utf-8'))['docs'], ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
+def js(x):
+    return json.dumps(x, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
+
+# Biblioteca (docs.json) con sus etiquetas del sitio actual (etiquetas.json, de prep-etiquetas.py). Las hojas de seguridad
+# y los informes para inversores tienen su propia página: no van en la lista, pero el visor los abre igual.
+BIB = json.load(open('docs.json', encoding='utf-8'))['docs']
+OTROS = json.load(open('docs-msds.json', encoding='utf-8'))['docs'] + json.load(open('docs-inversores.json', encoding='utf-8'))['docs']
+ET = json.load(open('etiquetas.json', encoding='utf-8'))
+# El id de opción en los documentos es el slug; en la página va el id corto (sin el "-2" de WordPress).
+CORTO = {op['slug']: op['id'] for g in ET['grupos'] for op in g['opciones']}
+for d in BIB:
+    e = ET['docs'].get(d['id'])
+    if e:
+        d['e'] = {g: [CORTO.get(v, v) for v in vs] for g, vs in e.items()}
+GRUPOS = [{'id': g['id'], 'nombre': g['nombre'],
+           'opciones': [{k: op[k] for k in ('id', 'nombre', 'sub', 'provincia') if k in op} for op in g['opciones']]}
+          for g in ET['grupos']]
+docs = js(BIB)
+grupos = js(GRUPOS)
+plano = lambda t: unicodedata.normalize('NFD', t).encode('ascii', 'ignore').decode().lower()
+docs_visor = js(sorted(BIB + OTROS, key=lambda d: plano(d['t'])))
 aj = json.loads(open('assets.json').read()); aj.pop('iconos', None)
 assets = json.dumps(aj, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
 
@@ -62,12 +83,13 @@ def firmar(ruta, nombre, que, contexto):
 # --- Lista: ../index.html ---
 lista = open('lista.html', encoding='utf-8').read()
 comun = re.search(r'  /\* @comun.*?\*/\n(.*?)  /\* @fin-comun \*/', lista, re.S).group(1)
-t = lista.replace('/*__LOGOS__*/', LOGOS).replace('/*__DOCS__*/[]', docs).replace('/*__ASSETS__*/{}', assets)
+t = (lista.replace('/*__LOGOS__*/', LOGOS).replace('/*__DOCS__*/[]', docs).replace('/*__GRUPOS__*/[]', grupos)
+     .replace('/*__ASSETS__*/{}', assets))
 head, rest = t.split('</style>', 1)
 salida = os.path.join(AQUI, '..', 'index.html')
 open(salida, 'w', encoding='utf-8').write(armar(head, rest))
-firmar(salida, 'PROFERTIL · DOCUMENTOS', 'Maqueta de la lista de documentos: los PDF reales del sitio actual.',
-       'Prototipo de la sección Documentos para la web de Profertil.')
+firmar(salida, 'PROFERTIL · BIBLIOTECA VIRTUAL', 'Maqueta de la Biblioteca Virtual: los PDF reales del sitio actual, con sus etiquetas.',
+       'Prototipo de la Biblioteca Virtual para la web de Profertil.')
 print('lista', os.path.getsize(salida))
 
 # --- Visor: ../ver/index.html ---
@@ -85,7 +107,7 @@ pie = json.loads(subprocess.run(['node', '-e', PIE, COMP], capture_output=True, 
 badge = [l for l in lista.split('\n') if 'id="pf-badge-bg"' in l][0].strip()
 v = open('visor.html', encoding='utf-8').read()
 v = (v.replace('/*__COMUN__*/', comun).replace('/*__LOGOS__*/', LOGOS).replace('/*__BADGE__*/', badge)
-      .replace('/*__DOCS__*/[]', docs).replace('/*__ASSETS__*/{}', assets)
+      .replace('/*__DOCS__*/[]', docs_visor).replace('/*__ASSETS__*/{}', assets)
       .replace('/*__PIE_CSS__*/', pie['css']).replace('/*__PIE_HTML__*/', pie['html']))
 head, rest = v.split('</style>', 1)
 os.makedirs(os.path.join(AQUI, '..', 'ver'), exist_ok=True)

@@ -1,5 +1,5 @@
-<title>Documentos Profertil</title>
-<meta name="description" content="Maqueta de la lista de documentos de profertil.com.ar sobre el concepto web del manual de marca: los boletines, ensayos, hojas de seguridad e informes reales del sitio actual, con buscador, filtros y visor de PDF.">
+<title>Biblioteca Virtual Profertil</title>
+<meta name="description" content="Maqueta de la Biblioteca Virtual de profertil.com.ar sobre el concepto web del manual de marca: los boletines y ensayos reales del sitio actual, con buscador, filtros por cultivo, zona, año y nutriente, y visor de PDF.">
 <meta name="theme-color" content="#003DA5">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -7,8 +7,9 @@
 <link rel="stylesheet" href="../componentes/tokens.css">
 <link rel="stylesheet" href="../componentes/base.css">
 <style>
-/* Documentos Profertil: la lista de documentos del sitio actual (boletines, ensayos, hojas de seguridad, informes).
-   Misma lógica que Novedades (barra, filtros en el dock, buscador en la lupa, ancla); en vez de tarjetas, filas. */
+/* Biblioteca Virtual Profertil: los documentos técnicos del sitio actual (boletines, ensayos, informes de campaña).
+   Misma lógica que Novedades (barra, filtros en el dock, buscador en la lupa, ancla); en vez de tarjetas, filas.
+   Los filtros son las etiquetas del sitio actual: cultivo, zona, año y nutriente. */
 :root {
   color-scheme: light;
   /* Los tokens del sistema salen de ../componentes/tokens.css (generado desde el Figma Master) y las
@@ -64,10 +65,10 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 
 /* --- Pastillas de categoría y chips de año: piezas "pastilla" y "chip" de base.css. */
 
-/* --- Panel de filtros: barra fija full rounded con "Todas" y las tres
-   categorias con mas notas; arriba se despliega el panel con las demas y el
-   año. En mobile la barra se reduce a un boton "Filtros" y el panel trae
-   todas las categorias. Abre y cierra animando el alto del panel (medido en
+/* --- Panel de filtros: barra fija full rounded con "Todos" y los cuatro
+   grupos (cultivo, zona, año, nutriente); arriba se despliega el panel con los
+   grupos en acordeón, uno abierto por vez. En mobile la barra se reduce a un
+   boton "Filtros" y el panel trae los cuatro grupos. Abre y cierra animando el alto del panel (medido en
    JS: animar 0fr a 1fr en un contenedor de alto automatico falla en Chrome)
    y, en mobile, el ancho. */
 .pf-filters {
@@ -82,8 +83,7 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   border-radius: 24px;
   transition: width var(--f-cerrar) var(--f-curva), border-radius var(--f-cerrar) var(--f-curva), transform 520ms var(--ease), opacity 300ms ease;
   background: var(--glass);
-  border: 1px solid rgba(255, 255, 255, 0.92);
-  box-shadow: 0 24px 60px -24px rgba(10, 30, 74, 0.5);
+  border: 1px solid var(--line);
   backdrop-filter: blur(22px) saturate(1.4);
   -webkit-backdrop-filter: blur(22px) saturate(1.4);
   overflow: hidden;
@@ -123,7 +123,51 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 .pf-f-toggle svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform var(--f-flecha) var(--f-curva); }
 .pf-filters.pf-abierto .pf-f-toggle svg { transform: rotate(180deg); }
 .pf-f-count { position: absolute; top: 2px; right: 2px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 999px; background: var(--verde); color: #fff; display: grid; place-items: center; font-size: 0.66rem; font-variant-numeric: tabular-nums; }
-.pf-f-clear { justify-self: start; border: 0; background: transparent; cursor: pointer; padding: 4px 0; color: var(--azul); font-size: 0.88rem; text-decoration: underline; text-underline-offset: 3px; }
+.pf-f-clear { justify-self: start; margin-top: 2px; border: 0; background: transparent; cursor: pointer; padding: 4px 0; color: var(--azul); font-size: 0.88rem; text-decoration: underline; text-underline-offset: 3px; }
+
+/* --- Grupos del panel: acordeón. Un grupo abierto por vez; cerrado muestra sus filtros activos (se sacan tocándolos).
+   Dentro de un grupo las opciones suman (o); entre grupos se cruzan (y). Las que darían 0 resultados quedan atenuadas. */
+@media (min-width: 641px) { .pf-filters { min-width: min(100% - 32px - var(--a), 680px); } }
+.pf-f-in { gap: 10px; }
+.pf-f-grupos { display: grid; }
+.pf-f-gr + .pf-f-gr { border-top: 1px solid var(--line); }
+.pf-f-gr__cab { position: relative; display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 6px 2px; border: 0; background: transparent; cursor: pointer; text-align: left; }
+.pf-f-gr__cab .pf-f-label { flex: none; font-size: 0.8rem; color: var(--ink); }
+.pf-f-gr__res { flex: 1; min-width: 0; font-size: var(--texto-chico); color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pf-f-gr__cab svg { flex: none; width: 18px; height: 18px; fill: none; stroke: var(--ink-2); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transform: rotate(180deg); transition: transform var(--f-flecha) var(--f-curva); }
+.pf-f-gr.pf-abierto .pf-f-gr__cab svg { transform: none; }
+@media (hover: hover) and (pointer: fine) { .pf-f-gr__cab:hover .pf-f-label { color: var(--azul); } }
+.pf-f-gr__cab .pf-f-n { position: static; }
+.pf-f-gr__activos { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 0 12px; }
+.pf-f-gr__activos:empty, .pf-f-gr.pf-abierto .pf-f-gr__activos { display: none; }
+.pf-f-gr__cuerpo { display: grid; grid-template-rows: 0fr; visibility: hidden; transition: grid-template-rows var(--f-cerrar) var(--f-curva), visibility 0s linear var(--f-cerrar); }
+.pf-f-gr.pf-abierto .pf-f-gr__cuerpo { grid-template-rows: 1fr; visibility: visible; transition: grid-template-rows var(--f-abrir) var(--f-curva); }
+.pf-f-gr__cuerpo > div { min-height: 0; overflow: hidden; }
+.pf-quieto .pf-f-gr__cuerpo { transition: none !important; }
+.pf-f-gr__in { display: grid; gap: 10px; padding: 0 0 14px; }
+.pf-f-sub { display: grid; gap: 4px; }
+.pf-f-sub__t { margin: 0; padding-left: 3px; font-size: 0.74rem; color: var(--ink-2); }
+.pf-f-gr .pf-f-row { padding: 2px; gap: 6px; }
+/* Zona: una fila por provincia; la primera pastilla es la provincia entera, separada de sus localidades. */
+.pf-f-prov { margin-right: 6px; }
+.pf-f-gr .pf-pastilla, .pf-f-gr .pf-chip { gap: 7px; }
+.pf-pastilla__n { font: 400 0.86em/1 var(--f-body); font-variant-numeric: tabular-nums; opacity: .72; }
+.pf-f-gr .pf-cero:not([aria-pressed="true"]) { opacity: .34; cursor: default; }
+.pf-f-gr .pf-cero:not([aria-pressed="true"]):active { transform: none; }
+/* Contador de filtros activos en la barra y en cada grupo. */
+.pf-f-n { display: inline-grid; place-items: center; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 999px; background: var(--verde); color: #fff; font: 400 0.66rem/1 var(--f-body); font-variant-numeric: tabular-nums; }
+.pf-f-main .pf-pastilla { gap: 6px; }
+.pf-f-main .pf-pastilla[aria-expanded="true"] { background: var(--line); }
+@media (max-width: 640px) {
+  .pf-f-gr__cab { min-height: 52px; }
+  .pf-f-gr .pf-pastilla { --h: 34px; }
+  .pf-f-gr .pf-chip { --h: 34px; }
+  .pf-f-gr .pf-f-row { gap: 8px; }
+  .pf-f-in { padding: 6px 16px 12px; }
+}
+/* Sin sombras: la barra y el indicador de los selectores (piezas de base.css) quedan planos en esta página. */
+.pf-barra--solida { box-shadow: none; }
+.pf-selector__ind { box-shadow: none; }
 
 /* --- Vacio ---------------------------------------------------------------- */
 .pf-empty { padding: 60px 0 200px; display: grid; justify-items: center; gap: 14px; text-align: center; }
@@ -360,8 +404,8 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 </header>
 
 <section class="pf-dh pf-col">
-  <h1>Documentos</h1>
-  <p>Boletines técnicos, ensayos de fertilización, hojas de seguridad e informes para inversores.</p>
+  <h1>Biblioteca Virtual</h1>
+  <p>Boletines técnicos, ensayos de fertilización y trabajos de investigación sobre la nutrición de los cultivos y el cuidado del suelo.</p>
 </section>
 
 <main class="pf-col" id="pf-lista" tabindex="-1">
@@ -388,20 +432,19 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   <div class="pf-empty" id="pf-empty" hidden>
     <svg viewBox="0 0 555 662" aria-hidden="true"><use href="#pf-simbolo"/></svg>
     <p id="pf-emptyText"></p>
-    <button class="pf-boton pf-boton--verde" id="pf-emptyReset" type="button">Ver todos los documentos</button>
+    <button class="pf-boton pf-boton--verde" id="pf-emptyReset" type="button">Ver toda la Biblioteca</button>
   </div>
   <div class="pf-sentinel" id="pf-sentinel"></div>
 </main>
 
 <section class="pf-filters" id="pf-filters" aria-label="Filtros">
   <div class="pf-f-body" id="pf-fBody"><div class="pf-f-in">
-    <div class="pf-f-group pf-f-cats"><p class="pf-f-label">Categoría</p><div class="pf-f-row" id="pf-fCatsTodas"></div></div>
-    <div class="pf-f-group"><p class="pf-f-label">Año</p><div class="pf-f-row" id="pf-fAnios"></div></div>
+    <div class="pf-f-grupos" id="pf-fGrupos"></div>
     <button class="pf-f-clear" id="pf-fClear" type="button" hidden>Limpiar filtros</button>
   </div></div>
   <div class="pf-f-bar">
-    <div class="pf-f-main" id="pf-fCats" role="group" aria-label="Categoría"></div>
-    <button class="pf-f-toggle" id="pf-fToggle" type="button" aria-expanded="false" aria-controls="pf-fBody" aria-label="Más filtros"><span class="pf-f-txt">Filtros</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg><span class="pf-f-count" id="pf-fCount" hidden>0</span></button>
+    <div class="pf-f-main" id="pf-fMain" role="group" aria-label="Filtros"></div>
+    <button class="pf-f-toggle" id="pf-fToggle" type="button" aria-expanded="false" aria-controls="pf-fBody" aria-label="Filtros"><span class="pf-f-txt" id="pf-fTxt">Filtros</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg><span class="pf-f-count" id="pf-fCount" hidden>0</span></button>
   </div>
 </section>
 
@@ -411,10 +454,12 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 (function () {
   "use strict";
 
-  /* Datos reales: los documentos (título + PDF) de las secciones de biblioteca del sitio actual, del crawl
-     (urls.csv). Por documento: id, título (t), categoría (c) = la sección de la URL, año (y) = el que dice el
-     título (o el de publicación, salvo la carga masiva de 2020), PDF original (u) y, en la muestra, copia local (l). */
+  /* Datos reales: los documentos (título + PDF) de la Biblioteca Virtual del sitio actual, del crawl (urls.csv). Por documento:
+     id, título (t), sección de la URL (c, solo para la etiqueta y el arte), año del título (y), PDF original (u), copia local en la
+     muestra (l) y las etiquetas del sitio actual (e): {cultivo, zona, anio, nutriente}, cada una una lista de ids de opción.
+     GRUPOS son los cuatro grupos con sus opciones en el orden de la portada de la Biblioteca Virtual. */
   var DOCS = /*__DOCS__*/[];
+  var GRUPOS = /*__GRUPOS__*/[];
   var A = /*__ASSETS__*/{};
   var $ = function (id) { return document.getElementById(id); };
 
@@ -472,18 +517,26 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   });
 
   /* --- Estado ------------------------------------------------------------- */
-  var estado = { q: "", cats: {}, anios: {}, orden: "az" };
+  var SIN = "sin";   // la opción "Sin clasificar" de cada grupo: documentos sin etiqueta en ese grupo
+  var sel = {};
+  GRUPOS.forEach(function (g) { sel[g.id] = {}; });
+  var estado = { q: "", sel: sel, orden: "az" };
   var despertar = function () {};   // lo define la Ancla, más abajo
   var lista = [], pintadas = 0, TANDA = 60;
   var docs = $("pf-docs");
   var esMobile = window.matchMedia("(max-width: 640px)");
   function activos(o) { return Object.keys(o).filter(function (k) { return o[k]; }); }
+  function etiquetas(d, g) { return (d.e && d.e[g]) || []; }
+  function tiene(d, g, v) { var vs = etiquetas(d, g); return v === SIN ? !vs.length : vs.indexOf(v) !== -1; }
+  // Dentro de un grupo alcanza con una opción (o); entre grupos tienen que cumplirse todos (y). "salvo" deja afuera un grupo, para contar sus opciones.
   function pasa(d, salvo) {
     var q = plano(estado.q.trim());
     if (q && d.buscable.indexOf(q) === -1) return false;
-    var cs = activos(estado.cats), as = activos(estado.anios);
-    if (salvo !== "cat" && cs.length && cs.indexOf(d.c) === -1) return false;
-    if (salvo !== "anio" && as.length && as.indexOf(d.y || "sin") === -1) return false;
+    for (var i = 0; i < GRUPOS.length; i++) {
+      var g = GRUPOS[i].id; if (g === salvo) continue;
+      var ks = activos(estado.sel[g]);
+      if (ks.length && !ks.some(function (k) { return tiene(d, g, k); })) return false;
+    }
     return true;
   }
   function filtrar() {
@@ -572,55 +625,130 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
     $("pf-empty").hidden = lista.length > 0;
   }
 
-  /* --- Filtros ------------------------------------------------------------ */
-  var ANIOS = [];
-  DOCS.forEach(function (d) { if (d.y && ANIOS.indexOf(d.y) === -1) ANIOS.push(d.y); });
-  ANIOS.sort().reverse();
-  ANIOS.push("sin");
-  var PRINCIPALES = CATS.map(function (x) { return { id: x.id, n: DOCS.filter(function (d) { return d.c === x.id; }).length }; })
-    .sort(function (a, b) { return b.n - a.n; }).slice(0, 3).map(function (x) { return x.id; });
-  function contar(campo, v) {
-    return DOCS.reduce(function (s, d) {
-      if (!pasa(d, campo)) return s;
-      return s + ((campo === "cat" ? d.c === v : (d.y || "sin") === v) ? 1 : 0);
-    }, 0);
+  /* --- Filtros ------------------------------------------------------------
+     Las opciones salen de la portada de la Biblioteca Virtual, en su orden. Las que no tienen ningún documento en la Biblioteca no se
+     muestran; al final de cada grupo va "Sin clasificar". El panel se arma una vez y después solo se actualiza (estado, conteos y
+     atenuadas), así el acordeón no pierde su animación ni el teclado su lugar. */
+  var NOMBRE = {}, TOTAL = {};
+  GRUPOS.forEach(function (g) {
+    NOMBRE[g.id] = { sin: "Sin clasificar" }; TOTAL[g.id] = {};
+    g.opciones.forEach(function (o) { NOMBRE[g.id][o.id] = o.nombre; });
+    DOCS.forEach(function (d) {
+      var vs = etiquetas(d, g.id);
+      if (!vs.length) TOTAL[g.id][SIN] = (TOTAL[g.id][SIN] || 0) + 1;
+      vs.forEach(function (v) { TOTAL[g.id][v] = (TOTAL[g.id][v] || 0) + 1; });
+    });
+    g.visibles = g.opciones.filter(function (o) { return TOTAL[g.id][o.id]; });
+  });
+  var POR_G = {};
+  GRUPOS.forEach(function (g) { POR_G[g.id] = g; });
+  // Fuera de su grupo (chips y avisos) un nutriente se lee con su nombre de grupo: "S" solo no dice nada.
+  function nombreOp(g, v) { return v === SIN ? POR_G[g].nombre + " sin clasificar" : (g === "nutriente" ? "Nutriente " : "") + NOMBRE[g][v]; }
+  var abierto = null;   // el grupo abierto del acordeón
+  var CHEVRON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg>';
+
+  function opcion(g, o, extra) {
+    // Año usa el chip de año del sistema; los demás grupos, la pastilla de filtro (cultivo en verde, zona y nutriente en azul).
+    var chip = g.id === "anio";
+    var cls = chip ? "pf-chip" : "pf-pastilla", st = !chip && g.id === "cultivo" ? ' style="--pc:var(--verde)"' : "";
+    return '<button type="button" class="' + cls + (extra ? " " + extra : "") + '"' + st + ' data-f="op" data-g="' + g.id + '" data-v="' + o.id + '" aria-pressed="false">' +
+      esc(o.nombre) + '<b class="' + (chip ? "pf-chip__n" : "pf-pastilla__n") + '"></b></button>';
   }
-  function pintarFiltros() {
-    var ninguna = !activos(estado.cats).length;
-    var todas = '<button type="button" class="pf-pastilla pf-pastilla--todas" data-f="todas" aria-pressed="' + ninguna + '">Todos</button>';
-    function pill(x) {
-      return '<button type="button" class="pf-pastilla" style="--pc:' + x.f.bg + '" data-f="cat" data-v="' + x.id + '" aria-pressed="' + !!estado.cats[x.id] + '">' + x.nombre + "</button>";
-    }
-    var barra = CATS.filter(function (x) { return PRINCIPALES.indexOf(x.id) !== -1 || estado.cats[x.id]; });
-    $("pf-fCats").innerHTML = todas + barra.map(pill).join("");
-    $("pf-fCatsTodas").innerHTML = todas + CATS.map(pill).join("");
-    $("pf-fAnios").innerHTML = ANIOS.map(function (a) {
-      return '<button type="button" class="pf-chip" data-f="anio" data-v="' + a + '" aria-pressed="' + !!estado.anios[a] + '">' + (a === "sin" ? "Sin año" : a) + '<b class="pf-chip__n">' + contar("anio", a) + "</b></button>";
+  function armarFiltros() {
+    $("pf-fMain").innerHTML = '<button type="button" class="pf-pastilla pf-pastilla--todas" data-f="todas" aria-pressed="true">Todos</button>' +
+      GRUPOS.map(function (g) {
+        return '<button type="button" class="pf-pastilla pf-pastilla--todas" data-abrir="' + g.id + '" aria-expanded="false" aria-controls="pf-fBody">' + g.nombre + '<b class="pf-f-n" hidden></b></button>';
+      }).join("");
+    $("pf-fGrupos").innerHTML = GRUPOS.map(function (g) {
+      var h = "", subs = [], por = {};
+      g.visibles.forEach(function (o) { var k = o.sub || ""; if (!por[k]) { por[k] = []; subs.push(k); } por[k].push(o); });
+      subs.forEach(function (k) {
+        var ops = por[k];
+        if (g.id === "zona") {
+          // La provincia va primero, separada de sus localidades.
+          h += '<div class="pf-f-row">' + ops.map(function (o) { return opcion(g, o, o.provincia ? "pf-f-prov" : ""); }).join("") + "</div>";
+        } else {
+          h += '<div class="pf-f-sub">' + (k ? '<p class="pf-f-sub__t">' + esc(k) + "</p>" : "") + '<div class="pf-f-row">' + ops.map(function (o) { return opcion(g, o); }).join("") + "</div></div>";
+        }
+      });
+      if (TOTAL[g.id][SIN]) h += '<div class="pf-f-row">' + opcion(g, { id: SIN, nombre: "Sin clasificar" }) + "</div>";
+      return '<section class="pf-f-gr" data-grupo="' + g.id + '">' +
+        '<button type="button" class="pf-f-gr__cab" data-grupo="' + g.id + '" aria-expanded="false" aria-controls="pf-fg-' + g.id + '">' +
+        '<span class="pf-f-label">' + g.nombre + '</span><b class="pf-f-n" hidden></b><span class="pf-f-gr__res"></span>' + CHEVRON + "</button>" +
+        '<div class="pf-f-gr__activos"></div>' +
+        '<div class="pf-f-gr__cuerpo" id="pf-fg-' + g.id + '" role="group" aria-label="' + g.nombre + '"><div><div class="pf-f-gr__in">' + h + "</div></div></div></section>";
     }).join("");
   }
+  function abrirGrupo(g) {
+    abierto = g;
+    document.querySelectorAll(".pf-f-gr").forEach(function (el) {
+      var si = el.dataset.grupo === g;
+      el.classList.toggle("pf-abierto", si);
+      el.querySelector(".pf-f-gr__cab").setAttribute("aria-expanded", String(si));
+    });
+    document.querySelectorAll("#pf-fMain [data-abrir]").forEach(function (b) {
+      b.setAttribute("aria-expanded", String(b.dataset.abrir === g && $("pf-filters").classList.contains("pf-abierto")));
+    });
+  }
+  function pintarFiltros() {
+    var nTotal = 0;
+    GRUPOS.forEach(function (g) {
+      // Conteo de cada opción con los demás grupos y la búsqueda aplicados: lo que quedaría si se la suma.
+      var cuenta = {};
+      DOCS.forEach(function (d) {
+        if (!pasa(d, g.id)) return;
+        var vs = etiquetas(d, g.id);
+        if (!vs.length) cuenta[SIN] = (cuenta[SIN] || 0) + 1;
+        vs.forEach(function (v) { cuenta[v] = (cuenta[v] || 0) + 1; });
+      });
+      var ks = activos(estado.sel[g.id]);
+      nTotal += ks.length;
+      var sec = document.querySelector('.pf-f-gr[data-grupo="' + g.id + '"]');
+      sec.querySelectorAll("[data-f='op']").forEach(function (b) {
+        var v = b.dataset.v, n = cuenta[v] || 0, on = !!estado.sel[g.id][v];
+        b.setAttribute("aria-pressed", String(on));
+        b.classList.toggle("pf-cero", !n);
+        if (!n && !on) b.setAttribute("aria-disabled", "true"); else b.removeAttribute("aria-disabled");
+        b.lastElementChild.textContent = n;
+      });
+      // Cerrado, el grupo muestra lo elegido: en el resumen y como pastillas que se sacan tocándolas.
+      var nombres = ks.map(function (k) { return k === SIN ? "Sin clasificar" : NOMBRE[g.id][k]; });
+      sec.querySelector(".pf-f-gr__res").textContent = nombres.length ? nombres.join(", ") : "Todos";
+      var nb = sec.querySelector(".pf-f-gr__cab .pf-f-n"); nb.hidden = !ks.length; nb.textContent = ks.length;
+      sec.querySelector(".pf-f-gr__activos").innerHTML = ks.map(function (k) {
+        var o = { id: k, nombre: k === SIN ? "Sin clasificar" : NOMBRE[g.id][k] };
+        return opcion(g, o).replace('aria-pressed="false"', 'aria-pressed="true" aria-label="Quitar el filtro ' + esc(nombreOp(g.id, k)) + '"').replace(/<b class="[^"]*"><\/b>/, X);
+      }).join("");
+      var bb = document.querySelector('#pf-fMain [data-abrir="' + g.id + '"] .pf-f-n'); bb.hidden = !ks.length; bb.textContent = ks.length;
+    });
+    document.querySelector('#pf-fMain [data-f="todas"]').setAttribute("aria-pressed", String(!nTotal));
+  }
+  function nFiltros() { return GRUPOS.reduce(function (s, g) { return s + activos(estado.sel[g.id]).length; }, 0); }
   function resumen() {
-    var as = activos(estado.anios);
     var q = estado.q.trim();
-    var nf = activos(estado.cats).length + as.length;
+    var nf = nFiltros();
     var t = "<b>" + lista.length + "</b> " + (lista.length === 1 ? "documento" : "documentos");
-    if (!q && !nf) t = "Todos los documentos · <b>" + lista.length + "</b>";
+    if (!q && !nf) t = "Toda la Biblioteca · <b>" + lista.length + "</b>";
     $("pf-resultText").innerHTML = t;
     $("pf-qCount").textContent = lista.length;
-    var nsub = esMobile.matches ? nf : as.length;
+    // En el celular el botón del dock dice cuántos filtros hay; abierto, muestra el resultado y cierra el panel.
+    var nsub = esMobile.matches ? nf : 0;
     $("pf-fCount").hidden = nsub === 0; $("pf-fCount").textContent = nsub;
+    $("pf-fTxt").textContent = esMobile.matches && $("pf-filters").classList.contains("pf-abierto")
+      ? "Ver " + lista.length + (lista.length === 1 ? " documento" : " documentos") : "Filtros";
     $("pf-fClear").hidden = nf === 0;
     activosChips(q);
     $("pf-emptyText").textContent = q
       ? "Ningún documento coincide con «" + q + "»" + (nf ? " con esos filtros" : "") + ". Probá con otra palabra o limpiá los filtros."
       : "Ningún documento cumple esa combinación de filtros. Sacá alguno para ver más.";
   }
-  // La selección vive en la dirección (#cat=…&anio=…&q=…&orden=anio): se puede compartir, y al volver del visor la lista está como se dejó.
+  // La selección vive en la dirección (#cultivo=…&zona=…&anio=…&nutriente=…&q=…&orden=anio): se puede compartir, y al volver del
+  // visor la lista está como se dejó.
   var urlLista = false;
   function aUrl() {
     if (!urlLista) return;
-    var p = [], cs = activos(estado.cats), as = activos(estado.anios), q = estado.q.trim();
-    if (cs.length) p.push("cat=" + cs.join(","));
-    if (as.length) p.push("anio=" + as.sort().reverse().join(","));
+    var p = [], q = estado.q.trim();
+    GRUPOS.forEach(function (g) { var ks = activos(estado.sel[g.id]); if (ks.length) p.push(g.id + "=" + ks.join(",")); });
     if (q) p.push("q=" + encodeURIComponent(q));
     if (estado.orden === "anio") p.push("orden=anio");
     try { history.replaceState(null, "", p.length ? "#" + p.join("&") : location.pathname + location.search); } catch (e) {}
@@ -636,8 +764,12 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   var X = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2 2 10"/></svg>';
   function activosChips(q) {
     var h = "";
-    activos(estado.cats).forEach(function (k) { h += '<button type="button" class="pf-chip" aria-pressed="true" data-quitar="cat" data-v="' + k + '" aria-label="Quitar el filtro ' + POR[k].nombre + '">' + POR[k].nombre + X + "</button>"; });
-    activos(estado.anios).sort().reverse().forEach(function (k) { h += '<button type="button" class="pf-chip" aria-pressed="true" data-quitar="anio" data-v="' + k + '" aria-label="Quitar el filtro ' + (k === "sin" ? "Sin año" : k) + '">' + (k === "sin" ? "Sin año" : k) + X + "</button>"; });
+    GRUPOS.forEach(function (g) {
+      activos(estado.sel[g.id]).forEach(function (k) {
+        var n = nombreOp(g.id, k);
+        h += '<button type="button" class="pf-chip" aria-pressed="true" data-quitar="op" data-g="' + g.id + '" data-v="' + k + '" aria-label="Quitar el filtro ' + esc(n) + '">' + esc(n) + X + "</button>";
+      });
+    });
     if (q) h += '<button type="button" class="pf-chip" aria-pressed="true" data-quitar="q" aria-label="Quitar la búsqueda">«' + esc(q) + "»" + X + "</button>";
     if (h) h += '<button type="button" class="pf-activos__limpiar" data-quitar="todo">Limpiar todo</button>';
     $("pf-activos").innerHTML = h;
@@ -646,8 +778,7 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
     var b = e.target.closest("[data-quitar]"); if (!b) return;
     var t = b.dataset.quitar;
     if (t === "todo") { limpiar(); return; }
-    if (t === "cat") delete estado.cats[b.dataset.v];
-    else if (t === "anio") delete estado.anios[b.dataset.v];
+    if (t === "op") delete estado.sel[b.dataset.g][b.dataset.v];
     else if (t === "q") { estado.q = ""; $("pf-q").value = ""; }
     aplicar();
   });
@@ -746,22 +877,35 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
     f.classList.toggle("pf-chica", dy > 0 && y > 40 && !alFinal);
   }, { passive: true });
   $("pf-filters").addEventListener("click", function (e) {
+    var ab = e.target.closest("[data-abrir]");
+    if (ab) {
+      // Desde la barra: abre el panel en ese grupo; si ya estaba abierto ahí, lo cierra.
+      var yaAbierto = $("pf-filters").classList.contains("pf-abierto");
+      if (yaAbierto && abierto === ab.dataset.abrir) { abrirFiltros(false); return; }
+      abrirGrupo(ab.dataset.abrir);
+      if (!yaAbierto) abrirFiltros(true); else abrirGrupo(ab.dataset.abrir);
+      return;
+    }
+    var cab = e.target.closest(".pf-f-gr__cab");
+    if (cab) { abrirGrupo(abierto === cab.dataset.grupo ? null : cab.dataset.grupo); return; }
     var b = e.target.closest("[data-f]"); if (!b) return;
-    if (b.dataset.f === "todas") { estado.cats = {}; aplicar(); return; }
-    // Categoría: una sola a la vez (tocar la activa vuelve a "Todos"). Año: varios.
-    if (b.dataset.f === "cat") { var on = !estado.cats[b.dataset.v]; estado.cats = {}; if (on) estado.cats[b.dataset.v] = true; }
-    else estado.anios[b.dataset.v] = !estado.anios[b.dataset.v];
+    if (b.dataset.f === "todas") { GRUPOS.forEach(function (g) { estado.sel[g.id] = {}; }); aplicar(); return; }
+    if (b.getAttribute("aria-disabled") === "true") return;
+    var g = b.dataset.g, v = b.dataset.v;
+    if (estado.sel[g][v]) delete estado.sel[g][v]; else estado.sel[g][v] = true;
     aplicar();
   });
-  function limpiar() { estado.cats = {}; estado.anios = {}; estado.q = ""; $("pf-q").value = ""; aplicar(); }
+  function limpiar() { GRUPOS.forEach(function (g) { estado.sel[g.id] = {}; }); estado.q = ""; $("pf-q").value = ""; aplicar(); }
   $("pf-fClear").addEventListener("click", limpiar);
   $("pf-emptyReset").addEventListener("click", limpiar);
   // El panel anima su alto en px: se mide el alto final (con el ancho final, sin transiciones y sin pintar),
   // se arranca desde el actual y al terminar queda en auto con scroll (.listo).
   var tListo;
   function abrirFiltros(si) {
-    var f = $("pf-filters"), b = $("pf-fBody");
+    var f = $("pf-filters"), b = $("pf-fBody"), gr = $("pf-fGrupos");
     clearTimeout(tListo);
+    // El grupo que va a quedar abierto se abre antes de medir y sin su propia animación: el panel ya llega con su alto final.
+    if (si) { gr.classList.add("pf-quieto"); abrirGrupo(abierto || primerGrupo()); void gr.offsetHeight; }
     var desde = b.offsetHeight, anchoAhora = b.firstElementChild.offsetWidth;
     f.style.transition = b.style.transition = "none";
     f.classList.remove("pf-listo");
@@ -778,6 +922,9 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
     f.classList.toggle("pf-abierto", si);
     b.style.height = hasta + "px";
     $("pf-fToggle").setAttribute("aria-expanded", String(si));
+    gr.classList.remove("pf-quieto");
+    abrirGrupo(abierto);
+    resumen();
     var dur = parseFloat(getComputedStyle(document.documentElement).getPropertyValue(si ? "--f-abrir" : "--f-cerrar")) || 420;
     tListo = setTimeout(terminar, dur + 60);
   }
@@ -790,6 +937,12 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   }
   $("pf-fBody").addEventListener("transitionend", function (e) { if (e.target === this && e.propertyName === "height") terminar(); });
   $("pf-fToggle").addEventListener("click", function () { abrirFiltros(!$("pf-filters").classList.contains("pf-abierto")); });
+  // Al abrir el panel queda abierto el primer grupo con filtros elegidos; si no hay ninguno, Cultivo.
+  function primerGrupo() {
+    for (var i = 0; i < GRUPOS.length; i++) if (activos(estado.sel[GRUPOS[i].id]).length) return GRUPOS[i].id;
+    return GRUPOS[0].id;
+  }
+  armarFiltros();
   abrirFiltros(false);
 
   if ("IntersectionObserver" in window) {
@@ -861,14 +1014,14 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
     else window.scrollBy({ top: Math.round(window.innerHeight * BAJAR_P), behavior: suave });
   });
 
-  // La dirección trae la selección: #buscar abre el buscador; #cat=id, #anio=2008,2007, #q=texto y #orden=anio se pueden combinar con &.
+  // La dirección trae la selección: #buscar abre el buscador; #cultivo=avena, #zona=pergamino,balcarce, #anio=2011, #nutriente=n,
+  // #q=texto y #orden=anio se pueden combinar con &. Una opción que no existe se ignora.
   var pedido = location.hash.slice(1), conBusca = pedido === "buscar";
   pedido.split("&").forEach(function (par) {
     var i = par.indexOf("="); if (i < 1) return;
     var k = par.slice(0, i), v = par.slice(i + 1);
     try { v = decodeURIComponent(v); } catch (e) {}
-    if (k === "cat") { if (POR[v.split(",")[0]]) estado.cats[v.split(",")[0]] = true; }
-    else if (k === "anio") v.split(",").forEach(function (a) { if (ANIOS.indexOf(a) !== -1) estado.anios[a] = true; });
+    if (POR_G[k]) v.split(",").forEach(function (o) { if (o === SIN ? TOTAL[k][SIN] : NOMBRE[k][o] && TOTAL[k][o]) estado.sel[k][o] = true; });
     else if (k === "q" && v) { $("pf-q").value = estado.q = v; conBusca = true; }
     else if (k === "orden" && v === "anio") estado.orden = "anio";
   });

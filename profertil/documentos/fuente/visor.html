@@ -171,7 +171,7 @@ body.pf-foco .pf-v-doc { grid-column: 1; grid-row: 1; margin-top: 0; padding-bot
 <header class="pf-barra pf-barra--solida" id="pf-top">
   <div class="pf-barra__in">
     <nav class="pf-barra__nav" id="pf-nav" aria-label="Sitio">
-      <a class="pf-barra__logo" href="../" aria-label="Profertil, ir a Documentos">
+      <a class="pf-barra__logo" href="../" aria-label="Profertil, ir a la Biblioteca">
         <svg viewBox="0 0 1458 1021" aria-hidden="true"><use href="#pf-logo-blanco"/></svg>
       </a>
       <div class="pf-barra__menu">
@@ -232,11 +232,14 @@ body.pf-foco .pf-v-doc { grid-column: 1; grid-row: 1; margin-top: 0; padding-bot
   d = d || DOCS[0];
   var cat = POR[d.c];
   var url = d.l ? "../pdf/" + encodeURIComponent(d.l) : null;   // copia local (solo la muestra); la original no se puede leer desde otro dominio
-  document.title = d.t + " · Documentos Profertil";
+  // La Biblioteca es la lista de esta maqueta. Las hojas de seguridad y los informes para inversores tienen su propia página
+  // (fuera de esta maqueta): el visor los abre igual, sin el link de vuelta a una lista.
+  var enBiblioteca = d.c !== "msds" && d.c !== "inversores";
+  document.title = d.t + (enBiblioteca ? " · Biblioteca Virtual Profertil" : " · Profertil");
 
   /* --- Cabecera y datos -------------------------------------------------------------- */
   $("pf-cabIn").innerHTML =
-    '<a class="pf-v-volver" href="../#cat=' + d.c + '">' + FLECHA_IZQ + "Documentos</a>" + etq(d.c, d.y || "") +
+    (enBiblioteca ? '<a class="pf-v-volver" href="../">' + FLECHA_IZQ + "Biblioteca</a>" : "") + etq(d.c, d.y || "") +
     "<h1" + (d.t.length > 90 ? ' class="pf-largo"' : "") + ">" + esc(d.t) + "</h1>";
   var bajarHref = url || d.u;
   function datos(paginas) {
@@ -295,8 +298,8 @@ body.pf-foco .pf-v-doc { grid-column: 1; grid-row: 1; margin-top: 0; padding-bot
     });
     otros.slice(0, 4).forEach(function (x) { $("pf-rel").appendChild(fila(x)); });
     $("pf-sigueT").textContent = "Más de " + cat.nombre.toLowerCase();
-    $("pf-sigueTodos").href = "../#cat=" + d.c;
-    $("pf-sigueTodos").innerHTML = "Ver los " + DOCS.filter(function (x) { return x.c === d.c; }).length + " documentos " + FLECHA_DER;
+    if (enBiblioteca) $("pf-sigueTodos").innerHTML = "Ver toda la Biblioteca " + FLECHA_DER;
+    else $("pf-sigueTodos").hidden = true;
   })();
 
   /* --- Curva del punto: un resorte apenas subamortiguado, muestreado como linear(). --------- */
