@@ -31,7 +31,7 @@ python3 profertil/documentos/fuente/build.py
   del sitio nuevo: no van en la lista, pero el visor los abre igual. Los tres los arma `prep-docs.py` desde el crawl.
 - `etiquetas.json`: las etiquetas de la Biblioteca Virtual del sitio actual por documento. Lo arma `prep-etiquetas.py`.
 - `../vendor/`: pdf.js (Apache 2.0), versión legacy para que ande también en Safari viejos.
-- `../pdf/`: copia de una muestra de 36 PDF, de todas las categorías.
+- `../pdf/`: copia de todos los PDF (ver "Los PDF" abajo).
 - `transicion*.{css,js}`, `logo-blanco.svg`, `simbolo-color.svg`, `assets.json`: los mismos de Novedades. El
   `build.py` toma el logo animado de la transición del componente de la librería.
 
@@ -53,8 +53,8 @@ va cada documento y qué etiqueta y arte lleva la fila, pero ya no es un filtro.
   en la fila y el que usa el orden "Por año"; el filtro de año es otro (ver abajo).
 - **Páginas y peso:** el crawl no los trae. El visor los lee del PDF al abrirlo.
 - Hay 15 PDF que cuelgan de más de una página del sitio actual (algunos con títulos distintos); se conserva una
-  entrada por título.
-- Algunos PDF llegan con saltos de línea antes de `%PDF`. pdf.js lo tolera.
+  entrada por título. Entre los 668 quedan 4 PDF compartidos por 10 documentos: se guardan una sola vez.
+- Algunos PDF llegan con saltos de línea antes de `%PDF`. pdf.js lo tolera; el chequeo de `prep-docs.py` mira el primer KB.
 
 ## Etiquetas
 
@@ -100,20 +100,29 @@ Resultado sobre los 627 documentos (noviembre de 2026):
 - La selección vive en la dirección: `#cultivo=avena&zona=pergamino,balcarce&anio=2011&nutriente=n&q=urea&orden=anio`.
 - En el celular el botón del dock abierto dice cuántos documentos quedan ("Ver 24 documentos") y cierra el panel.
 
-## La muestra de PDF
+## Los PDF
 
-profertil.com.ar no manda cabeceras CORS, así que pdf.js no puede leer sus PDF desde otro dominio. La lista
-muestra los 627 de la Biblioteca, pero el visor dibuja solo los que tienen copia local (`l` en `docs.json`); para los demás
-muestra un aviso con el botón que abre el PDF en su dirección original. Con el sitio nuevo en el mismo dominio no
-hace falta nada de esto.
+profertil.com.ar no manda cabeceras CORS, así que pdf.js no puede leer sus PDF desde otro dominio. Por eso la maqueta
+trae una copia de cada uno en `../pdf/` y el visor lee esa copia. Con el sitio nuevo en el mismo dominio no hace falta.
+
+- 668 documentos, 662 direcciones de PDF distintas, unos 450 MB en total (noviembre de 2026). El más pesado, 35 MB;
+  la mitad pesa menos de 320 KB. Se guardan tal como vienen, sin recomprimir.
+- Un archivo por dirección: si un PDF cuelga de varios documentos, todos apuntan al mismo. El nombre sale de la
+  dirección (minúsculas, sin acentos ni caracteres raros, hasta 80 caracteres; si dos chocan, `-2`, `-3`).
+- `l` en los tres `.json` es ese nombre. El visor y la lista también aceptan en `l` una dirección completa (`https://...`),
+  por si alguna vez los PDF se alojan aparte en un lugar que permita leerlos.
+- Sin `l` (el original da error), el visor muestra un aviso con el botón que abre la dirección original. Hoy son 2,
+  los dos de Inversores: `Estatuto.pdf` y el poder de administración de 2022, que dan 404 en el sitio actual.
 
 ```bash
-python3 profertil/documentos/fuente/prep-docs.py            # rehace los tres .json (conserva las copias)
-python3 profertil/documentos/fuente/prep-docs.py --bajar    # además baja una muestra nueva a ../pdf/
+python3 profertil/documentos/fuente/prep-docs.py            # rehace los tres .json y marca `l` según lo que hay en ../pdf/
+python3 profertil/documentos/fuente/prep-docs.py --bajar    # además baja los que falten
 ```
 
-`URLS_CSV` apunta al `urls.csv` del relevamiento (por defecto, el de `~/Documents/Desarrollo/relevamiento-profertil`).
-El servidor del sitio corta si se le pide de a muchos: `--bajar` usa dos pedidos a la vez y reintenta.
+`--bajar` conserva lo ya bajado, baja de a dos pedidos (el servidor corta si se le pide de a muchos) con reintentos,
+guarda solo lo que llegó entero y es PDF, borra de `../pdf/` lo que ya no corresponde a ningún documento y lista los
+fallos al final. `URLS_CSV` apunta al `urls.csv` del relevamiento (por defecto, el de
+`~/Documents/Desarrollo/relevamiento-profertil`).
 
 ## Pendiente de diseño
 

@@ -2,7 +2,7 @@
 """Arma docs.json: los documentos (título + PDF) del sitio actual de Profertil, desde el crawl.
 
 Entrada: urls.csv del relevamiento (URLS_CSV, por defecto el del repo de relevamiento).
-Salida:  tres archivos, uno por página del sitio nuevo, y con --bajar copias de una muestra en ../pdf/.
+Salida:  tres archivos, uno por página del sitio nuevo, y con --bajar la copia de todos los PDF en ../pdf/.
   docs.json             la Biblioteca Virtual (cereales, oleaginosas, pasturas, industriales, biblioteca)
   docs-msds.json        las hojas de seguridad
   docs-inversores.json  los informes para inversores
@@ -12,13 +12,14 @@ contenido es un título y un PDF colgado (cantidad_descargas = 1). La categoría
 que declara la URL; no se inventa ninguna otra.
 
   python3 profertil/documentos/fuente/prep-docs.py            # solo los tres .json
-  python3 profertil/documentos/fuente/prep-docs.py --bajar    # además baja la muestra de PDF
+  python3 profertil/documentos/fuente/prep-docs.py --bajar    # además baja los PDF que falten (conserva los ya bajados)
 """
 import csv, json, os, re, subprocess, sys, time, unicodedata
 from urllib.parse import urlparse, unquote
 from concurrent.futures import ThreadPoolExecutor
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
+CARPETA = os.path.join(AQUI, '..', 'pdf')
 URLS = os.environ.get('URLS_CSV', os.path.expanduser('~/Documents/Desarrollo/relevamiento-profertil/output/urls.csv'))
 
 # Sección de la URL -> categoría. "inversores-es" es el mismo menú de Inversores en otra rama.
@@ -92,34 +93,16 @@ def main():
     docs = sorted(unicos, key=lambda d: plano(d['t']))
     print(len(docs), 'documentos')
 
-    # Muestra local: se necesita porque profertil.com.ar no manda cabeceras CORS y pdf.js no puede leer PDF de otro dominio.
+    # Copia local de cada PDF: profertil.com.ar no manda cabeceras CORS y pdf.js no puede leer PDF de otro dominio.
+    # Un archivo por dirección de PDF, aunque cuelgue de varias páginas.
+    nombres = nombres_locales(docs)
     if '--bajar' in sys.argv:
-        muestra = elegir_muestra(docs)
-        carpeta = os.path.join(AQUI, '..', 'pdf')
-        os.makedirs(carpeta, exist_ok=True)
-        for d in muestra:
-            dest = os.path.join(carpeta, d['id'][:80] + '.pdf')
-            if not os.path.exists(dest):
-                subprocess.run(['curl', '-sL', '--max-time', '60', '-o', dest, d['u']], check=False)
-            # Algunos PDF del sitio llegan con saltos de línea antes de %PDF: los lectores lo toleran.
-            ok = os.path.exists(dest) and b'%PDF-' in open(dest, 'rb').read(1024)
-            if ok:
-                for e in docs:
-                    if e['id'] == d['id']:
-                        e['l'] = d['id'][:80] + '.pdf'
-            elif os.path.exists(dest):
-                os.remove(dest)
-        print(sum(1 for d in docs if d.get('l')), 'copias locales')
-    else:
-        # Conserva las copias locales ya bajadas, estén en el archivo que estén.
-        l = {}
-        for f in [BIBLIOTECA] + list(ARCHIVOS.values()):
-            previo = os.path.join(AQUI, f)
-            if os.path.exists(previo):
-                l.update({d['id']: d['l'] for d in json.load(open(previo, encoding='utf-8'))['docs'] if d.get('l')})
-        for d in docs:
-            if d['id'] in l:
-                d['l'] = l[d['id']]
+        bajar_todos(nombres)
+    for d in docs:
+        d.pop('l', None)
+        if valido(os.path.join(CARPETA, nombres[d['u']])):
+            d['l'] = nombres[d['u']]
+    print(sum(1 for d in docs if d.get('l')), 'documentos con copia local,', len({d['u'] for d in docs if d.get('l')}), 'PDF')
 
     partes = {BIBLIOTECA: []}
     for f in ARCHIVOS.values():
@@ -131,41 +114,73 @@ def main():
         print('  %-22s %d' % (f, len(lst)))
 
 
-def peso(url):
-    # Pocos pedidos a la vez y un reintento: el servidor corta si se le pide de a muchos.
-    for _ in range(2):
-        r = subprocess.run(['curl', '-sIL', '--max-time', '20', url], capture_output=True, text=True).stdout
-        m = re.findall(r'(?im)^content-length:\s*(\d+)', r)
-        if m:
-            return int(m[-1])
-        time.sleep(1.5)
-    return 0
+def nombres_locales(docs):
+    """Nombre de archivo de cada PDF: el de su dirección, en minúsculas y sin caracteres raros.
+    Si dos direcciones distintas dan el mismo nombre, la segunda lleva -2, la tercera -3, y así."""
+    nombres, usados = {}, set()
+    for u in sorted({d['u'] for d in docs}):
+        partes = [q for q in urlparse(u).path.split('/') if q]
+        base = re.sub(r'[^a-z0-9._-]+', '-', plano(unquote(partes[-1]))).strip('-.')
+        base = re.sub(r'\.pdf$', '', base)[:80] or 'documento'
+        n, k = base + '.pdf', 1
+        while n in usados:
+            k += 1
+            n = '%s-%d.pdf' % (base, k)
+        usados.add(n)
+        nombres[u] = n
+    return nombres
 
 
-def elegir_muestra(docs):
-    """~36 documentos que cubran categorías y años, sin PDF de más de 3,5 MB."""
-    import random
-    random.seed(7)
-    por = {}
-    for d in docs:
-        por.setdefault(d['c'], []).append(d)
-    cupo = {'cereales': 12, 'oleaginosas': 6, 'pasturas': 4, 'industriales': 3, 'msds': 4, 'inversores': 5, 'biblioteca': 2}
-    cand = []
-    for c, n in cupo.items():
-        lst = por.get(c, [])
-        random.shuffle(lst)
-        cand += lst[:n * 3]
+def valido(ruta):
+    # Algunos PDF del sitio llegan con saltos de línea antes de %PDF: se mira el primer KB.
+    if not os.path.exists(ruta):
+        return False
+    with open(ruta, 'rb') as f:
+        return b'%PDF-' in f.read(1024)
+
+
+def bajar(u, dest):
+    """Baja un PDF a un archivo temporal y lo deja solo si llegó entero y es PDF. Tres intentos."""
+    tmp = dest + '.parcial'
+    for i in range(3):
+        r = subprocess.run(['curl', '-sfL', '--retry', '2', '--max-time', '600', '-o', tmp, u], capture_output=True, text=True)
+        if r.returncode == 0 and valido(tmp):
+            os.replace(tmp, dest)
+            return 'ok'
+        if os.path.exists(tmp):
+            os.remove(tmp)
+        if r.returncode == 22:   # el servidor respondió con error (404, por ejemplo): no tiene sentido insistir
+            return 'error del servidor'
+        time.sleep(3 * (i + 1))
+    return 'no se pudo bajar (código %d)' % r.returncode if r.returncode else 'no es un PDF'
+
+
+def bajar_todos(nombres):
+    """Conserva lo ya bajado; baja el resto con dos pedidos a la vez (el servidor corta si se le pide de a muchos)."""
+    os.makedirs(CARPETA, exist_ok=True)
+    faltan = [(u, n) for u, n in nombres.items() if not valido(os.path.join(CARPETA, n))]
+    print(len(nombres) - len(faltan), 'PDF ya estaban;', len(faltan), 'por bajar')
+    hechos = [0]
+
+    def uno(par):
+        u, n = par
+        res = bajar(u, os.path.join(CARPETA, n))
+        hechos[0] += 1
+        if hechos[0] % 25 == 0:
+            print('  ', hechos[0], 'de', len(faltan), flush=True)
+        return u, res
+
     with ThreadPoolExecutor(2) as ex:
-        pesos = list(ex.map(lambda d: peso(d['u']), cand))
-    res, cuenta = [], {}
-    for d, p in zip(cand, pesos):
-        if p == 0 or p > 3_500_000:
-            continue
-        if cuenta.get(d['c'], 0) >= cupo[d['c']]:
-            continue
-        cuenta[d['c']] = cuenta.get(d['c'], 0) + 1
-        res.append(d)
-    return res
+        fallos = [(u, r) for u, r in ex.map(uno, faltan) if r != 'ok']
+    # Copias que ya no corresponden a ningún documento.
+    sobran = set(os.listdir(CARPETA)) - set(nombres.values())
+    for n in sobran:
+        os.remove(os.path.join(CARPETA, n))
+    if sobran:
+        print(len(sobran), 'archivos sobrantes borrados')
+    print(len(fallos), 'fallos')
+    for u, r in fallos:
+        print('   ', r, u)
 
 
 if __name__ == '__main__':

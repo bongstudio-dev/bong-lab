@@ -497,8 +497,8 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   "use strict";
 
   /* Datos reales: los documentos (título + PDF) de la Biblioteca Virtual del sitio actual, del crawl (urls.csv). Por documento:
-     id, título (t), sección de la URL (c, solo para la etiqueta y el arte), año del título (y), PDF original (u), copia local en la
-     muestra (l) y las etiquetas del sitio actual (e): {cultivo, zona, anio, nutriente}, cada una una lista de ids de opción.
+     id, título (t), sección de la URL (c, solo para la etiqueta y el arte), año del título (y), PDF original (u), copia local (l, el nombre
+     del archivo en pdf/) y las etiquetas del sitio actual (e): {cultivo, zona, anio, nutriente}, cada una una lista de ids de opción.
      GRUPOS son los cuatro grupos con sus opciones en el orden de la portada de la Biblioteca Virtual. */
   var DOCS = /*__DOCS__*/[];
   var GRUPOS = /*__GRUPOS__*/[];
@@ -645,7 +645,7 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
     var li = document.createElement("li");
     li.className = "pf-doc" + (sinEntrada ? " pf-quieta" : "");
     li.dataset.k = d.k;
-    var bajar = d.l ? 'href="pdf/' + encodeURIComponent(d.l) + '" download' : 'href="' + esc(d.u) + '" target="_blank" rel="noopener"';
+    var bajar = d.l ? 'href="' + esc(/^https?:\/\//.test(d.l) ? d.l : "pdf/" + encodeURIComponent(d.l)) + '" download' : 'href="' + esc(d.u) + '" target="_blank" rel="noopener"';
     li.innerHTML = (vista === "mini" ? '<div class="pf-doc__arte">' + arte(d) + "</div>" : "") + etq(d.c, vista === "mini" ? "" : "").replace('class="pf-etiqueta"', 'class="pf-etiqueta" title="' + POR[d.c].nombre + '"') +
       '<h2 class="pf-doc__t"' + (vista === "compacta" ? ' title="' + esc(d.t) + '"' : "") + '><a href="ver/?d=' + encodeURIComponent(d.id) + '">' + resaltar(d.t, q) + "</a></h2>" +
       '<span class="pf-doc__y">' + (d.y || "") + "</span>" +
