@@ -67,7 +67,7 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 
 /* --- Pastillas de categoría y chips de año: piezas "pastilla" y "chip" de base.css. */
 
-/* --- Panel de filtros: barra fija full rounded con "Todos" y los cuatro
+/* --- Panel de filtros: barra fija full rounded con los cuatro
    grupos (cultivo, zona, año, nutriente); arriba se despliega el panel con los
    grupos en acordeón, uno abierto por vez. En mobile la barra se reduce a un
    boton "Filtros" y el panel trae los cuatro grupos. Abre y cierra animando el alto del panel (medido en
@@ -718,8 +718,9 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
       esc(o.nombre) + '<b class="' + (chip ? "pf-chip__n" : "pf-pastilla__n") + '"></b></button>';
   }
   function armarFiltros() {
-    $("pf-fMain").innerHTML = '<button type="button" class="pf-pastilla pf-pastilla--todas" data-f="todas" aria-pressed="true">Todos</button>' +
-      GRUPOS.map(function (g) {
+    // Sin pastilla "Todos": que no haya filtros ya se ve en que ninguna pastilla lleva contador, y para sacarlos
+    // están "Limpiar todo" arriba de la lista y "Limpiar filtros" en el panel.
+    $("pf-fMain").innerHTML = GRUPOS.map(function (g) {
         return '<button type="button" class="pf-pastilla pf-pastilla--todas" data-abrir="' + g.id + '" aria-expanded="false" aria-controls="pf-fBody">' + g.nombre + '<b class="pf-f-n" hidden></b></button>';
       }).join("");
     $("pf-fGrupos").innerHTML = GRUPOS.map(function (g) {
@@ -754,7 +755,6 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
     });
   }
   function pintarFiltros() {
-    var nTotal = 0;
     GRUPOS.forEach(function (g) {
       // Conteo de cada opción con los demás grupos y la búsqueda aplicados: lo que quedaría si se la suma.
       var cuenta = {};
@@ -765,7 +765,6 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
         vs.forEach(function (v) { cuenta[v] = (cuenta[v] || 0) + 1; });
       });
       var ks = activos(estado.sel[g.id]);
-      nTotal += ks.length;
       var sec = document.querySelector('.pf-f-gr[data-grupo="' + g.id + '"]');
       sec.querySelectorAll("[data-f='op']").forEach(function (b) {
         var v = b.dataset.v, n = cuenta[v] || 0, on = !!estado.sel[g.id][v];
@@ -776,7 +775,7 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
       });
       // Cerrado, el grupo muestra lo elegido: en el resumen y como pastillas que se sacan tocándolas.
       var nombres = ks.map(function (k) { return k === SIN ? "Sin clasificar" : NOMBRE[g.id][k]; });
-      sec.querySelector(".pf-f-gr__res").textContent = nombres.length ? nombres.join(", ") : "Todos";
+      sec.querySelector(".pf-f-gr__res").textContent = nombres.join(", ");
       var nb = sec.querySelector(".pf-f-gr__cab .pf-f-n"); nb.hidden = !ks.length; nb.textContent = ks.length;
       sec.querySelector(".pf-f-gr__activos").innerHTML = ks.map(function (k) {
         var o = { id: k, nombre: k === SIN ? "Sin clasificar" : NOMBRE[g.id][k] };
@@ -784,7 +783,6 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
       }).join("");
       var bb = document.querySelector('#pf-fMain [data-abrir="' + g.id + '"] .pf-f-n'); bb.hidden = !ks.length; bb.textContent = ks.length;
     });
-    document.querySelector('#pf-fMain [data-f="todas"]').setAttribute("aria-pressed", String(!nTotal));
   }
   function nFiltros() { return GRUPOS.reduce(function (s, g) { return s + activos(estado.sel[g.id]).length; }, 0); }
   function resumen() {
@@ -952,7 +950,6 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
     var cab = e.target.closest(".pf-f-gr__cab");
     if (cab) { abrirGrupo(abierto === cab.dataset.grupo ? null : cab.dataset.grupo); return; }
     var b = e.target.closest("[data-f]"); if (!b) return;
-    if (b.dataset.f === "todas") { GRUPOS.forEach(function (g) { estado.sel[g.id] = {}; }); aplicar(); return; }
     if (b.getAttribute("aria-disabled") === "true") return;
     var g = b.dataset.g, v = b.dataset.v;
     if (estado.sel[g][v]) delete estado.sel[g][v]; else estado.sel[g][v] = true;
@@ -972,6 +969,9 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
     // El grupo que va a quedar abierto se abre antes de medir y sin su propia animación: el panel ya llega con su alto final.
     if (si) { gr.classList.add("pf-quieto"); abrirGrupo(abierto || primerGrupo()); void gr.offsetHeight; }
     var desde = b.offsetHeight, anchoAhora = b.firstElementChild.offsetWidth;
+    // Cerrar lo que ya está cerrado (al cargar) no anima: si no, el ida y vuelta de la medición hace que la barra
+    // se achique de 680 a su ancho cerrado al entrar a la página.
+    var yaCerrada = !si && !f.classList.contains("pf-abierto");
     f.style.transition = b.style.transition = "none";
     f.classList.remove("pf-listo");
     f.classList.toggle("pf-abierto", si);
@@ -983,9 +983,10 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
     f.classList.toggle("pf-abierto", !si);
     b.style.height = desde + "px";
     void f.offsetWidth;
-    f.style.transition = b.style.transition = "";
+    if (!yaCerrada) f.style.transition = b.style.transition = "";
     f.classList.toggle("pf-abierto", si);
     b.style.height = hasta + "px";
+    if (yaCerrada) { void f.offsetWidth; f.style.transition = b.style.transition = ""; }
     $("pf-fToggle").setAttribute("aria-expanded", String(si));
     gr.classList.remove("pf-quieto");
     abrirGrupo(abierto);
