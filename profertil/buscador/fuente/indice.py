@@ -89,7 +89,7 @@ def paginas():
 
 # id, nombre del grupo, singular, plural, artículo del plural, lista con la búsqueda aplicada (vacío: el panel muestra todos), fuente
 GRUPOS = [
-    ('documentos', 'Documentos', 'documento', 'documentos', 'los', 'documentos/#q=', documentos),
+    ('documentos', 'Biblioteca', 'documento', 'documentos', 'los', 'documentos/#q=', documentos),
     ('notas', 'Notas', 'nota', 'notas', 'las', 'novedades/#q=', notas),
     ('paginas', 'Páginas', 'página', 'páginas', 'las', '', paginas),
 ]

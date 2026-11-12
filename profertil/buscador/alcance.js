@@ -1,7 +1,7 @@
 /* Buscador con alcance: se suma al buscador de la barra (pieza "barra" de base.css) de cualquier página.
 
    <link rel="stylesheet" href="../buscador/alcance.css">
-   <script src="../buscador/alcance.js" data-seccion="documentos" data-nombre="Documentos" defer></script>
+   <script src="../buscador/alcance.js" data-seccion="documentos" data-nombre="Biblioteca" defer></script>
 
    data-seccion es el id del grupo del índice que corresponde a la página; data-nombre, cómo se nombra en el interruptor.
    La página conserva su buscador: con el interruptor en la sección, cada letra la filtra en el lugar como siempre.

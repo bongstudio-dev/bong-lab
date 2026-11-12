@@ -580,7 +580,7 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   <symbol id="pf-badge-bg" viewBox="0 0 100 100"><path d="M32 0H68C76.4869 0 84.6263 3.37142 90.6274 9.37258C96.6286 15.3737 100 23.5131 100 32V68C100 76.4869 96.6286 84.6263 90.6274 90.6274C84.6263 96.6286 76.4869 100 68 100H32C23.5131 100 15.3737 96.6286 9.37258 90.6274C3.37142 84.6263 0 76.4869 0 68V32C0 23.5131 3.37142 15.3737 9.37258 9.37258C15.3737 3.37142 23.5131 0 32 0Z"/></symbol>
 </defs></svg>
 
-<a class="pf-saltar" href="#pf-lista">Ir a la lista de documentos</a>
+<a class="pf-saltar" href="#pf-lista">Ir a la Biblioteca</a>
 
 <header class="pf-barra pf-barra--solida" id="pf-top">
   <div class="pf-barra__in">
@@ -593,8 +593,8 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
       </div>
       <span class="pf-barra__menu-mobile" aria-hidden="true"><i><b></b><b></b><b></b><b></b></i>Menú</span>
       <div class="pf-barra__busca" id="pf-busca" role="search">
-        <button class="pf-barra__lupa" id="pf-goSearch" type="button" aria-label="Buscar documentos" aria-expanded="false" aria-controls="pf-q"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></button>
-        <input id="pf-q" name="q" type="search" autocomplete="off" spellcheck="false" enterkeyhint="search" placeholder="Buscá: soja, boletín, urea…" aria-label="Buscar documentos" tabindex="-1">
+        <button class="pf-barra__lupa" id="pf-goSearch" type="button" aria-label="Buscar en la Biblioteca" aria-expanded="false" aria-controls="pf-q"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></button>
+        <input id="pf-q" name="q" type="search" autocomplete="off" spellcheck="false" enterkeyhint="search" placeholder="Buscá: soja, boletín, urea…" aria-label="Buscar en la Biblioteca" tabindex="-1">
         <span class="pf-barra__cuenta" id="pf-qCount">0</span>
       </div>
       <button class="pf-barra__cerrar" id="pf-qClose" type="button" aria-label="Cerrar buscador" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
@@ -1260,7 +1260,7 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 })();
 </script>
 <script>
-/* Transición entre Novedades, Documentos y sus páginas. En Documentos va fija, sin panel para elegirla:
+/* Transición entre Novedades, la Biblioteca y sus páginas. En la Biblioteca va fija, sin panel para elegirla:
    usa la que dejó la cabeza (la misma que Novedades, así entrar y salir coinciden). */
 (function () {
   var d = document.documentElement, T = window.PF_TR, c = T.c;

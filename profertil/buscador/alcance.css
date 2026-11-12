@@ -1,5 +1,5 @@
 /* Buscador con alcance: se suma a la pieza "barra" de base.css (lupa, campo y cerrar).
-   Un interruptor al final del campo ("Documentos · Todo el sitio") elige dónde buscar: en la sección filtra la
+   Un interruptor al final del campo ("Biblioteca · Todo el sitio") elige dónde buscar: en la sección filtra la
    lista de la página; en todo el sitio abre abajo de la barra el panel de resultados por tipo. Lo arma ../buscador/alcance.js.
    Sale de los tokens (tokens.css) y de las piezas chip y barra de base.css. Sin sombras. */
 

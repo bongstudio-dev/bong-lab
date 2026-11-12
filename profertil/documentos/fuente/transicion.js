@@ -1,4 +1,4 @@
-/* Transición entre Novedades, Documentos y sus páginas. En Documentos va fija, sin panel para elegirla:
+/* Transición entre Novedades, la Biblioteca y sus páginas. En la Biblioteca va fija, sin panel para elegirla:
    usa la que dejó la cabeza (la misma que Novedades, así entrar y salir coinciden). */
 (function () {
   var d = document.documentElement, T = window.PF_TR, c = T.c;

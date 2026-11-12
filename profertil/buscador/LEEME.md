@@ -1,7 +1,7 @@
 # Buscador con alcance
 
 El buscador de la barra (la lupa) busca por defecto dentro de la sección y se puede ampliar a todo el sitio.
-Lo usan Documentos y Novedades con el mismo componente.
+Lo usan la Biblioteca y Novedades con el mismo componente.
 
 - `alcance.css` y `alcance.js`: el componente. Se suma al buscador que ya tiene la página (pieza "barra" de
   `../componentes/base.css`), sin reemplazarlo.
@@ -10,10 +10,10 @@ Lo usan Documentos y Novedades con el mismo componente.
 
 ## Cómo funciona
 
-- Al abrir el buscador aparece al final del campo un interruptor chico con dos opciones: **Documentos** (o
+- Al abrir el buscador aparece al final del campo un interruptor chico con dos opciones: **Biblioteca** (o
   **Novedades**) y **Todo el sitio**. La elegida va en el tono del chip; la otra, en texto gris.
 - En la sección (por defecto), lo que se escribe filtra la lista de la página en el lugar, igual que siempre.
-- En **Todo el sitio**, apenas se escribe algo, abajo de la barra se abre un panel con los resultados por tipo (Documentos, Notas, Páginas),
+- En **Todo el sitio**, apenas se escribe algo, abajo de la barra se abre un panel con los resultados por tipo (Biblioteca, Notas, Páginas),
   con el contador de cada grupo y los primeros cinco. "Ver los N" lleva a la lista de ese tipo con la búsqueda
   aplicada; si es la sección donde uno está, vuelve a la sección. Las páginas no tienen lista: el botón las
   despliega en el panel.
@@ -35,11 +35,11 @@ aviso sin resultados, si lo hay, `pf-empty`). En el head, después de `base.css`
 
 ```html
 <link rel="stylesheet" href="../buscador/alcance.css">
-<script src="../buscador/alcance.js" data-seccion="documentos" data-nombre="Documentos" defer></script>
+<script src="../buscador/alcance.js" data-seccion="documentos" data-nombre="Biblioteca" defer></script>
 ```
 
 `data-seccion` es el id del grupo del índice que corresponde a la página; `data-nombre`, el texto del chip.
-En Documentos va en `documentos/fuente/lista.html` y en Novedades en `novedades/fuente/template.html`; después,
+En la Biblioteca va en `documentos/fuente/lista.html` y en Novedades en `novedades/fuente/template.html`; después,
 el `build.py` de cada una.
 
 ## El índice
@@ -55,7 +55,7 @@ sitio actual).
 
 | Grupo | Sale de | Resumen | Lleva a |
 |---|---|---|---|
-| Documentos (668) | `documentos/fuente/docs.json` | categoría y año | `documentos/ver/?d=…` |
+| Biblioteca (668) | `documentos/fuente/docs.json` | categoría y año | `documentos/ver/?d=…` |
 | Notas (471) | `novedades/fuente/notas.json` | tipo, año y bajada (hasta 140 letras) | `novedades/nota/?n=…` |
 | Páginas (28) | mapa de arquitectura v0 (`/api/arquitectura`), solo nodos `pagina` | dónde está en el menú | la maqueta si existe (Novedades), si no la dirección del sitio actual |
 
