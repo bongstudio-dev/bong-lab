@@ -10,7 +10,7 @@
      "slug": "arroz",
      "nombre": "Arroz",
      "sub": "Cereales",
-     "n": 0
+     "n": 9
     },
     {
      "id": "avena",
@@ -31,21 +31,21 @@
      "slug": "maiz",
      "nombre": "Maíz",
      "sub": "Cereales",
-     "n": 0
+     "n": 142
     },
     {
      "id": "sorgo",
      "slug": "sorgo",
      "nombre": "Sorgo",
      "sub": "Cereales",
-     "n": 1
+     "n": 7
     },
     {
      "id": "trigo",
      "slug": "trigo",
      "nombre": "Trigo",
      "sub": "Cereales",
-     "n": 2
+     "n": 129
     },
     {
      "id": "colza-canola",
@@ -66,14 +66,14 @@
      "slug": "soja",
      "nombre": "Soja",
      "sub": "Oleaginosas",
-     "n": 0
+     "n": 82
     },
     {
      "id": "cana-de-azucar",
      "slug": "cana-de-azucar",
      "nombre": "Caña de Azúcar",
      "sub": "Industriales",
-     "n": 0
+     "n": 11
     },
     {
      "id": "tabaco",
@@ -101,7 +101,7 @@
      "slug": "pasturas-consociadas",
      "nombre": "Pasturas consociadas",
      "sub": "Pasturas",
-     "n": 1
+     "n": 12
     },
     {
      "id": "pasturas-puras",
@@ -559,9 +559,6 @@
  ],
  "docs": {
   "abastecimiento-de-p-y-de-n-en-pasturas": {
-   "cultivo": [
-    "pasturas-consociadas"
-   ],
    "zona": [
     "buenos-aires",
     "balcarce"
@@ -572,12 +569,18 @@
    ]
   },
   "absorcion-de-nutrientes-por-el-maiz-alto-rendimiento": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "n",
     "p"
    ]
   },
   "actividades-experimentales-en-maiz-2004-2005": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -616,6 +619,9 @@
    ]
   },
   "analisis-ambiental-la-puerta": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "cordoba"
    ],
@@ -624,6 +630,9 @@
    ]
   },
   "analisis-ambiental-pehuajo": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "pehuajo"
@@ -633,6 +642,9 @@
    ]
   },
   "analisis-ambiental-tucuman": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "tucuman",
     "departamento-burruyacu"
@@ -642,6 +654,9 @@
    ]
   },
   "analisis-ambiental-wheelwright": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -650,6 +665,9 @@
    ]
   },
   "analisis-de-la-campana-trigo-2004-2005": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -658,6 +676,9 @@
    ]
   },
   "analisis-de-la-respuesta-fisica-y-economica-del-cultivo-de-soja-a-la-fertilizacion-con-fosforo-2004-2005": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -666,6 +687,9 @@
    ]
   },
   "analisis-economico-cultivo-de-maiz-sobre-vicia": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "cordoba",
     "marcos-juarez"
@@ -676,6 +700,9 @@
    ]
   },
   "analisis-economico-de-diferentes-estrategias-de-fertilizacion-en-trigo-soja-2004-2005": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -685,6 +712,9 @@
    ]
   },
   "aplicacion-de-la-metodologia-dris-al-cultivo-de-trigo-en-la-region-semiarida-pampeana": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -693,6 +723,9 @@
    ]
   },
   "aplicacion-del-sistema-triguero-v2": {
+   "cultivo": [
+    "trigo"
+   ],
    "nutriente": [
     "npks"
    ]
@@ -703,6 +736,9 @@
    ]
   },
   "aplicacion-foliar-de-nitrogeno-y-azufre-en-soja": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -712,6 +748,9 @@
    ]
   },
   "aspectos-del-manejo-del-cultivo-y-de-la-fertilizacion-nitrogenada-en-sorgo-granifero-2001-2002": {
+   "cultivo": [
+    "sorgo"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -720,6 +759,9 @@
    ]
   },
   "aspectos-del-manejo-del-maiz-de-segunda-y-fertilizacion-nitrogenada-2004-2005": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -737,6 +779,9 @@
    ]
   },
   "azospirillum-y-micorrizas-en-trigo-2006-2007": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "necochea"
@@ -747,6 +792,9 @@
    ]
   },
   "azufre-en-maiz": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -756,6 +804,9 @@
    ]
   },
   "azufre-en-maiz-2000-1": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "balcarce"
@@ -807,6 +858,9 @@
    ]
   },
   "balance-nutricional-y-productividad-del-trigo-2004-2005": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "bahia-blanca"
@@ -849,6 +903,9 @@
    ]
   },
   "boletin-10-fertilizacion-del-cultivo-de-trigo-2007": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "balcarce"
@@ -915,6 +972,9 @@
    ]
   },
   "boletin-22-mejores-practicas-de-manejo-para-la-nutricion-en-maiz-tardio": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "npks"
    ]
@@ -928,6 +988,9 @@
    ]
   },
   "boletin-24-mpm-para-la-fertilizacion-con-n-en-arroz": {
+   "cultivo": [
+    "arroz"
+   ],
    "zona": [
     "entre-rios"
    ],
@@ -955,6 +1018,9 @@
    ]
   },
   "boletin-28-mpm-para-la-cana-de-azucar-etp": {
+   "cultivo": [
+    "cana-de-azucar"
+   ],
    "zona": [
     "tucuman"
    ],
@@ -971,6 +1037,9 @@
    ]
   },
   "boletin-3-ensayo-de-fertilizacion-nitrogenada-en-bragado-2005": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "bragado"
@@ -986,6 +1055,9 @@
    ]
   },
   "boletin-32-analizando-con-triguero": {
+   "cultivo": [
+    "trigo"
+   ],
    "nutriente": [
     "n"
    ]
@@ -996,6 +1068,9 @@
    ]
   },
   "boletin-4-ensayos-de-fertilizacion-nitrogenadas-en-balcarce": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "balcarce"
@@ -1006,12 +1081,18 @@
    ]
   },
   "boletin-5-ensayos-de-fertilizacion-nitrogenada-en-necochea-2005": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "necochea"
    ]
   },
   "boletin-6-ensayos-de-fertilizacion-nitrogenada-en-tres-arroyos-2005": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "tres-arroyos"
@@ -1022,6 +1103,9 @@
    ]
   },
   "boletin-7-volatilizacion-del-amoniaco-parte-ii-2006": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -1042,6 +1126,9 @@
    ]
   },
   "boletin-9-resultados-mit-05-2006": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "bragado"
@@ -1084,7 +1171,15 @@
     "n"
    ]
   },
+  "bt-39-manejo-de-n-y-emisiones-gei": {
+   "cultivo": [
+    "maiz"
+   ]
+  },
   "bt-43-nitrogeno-en-trigo-por-que-es-clave-para-producir-mas-y-mejor": {
+   "cultivo": [
+    "arroz"
+   ],
    "zona": [
     "entre-rios"
    ],
@@ -1110,6 +1205,9 @@
    ]
   },
   "cambios-en-la-dinamica-de-los-nutrientes-y-productividad-en-trigo-2007-2008": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "bahia-blanca"
@@ -1127,6 +1225,9 @@
    ]
   },
   "cana-de-azucar-2": {
+   "cultivo": [
+    "cana-de-azucar"
+   ],
    "zona": [
     "tucuman"
    ],
@@ -1137,6 +1238,9 @@
    ]
   },
   "cana-de-azucar-en-tucuman": {
+   "cultivo": [
+    "cana-de-azucar"
+   ],
    "zona": [
     "tucuman"
    ],
@@ -1154,6 +1258,9 @@
    ]
   },
   "caracterizacion-fisica-funcional-de-los-suelos-mit-2012": {
+   "cultivo": [
+    "maiz"
+   ],
    "anio": [
     "2012"
    ],
@@ -1183,6 +1290,9 @@
    ]
   },
   "cloro-en-trigo": {
+   "cultivo": [
+    "trigo"
+   ],
    "nutriente": [
     "k",
     "micro"
@@ -1206,6 +1316,9 @@
    ]
   },
   "como-aumentar-rendimientos-soja-vision-nutricion": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -1227,6 +1340,9 @@
    ]
   },
   "comportamiento-de-grupos-de-maduracion-y-estrategia-de-fertilizacion-en-soja-segun-ambiente-productivo-campana-2008-09": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -1236,6 +1352,9 @@
    ]
   },
   "comportamiento-de-grupos-de-maduracion-y-estrategias-de-fertilizacion-en-soja": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -1246,6 +1365,9 @@
    ]
   },
   "comportamiento-del-nitrogeno-durante-el-ciclo-del-cultivo-de-trigo": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "balcarce"
@@ -1274,6 +1396,9 @@
    ]
   },
   "consideraciones-sobre-la-fertilizacion-nitrogenada-de-trigo-en-santa-fe": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -1282,9 +1407,6 @@
    ]
   },
   "contenido-de-azufre-y-relacion-ns-en-trigo-2006-2007": {
-   "cultivo": [
-    "trigo"
-   ],
    "zona": [
     "buenos-aires"
    ],
@@ -1330,6 +1452,9 @@
    ]
   },
   "criterio-para-el-manejo-de-la-fertilizacion": {
+   "cultivo": [
+    "soja"
+   ],
    "nutriente": [
     "n",
     "p",
@@ -1337,6 +1462,9 @@
    ]
   },
   "criterios-para-el-manejo-de-la-fertilizacion-de-soja-1999-2004": {
+   "cultivo": [
+    "soja"
+   ],
    "nutriente": [
     "micro",
     "n",
@@ -1345,6 +1473,9 @@
    ]
   },
   "criterios-para-el-manejo-de-la-fertilizacion-de-soja-2004-2005": {
+   "cultivo": [
+    "soja"
+   ],
    "nutriente": [
     "micro",
     "n",
@@ -1353,6 +1484,9 @@
    ]
   },
   "criterios-para-el-manejo-de-la-fertilizacion-del-cultivo-de-maiz": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "n",
     "p",
@@ -1360,12 +1494,18 @@
    ]
   },
   "criterios-para-el-manejo-de-la-fertilizacion-del-cultivo-de-soja": {
+   "cultivo": [
+    "soja"
+   ],
    "nutriente": [
     "p",
     "s"
    ]
   },
   "cuantificacion-de-las-perdidas-de-nitrogeno-por-volatilizacion-y-su-efecto-sobre-el-cultivo-de-maiz-desde-urea-de-liberacion-controlada-2004-5": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "balcarce"
@@ -1433,6 +1573,9 @@
    ]
   },
   "desarrollo-de-estrategias-de-fertilizacion-para-mejorar-integralmente-sanidad-calidad-y-rendimiento-en-trigo-pan-2011": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -1445,6 +1588,9 @@
    ]
   },
   "determinacion-de-la-calidad-de-los-sorgos-bmr-y-graniferos-y-fertilizacion-nitrogenada-2005-2006": {
+   "cultivo": [
+    "sorgo"
+   ],
    "zona": [
     "buenos-aires",
     "bordenave"
@@ -1454,6 +1600,9 @@
    ]
   },
   "diagnostico-de-la-fertilizacion-nitrogenada-en-maiz": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "n"
    ]
@@ -1468,6 +1617,9 @@
    ]
   },
   "diagnostico-del-estado-nutricional-del-cultivo-de-trigo-estableciendo-una-concentracion-critica-de-nitratos": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -1525,11 +1677,17 @@
    ]
   },
   "efecto-a-largo-plazo-de-la-fertilizacion-y-los-sistemas-de-labranza-sobre-el-suelo-y-rendimiento-del-maiz": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "suelos"
    ]
   },
   "efecto-aditivo-del-agregado-de-diferentes-nutrientes-en-maiz": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "n",
     "p",
@@ -1537,6 +1695,9 @@
    ]
   },
   "efecto-aditivo-del-agregado-de-diferentes-nutrientes-en-maiz-2006-2007": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -1546,6 +1707,9 @@
    ]
   },
   "efecto-agregado-de-diferentes-nutrientes-en-maiz-2006-2007-2008": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -1555,6 +1719,9 @@
    ]
   },
   "efecto-de-diferentes-estrategias-de-fertilizacion-en-maiz-2006-07": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -1566,6 +1733,9 @@
    ]
   },
   "efecto-de-diferentes-estrategias-de-fertilizacion-en-trigo-pan-2006-2007-2008": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -1574,17 +1744,26 @@
    ]
   },
   "efecto-de-la-aplicacion-de-azufre-y-distintas-dosis-de-nitrogeno-sobre-el-rendimiento-del-doble-cultivo-trigo-soja": {
+   "cultivo": [
+    "trigo"
+   ],
    "nutriente": [
     "n",
     "s"
    ]
   },
   "efecto-de-la-aplicacion-de-fosfitos-foliares-en-el-rendimiento-de-soja-de-2da": {
+   "cultivo": [
+    "soja"
+   ],
    "nutriente": [
     "micro"
    ]
   },
   "efecto-de-la-fertilizacion-complementaria-de-n-en-trigo-2007-2008": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "general-villegas"
@@ -1594,6 +1773,9 @@
    ]
   },
   "efecto-de-la-fertilizacion-con-azufre-en-maiz-2002": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -1602,6 +1784,9 @@
    ]
   },
   "efecto-de-la-fertilizacion-con-nitrogeno-azufre-y-boro-sobre-la-produccion-de-materia-seca": {
+   "cultivo": [
+    "pasturas-consociadas"
+   ],
    "zona": [
     "nueve-de-julio",
     "santa-fe"
@@ -1638,6 +1823,9 @@
    ]
   },
   "efecto-de-la-fertilizacion-con-potasio-y-cloro-en-trigo-2004-2005": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -1647,6 +1835,9 @@
    ]
   },
   "efecto-de-la-fertilizacion-con-potasio-y-cloro-sobre-el-rendimiento-y-severidad-de-enfermedades": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -1656,6 +1847,9 @@
    ]
   },
   "efecto-de-la-fertilizacion-con-zinc-en-trigo-2005-2006": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -1675,6 +1869,9 @@
    ]
   },
   "efecto-de-la-fertilizacion-foliar-complementaria-en-soja-2008": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -1684,6 +1881,9 @@
    ]
   },
   "efecto-de-la-fertilizacion-foliar-complementaria-en-trigo-2004-2005": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -1693,6 +1893,9 @@
    ]
   },
   "efecto-de-la-fertilizacion-foliar-sobre-la-recuperacion-de-un-maiz-afectado-por-heladas-2007": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -1702,6 +1905,9 @@
    ]
   },
   "efecto-de-la-fertilizacion-fosforada-y-azospirillum-en-trigo-2004-2005": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -1711,6 +1917,9 @@
    ]
   },
   "efecto-de-la-fertilizacion-fosforica-sobre-los-niveles-productivos": {
+   "cultivo": [
+    "cana-de-azucar"
+   ],
    "zona": [
     "tucuman"
    ],
@@ -1719,6 +1928,9 @@
    ]
   },
   "efecto-de-la-fertilizacion-nitrogenada-con-inhibidores-en-maiz-2007-2008": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -1775,6 +1987,9 @@
    ]
   },
   "efecto-de-la-fertilizacion-sobre-el-consumo-y-la-eua-en-trigo": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "cordoba"
    ],
@@ -1811,6 +2026,9 @@
    ]
   },
   "efecto-de-un-inhibidor-de-la-ureasa-sobre-la-fertilizacion-nitrogenada-en-maiz-de-segunda-2010": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "santa-fe",
     "la-capital"
@@ -1828,6 +2046,9 @@
    ]
   },
   "efecto-del-fosforo-y-de-promotores-de-crecimiento-en-maiz-2007-2008": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -1848,6 +2069,9 @@
    ]
   },
   "efecto-del-manejo-de-nutrientes-sobre-trigo-2004-2005": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -1858,6 +2082,9 @@
    ]
   },
   "efecto-del-nitrogeno-y-del-azufre-sobre-calidad-de-trigo-2002-2003": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "bahia-blanca"
@@ -1877,6 +2104,9 @@
    ]
   },
   "efecto-del-zinc-en-trigo": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -1885,6 +2115,9 @@
    ]
   },
   "efecto-residual-de-soja-de-segunda-a-la-fertilizacion-de-la-lenteja-2006-2007": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -1894,6 +2127,9 @@
    ]
   },
   "efecto-sobre-el-cultivo-de-soja-por-fertilizacion-en-la-linea-de-siembra-2004-2005": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "cordoba"
    ],
@@ -1903,6 +2139,9 @@
    ]
   },
   "efecto-sobre-la-fertilizacion-foliar-sobre-la-recuperacion-de-un-maiz-afectado-por-heladas-2007-2008": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -1912,6 +2151,9 @@
    ]
   },
   "efecto-sobre-la-fitotoxicidad-y-rendimiento-de-dosis-crecientes-de-fertilizantes-fosforados-y-nitrogenados-en-trigo-2007": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -1922,6 +2164,9 @@
    ]
   },
   "efecto-sobre-la-fitotoxicidad-y-rendimiento-de-dosis-crecientes-de-n-y-s-en-trigo-2007-2008": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -2010,6 +2255,9 @@
    ]
   },
   "eficiencia-de-uso-de-enetotal-en-arroz-san-salvador-entre-rios": {
+   "cultivo": [
+    "arroz"
+   ],
    "zona": [
     "entre-rios"
    ],
@@ -2042,11 +2290,17 @@
    ]
   },
   "eficiencia-uso-enetotal-en-arroz-villa-clara-entre-rios": {
+   "cultivo": [
+    "arroz"
+   ],
    "nutriente": [
     "n"
    ]
   },
   "eficiencia-y-fitotoxicidad-de-fertilizantes-fosforados-en-soja-2005-2006": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -2077,6 +2331,9 @@
    ]
   },
   "el-manejo-del-riesgo-de-la-fertilizacion-en-cereales": {
+   "cultivo": [
+    "trigo"
+   ],
    "nutriente": [
     "n",
     "p",
@@ -2084,6 +2341,9 @@
    ]
   },
   "el-monocultivo-de-soja-y-el-deficit-de-nitrogeno": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -2092,6 +2352,9 @@
    ]
   },
   "el-potasio-magnesio-y-azufre-incrementan-el-rendimiento-y-las-utilidades-en-el-maiz": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "k",
     "micro",
@@ -2099,6 +2362,9 @@
    ]
   },
   "emisiones-de-oxido-nitroso-en-un-cultivo-de-soja-2004-2005": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -2107,11 +2373,17 @@
    ]
   },
   "enetotal-en-maiz-tres-anos-de-buenos-resultados": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "n"
    ]
   },
   "enetotal-en-trigo-tres-anos-de-buenos-resultados": {
+   "cultivo": [
+    "trigo"
+   ],
    "nutriente": [
     "n"
    ]
@@ -2126,6 +2398,9 @@
    ]
   },
   "enetotal-plus-2": {
+   "cultivo": [
+    "maiz"
+   ],
    "anio": [
     "2017"
    ],
@@ -2134,6 +2409,9 @@
    ]
   },
   "enetotal-plus-eficiencia-maiz": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "n"
    ]
@@ -2154,6 +2432,9 @@
    ]
   },
   "enetotal-plus-n-seguro-para-el-mayor-rinde-en-cana-de-azucar": {
+   "cultivo": [
+    "cana-de-azucar"
+   ],
    "zona": [
     "tucuman"
    ],
@@ -2167,6 +2448,9 @@
    ]
   },
   "ensayo-de-dosis-de-fertilizante-en-siembra-de-soja-de-primera-en-distintos-ambientes-segun-la-profundidad-de-la-tosca-2012": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "buenos-aires",
     "olavarria"
@@ -2179,6 +2463,9 @@
    ]
   },
   "ensayo-de-fertilizacion-con-cobalto-y-molibdeno-en-soja-2005-2006": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "cordoba"
    ],
@@ -2187,6 +2474,9 @@
    ]
   },
   "ensayo-de-fertilizacion-en-cana-de-azucar": {
+   "cultivo": [
+    "cana-de-azucar"
+   ],
    "zona": [
     "salta"
    ],
@@ -2195,6 +2485,9 @@
    ]
   },
   "ensayo-de-fuentes-nitroazufradas-en-maiz-2007": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -2212,6 +2505,9 @@
    ]
   },
   "ensayos-de-evaluacion-de-enetotal-en-trigo-revista-tecnica-de-trigo-aapresid-2010": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -2223,6 +2519,9 @@
    ]
   },
   "ensayos-de-fertilizacion-balanceada-en-arroz": {
+   "cultivo": [
+    "arroz"
+   ],
    "zona": [
     "entre-rios"
    ],
@@ -2231,6 +2530,9 @@
    ]
   },
   "ensayos-de-fertilizacion-en-maiz-eea-inta-marcos-juarez": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "cordoba",
     "marcos-juarez"
@@ -2242,6 +2544,9 @@
    ]
   },
   "ensayos-exploratorios-de-fertilizacion-con-magnesio-y-potasio-en-soja-2004-2005": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -2251,6 +2556,9 @@
    ]
   },
   "ensayos-exploratorios-de-fertilizacion-con-potasio-magnesio-y-cloro-en-trigo-2004-2005": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -2277,6 +2585,9 @@
    ]
   },
   "estrategias-de-fertilizacion-en-trigo": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -2287,11 +2598,17 @@
    ]
   },
   "estrategias-de-fertilizacion-nitrogenada-para-la-obtencion-de-trigos": {
+   "cultivo": [
+    "trigo"
+   ],
    "nutriente": [
     "n"
    ]
   },
   "estrategias-de-fertilizacion-nitrogenada-para-la-obtencion-de-trigos-con-calidad-de-exportacion-2003-2004-y-2004-2005": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -2300,6 +2617,9 @@
    ]
   },
   "estrategias-de-fertilizacion-para-la-secuencia-trigo-soja-2004-2005": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -2310,6 +2630,9 @@
    ]
   },
   "estrategias-de-fertilizacion-trigo-revista-tecnica-de-trigo-aapresid-2008": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -2318,6 +2641,9 @@
    ]
   },
   "estrategias-de-manejo-nutricional-de-trigos-2006-2007": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -2326,6 +2652,9 @@
    ]
   },
   "estrategias-de-nutricion-en-pasturas-consociadas-valle-bonaerense-del-rio-colorado": {
+   "cultivo": [
+    "pasturas-consociadas"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -2334,6 +2663,9 @@
    ]
   },
   "estrategias-integrales-para-la-nutricion-y-control-en-soja-2008-2009": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -2344,6 +2676,9 @@
    ]
   },
   "estratificacion-de-fosforo-en-el-suelo-y-diagnostico-de-la-fertilizacion-fosfatada-en-trigo-en-siembra-directa": {
+   "cultivo": [
+    "trigo"
+   ],
    "nutriente": [
     "p"
    ]
@@ -2358,6 +2693,9 @@
    ]
   },
   "estudio-de-la-interaccion-nitrogeno-x-azufre-en-trigo-fuentes-liquidas-2005-2006": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -2380,6 +2718,9 @@
    ]
   },
   "evaluacion-aditiva-de-tecnologias-complementarias-en-maiz-2007-2008": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -2389,6 +2730,9 @@
    ]
   },
   "evaluacion-agronomica-de-sulfato-de-calcio-granulado-en-el-cultivo-de-soja-2003-2004": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -2407,6 +2751,9 @@
    ]
   },
   "evaluacion-de-diferentes-dosis-de-n-sobre-maiz-2003-2004": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "micro",
     "n",
@@ -2415,6 +2762,9 @@
    ]
   },
   "evaluacion-de-diferentes-dosis-de-n-sobre-maiz-en-sd-2006-2007": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "cordoba"
    ],
@@ -2423,6 +2773,9 @@
    ]
   },
   "evaluacion-de-diferentes-dosis-y-momentos-de-aplicacion-de-nitrogeno-y-azufre-en-maiz-2006-2007": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -2432,6 +2785,9 @@
    ]
   },
   "evaluacion-de-diferentes-dosis-y-momentos-de-aplicacion-de-un-fertilizante-foliar": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "micro",
     "n",
@@ -2440,6 +2796,9 @@
    ]
   },
   "evaluacion-de-diferentes-estrategias-de-fertilizacion-de-base-y-foliar-en-trigo-2007-2008": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -2449,6 +2808,9 @@
    ]
   },
   "evaluacion-de-diferentes-estrategias-de-fertilizacion-en-maiz-2006-2007": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -2460,6 +2822,9 @@
    ]
   },
   "evaluacion-de-diferentes-fuentes-y-formas-de-aplicacion-del-n-en-postemergencia": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "cordoba"
    ],
@@ -2468,6 +2833,9 @@
    ]
   },
   "evaluacion-de-dosis-y-momentos-de-aplicacion-de-fertilizante-foliar-en-trigo-2007": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -2477,6 +2845,9 @@
    ]
   },
   "evaluacion-de-dosis-y-momentos-de-aplicacion-de-un-fertilizante-foliar-y-uso-combinado-con-fungicidas-en-trigo-2007": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -2486,6 +2857,9 @@
    ]
   },
   "evaluacion-de-fertilizacion-de-base-y-foliar-en-trigo-2007": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -2496,6 +2870,9 @@
    ]
   },
   "evaluacion-de-fertilizacion-nitrogenada-en-maiz-2006-2007": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "cordoba"
    ],
@@ -2504,6 +2881,9 @@
    ]
   },
   "evaluacion-de-fertilizaciones-de-n-y-s-en-maiz-en-el-ctro-sur-bsas-2006-2007": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -2513,6 +2893,9 @@
    ]
   },
   "evaluacion-de-formulaciones-con-micronutrientes-en-tratamientos-biologicos-con-azospirillum-de-trigo": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -2522,6 +2905,9 @@
    ]
   },
   "evaluacion-de-formulaciones-con-micronutrientes-en-tratamientos-con-azospirillum-en-trigo-2007-2008": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -2531,6 +2917,9 @@
    ]
   },
   "evaluacion-de-formulaciones-con-micronutrientes-en-trigo-2007": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -2540,6 +2929,9 @@
    ]
   },
   "evaluacion-de-la-aplicacion-de-nutrientes-y-estrategias-de-fertilizacion-en-soja-2006-2007": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -2550,6 +2942,9 @@
    ]
   },
   "evaluacion-de-la-fertilizacion-complementaria-con-nitrogeno-y-boro-2006-07": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -2560,6 +2955,9 @@
    ]
   },
   "evaluacion-de-la-fertilizacion-foliar-complementaria-en-soja-2005-2006": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -2572,6 +2970,9 @@
    ]
   },
   "evaluacion-de-la-fertilizacion-foliar-en-soja-2006-2007": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "entre-rios"
    ],
@@ -2594,6 +2995,9 @@
    ]
   },
   "evaluacion-de-la-fertilizacion-foliar-sobre-el-rendimiento-en-trigo-iv-2005-2006": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -2621,6 +3025,9 @@
    ]
   },
   "evaluacion-de-la-inoculacion-con-azospirillum-en-trigo-2005-2006": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -2630,6 +3037,9 @@
    ]
   },
   "evaluacion-de-la-inoculacion-con-azospirillum-en-trigo-bajo-distintos-niveles-de-fertilidad-2005-2006": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -2639,6 +3049,9 @@
    ]
   },
   "evaluacion-de-la-inoculacion-con-micorrizas-en-maiz-2005-2006": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -2649,6 +3062,9 @@
    ]
   },
   "evaluacion-de-la-inoculacion-con-micorrizas-en-trigo-2005-2006": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -2659,6 +3075,9 @@
    ]
   },
   "evaluacion-de-la-inoculacion-con-pseudomonas-en-maiz-2005-2006": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -2669,6 +3088,9 @@
    ]
   },
   "evaluacion-de-la-inoculacion-con-pseudomonas-en-trigo-2005-2006": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -2678,6 +3100,9 @@
    ]
   },
   "evaluacion-de-la-interaccion-entre-genetica-y-respuesta-a-la-fertilizacion-en-maiz-2003-2004": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -2687,6 +3112,9 @@
    ]
   },
   "evaluacion-de-la-respuesta-a-n-en-maiz-2007-2008": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "cordoba",
     "marcos-juarez"
@@ -2696,6 +3124,9 @@
    ]
   },
   "evaluacion-de-la-respuesta-del-cultivo-de-maiz-a-la-fertilizacion-con-urea-granulada-revista-aapresid-2008": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -2704,6 +3135,9 @@
    ]
   },
   "evaluacion-de-la-respuesta-del-cultivo-de-trigo-bajo-distintas-estrategias-de-fertilizacion-en-lote-de-productor": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "loberia",
@@ -2718,6 +3152,9 @@
    ]
   },
   "evaluacion-de-la-respuesta-por-zona-de-manejo-a-la-fert-nitrogenada-variable-en-el-maiz-2012": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "nueve-de-julio"
@@ -2730,6 +3167,9 @@
    ]
   },
   "evaluacion-del-agregado-de-lombricompuestos-y-fertilizantes-en-trigo-2004-2005": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -2752,6 +3192,9 @@
    ]
   },
   "evaluacion-del-efecto-de-un-fertilizante-foliar-nitrogenado-sobre-el-rendimiento-la-calidad-y-la-eficiencia-de-uso-del-nitrogeno-en-trigo": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -2776,6 +3219,9 @@
    ]
   },
   "evaluacion-del-rendimiento-y-la-calidad-de-cultivares-de-trigo-bajo-diferentes-estrategias-de-fertilizacion-nitrogenada": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "cordoba",
     "marcos-juarez"
@@ -2785,11 +3231,17 @@
    ]
   },
   "evaluacion-efecto-del-inhibidor-ureasa-nbpt-sobre-el-aprovechamiento-del-nitrogeno-en-arroz": {
+   "cultivo": [
+    "arroz"
+   ],
    "nutriente": [
     "n"
    ]
   },
   "evaluacion-tecnica-y-balance-de-nutrientes-de-diferentes-estrategias-de-fertilizacion-en-maiz-2007-2008": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "general-villegas"
@@ -2855,6 +3307,9 @@
    ]
   },
   "experimentacion-del-cultivo-de-maiz-en-la-region-litoral-sur-de-crea-campana-2011-2012-2012": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "entre-rios"
    ],
@@ -2869,6 +3324,9 @@
    ]
   },
   "experimentacion-del-cultivo-de-soja-en-la-region-litoral-sur-de-crea-campana-2011-2012-2012": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "entre-rios"
    ],
@@ -2884,6 +3342,9 @@
    ]
   },
   "experimentacion-del-cultivo-de-trigo-en-la-region-litoral-sur-de-crea-campana-2011-2012-2012": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "entre-rios"
    ],
@@ -2926,6 +3387,9 @@
    ]
   },
   "fertilizacion-azufrada-en-maiz-2003-2004-y-2004-2005": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -2935,6 +3399,9 @@
    ]
   },
   "fertilizacion-azufrada-en-maiz-2004-2005": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -2944,6 +3411,9 @@
    ]
   },
   "fertilizacion-azufrada-en-maiz-reporte-final-2005-2006": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -2959,6 +3429,9 @@
    ]
   },
   "fertilizacion-balanceada-en-maiz": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "n",
     "p",
@@ -2975,6 +3448,9 @@
    ]
   },
   "fertilizacion-combinada-en-cultivos-de-trigo-2007": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "lincoln"
@@ -2985,6 +3461,9 @@
    ]
   },
   "fertilizacion-con-boro-en-soja-efecto-sobre-los-rendimientos-e-interaccion-con-el-uso-de-fungicidas-2011": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -2998,6 +3477,9 @@
    ]
   },
   "fertilizacion-con-cloro-en-trigo-2004-2005": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -3006,6 +3488,9 @@
    ]
   },
   "fertilizacion-con-diferentes-fuentes": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "nueve-de-julio"
@@ -3021,6 +3506,9 @@
    ]
   },
   "fertilizacion-con-fosforo-en-secuencias-continuas-de-soja": {
+   "cultivo": [
+    "soja"
+   ],
    "nutriente": [
     "p",
     "ps",
@@ -3028,6 +3516,9 @@
    ]
   },
   "fertilizacion-con-fosforo-y-azufre-para-la-produccion-de-trigo": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -3037,6 +3528,9 @@
    ]
   },
   "fertilizacion-con-nitrogeno-azufre-y-zinc-en-maiz-2013": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "nueve-de-julio"
@@ -3052,6 +3546,9 @@
    ]
   },
   "fertilizacion-con-nitrogeno-fosforo-azufre-y-micronutrientes-en-la-secuencia-trigo-soja": {
+   "cultivo": [
+    "trigo"
+   ],
    "nutriente": [
     "micro",
     "n",
@@ -3060,6 +3557,9 @@
    ]
   },
   "fertilizacion-con-zinc-en-el-cultivo-de-maiz-2012-2013": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "bolivar"
@@ -3073,6 +3573,9 @@
    ]
   },
   "fertilizacion-con-zinc-en-maiz-2005-2006": {
+   "cultivo": [
+    "soja"
+   ],
    "nutriente": [
     "micro"
    ]
@@ -3090,6 +3593,9 @@
    ]
   },
   "fertilizacion-de-cana-de-azucar": {
+   "cultivo": [
+    "cana-de-azucar"
+   ],
    "zona": [
     "tucuman"
    ],
@@ -3123,6 +3629,9 @@
    ]
   },
   "fertilizacion-de-la-cana-de-azucar-en-tucuman": {
+   "cultivo": [
+    "cana-de-azucar"
+   ],
    "zona": [
     "tucuman"
    ],
@@ -3131,6 +3640,9 @@
    ]
   },
   "fertilizacion-de-la-soja-2008": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "tucuman"
    ],
@@ -3148,6 +3660,9 @@
    ]
   },
   "fertilizacion-de-maiz-en-el-norte-de-bsas-2003-2004": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -3158,6 +3673,9 @@
    ]
   },
   "fertilizacion-de-maiz-en-el-norte-de-bsas-y-sur-santa-fe-2005-2006": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -3168,6 +3686,9 @@
    ]
   },
   "fertilizacion-de-maiz-en-la-region-pampeana": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "n",
     "p",
@@ -3175,6 +3696,9 @@
    ]
   },
   "fertilizacion-de-maiz-en-siembra-directa": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "n"
    ]
@@ -3192,12 +3716,18 @@
    ]
   },
   "fertilizacion-de-soja-en-la-provincia-de-cordoba": {
+   "cultivo": [
+    "soja"
+   ],
    "nutriente": [
     "p",
     "s"
    ]
   },
   "fertilizacion-de-soja-en-vertisoles": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "entre-rios"
    ],
@@ -3207,6 +3737,9 @@
    ]
   },
   "fertilizacion-de-soja-que-estrategia-adoptamos": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -3216,6 +3749,9 @@
    ]
   },
   "fertilizacion-de-trigo": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "balcarce"
@@ -3249,11 +3785,17 @@
    ]
   },
   "fertilizacion-del-cultivo-de-soja": {
+   "cultivo": [
+    "soja"
+   ],
    "nutriente": [
     "p"
    ]
   },
   "fertilizacion-del-cultivo-de-trigo": {
+   "cultivo": [
+    "trigo"
+   ],
    "nutriente": [
     "n",
     "p",
@@ -3261,6 +3803,9 @@
    ]
   },
   "fertilizacion-del-cultivo-de-trigo-2007-2008": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -3335,6 +3880,9 @@
    ]
   },
   "fertilizacion-en-el-cultivo-de-maiz-en-c-de-gomez-2004-2005": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -3345,12 +3893,18 @@
    ]
   },
   "fertilizacion-en-maiz": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "micro",
     "nps"
    ]
   },
   "fertilizacion-en-maiz-2006-2007": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -3361,6 +3915,9 @@
    ]
   },
   "fertilizacion-en-maiz-2008": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "cordoba"
    ],
@@ -3370,6 +3927,9 @@
    ]
   },
   "fertilizacion-en-maiz-en-dos-localidades-2004-2005": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -3387,6 +3947,9 @@
    ]
   },
   "fertilizacion-en-soja": {
+   "cultivo": [
+    "soja"
+   ],
    "nutriente": [
     "p",
     "s",
@@ -3394,6 +3957,9 @@
    ]
   },
   "fertilizacion-en-soja-con-micronutrientes": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -3402,6 +3968,9 @@
    ]
   },
   "fertilizacion-en-soja-en-intersiembra-con-trigo-revista-tecnica-de-soja-aapresid-2009": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "buenos-aires",
     "balcarce"
@@ -3413,6 +3982,9 @@
    ]
   },
   "fertilizacion-en-sorgo": {
+   "cultivo": [
+    "sorgo"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -3421,9 +3993,6 @@
    ]
   },
   "fertilizacion-en-trigo": {
-   "cultivo": [
-    "trigo"
-   ],
    "nutriente": [
     "k",
     "n",
@@ -3462,6 +4031,9 @@
    ]
   },
   "fertilizacion-foliar-en-pasturas": {
+   "cultivo": [
+    "pasturas-consociadas"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -3472,11 +4044,17 @@
    ]
   },
   "fertilizacion-foliar-en-soja": {
+   "cultivo": [
+    "soja"
+   ],
    "nutriente": [
     "micro"
    ]
   },
   "fertilizacion-foliar-en-soja-2005-2006": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "buenos-aires",
     "san-antonio-de-areco"
@@ -3489,6 +4067,9 @@
    ]
   },
   "fertilizacion-foliar-en-trigo-2004": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "bordenave"
@@ -3505,6 +4086,9 @@
    ]
   },
   "fertilizacion-fosfatada-de-trigo-respuesta-y-forma-de-aplicacion": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "balcarce"
@@ -3546,21 +4130,33 @@
    ]
   },
   "fertilizacion-fosforada-de-soja-y-su-impacto-en-la-disponibilidad-de-fosforo-del-suelo": {
+   "cultivo": [
+    "soja"
+   ],
    "nutriente": [
     "p"
    ]
   },
   "fertilizacion-fosforada-del-cultivo-de-soja": {
+   "cultivo": [
+    "soja"
+   ],
    "nutriente": [
     "p"
    ]
   },
   "fertilizacion-fosforada-liquida-en-maiz": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "p"
    ]
   },
   "fertilizacion-fosforada-y-nitrogenada-en-trigo-tres-anos-de-experiencia-2012": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -3575,12 +4171,18 @@
    ]
   },
   "fertilizacion-liquida-en-trigo-2007": {
+   "cultivo": [
+    "trigo"
+   ],
    "nutriente": [
     "n",
     "s"
    ]
   },
   "fertilizacion-liquida-sobre-cultivo-de-maiz-2007": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -3600,6 +4202,9 @@
    ]
   },
   "fertilizacion-nitro-azufrada-en-trigo-2006": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "bordenave"
@@ -3610,6 +4215,9 @@
    ]
   },
   "fertilizacion-nitrogenada-al-cultivo-de-trigo-en-macollaje-2008": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -3618,6 +4226,9 @@
    ]
   },
   "fertilizacion-nitrogenada-de-sorgo-2005-2006-y-2006-2007": {
+   "cultivo": [
+    "sorgo"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -3626,6 +4237,9 @@
    ]
   },
   "fertilizacion-nitrogenada-del-cultivo-de-maiz": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "n"
    ]
@@ -3639,6 +4253,9 @@
    ]
   },
   "fertilizacion-nitrogenada-en-cana-de-azucar": {
+   "cultivo": [
+    "cana-de-azucar"
+   ],
    "zona": [
     "tucuman"
    ],
@@ -3658,14 +4275,14 @@
    ]
   },
   "fertilizacion-nitrogenada-en-cultivo-de-maiz-en-v6-2008": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "n"
    ]
   },
   "fertilizacion-nitrogenada-en-sorgo-en-el-sur-bonaerense-2007": {
-   "cultivo": [
-    "sorgo"
-   ],
    "zona": [
     "buenos-aires"
    ],
@@ -3674,6 +4291,9 @@
    ]
   },
   "fertilizacion-nitrogenada-en-trigo-en-el-se-bsas-2002-2005": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "balcarce"
@@ -3683,6 +4303,9 @@
    ]
   },
   "fertilizacion-nitrogenada-foliar-en-trigo-en-el-ctro-sur-de-buenos-aires": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -3699,6 +4322,9 @@
    ]
   },
   "fertilizacion-nitrogenada-para-calidad-en-trigo-candeal": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -3707,6 +4333,9 @@
    ]
   },
   "fertilizacion-nitrogenada-para-trigos-de-calidad": {
+   "cultivo": [
+    "trigo"
+   ],
    "nutriente": [
     "n"
    ]
@@ -3751,6 +4380,9 @@
    ]
   },
   "fertilizacion-nitrogenada-y-azufrada-en-maiz-sobre-trigo-2007-2008": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "cordoba",
     "marcos-juarez"
@@ -3773,11 +4405,17 @@
    ]
   },
   "fertilizacion-nitrogenada-y-tardia-en-trigo-pan-y-candeal-para-calidad": {
+   "cultivo": [
+    "trigo"
+   ],
    "nutriente": [
     "n"
    ]
   },
   "fertilizacion-nitrogeno-azufrada-del-doble-cultivo-trigo-soja-2004-2005": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -3808,6 +4446,9 @@
    ]
   },
   "fertilizacion-potasica-y-clorada-una-herramienta-eficaz-para-reducir-la-incidencia-de-enfermedades": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -3818,6 +4459,9 @@
    ]
   },
   "fertilizacion-y-calidad-en-trigo": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -3827,6 +4471,9 @@
    ]
   },
   "fertilizacion-y-contenido-de-proteina-en-soja-2006": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "cordoba",
     "marcos-juarez"
@@ -3837,12 +4484,18 @@
    ]
   },
   "fertilizacion-y-nutricion-en-el-cultivo-de-la-soja": {
+   "cultivo": [
+    "soja"
+   ],
    "nutriente": [
     "p",
     "s"
    ]
   },
   "fertilizantes-foliares-para-manejo-de-enfermedades-de-fin-de-ciclo-de-la-soja": {
+   "cultivo": [
+    "soja"
+   ],
    "nutriente": [
     "micro",
     "n",
@@ -3850,6 +4503,9 @@
    ]
   },
   "fertilizantes-liquidos-en-el-doble-cultivo-trigo-soja": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -3910,6 +4566,9 @@
    ]
   },
   "fitotoxicidad-por-fertilizacion-en-la-linea-en-siembra-directa-de-trigo": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "cordoba",
     "marcos-juarez"
@@ -3920,6 +4579,9 @@
    ]
   },
   "formas-de-aplicacion-de-fertilizantes-en-soja-2005-2006": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "la-pampa"
    ],
@@ -3946,6 +4608,9 @@
    ]
   },
   "fosforo-en-la-monocultura-sojera-efecto-de-la-dosis-forma-y-momento-de-aplicacion-sobre-el-balance-nutricional-primer-ano-2012": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "buenos-aires",
     "nueve-de-julio"
@@ -3967,6 +4632,9 @@
    ]
   },
   "fraccionamiento-de-n-en-cultivos-de-trigo-2007-2008": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -4014,6 +4682,9 @@
    ]
   },
   "guia-practica-del-cultivo-de-maiz": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "n",
     "p",
@@ -4032,6 +4703,9 @@
    ]
   },
   "https-www-profertil-com-ar-wp-content-uploads-2022-03-libro_mbpmf_2020-pdf": {
+   "cultivo": [
+    "arroz"
+   ],
    "zona": [
     "entre-rios"
    ],
@@ -4039,12 +4713,38 @@
     "n"
    ]
   },
+  "https-www-profertil-com-ar-wp-content-uploads-2024-05-bt-38-enetotal-1-pdf": {
+   "cultivo": [
+    "maiz"
+   ]
+  },
+  "https-www-profertil-com-ar-wp-content-uploads-2024-12-bt-40-secuestro-de-carbono-pdf": {
+   "cultivo": [
+    "maiz"
+   ]
+  },
+  "https-www-profertil-com-ar-wp-content-uploads-2025-09-bt-41-factores-de-emision-gei-urea-y-enetotal-plus-pdf": {
+   "cultivo": [
+    "maiz"
+   ]
+  },
+  "https-www-profertil-com-ar-wp-content-uploads-2025-11-bt-42-enetotal-plus-se-bs-as-pdf": {
+   "cultivo": [
+    "maiz"
+   ]
+  },
   "identificacion-de-sitios-deficientes-en-azufre-mediante-el-analisis-de-grano-de-soja": {
+   "cultivo": [
+    "soja"
+   ],
    "nutriente": [
     "s"
    ]
   },
   "identificacion-de-sitios-deficientes-en-azufre-mediante-grano-de-soja-2006": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -4053,6 +4753,9 @@
    ]
   },
   "implantacion-del-cultivo-de-sorgo": {
+   "cultivo": [
+    "sorgo"
+   ],
    "nutriente": [
     "suelos"
    ]
@@ -4070,6 +4773,9 @@
    ]
   },
   "importancia-de-la-fertilizacion-nitrogenada-sobre-la-calidad-del-trigo-2001-2004": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -4093,6 +4799,9 @@
    ]
   },
   "informe-anual-de-actividades-experimentales-en-maiz-2004-2005": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -4103,11 +4812,17 @@
    ]
   },
   "informe-de-los-ensayos-de-fertilizacion-de-soja-2005-2006": {
+   "cultivo": [
+    "soja"
+   ],
    "nutriente": [
     "p"
    ]
   },
   "informe-mit-2011": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -4123,6 +4838,9 @@
    ]
   },
   "informe-mit-maiz-2013": {
+   "cultivo": [
+    "maiz"
+   ],
    "anio": [
     "2013"
    ],
@@ -4146,11 +4864,17 @@
    ]
   },
   "inhibidor-de-ureasa-para-la-produccion-de-maiz-en-sembrado-directo": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "n"
    ]
   },
   "inoculacion-con-promotores-de-crecimiento-y-uso-de-diferentes-dosis-de-fertilizantes-fosforados-en-maiz-2006": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -4160,6 +4884,9 @@
    ]
   },
   "inoculacion-de-soja-en-el-norte-centro-y-oeste-de-buenos-aires-resultados-de-experiencias-y-practicas-de-manejo-para-mejorar-su-eficiencia-2008-09": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -4204,6 +4931,9 @@
    ]
   },
   "interacciones-entre-nutricion-y-sanidad-en-soja-2006-2007": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -4219,6 +4949,9 @@
    ]
   },
   "intersiembra-en-el-so-bsas-2006": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "coronel-suarez"
@@ -4236,6 +4969,9 @@
    ]
   },
   "intersiembra-trigo-soja": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "balcarce"
@@ -4246,6 +4982,9 @@
    ]
   },
   "jornada-maiz-tardio-analisis-economico-inta-oliveros": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "n",
     "np",
@@ -4260,6 +4999,9 @@
    ]
   },
   "la-fertilizacion-de-doble-cultivo-trigo-soja": {
+   "cultivo": [
+    "trigo"
+   ],
    "nutriente": [
     "n",
     "p",
@@ -4279,6 +5021,9 @@
    ]
   },
   "la-mineralizacion-neta-del-nitrogeno-durante-el-ciclo-del-cultivo-de-trigo-y-su-uso-en-el-balance-del-nitrogeno": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -4301,6 +5046,9 @@
    ]
   },
   "la-soja-y-la-fertilidad-residual-2004-2005": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -4327,6 +5075,9 @@
    ]
   },
   "las-micorrizas-en-el-trigo-y-su-relacion-con-el-fosforo-del-suelo": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "cordoba",
     "marcos-juarez"
@@ -4336,6 +5087,9 @@
    ]
   },
   "las-mpm-para-los-cultivos-y-sistemas-de-produccion-maiz-en-la-region-pampeana-central-2008-09": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "n",
     "p",
@@ -4368,6 +5122,9 @@
    ]
   },
   "los-maices-tardios-y-de-segunda-tienen-una-excelente-rentabilidad": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "n",
     "p",
@@ -4379,17 +5136,31 @@
     "n"
    ]
   },
+  "maicero-una-herramienta-para-planificar-y-manejar-los-sistemas-productivos-de-manera-sostenible": {
+   "cultivo": [
+    "maiz"
+   ]
+  },
   "maiz-de-2a-una-alternativa-que-suma": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "n"
    ]
   },
   "maiz-en-fechas-tardias-una-opcion-que-llego-para-quedarse": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "n"
    ]
   },
   "maiz-respuesta-a-fuentes-de-nitrogeno-y-azufre": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "n",
     "s"
@@ -4403,6 +5174,9 @@
    ]
   },
   "manejo-de-la-fertilizacion-del-maiz": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "n",
     "p",
@@ -4423,6 +5197,9 @@
    ]
   },
   "manejo-del-fosforo-en-pastura": {
+   "cultivo": [
+    "pasturas-consociadas"
+   ],
    "zona": [
     "entre-rios",
     "departamento-parana"
@@ -4437,6 +5214,9 @@
    ]
   },
   "manejo-estacional-de-suministro-de-nitrogeno-en-festuca-alta": {
+   "cultivo": [
+    "pasturas-consociadas"
+   ],
    "zona": [
     "buenos-aires",
     "balcarce"
@@ -4446,6 +5226,9 @@
    ]
   },
   "manejo-estacional-del-nitrogeno-en-festuca-alta": {
+   "cultivo": [
+    "pasturas-consociadas"
+   ],
    "zona": [
     "buenos-aires",
     "balcarce"
@@ -4516,6 +5299,9 @@
    ]
   },
   "materia-seca-nodular-y-nitrogeno-acumulado-en-soja-2004-2005": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "buenos-aires",
     "balcarce"
@@ -4525,6 +5311,9 @@
    ]
   },
   "mejoramiento-de-la-eficiencia-de-uso-del-n-mediante-sensores-remotos-2006-2007": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "entre-rios",
     "departamento-parana"
@@ -4535,6 +5324,9 @@
    ]
   },
   "mejores-practicas-de-manejo-de-la-fertilizacion-en-soja": {
+   "cultivo": [
+    "soja"
+   ],
    "nutriente": [
     "micro",
     "n",
@@ -4548,11 +5340,17 @@
    ]
   },
   "mejores-practicas-de-manejo-para-la-nutricion": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "npks"
    ]
   },
   "menores-perdidas-de-n-mas-granos-de-trigo": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -4561,6 +5359,9 @@
    ]
   },
   "metodos-de-colocacion-de-fosforo-en-el-cultivo-de-maiz-bajo-siembra-directa-2003-04": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "tandil"
@@ -4571,6 +5372,9 @@
    ]
   },
   "mit-de-aplicacion-san-luis-2013-mpm-de-fertilizacion-en-maiz": {
+   "cultivo": [
+    "maiz"
+   ],
    "anio": [
     "2013"
    ],
@@ -4579,6 +5383,9 @@
    ]
   },
   "miting-2011-fertilizacion-en-maiz-2011": {
+   "cultivo": [
+    "maiz"
+   ],
    "anio": [
     "2011"
    ],
@@ -4591,6 +5398,9 @@
    ]
   },
   "miting-2011-fertilizacion-en-soja-2011": {
+   "cultivo": [
+    "soja"
+   ],
    "anio": [
     "2011"
    ],
@@ -4602,6 +5412,9 @@
    ]
   },
   "miting-2011-fertilizacion-en-trigo-2011": {
+   "cultivo": [
+    "trigo"
+   ],
    "anio": [
     "2011"
    ],
@@ -4614,6 +5427,9 @@
    ]
   },
   "miting-tres-arroyos-fertilizacion-en-maiz-2011": {
+   "cultivo": [
+    "maiz"
+   ],
    "anio": [
     "2011"
    ],
@@ -4623,6 +5439,9 @@
    ]
   },
   "miting-tres-arroyos-fertilizacion-en-soja-2011": {
+   "cultivo": [
+    "soja"
+   ],
    "anio": [
     "2011"
    ],
@@ -4631,6 +5450,9 @@
    ]
   },
   "modelo-de-simulacion-ceres-como-herramienta-en-el-diagnostico-de-la-fertilizacion-nitrogenada-en-trigo-2003-2004": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -4639,6 +5461,9 @@
    ]
   },
   "momento-de-aplicacion-de-n-en-maiz": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "nueve-de-julio"
@@ -4648,16 +5473,25 @@
    ]
   },
   "momento-de-aplicacion-de-nitrogeno-y-respuesta-a-la-fertilizacion-de-maiz": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "n"
    ]
   },
   "momento-de-fertilizacion-nitrogenada-de-cultivos-de-maiz": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "n"
    ]
   },
   "momento-de-fertilizacion-y-la-dinamica-del-nitrogeno-2003-2004": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "bahia-blanca"
@@ -4667,6 +5501,9 @@
    ]
   },
   "momentos-de-aplicacion-y-fuentes-de-nitrogeno-en-maiz-2006-2007": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "entre-rios"
    ],
@@ -4675,6 +5512,9 @@
    ]
   },
   "mpm-para-la-nutricion-en-el-cultivo-de-trigo": {
+   "cultivo": [
+    "trigo"
+   ],
    "nutriente": [
     "n",
     "p"
@@ -4699,6 +5539,9 @@
    ]
   },
   "nitrogeno-y-azufre-para-rendimiento-y-calidad-en-trigo-2008": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -4713,6 +5556,9 @@
    ]
   },
   "novedades-en-el-manejo-de-efc-en-soja": {
+   "cultivo": [
+    "soja"
+   ],
    "nutriente": [
     "k",
     "micro"
@@ -4724,6 +5570,9 @@
    ]
   },
   "nuevas-estrategias-de-inoculacion-en-soja-efectos-sobre-la-nodulacion-el-rendimiento-y-su-interaccion-con-practicas-de-manejo-2008-09": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -4736,6 +5585,9 @@
    ]
   },
   "nuevas-estrategias-de-produccion-para-alcanzar-los-rendimientos-potenciales-en-soja-2006-2007": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -4746,6 +5598,9 @@
    ]
   },
   "nuevas-tendencias-en-nutricion-de-trigo": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -4758,17 +5613,27 @@
   },
   "nuevo-bt-disponible-como-definir-la-estrategia-de-nitrogeno-en-trigo": {
    "cultivo": [
+    "arroz",
     "avena",
     "cebada-cervecera",
+    "maiz",
+    "sorgo",
+    "trigo",
     "colza-canola",
     "girasol",
+    "soja",
+    "cana-de-azucar",
     "tabaco",
     "campos-naturales",
+    "pasturas-consociadas",
     "pasturas-puras",
     "verdeos-de-invierno"
    ]
   },
   "nuevos-nutrientes-en-maiz-2007": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -4788,6 +5653,9 @@
    ]
   },
   "nutricion-de-verdeos-y-pasturas": {
+   "cultivo": [
+    "pasturas-consociadas"
+   ],
    "nutriente": [
     "micro",
     "n",
@@ -4809,6 +5677,9 @@
    ]
   },
   "nutricion-del-cultivo-de-trigo-con-seguimiento-satelital-2": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "cordoba"
    ],
@@ -4829,6 +5700,9 @@
    ]
   },
   "nutricion-en-el-cultivo-de-maiz-ipni-f-garcia-2005": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "k",
     "micro",
@@ -4843,6 +5717,9 @@
    ]
   },
   "nutricion-en-soja-1": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -4851,6 +5728,9 @@
    ]
   },
   "nutricion-en-soja-2-2007": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -4869,6 +5749,9 @@
    ]
   },
   "nutricion-estrategica-de-soja-en-rotacion-2002-2003": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -4878,6 +5761,9 @@
    ]
   },
   "nutricion-para-rendimiento-y-calidad-de-trigo-con-seguimiento-satelital": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "necochea"
@@ -4902,6 +5788,9 @@
    ]
   },
   "nutrientes-en-maiz-experiencia-en-santa-fe-2008": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -4912,6 +5801,9 @@
    ]
   },
   "panorama-sanitario-del-cultivo-de-maiz-en-la-zona-norte-de-la-prov-de-bs-as-campanas-2007-08-2008-09": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -4927,6 +5819,9 @@
    ]
   },
   "pasturas-fertilizadas-para-hacer-eficiente-la-produccion-ganadera": {
+   "cultivo": [
+    "pasturas-consociadas"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -4937,6 +5832,9 @@
    ]
   },
   "pautas-para-el-manejo-nutricional-del-cultivo-de-trigo": {
+   "cultivo": [
+    "trigo"
+   ],
    "nutriente": [
     "n",
     "p",
@@ -4944,6 +5842,9 @@
    ]
   },
   "perdidas-de-nitrogeno-por-volatilizacion-y-su-implicancia-en-el-rendimiento-de-maiz-2008-2009": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -4953,6 +5854,9 @@
    ]
   },
   "perdidas-de-nitrogeno-por-volatilizacion-y-su-implicancia-en-el-rendimiento-del-cultivo-de-maiz-2008-09": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -4963,6 +5867,9 @@
    ]
   },
   "perdidas-por-volatilizacion-de-amoniaco-de-diferentes-fuentes-nitrogenadas-en-trigo": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -4971,6 +5878,9 @@
    ]
   },
   "prediccion-a-la-respuesta-del-nitrogeno-en-maiz-utilizando-un-tester-2008-2009": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -4994,6 +5904,9 @@
    ]
   },
   "presentacion-maiz": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "n",
     "p",
@@ -5013,6 +5926,9 @@
    ]
   },
   "produccion-de-pasturas-y-su-respuesta-a-la-fertilizacion-nitrogenada": {
+   "cultivo": [
+    "pasturas-consociadas"
+   ],
    "zona": [
     "buenos-aires",
     "bahia-blanca"
@@ -5022,6 +5938,9 @@
    ]
   },
   "produccion-de-rastrojo-en-cultivares-de-maiz-con-diferentes-ofertas-de-agua-y-nitrogeno-2008": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -5055,6 +5974,11 @@
     "micro"
    ]
   },
+  "protocolo-de-obtencion-de-enetotal-plus": {
+   "cultivo": [
+    "arroz"
+   ]
+  },
   "que-estrategia-adoptar-para-la-fertilizacion": {
    "zona": [
     "buenos-aires",
@@ -5083,6 +6007,9 @@
    ]
   },
   "recomendaciones-para-la-fertilizacion-de-la-cana-de-azucar": {
+   "cultivo": [
+    "cana-de-azucar"
+   ],
    "zona": [
     "tucuman"
    ]
@@ -5096,6 +6023,9 @@
    ]
   },
   "red-de-ensayo-de-soja-para-evaluar-diferentes-formas-de-fertilizantes-fosfatados-2005-2006": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "cordoba"
    ],
@@ -5109,6 +6039,9 @@
    ]
   },
   "red-de-ensayos-de-fertilizacion-nitrogenada-en-maiz-2005-2006": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -5117,6 +6050,9 @@
    ]
   },
   "red-de-ensayos-de-nutricion-de-cultivos-del-sur-de-santa-fe-2005-2006": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -5128,6 +6064,9 @@
    ]
   },
   "red-de-fertilizacion-nitrogenada-en-trigo-resultados-campana-2018": {
+   "cultivo": [
+    "trigo"
+   ],
    "anio": [
     "2018"
    ],
@@ -5136,6 +6075,9 @@
    ]
   },
   "red-de-fertilizacion-nitrogenada-para-calidad-en-trigo-pan": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -5144,11 +6086,17 @@
    ]
   },
   "relacion-entre-el-cultivo-antecesor-y-la-disponibilidad-de-nitrogeno-para-el-trigo-en-la-rotacion": {
+   "cultivo": [
+    "trigo"
+   ],
    "nutriente": [
     "n"
    ]
   },
   "relacion-entre-el-nivel-de-nodulacion-y-la-fertilizacion-nitrogenada-en-soja-2004-2005": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "chaco"
    ],
@@ -5157,6 +6105,9 @@
    ]
   },
   "relaciones-entre-la-eficiencia-de-uso-del-nitrogeno-y-la-radiacion-en-maiz-2006-2007": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "entre-rios"
    ],
@@ -5165,6 +6116,9 @@
    ]
   },
   "rendimiento-y-eficiencia-comparativa-de-uso-de-fosforo-nitrogeno-y-agua-en-trigo-y-cebada-cervecera-en-la-region-centro-y-noroeste-de-buenos-aires-2012": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -5190,6 +6144,9 @@
    ]
   },
   "renovacion-de-pasturas-fertilizacion-nitrogenada": {
+   "cultivo": [
+    "pasturas-consociadas"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -5209,6 +6166,9 @@
    ]
   },
   "requerimiento-y-manejo-de-fosforo-y-nitrogeno-en-pasturas-de-alta-produccion": {
+   "cultivo": [
+    "pasturas-consociadas"
+   ],
    "zona": [
     "buenos-aires",
     "balcarce"
@@ -5228,6 +6188,9 @@
    ]
   },
   "respuesta-a-azufre-en-trigo-segun-ambientes-y-nivel-de-n-2011": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "colon"
@@ -5242,6 +6205,9 @@
    ]
   },
   "respuesta-a-la-aplicacion-de-inoculantes-fertilizantes-y-fungicidas-en-trigo-2007": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -5251,6 +6217,10 @@
    ]
   },
   "respuesta-a-la-fertilizacion-en-el-doble-cultivo-maiz-soja-en-san-justo-aapresid-2002-03": {
+   "cultivo": [
+    "maiz",
+    "soja"
+   ],
    "zona": [
     "santa-fe",
     "san-justo"
@@ -5268,6 +6238,9 @@
    ]
   },
   "respuesta-a-la-fertilizacion-en-soja": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "entre-rios",
     "departamento-gualeguaychu"
@@ -5279,6 +6252,9 @@
    ]
   },
   "respuesta-a-la-inoculacion-con-micorrizas-en-dos-ambientes-de-fertlizacion-2007": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -5288,6 +6264,9 @@
    ]
   },
   "respuesta-a-la-utilizacion-combinada-de-azospirillum-y-fertilizacion-foliar-en-trigo-2007": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -5297,11 +6276,17 @@
    ]
   },
   "respuesta-a-nitrogeno-en-maiz-de-fecha-tardia-segun-antecesor": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "n"
    ]
   },
   "respuesta-al-agregado-de-n-y-s-en-trigo-2005-2008": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "general-villegas"
@@ -5311,6 +6296,9 @@
    ]
   },
   "respuesta-al-zinc-en-maiz-utilizando-diferentes-tecnologias-de-aplicacion-2011": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -5323,6 +6311,9 @@
    ]
   },
   "respuesta-al-zinc-en-maiz-utilizando-diferentes-tecnologias-de-aplicacion-en-la-region-centro-norte-de-buenos-aires": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -5331,6 +6322,9 @@
    ]
   },
   "respuesta-de-cultivos-de-trigo-a-la-fertilizacion-con-cloruros": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -5340,6 +6334,9 @@
    ]
   },
   "respuesta-del-cultivo-de-maiz-a-la-fertilizacion-con-n-p-y-s-en-el-sur-de-santa-fe-2008": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -5350,6 +6347,9 @@
    ]
   },
   "respuesta-del-cultivo-de-trigo-a-diferentes-antecesores-2004-2005": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -5359,6 +6359,9 @@
    ]
   },
   "respuesta-del-maiz-a-dosis-crecientes-de-azufre-2004-2005": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -5367,6 +6370,9 @@
    ]
   },
   "respuesta-del-maiz-a-dosis-crecientes-de-nitrogeno-utilizando-fuentes-liquidas-en-combinacion-con-inhibidores-de-la-nitrificacion-2008-09": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -5376,6 +6382,9 @@
    ]
   },
   "respuesta-del-maiz-a-la-fertilizacion-complementaria-2004-2006": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -5387,6 +6396,9 @@
    ]
   },
   "respuesta-del-maiz-a-la-fertilizacion-complementaria-con-n-y-zn-2007-2008": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -5397,6 +6409,9 @@
    ]
   },
   "respuesta-del-maiz-a-la-fertilizacion-complementaria-con-n-y-zn-2do-ano-2007-2008": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -5407,6 +6422,9 @@
    ]
   },
   "respuesta-del-maiz-a-la-fertilizacion-complementaria-por-via-foliar-2006-2007": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -5416,6 +6434,9 @@
    ]
   },
   "respuesta-del-maiz-a-la-fertilizacion-complementaria-y-promotores-de-crecimiento-2005-2006": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -5426,6 +6447,9 @@
    ]
   },
   "respuesta-del-maiz-a-la-fertilizacion-complemetaria-con-nitrogeno-zinc-boro-y-otros-nutrientes-aplicados-por-via-foliar": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -5437,6 +6461,9 @@
    ]
   },
   "respuesta-fertilizacion-boro-en-soja": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -5445,6 +6472,9 @@
    ]
   },
   "respuesta-tasa-de-respuesta-a-la-fertilizacion-nitrogenada-y-eun-del-agua-en-maiz-2008": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -5454,6 +6484,9 @@
    ]
   },
   "resultado-del-cultivo-de-trigo-en-el-primer-ano-de-ensayo-de-larga-duracion-2007": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -5462,6 +6495,9 @@
    ]
   },
   "resultados-ddc-maiz-2007-08-revista-tecnica-especial-de-aapresid-2008": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -5472,6 +6508,9 @@
    ]
   },
   "resultados-de-ensayo-de-maiz-en-franck-2005-2006": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -5482,6 +6521,9 @@
    ]
   },
   "resultados-de-ensayos-de-maiz-en-franck-articulo-revista-especial-ensayos-en-sd-ano-2007": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -5490,6 +6532,9 @@
    ]
   },
   "resultados-de-experiencias-en-maiz-2004-2005": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -5500,6 +6545,9 @@
    ]
   },
   "resultados-de-experiencias-en-soja-2004-2005": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "buenos-aires",
     "san-antonio-de-areco"
@@ -5510,6 +6558,9 @@
    ]
   },
   "resultados-de-la-red-de-ensayos-de-maiz-articulo-revista-tecnica-maiz-aapresid-2005-2006": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "n",
     "p",
@@ -5517,12 +6568,18 @@
    ]
   },
   "resultados-de-los-ensayos-de-fertilizacion-en-soja": {
+   "cultivo": [
+    "soja"
+   ],
    "nutriente": [
     "p",
     "s"
    ]
   },
   "resultados-de-los-mit-de-maiz-2010": {
+   "cultivo": [
+    "maiz"
+   ],
    "anio": [
     "2010"
    ],
@@ -5533,6 +6590,9 @@
    ]
   },
   "resultados-del-mit-de-casilda-maiz-de-2da-campana-2009-2010": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -5544,6 +6604,9 @@
    ]
   },
   "resultados-ensayos-nxs-de-mit-05-revista-tecnica-de-trigo-aapresid-2007": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -5553,11 +6616,17 @@
    ]
   },
   "resultados-evaluacion-de-rendimiento-y-eficiencia-de-uso-de-la-urea-granulada": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "n"
    ]
   },
   "resultados-mit-maiz-2012": {
+   "cultivo": [
+    "maiz"
+   ],
    "anio": [
     "2012"
    ],
@@ -5592,6 +6661,9 @@
    ]
   },
   "sistema-de-labranza-y-fertilizacion-en-trigo-en-el-so-bonaerense-1999": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "bordenave"
@@ -5606,18 +6678,27 @@
    ]
   },
   "soja-criterios-para-la-fertilizacion-del-cultivo": {
+   "cultivo": [
+    "soja"
+   ],
    "nutriente": [
     "p",
     "s"
    ]
   },
   "soja-efecto-de-los-fertilizantes-aplicados-en-la-linea-de-siembra": {
+   "cultivo": [
+    "soja"
+   ],
    "nutriente": [
     "n",
     "p"
    ]
   },
   "soja-efectos-de-diferentes-estrategias-de-fertilizacion-sobre-sus-rendimientos-y-el-balance-de-nutrientes-y-su-disponibilidad-en-los-suelos-revista-tecnica-de-soja-aapresid-2008": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -5630,6 +6711,9 @@
    ]
   },
   "soja-efectos-de-los-fertilizantes-aplicados-en-la-linea-de-siembra-2004-2005": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -5638,18 +6722,27 @@
    ]
   },
   "soja-fertilizacion-foliar-con-micronutrientes": {
+   "cultivo": [
+    "soja"
+   ],
    "nutriente": [
     "micro",
     "n"
    ]
   },
   "soja-respuesta-a-la-fertilizacion-en-la-region-pampeana": {
+   "cultivo": [
+    "soja"
+   ],
    "nutriente": [
     "p",
     "s"
    ]
   },
   "soja-resultados-de-experiencias-2004-2005": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "buenos-aires"
    ],
@@ -5662,6 +6755,9 @@
    ]
   },
   "sorgo-granifero-caracteristicas-y-manejo-del-cultivo-2013": {
+   "cultivo": [
+    "sorgo"
+   ],
    "anio": [
     "2013"
    ],
@@ -5671,6 +6767,9 @@
    ]
   },
   "sulfato-de-sodio-granulado-como-fuente-de-azufre-para-soja-2003-2004": {
+   "cultivo": [
+    "soja"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -5679,6 +6778,9 @@
    ]
   },
   "tecnologias-de-nutricion-en-trigo": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "cordoba"
    ],
@@ -5690,6 +6792,9 @@
    ]
   },
   "tecnologias-para-la-aplicacion-de-microelementos-en-maiz-dosis-y-sistemas-de-aplicacion-de-zinc-en-combinacion-con-fuentes-nitrogeno-azufradas-2008-09": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -5715,6 +6820,9 @@
    ]
   },
   "trigo-criterios-para-el-diagnostico-de-la-fertilizacion-fosfatada": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "balcarce"
@@ -5724,6 +6832,9 @@
    ]
   },
   "trigo-en-el-norte-santafecino-campana-2005": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -5733,11 +6844,17 @@
    ]
   },
   "trigo-ensayo-de-fertilizacion-azufrada": {
+   "cultivo": [
+    "trigo"
+   ],
    "nutriente": [
     "s"
    ]
   },
   "trigo-explorando-deficiencias-nutricionales-en-la-region-pampeana": {
+   "cultivo": [
+    "trigo"
+   ],
    "nutriente": [
     "micro",
     "n",
@@ -5746,17 +6863,26 @@
    ]
   },
   "trigo-fertilizacion-con-potasio-azufre-y-magnesio": {
+   "cultivo": [
+    "trigo"
+   ],
    "nutriente": [
     "k",
     "micro"
    ]
   },
   "trigo-micronutrientes": {
+   "cultivo": [
+    "trigo"
+   ],
    "nutriente": [
     "micro"
    ]
   },
   "trigo-pautas-para-el-manejo-nutricional-del-cultivo-2011": {
+   "cultivo": [
+    "trigo"
+   ],
    "anio": [
     "2011"
    ],
@@ -5770,6 +6896,9 @@
    ]
   },
   "trigo-respuesta-en-rendimiento-a-la-fertilizacion-con-cloruro-de-potasio-2007": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -5779,6 +6908,9 @@
    ]
   },
   "umbrales-de-respuesta-a-la-fertilizacion-nitrogenada-en-maiz-y-dosis-optimas-economicassegun-potencial-de-produccion": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "n",
     "p",
@@ -5786,11 +6918,17 @@
    ]
   },
   "uso-de-micronutrientes-en-cultivos-de-gruesa": {
+   "cultivo": [
+    "soja"
+   ],
    "nutriente": [
     "micro"
    ]
   },
   "uso-de-microorganismos-para-mejorar-la-fertilizacion-fosforada-de-trigo-2006-2007": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "buenos-aires",
     "pergamino"
@@ -5800,12 +6938,18 @@
    ]
   },
   "utilizacion-de-fertilizantes-foliares-en-combinacion-con-fungicidas-en-el-cultivo-de-trigo": {
+   "cultivo": [
+    "trigo"
+   ],
    "nutriente": [
     "micro",
     "n"
    ]
   },
   "utilizacion-de-fuentes-liquidas-y-granuladas-en-trigo-soja-2004-2005": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -5816,6 +6960,9 @@
    ]
   },
   "utilizacion-de-mezclas-fertilizantes-ns-granuladas-y-liquidas-en-maiz-2004-2005": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "santa-fe"
    ],
@@ -5836,6 +6983,9 @@
    ]
   },
   "utilizacion-de-sensores-remotos-para-la-nutricion-en-maiz-2005-2006": {
+   "cultivo": [
+    "maiz"
+   ],
    "zona": [
     "entre-rios"
    ],
@@ -5844,6 +6994,9 @@
    ]
   },
   "utilizacion-de-sensores-remotos-para-la-nutricion-nitrogenada-en-trigo-2005-2006": {
+   "cultivo": [
+    "trigo"
+   ],
    "zona": [
     "entre-rios"
    ],
@@ -5852,29 +7005,48 @@
    ]
   },
   "volatilizacion-del-amoniaco-articulo-revista-especial-ensayos-en-sd-aapresid-2006": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "n"
    ]
   },
   "volatilizacion-del-amoniaco-revista-tecnica-de-maiz-aapresid-ano-2007": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "n"
    ]
   },
   "zinc-en-el-cultivo-de-maiz-deficiencia-de-oportunidad": {
+   "cultivo": [
+    "maiz"
+   ],
    "nutriente": [
     "micro"
    ]
   }
  },
  "fuera": {
+  "https://www.profertil.com.ar/index.php/cereales/arroz-cereales/landing-page-arroz": [
+   "arroz"
+  ],
   "https://www.profertil.com.ar/index.php/cereales/eficiencia-de-uso-del-nitrogeno-en-maiz-ing-agr-mirta-toribio-id-profertil": [
+   "arroz",
    "avena",
    "cebada-cervecera",
+   "maiz",
+   "sorgo",
+   "trigo",
    "colza-canola",
    "girasol",
+   "soja",
+   "cana-de-azucar",
    "tabaco",
    "campos-naturales",
+   "pasturas-consociadas",
    "pasturas-puras",
    "verdeos-de-invierno"
   ],

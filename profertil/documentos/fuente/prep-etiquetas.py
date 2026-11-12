@@ -107,6 +107,9 @@ def entradas(op):
     url, vistas, res = op['url'], set(), []
     # El link de la portada a veces ya trae /page/N/ (P apunta a la segunda página): se empieza por la primera.
     url = re.sub(r'/page/\d+/?$', '/', url)
+    # Los links de la portada usan /sustentabilidad/, que para Maíz, Soja, Arroz y Caña redirige a páginas de productos.
+    # La ruta /sostenibilidad/ es la que lista los documentos de cada opción.
+    url = url.replace('/sustentabilidad/', '/sostenibilidad/')
     while url and url not in vistas:
         vistas.add(url)
         s = bajar(url)

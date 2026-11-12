@@ -75,15 +75,15 @@ Resultado sobre los 627 documentos (noviembre de 2026):
 
 | Grupo | Con etiqueta | Sin clasificar |
 |---|---|---|
-| Cultivo | 76 | 551 |
+| Cultivo | 456 | 171 |
 | Zona | 374 | 253 |
 | Año | 57 | 570 |
 | Nutriente | 610 | 17 |
-| Alguna | 614 | 13 |
+| Alguna | 621 | 6 |
 
-- Arroz, Maíz, Soja y Caña de azúcar no llevan a la Biblioteca: redirigen a la página de productos para ese cultivo.
-  Quedan sin documentos y la página no las muestra, igual que 2020 (su página no lista documentos). Algodón, Té y Yerba
-  mate figuran en la portada sin link.
+- Los links de la portada usan `/sustentabilidad/`, que para Arroz, Maíz, Soja y Caña de azúcar redirige a la página de
+  productos. El script reemplaza esa ruta por `/sostenibilidad/`, que es la que lista los documentos de cada opción.
+  Quedan sin documentos solo 2020 (su página no lista documentos), y Algodón, Té y Yerba mate figuran en la portada sin link.
 - El link de P en la portada apunta a su segunda página; el script empieza siempre por la primera.
 - Dos entradas que listan las páginas de etiqueta no están entre los documentos (tienen más de un PDF): quedan en
   `fuera` dentro de `etiquetas.json`.
