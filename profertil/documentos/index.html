@@ -54,7 +54,7 @@
 <link rel="stylesheet" href="../componentes/tokens.css">
 <link rel="stylesheet" href="../componentes/base.css">
 <link rel="stylesheet" href="../buscador/alcance.css">
-<script src="../buscador/alcance.js" data-seccion="documentos" data-nombre="Documentos" defer></script>
+<script src="../buscador/alcance.js" data-seccion="documentos" data-nombre="Biblioteca" defer></script>
 <style>
 /* Biblioteca Virtual Profertil: los documentos técnicos del sitio actual (boletines, ensayos, informes de campaña).
    Misma lógica que Novedades (barra, filtros en el dock, buscador en la lupa, ancla); en vez de tarjetas, filas.
@@ -325,7 +325,9 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 .pf-dh__arte { position: relative; aspect-ratio: 260 / 227; margin-bottom: -8px; }
 .pf-dh__foto { position: absolute; inset: 0; background: url("../novedades/fotos/demo-1.webp") 62% 40% / cover no-repeat var(--azul-oscuro, #002a73);
   -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20260%20227%22%3E%3Cpath%20d%3D%22M106.108%200C164.71%200%20212.217%2047.5063%20212.217%20106.108C212.217%20123.332%20208.111%20139.595%20200.828%20153.978L259.268%20212.417C239.93%20231.755%20208.578%20231.755%20189.24%20212.417L168.654%20191.831C151.116%20204.65%20129.496%20212.217%20106.108%20212.217C47.5063%20212.217%200%20164.711%200%20106.108C9.43891e-05%2047.5063%2047.5063%201.07058e-05%20106.108%200Z%22/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20260%20227%22%3E%3Cpath%20d%3D%22M106.108%200C164.71%200%20212.217%2047.5063%20212.217%20106.108C212.217%20123.332%20208.111%20139.595%20200.828%20153.978L259.268%20212.417C239.93%20231.755%20208.578%20231.755%20189.24%20212.417L168.654%20191.831C151.116%20204.65%20129.496%20212.217%20106.108%20212.217C47.5063%20212.217%200%20164.711%200%20106.108C9.43891e-05%2047.5063%2047.5063%201.07058e-05%20106.108%200Z%22/%3E%3C/svg%3E") center / contain no-repeat; }
-.pf-dh__hoja { position: absolute; left: -4%; bottom: -6%; width: 26%; color: var(--amarillo); fill: currentColor; }
+/* La Hoja va detrás de la foto, grande, asomando arriba a la derecha (lejos del texto). */
+.pf-dh__foto { z-index: 1; }
+.pf-dh__hoja { position: absolute; z-index: 0; right: -16%; top: -18%; width: 62%; color: var(--amarillo); fill: currentColor; }
 /* Paralaje: al bajar, la Lupa con la foto baja más lento que la página (se queda atrás) y la Hoja un poco menos,
    así se separan en dos planos. Lo mueve el navegador atado al scroll, sin JS; sin soporte o con movimiento
    reducido queda quieto. La banda azul recorta lo que se sale. */
@@ -373,7 +375,7 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   .pf-dh__in { display: block; }
   .pf-dh h1 { max-width: 6.2em; font-size: 44px; }
   .pf-dh__arte { position: absolute; top: -18px; right: -10px; width: 40%; max-width: 200px; margin: 0; --pf-dh-lupa: 90px; --pf-dh-hoja: -40px; }
-  .pf-dh__hoja { left: -4%; bottom: -8%; width: 28%; }
+  .pf-dh__hoja { right: -14%; top: -16%; width: 58%; }
   .pf-dh p { margin-top: 30px; font-size: var(--texto-cuerpo); }
   .pf-doc { grid-template-columns: minmax(0, 1fr) 36px; row-gap: 10px; padding: 16px 0; }
   .pf-doc .pf-etiqueta { grid-column: 1; grid-row: 1; justify-self: start; }
@@ -582,7 +584,7 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   <div class="pf-dh__in pf-col">
     <div>
       <h1>Biblioteca Virtual</h1>
-      <p>Accedé a los trabajos de investigación sobre nutrición de los cultivos, eficiencia de uso de los nutrientes y cuidado del suelo, el agua y el aire. Están elaborados por instituciones técnicas, por el área de Investigación y Desarrollo de Profertil o junto a especialistas de reconocida trayectoria.</p>
+      <p>Accedé a investigaciones sobre nutrición de cultivos, eficiencia de nutrientes y cuidado del suelo, agua y aire, elaboradas por Investigación y Desarrollo de Profertil, instituciones técnicas y especialistas de trayectoria.</p>
     </div>
     <div class="pf-dh__arte" aria-hidden="true">
       <div class="pf-dh__foto"></div>
