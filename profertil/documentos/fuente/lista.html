@@ -124,7 +124,21 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 @media (hover: hover) and (pointer: fine) { .pf-f-toggle:hover { background: var(--line); } }
 .pf-f-toggle svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform var(--f-flecha) var(--f-curva); }
 .pf-filters.pf-abierto .pf-f-toggle svg { transform: rotate(180deg); }
-.pf-f-count { position: absolute; top: 2px; right: 2px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 999px; background: var(--verde); color: #fff; display: grid; place-items: center; font-size: 0.66rem; font-variant-numeric: tabular-nums; }
+.pf-f-count { position: absolute; top: 2px; right: 2px; min-width: 17px; height: 17px; padding: 1px 4px 0; border-radius: 999px; background: var(--verde); color: #fff; display: grid; place-items: center; font-size: 0.66rem; }
+/* Cruz arriba a la derecha del panel abierto (como la flecha de la barra). Va
+   afuera del cuerpo con scroll para que no se vaya al bajar; el cuerpo deja
+   lugar arriba para que no pise la flecha del primer grupo. */
+.pf-f-x {
+  position: absolute; top: 10px; right: 12px; z-index: 2;
+  width: 36px; height: 36px; padding: 0; border: 0; border-radius: 999px;
+  background: var(--glass); color: var(--ink-2); cursor: pointer;
+  display: grid; place-items: center;
+  opacity: 0; visibility: hidden; transition: opacity calc(var(--f-fundido) * 0.7) ease, visibility 0s linear var(--f-cerrar);
+}
+.pf-f-x svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.pf-filters.pf-abierto .pf-f-x { opacity: 1; visibility: visible; transition: opacity var(--f-fundido) ease var(--f-fundido-retraso); }
+@media (hover: hover) and (pointer: fine) { .pf-f-x:hover { background: var(--line); color: var(--ink); } }
+.pf-f-x:focus-visible { outline: 2px solid var(--celeste); outline-offset: 2px; }
 .pf-f-clear { justify-self: start; margin-top: 2px; border: 0; background: transparent; cursor: pointer; padding: 4px 0; color: var(--azul); font-size: 0.88rem; text-decoration: underline; text-underline-offset: 3px; }
 
 /* --- Grupos del panel: acordeón. Un grupo abierto por vez; cerrado muestra sus filtros activos (se sacan tocándolos).
@@ -140,6 +154,7 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   .pf-filters.pf-abierto { min-width: min(100% - 32px - var(--a), 680px); transition-duration: var(--f-abrir), var(--f-abrir), 520ms, 300ms; }
 }
 .pf-f-in { gap: 10px; }
+.pf-filters .pf-f-in { padding-top: 48px; }
 .pf-f-grupos { display: grid; }
 .pf-f-gr + .pf-f-gr { border-top: 1px solid var(--line); }
 .pf-f-gr__cab { position: relative; display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 6px 2px; border: 0; background: transparent; cursor: pointer; text-align: left; }
@@ -166,7 +181,10 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 .pf-f-gr .pf-cero:not([aria-pressed="true"]) { opacity: .34; cursor: default; }
 .pf-f-gr .pf-cero:not([aria-pressed="true"]):active { transform: none; }
 /* Contador de filtros activos en la barra y en cada grupo. */
-.pf-f-n { display: inline-grid; place-items: center; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 999px; background: var(--verde); color: #fff; font: 400 0.66rem/1 var(--f-body); font-variant-numeric: tabular-nums; }
+/* Centrado óptico del número: en DM Sans la tinta de las cifras queda medio
+   píxel arriba del centro de la línea; 1 px de padding arriba la baja ese
+   medio píxel (medido). Cifras proporcionales: el 1 tabular queda corrido. */
+.pf-f-n { display: inline-grid; place-items: center; min-width: 17px; height: 17px; padding: 1px 4px 0; border-radius: 999px; background: var(--verde); color: #fff; font: 400 0.66rem/1 var(--f-body); }
 .pf-f-main .pf-pastilla { gap: 6px; }
 .pf-f-main .pf-pastilla[aria-expanded="true"] { background: var(--line); }
 @media (max-width: 640px) {
@@ -375,7 +393,8 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 .pf-docs[data-vista="compacta"] .pf-doc__d svg { width: 14px; height: 14px; }
 
 /* Miniaturas: cuadrados con el arte de la categoría (las Formas del sistema), el título abajo. */
-.pf-docs[data-vista="mini"] { display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: 30px 18px; border-top: 0; padding-top: 4px; }
+/* align-content start: con pocos resultados el min-height de la lista (60vh) no se reparte entre las filas. */
+.pf-docs[data-vista="mini"] { display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); align-content: start; gap: 30px 18px; border-top: 0; padding-top: 4px; }
 .pf-docs[data-vista="mini"] .pf-doc { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; align-items: start; row-gap: 10px; padding: 0; border: 0; }
 .pf-docs[data-vista="mini"] .pf-doc__arte { display: block; grid-row: 1; aspect-ratio: 1; border-radius: var(--radio-media); overflow: hidden; line-height: 0; transition: transform 320ms var(--ease); }
 .pf-docs[data-vista="mini"] .pf-doc__arte svg { width: 100%; height: 100%; }
@@ -480,6 +499,7 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 </main>
 
 <section class="pf-filters" id="pf-filters" aria-label="Filtros">
+  <button class="pf-f-x" id="pf-fX" type="button" aria-label="Cerrar filtros"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg></button>
   <div class="pf-f-body" id="pf-fBody"><div class="pf-f-in">
     <div class="pf-f-grupos" id="pf-fGrupos"></div>
     <button class="pf-f-clear" id="pf-fClear" type="button" hidden>Limpiar filtros</button>
@@ -981,6 +1001,24 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   }
   $("pf-fBody").addEventListener("transitionend", function (e) { if (e.target === this && e.propertyName === "height") terminar(); });
   $("pf-fToggle").addEventListener("click", function () { abrirFiltros(!$("pf-filters").classList.contains("pf-abierto")); });
+  // Se cierra con la cruz, con Escape y tocando afuera. El toque de afuera solo cierra: el clic que le sigue se descarta
+  // para no abrir de rebote el documento que estaba debajo (el ancla queda afuera de esto: cierra y además baja).
+  function filtrosAbiertos() { return $("pf-filters").classList.contains("pf-abierto"); }
+  $("pf-fX").addEventListener("click", function () { abrirFiltros(false); $("pf-fToggle").focus(); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && filtrosAbiertos() && !$("pf-busca").classList.contains("pf-abierto")) { abrirFiltros(false); $("pf-fToggle").focus(); }
+  });
+  var tCerroAfuera = -1e9;
+  document.addEventListener("pointerdown", function (e) {
+    if (!filtrosAbiertos() || $("pf-filters").contains(e.target) || $("pf-ancla").contains(e.target)) return;
+    tCerroAfuera = performance.now();
+    abrirFiltros(false);
+  }, true);
+  document.addEventListener("click", function (e) {
+    if (performance.now() - tCerroAfuera > 700) return;
+    tCerroAfuera = -1e9;
+    e.preventDefault(); e.stopPropagation();
+  }, true);
   // Al abrir el panel queda abierto el primer grupo con filtros elegidos; si no hay ninguno, Cultivo.
   function primerGrupo() {
     for (var i = 0; i < GRUPOS.length; i++) if (activos(estado.sel[GRUPOS[i].id]).length) return GRUPOS[i].id;
