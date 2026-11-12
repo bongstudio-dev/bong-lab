@@ -127,7 +127,9 @@
     }
 
     /* --- Panel ---------------------------------------------------------------------------------------- */
+    // El panel aparece recién cuando hay algo escrito: vacío no tiene nada para mostrar.
     function mostrarPanel(si) {
+      si = si && amplio && !!input.value.trim();
       panel.hidden = !si;
       velo.hidden = !si;
     }
@@ -136,12 +138,8 @@
       if (!amplio) return;
       var q = input.value.trim(), ts = terminos(q);
       var volver = ""; // volver a la sección es el interruptor del campo
-      if (!ts.length) {
-        panel.innerHTML = '<div class="pf-alc__cab"><p class="pf-alc__titulo">En todo el sitio</p>' + volver + "</div>" +
-          '<p class="pf-alc__nada">Escribí para buscar en documentos, notas y páginas.</p>';
-        vivo.textContent = "";
-        return;
-      }
+      mostrarPanel(!!ts.length);
+      if (!ts.length) { panel.innerHTML = ""; vivo.textContent = ""; return; }
       if (!indice) {
         panel.innerHTML = '<div class="pf-alc__cab"><p class="pf-alc__titulo">En todo el sitio</p>' + volver + "</div>" +
           '<p class="pf-alc__nada">' + (fallo ? "No se pudo cargar el buscador del sitio. Probá de nuevo en un momento." : "Buscando…") + "</p>";

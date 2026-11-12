@@ -13,7 +13,7 @@ Lo usan Documentos y Novedades con el mismo componente.
 - Al abrir el buscador aparece al final del campo un interruptor chico con dos opciones: **Documentos** (o
   **Novedades**) y **Todo el sitio**. La elegida va en el tono del chip; la otra, en texto gris.
 - En la sección (por defecto), lo que se escribe filtra la lista de la página en el lugar, igual que siempre.
-- En **Todo el sitio** abajo de la barra se abre un panel con los resultados por tipo (Documentos, Notas, Páginas),
+- En **Todo el sitio**, apenas se escribe algo, abajo de la barra se abre un panel con los resultados por tipo (Documentos, Notas, Páginas),
   con el contador de cada grupo y los primeros cinco. "Ver los N" lleva a la lista de ese tipo con la búsqueda
   aplicada; si es la sección donde uno está, vuelve a la sección. Las páginas no tienen lista: el botón las
   despliega en el panel.
