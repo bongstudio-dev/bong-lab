@@ -124,7 +124,7 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 @media (hover: hover) and (pointer: fine) { .pf-f-toggle:hover { background: var(--line); } }
 .pf-f-toggle svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform var(--f-flecha) var(--f-curva); }
 .pf-filters.pf-abierto .pf-f-toggle svg { transform: rotate(180deg); }
-.pf-f-count { position: absolute; top: 2px; right: 2px; min-width: 17px; height: 17px; padding: 1px 4px 0; border-radius: 999px; background: var(--verde); color: #fff; display: grid; place-items: center; font-size: 0.66rem; }
+.pf-f-count { position: absolute; top: 2px; right: 2px; min-width: 18px; height: 18px; padding: 1px 4px 0; border-radius: 999px; background: var(--verde); color: #fff; display: grid; place-items: center; font-size: 11px; line-height: 1; }
 /* Cruz arriba a la derecha del panel abierto (como la flecha de la barra). Va
    afuera del cuerpo con scroll para que no se vaya al bajar; el cuerpo deja
    lugar arriba para que no pise la flecha del primer grupo. */
@@ -181,10 +181,11 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 .pf-f-gr .pf-cero:not([aria-pressed="true"]) { opacity: .34; cursor: default; }
 .pf-f-gr .pf-cero:not([aria-pressed="true"]):active { transform: none; }
 /* Contador de filtros activos en la barra y en cada grupo. */
-/* Centrado óptico del número: en DM Sans la tinta de las cifras queda medio
-   píxel arriba del centro de la línea; 1 px de padding arriba la baja ese
-   medio píxel (medido). Cifras proporcionales: el 1 tabular queda corrido. */
-.pf-f-n { display: inline-grid; place-items: center; min-width: 17px; height: 17px; padding: 1px 4px 0; border-radius: 999px; background: var(--verde); color: #fff; font: 400 0.66rem/1 var(--f-body); }
+/* Centrado del número: todo cae en píxel entero. Con 17 px el círculo quedaba
+   en medio píxel dentro de la pastilla de 30 y la cifra, ajustada al píxel,
+   se corría. 18 px de alto, cuerpo de 11 px y 1 px de padding arriba: la tinta
+   queda a 0,1 px del centro (medido). Cifras proporcionales: el 1 tabular queda corrido. */
+.pf-f-n { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 1px 4px 0; border-radius: 999px; background: var(--verde); color: #fff; font: 400 11px/1 var(--f-body); }
 .pf-f-main .pf-pastilla { gap: 6px; }
 .pf-f-main .pf-pastilla[aria-expanded="true"] { background: var(--line); }
 @media (max-width: 640px) {
