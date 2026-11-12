@@ -15,25 +15,7 @@
    Los datos son una copia fija del sitio actual: ../notas/<nota>.json.
    ========================================================================== */
 /* Sin sombras: las cajas se separan del fondo por el color. */
-:root { color-scheme: light; }
-*, *::before, *::after { box-sizing: border-box; }
-[hidden] { display: none !important; }
-html { background: var(--bg); -webkit-tap-highlight-color: transparent; }
-body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: var(--texto-cuerpo); line-height: 1.5; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
-button { font: inherit; color: inherit; }
-a { color: inherit; }
-button, a { touch-action: manipulation; }
-:focus-visible { outline: 2px solid var(--celeste); outline-offset: 2px; }
-.pf-wrap { width: min(100% - 32px, 1320px); margin-inline: auto; }
-.pf-flecha { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-/* --- Barra: la pieza "barra" de base.css, azul desde arriba (la nota va sobre el fondo).
-   Abajo, una línea tiza que se llena con la lectura. */
-.pf-barra__menu > a { text-decoration: none; }
-.pf-barra--solida { box-shadow: none; }
-.pf-barra__busca { text-decoration: none; }
-.pf-progreso { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; }
-.pf-progreso i { display: block; height: 100%; background: var(--amarillo); transform: scaleX(var(--p, 0)); transform-origin: left; }
 
 /* --- Grilla de tres columnas: índice, nota y datos.
    Fila 1 el título (de lado a lado), fila 2 la foto con el índice y los datos a los costados, fila 3 el texto. */
@@ -60,8 +42,6 @@ button, a { touch-action: manipulation; }
 /* --- Carga de imágenes: mientras llega la foto, su lugar (con la proporción reservada) muestra un brillo que pasa;
    al llegar, la foto aparece con un fundido. */
 :is(.pf-n-foto__hoja, .pf-n-imgcaja, .pf-n-mini__img).pf-esqueleto { background: linear-gradient(100deg, transparent 35%, color-mix(in srgb, var(--color-blanco) 70%, transparent) 50%, transparent 65%) var(--card); background-size: 250% 100%; animation: pf-brillo 1.5s linear infinite; }
-@keyframes pf-brillo { from { background-position: 125% 0; } to { background-position: -25% 0; } }
-@media (prefers-reduced-motion: reduce) { .pf-esqueleto { animation: none !important; } }
 img.pf-carga { opacity: 0; transition: opacity 500ms ease; }
 img.pf-carga.pf-lista { opacity: 1; }
 .pf-n-imgcaja { display: block; width: 100%; border-radius: var(--radio-media); overflow: hidden; line-height: 0; }
@@ -134,8 +114,6 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
 .pf-n-salir kbd { padding: 3px 7px; border-radius: 999px; background: var(--card); font: inherit; font-size: var(--texto-mini); color: var(--ink-3); }
 @media (hover: hover) and (pointer: fine) { .pf-n-salir:hover { color: var(--azul); border-color: var(--azul); } }
 @media (hover: none) { .pf-n-salir kbd { display: none; } }
-.pf-aviso { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 60; transform: translate(-50%, 16px); padding: 12px 18px; border-radius: 999px; background: var(--ink); color: var(--tiza); font-size: var(--texto-chico); opacity: 0; pointer-events: none; transition: opacity 220ms ease, transform 320ms var(--ease); }
-.pf-aviso.pf-on { opacity: 1; transform: translate(-50%, 0); }
 
 /* --- Relacionadas: tres tarjetas y nada más. */
 .pf-n-sigue { margin-top: 128px; }
@@ -164,7 +142,6 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
 @media (hover: hover) and (pointer: fine) { .pf-n-mini:hover .pf-n-mini__img { transform: translateY(-3px); } }
 .pf-n-mini:active .pf-n-mini__img { transform: scale(.985); }
 
-.pf-pie { margin-top: 120px; }
 
 /* --- Pantallas medianas y celular: una columna; el índice se va y los temas pasan abajo del texto. */
 @media (max-width: 1100px) {
@@ -206,7 +183,6 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
   .pf-n-compartir > *, .pf-n-foco { width: 30px; height: 30px; }
   .pf-n-compartir svg { width: 14px; height: 14px; }
   .pf-n-foco svg { width: 16px; height: 16px; }
-  .pf-pie { margin-top: 80px; }
 }
 /*__PIE_CSS__*/
 </style>

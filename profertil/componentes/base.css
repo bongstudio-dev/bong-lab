@@ -1,6 +1,7 @@
-/* Piezas base del sistema web de Profertil.
-   Las comparten todos los componentes, la librería y (más adelante) Novedades: se cargan una sola vez,
-   después de tokens.css, y ningún componente las vuelve a definir.
+/* Piezas base del sistema web de Profertil: el CSS central.
+   Las comparten todos los componentes, la librería y las páginas (Novedades, Nota, Biblioteca y su visor):
+   se cargan una sola vez, después de tokens.css, y ninguna página ni componente las vuelve a definir. Cada
+   página suma en su <style> solo lo que es propio de ella; si algo se repite en dos páginas, va acá.
 
    Reglas para todo el CSS del sistema:
    - Toda clase, id y animación empieza con pf- (así nada choca con el tema de WordPress ni con otro plugin).
@@ -170,3 +171,212 @@ a.pf-etiqueta { text-decoration: none; }
 /* @pieza oculto
    Texto solo para lectores de pantalla. */
 .pf-oculto { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* @pieza pagina
+   Página: lo común a toda página del sitio. Caja, oculto, cuerpo de texto, foco, selección, columnas
+   (.pf-wrap para grillas, .pf-col para listas y lectura), salto al contenido y movimiento reducido.
+   Tacto: sin el destello gris de Safari, sin la demora del doble toque y sin seleccionar el texto de los
+   botones al dejar apretado. Los :hover van siempre dentro de (hover: hover) and (pointer: fine). */
+:root {
+  color-scheme: light;
+  --shadow: var(--sombra-tarjeta);
+  --f-mono: "DM Mono", ui-monospace, Menlo, monospace;
+}
+html { background: var(--bg); -webkit-tap-highlight-color: transparent; }
+/* Lo que coincide con la búsqueda, en títulos y resultados. */
+mark { background: color-mix(in srgb, var(--amarillo) 55%, transparent); color: inherit; border-radius: 3px; padding: 0 1px; }
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: var(--texto-cuerpo);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+button { font: inherit; color: inherit; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--celeste); outline-offset: 2px; }
+.pf-wrap { width: min(100% - 32px, 1320px); margin-inline: auto; }
+.pf-ico { display: block; width: 100%; height: 100%; }
+::selection { background: color-mix(in srgb, var(--celeste) 32%, transparent); color: var(--ink); }
+/* Salto al contenido: lo primero que encuentra el teclado; solo se ve al recibir el foco. */
+.pf-saltar { position: fixed; top: 12px; left: 12px; z-index: 90; padding: 10px 16px; border-radius: 999px; background: var(--tiza); color: var(--azul); font-size: var(--texto-chico); font-weight: 500; text-decoration: none; transform: translateY(-200%); }
+.pf-saltar:focus-visible { transform: none; }
+button, a, [role="button"] { touch-action: manipulation; }
+button, [role="button"] { -webkit-user-select: none; user-select: none; }
+/* Marca del final de una lista que se carga por tandas (la mira un IntersectionObserver). */
+.pf-sentinel { height: 1px; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+.pf-col { width: min(100% - 32px, 1120px); margin-inline: auto; }
+.pf-flecha { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* @pieza resultados
+   Resultados: la fila con el total y las herramientas arriba de una lista, y el estado vacío. */
+.pf-result-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; padding-block: 22px 16px; }
+.pf-result-text { margin: 0; color: var(--ink-2); min-width: 0; }
+.pf-result-text b { color: var(--azul); font-weight: 600; font-variant-numeric: tabular-nums; }
+.pf-empty { padding: 60px 0 200px; display: grid; justify-items: center; gap: 14px; text-align: center; }
+.pf-empty svg { width: 64px; height: 76px; }
+.pf-empty p { margin: 0; max-width: 42ch; color: var(--ink-2); font-size: 1.05rem; }
+
+/* @pieza filtros
+   Filtros: el dock fijo abajo (barra con las pastillas, panel en acordeón que se despliega hacia arriba,
+   contador) y el ancla azul a su derecha. Cada página define lo suyo: la caja .pf-filters (ancho, fondo,
+   transiciones), el relleno del panel y el contador. El alto del panel lo anima el JS en px (animar 0fr a 1fr
+   en un contenedor de alto automático falla en Chrome). En mobile la barra es solo el botón "Filtros", que
+   se compacta al bajar como la barra de Safari. --a es el alto del dock cerrado: el ancla mide lo mismo. */
+:root { --a: 49px; } /* 30 de pastilla + 2 x 3 de f-main + 2 x 5 de f-bar + 2 de borde + 1 del borde del f-body */
+/* left y right en 0 con margen auto: con left 50% el ancho se calcula sobre media pantalla y las pastillas
+   quedan cortadas. right deja lugar al ancla. Sin sombra: el vidrio se separa del fondo con el borde. */
+.pf-filters {
+  position: fixed; left: 0; right: calc(var(--a) + var(--ancla-gap)); margin-inline: auto;
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  z-index: 40;
+  width: fit-content; max-width: min(100% - 32px - var(--a), 980px);
+  max-height: calc(100% - 110px);
+  display: flex; flex-direction: column;
+  border-radius: 24px;
+  transition: width var(--f-cerrar) var(--f-curva), border-radius var(--f-cerrar) var(--f-curva), transform 520ms var(--ease), opacity 300ms ease;
+  background: var(--glass);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(22px) saturate(1.4);
+  -webkit-backdrop-filter: blur(22px) saturate(1.4);
+  overflow: hidden;
+}
+.pf-filters.pf-abierto { border-radius: 26px; transition-duration: var(--f-abrir), var(--f-abrir), 520ms, 300ms; }
+/* El panel no ensancha la barra; cerrado queda fuera del tab recién cuando termina de bajar. */
+.pf-f-body {
+  contain: inline-size; flex: 0 1 auto; min-height: 0; height: 0; overflow: hidden;
+  border-bottom: 1px solid transparent;
+  visibility: hidden; opacity: 0;
+  transition: height var(--f-cerrar) var(--f-curva), opacity calc(var(--f-fundido) * 0.7) ease, border-color 260ms ease, visibility 0s linear var(--f-cerrar);
+}
+.pf-filters.pf-abierto .pf-f-body { visibility: visible; opacity: 1; border-bottom-color: var(--line); transition: height var(--f-abrir) var(--f-curva), opacity var(--f-fundido) ease var(--f-fundido-retraso), border-color 260ms ease; }
+/* Mientras anima no hay scroll (aparecería la barra a mitad de camino): se habilita con .pf-listo. */
+.pf-filters.pf-abierto.pf-listo .pf-f-body { height: auto; overflow-y: auto; }
+.pf-filters .pf-f-cats { display: grid; }
+.pf-f-group { display: grid; gap: 8px; }
+.pf-f-row { display: flex; flex-wrap: wrap; gap: 7px; padding: 3px; }
+.pf-f-in { padding: 18px 20px 14px; display: grid; gap: 14px; }
+.pf-f-label { margin: 0; font-size: 0.74rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); }
+/* Contador de filtros activos. Centrado del número: todo cae en píxel entero (18 px de alto, cuerpo de 11 px y
+   1 px arriba en DM Sans); con 17 px quedaba en medio píxel dentro de la pastilla de 30 y la cifra se corría. */
+.pf-f-count { position: absolute; top: 2px; right: 2px; min-width: 18px; height: 18px; padding: 1px 4px 0; border-radius: 999px; background: var(--verde); color: #fff; display: grid; place-items: center; font-size: 11px; line-height: 1; }
+.pf-f-clear { justify-self: start; margin-top: 2px; border: 0; background: transparent; cursor: pointer; padding: 4px 0; color: var(--azul); font-size: 0.88rem; text-decoration: underline; text-underline-offset: 3px; }
+.pf-f-bar { flex: none; display: flex; align-items: center; gap: 4px; padding: 5px 5px 5px 6px; }
+.pf-f-main { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; flex: 1; min-width: 0; padding: 3px; }
+.pf-f-main::-webkit-scrollbar { display: none; }
+.pf-f-toggle {
+  position: relative; flex: none;
+  width: 36px; height: 36px; border: 0; border-radius: 999px;
+  background: transparent; color: var(--ink-2); cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.pf-f-txt { display: none; }
+@media (hover: hover) and (pointer: fine) {
+  .pf-f-toggle:hover { background: var(--line); }
+}
+.pf-f-toggle svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform var(--f-flecha) var(--f-curva); }
+.pf-filters.pf-abierto .pf-f-toggle svg { transform: rotate(180deg); }
+@media (max-width: 640px) {
+  :root { --a: 57px; } /* toggle 46 + 2 x 4 de f-bar + 2 de borde + 1 del f-body */
+  .pf-pastilla { --h: 30px; }
+  .pf-f-in { padding: 16px 14px 12px; }
+  .pf-filters { width: var(--f-ancho-cerrado, calc(100% - 32px - var(--ancla-gap) - var(--a))); border-radius: 28px; transition: width var(--f-chica) var(--f-chica-curva), bottom var(--f-chica) var(--f-chica-curva), border-radius var(--f-cerrar) var(--f-curva), transform 520ms var(--ease), opacity 300ms ease; }
+  .pf-f-count { position: static; order: 2; }
+  .pf-filters.pf-abierto { width: calc(100% - 32px - var(--ancla-gap) - var(--a)); transition-duration: var(--f-abrir), var(--f-abrir), var(--f-abrir), 520ms, 300ms; }
+  .pf-f-main { display: none; }
+  .pf-f-bar { justify-content: center; padding: 4px; }
+  .pf-f-toggle { width: auto; height: 46px; padding: 0 22px 0 26px; color: var(--ink); font-family: var(--f-display); font-size: 1.04rem; transition: height var(--f-chica) var(--f-chica-curva), padding var(--f-chica) var(--f-chica-curva), gap var(--f-chica) var(--f-chica-curva), font-size var(--f-chica) var(--f-chica-curva); }
+  .pf-f-toggle svg { transition: transform var(--f-flecha) var(--f-curva), width var(--f-chica) var(--f-chica-curva), height var(--f-chica) var(--f-chica-curva); }
+  .pf-filters.pf-chica:not(.pf-abierto) { width: 104px; bottom: calc(6px + env(safe-area-inset-bottom, 0px)); }
+  .pf-filters.pf-chica:not(.pf-abierto):has(.pf-f-count:not([hidden])) { width: 128px; }
+  .pf-filters.pf-chica:not(.pf-abierto) .pf-f-toggle { height: 30px; padding: 0 12px 0 15px; gap: 5px; font-size: 0.82rem; }
+  .pf-filters.pf-chica:not(.pf-abierto) .pf-f-toggle svg { width: 13px; height: 13px; }
+  .pf-filters.pf-chica:not(.pf-abierto) .pf-f-count { transform: scale(0.85); }
+  .pf-f-toggle:hover { background: transparent; }
+  .pf-f-txt { display: inline; }
+}
+/* Ancla: la acción principal, afuera del dock. Baja o vuelve al principio de la lista. En desktop la x la
+   pone el JS (--ancla-x); en mobile sale del CSS, con la transición del dock, para que se muevan juntos. */
+.pf-ancla {
+  position: fixed; left: var(--ancla-x, -200px); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 41;
+  width: var(--a); height: var(--a);
+  padding: 0; border: 0; background: none; cursor: pointer;
+  will-change: transform; transform: scale(0);
+  transform-origin: left bottom; /* al compactarse no se abre el hueco con el dock */
+}
+.pf-ancla-cuerpo {
+  display: grid; place-items: center; width: 100%; height: 100%;
+  border-radius: 50%; background: var(--azul); color: var(--tiza);
+  will-change: transform;
+}
+.pf-ancla svg { width: 44%; height: 44%; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; will-change: transform; }
+.pf-ancla:focus-visible { outline: none; }
+.pf-ancla:focus-visible .pf-ancla-cuerpo { outline: 2px solid var(--celeste); outline-offset: 3px; }
+/* Mobile: el dock (ancho w) va centrado entre 0 y 100% - --a - gap; la bola arranca un gap después de su
+   borde derecho. Compacto, w es 104 (128 con contador) y la bola baja a 41 px con la misma transición. */
+@media (max-width: 640px) {
+  .pf-ancla {
+    left: calc(100% - 16px - var(--a));
+    transition: bottom var(--f-chica) var(--f-chica-curva), left var(--f-chica) var(--f-chica-curva), width var(--f-chica) var(--f-chica-curva), height var(--f-chica) var(--f-chica-curva);
+  }
+  .pf-filters.pf-chica:not(.pf-abierto) ~ .pf-ancla {
+    bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+    left: calc((100% - var(--a) + var(--ancla-gap) + 104px) / 2);
+    width: 41px; height: 41px;
+  }
+  .pf-filters.pf-chica:not(.pf-abierto):has(.pf-f-count:not([hidden])) ~ .pf-ancla { left: calc((100% - var(--a) + var(--ancla-gap) + 128px) / 2); }
+}
+
+/* @pieza documento
+   Documento: la fila de un documento (etiqueta, título, año y descarga), en la lista de la Biblioteca y en Más de la Biblioteca del visor. */
+.pf-docs { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.pf-doc { position: relative; display: grid; grid-template-columns: 172px minmax(0, 1fr) 52px 36px; align-items: center; column-gap: 20px; padding: 15px 0; border-bottom: 1px solid var(--line); }
+.pf-doc .pf-etiqueta { --s: var(--etq-s); }
+.pf-doc__t { margin: 0; font: 500 1.2rem/1.2 var(--f-display); letter-spacing: -0.012em; color: var(--azul); text-wrap: pretty; overflow-wrap: break-word; transition: translate 320ms var(--ease); }
+.pf-doc__t a { color: inherit; text-decoration: none; }
+.pf-doc__t a::after { content: ""; position: absolute; inset: 0; }
+.pf-doc__y { font-size: var(--texto-chico); color: var(--ink-2); font-variant-numeric: tabular-nums; text-align: right; }
+.pf-doc__d { position: relative; z-index: 1; display: grid; place-items: center; width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink-2); text-decoration: none; transition: color 200ms ease, border-color 200ms ease, background 200ms ease; }
+.pf-doc__d svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+@media (hover: hover) and (pointer: fine) {
+  .pf-doc:hover .pf-doc__t { translate: 4px 0; }
+  .pf-doc__d:hover { background: var(--azul); border-color: var(--azul); color: var(--tiza); }
+}
+.pf-doc:active .pf-doc__t { translate: 2px 0; }
+.pf-doc:has(a:focus-visible) { outline: 2px solid var(--celeste); outline-offset: 2px; border-radius: 6px; }
+@media (max-width: 640px) {
+  .pf-doc { grid-template-columns: minmax(0, 1fr) 36px; row-gap: 10px; padding: 16px 0; }
+  .pf-doc .pf-etiqueta { grid-column: 1; grid-row: 1; justify-self: start; }
+  .pf-doc__t { grid-column: 1; grid-row: 2; font-size: 1.08rem; }
+  .pf-doc__y { grid-column: 1; grid-row: 3; text-align: left; margin-top: -2px; }
+  .pf-doc__y:empty { display: none; }
+  .pf-doc__d { grid-column: 2; grid-row: 1 / span 3; align-self: start; }
+}
+
+/* @pieza lectura
+   Lectura: lo común a las páginas de lectura (Nota y visor de la Biblioteca). Barra sólida sin sombra con la
+   línea amarilla de progreso abajo (el JS pone --p de 0 a 1), brillo del esqueleto de carga, aviso que sube
+   desde abajo y aire antes del pie. */
+.pf-barra--solida { box-shadow: none; }
+.pf-barra__menu > a { text-decoration: none; }
+.pf-barra__busca { text-decoration: none; }
+.pf-progreso { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; }
+.pf-progreso i { display: block; height: 100%; background: var(--amarillo); transform: scaleX(var(--p, 0)); transform-origin: left; }
+@keyframes pf-brillo { from { background-position: 125% 0; } to { background-position: -25% 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .pf-esqueleto { animation: none !important; }
+}
+.pf-aviso { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 60; transform: translate(-50%, 16px); padding: 12px 18px; border-radius: 999px; background: var(--ink); color: var(--tiza); font-size: var(--texto-chico); opacity: 0; pointer-events: none; transition: opacity 240ms ease, transform 320ms var(--ease); }
+.pf-aviso.pf-on { opacity: 1; transform: translate(-50%, 0); }
+.pf-pie { margin-top: 120px; }
+@media (max-width: 640px) {
+  .pf-pie { margin-top: 80px; }
+}

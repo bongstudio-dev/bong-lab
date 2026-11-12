@@ -15,27 +15,8 @@
    Los datos son una copia fija del sitio actual (docs.json); el PDF se dibuja con pdf.js.
    ========================================================================== */
 /* Sin sombras: las páginas se separan del fondo por el color y una línea. */
-:root { color-scheme: light; }
-*, *::before, *::after { box-sizing: border-box; }
-[hidden] { display: none !important; }
-html { background: var(--bg); -webkit-tap-highlight-color: transparent; scroll-padding-top: 96px; }
-body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: var(--texto-cuerpo); line-height: 1.5; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
-button { font: inherit; color: inherit; }
-a { color: inherit; }
-button, a { touch-action: manipulation; }
-:focus-visible { outline: 2px solid var(--celeste); outline-offset: 2px; }
-.pf-flecha { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.pf-col { width: min(100% - 32px, 1120px); margin-inline: auto; }
-::selection { background: color-mix(in srgb, var(--celeste) 32%, transparent); color: var(--ink); }
-.pf-saltar { position: fixed; top: 12px; left: 12px; z-index: 90; padding: 10px 16px; border-radius: 999px; background: var(--tiza); color: var(--azul); font-size: var(--texto-chico); font-weight: 500; text-decoration: none; transform: translateY(-200%); }
-.pf-saltar:focus-visible { transform: none; }
+html { scroll-padding-top: 96px; }
 
-/* --- Barra: la pieza "barra" de base.css, azul desde arriba. Abajo, una línea que se llena con la lectura. */
-.pf-barra__menu > a { text-decoration: none; }
-.pf-barra--solida { box-shadow: none; }
-.pf-barra__busca { text-decoration: none; }
-.pf-progreso { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; }
-.pf-progreso i { display: block; height: 100%; background: var(--amarillo); transform: scaleX(var(--p, 0)); transform-origin: left; }
 
 /* --- Grilla de tres columnas: índice de páginas, documento y datos. Fila 1 el título, fila 2 el resto. */
 .pf-v-grilla { width: min(100% - 32px, 1280px); margin-inline: auto; display: grid; grid-template-columns: 190px minmax(0, 780px) 190px; justify-content: center; gap: 0 56px; padding-top: calc(140px + env(safe-area-inset-top, 0px)); }
@@ -56,8 +37,7 @@ button, a { touch-action: manipulation; }
 .pf-v-pag canvas { display: block; width: 100%; height: 100%; opacity: 0; transition: opacity 400ms ease; }
 .pf-v-pag.pf-lista canvas { opacity: 1; }
 .pf-v-pag.pf-esqueleto { background: linear-gradient(100deg, transparent 35%, color-mix(in srgb, var(--color-blanco) 70%, transparent) 50%, transparent 65%) var(--card); background-size: 250% 100%; animation: pf-brillo 1.5s linear infinite; }
-@keyframes pf-brillo { from { background-position: 125% 0; } to { background-position: -25% 0; } }
-@media (prefers-reduced-motion: reduce) { .pf-esqueleto { animation: none !important; } .pf-v-pag canvas, .pf-v-cuenta, .pf-aviso { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .pf-v-pag canvas, .pf-v-cuenta, .pf-aviso { transition: none; } }
 .pf-v-num { position: absolute; right: 10px; bottom: 8px; padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--ink) 62%, transparent); color: var(--tiza); font-size: var(--texto-mini); font-variant-numeric: tabular-nums; opacity: 0; transition: opacity 200ms ease; pointer-events: none; }
 @media (hover: hover) and (pointer: fine) { .pf-v-pag:hover .pf-v-num { opacity: 1; } }
 
@@ -103,28 +83,13 @@ body.pf-foco .pf-v-doc { grid-column: 1; grid-row: 1; margin-top: 0; padding-bot
 .pf-v-salir kbd { padding: 3px 7px; border-radius: 999px; background: var(--card); font: inherit; font-size: var(--texto-mini); color: var(--ink-2); }
 @media (hover: hover) and (pointer: fine) { .pf-v-salir:hover { color: var(--azul); border-color: var(--azul); } }
 @media (hover: none) { .pf-v-salir kbd { display: none; } }
-.pf-aviso { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 60; transform: translate(-50%, 16px); padding: 12px 18px; border-radius: 999px; background: var(--ink); color: var(--tiza); font-size: var(--texto-chico); opacity: 0; pointer-events: none; transition: opacity 240ms ease, transform 320ms var(--ease); }
-.pf-aviso.pf-on { opacity: 1; transform: translate(-50%, 0); }
 
 /* --- Más documentos: filas, las mismas de la lista. */
 .pf-v-sigue { margin-top: 128px; }
 .pf-v-sigue__cab { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 20px; margin-bottom: 20px; }
 .pf-v-sigue__cab h2 { margin: 0; font: 600 var(--texto-subtitulo)/1.1 var(--f-display); letter-spacing: -0.02em; color: var(--azul); }
 .pf-v-sigue__cab a { display: inline-flex; align-items: center; gap: 6px; color: var(--azul); font-size: var(--texto-chico); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, var(--celeste) 60%, transparent); }
-.pf-docs { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
-.pf-doc { position: relative; display: grid; grid-template-columns: 172px minmax(0, 1fr) 52px 36px; align-items: center; column-gap: 20px; padding: 15px 0; border-bottom: 1px solid var(--line); }
-.pf-doc .pf-etiqueta { --s: var(--etq-s); }
-.pf-doc__t { margin: 0; font: 500 1.2rem/1.2 var(--f-display); letter-spacing: -0.012em; color: var(--azul); text-wrap: pretty; overflow-wrap: break-word; transition: translate 320ms var(--ease); }
-.pf-doc__t a { color: inherit; text-decoration: none; }
-.pf-doc__t a::after { content: ""; position: absolute; inset: 0; }
-.pf-doc__y { font-size: var(--texto-chico); color: var(--ink-2); font-variant-numeric: tabular-nums; text-align: right; }
-.pf-doc__d { position: relative; z-index: 1; display: grid; place-items: center; width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink-2); text-decoration: none; transition: color 200ms ease, border-color 200ms ease, background 200ms ease; }
-.pf-doc__d svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-@media (hover: hover) and (pointer: fine) { .pf-doc:hover .pf-doc__t { translate: 4px 0; } .pf-doc__d:hover { background: var(--azul); border-color: var(--azul); color: var(--tiza); } }
-.pf-doc:active .pf-doc__t { translate: 2px 0; }
-.pf-doc:has(a:focus-visible) { outline: 2px solid var(--celeste); outline-offset: 2px; border-radius: 6px; }
 
-.pf-pie { margin-top: 120px; }
 
 /* --- Pantallas medianas y celular: una columna; el índice se va y los datos pasan arriba del documento. */
 @media (max-width: 1100px) {
@@ -150,13 +115,6 @@ body.pf-foco .pf-v-doc { grid-column: 1; grid-row: 1; margin-top: 0; padding-bot
   .pf-v-in h1.pf-largo { font-size: 1.65rem; }
   .pf-v-sigue { margin-top: 80px; }
   .pf-v-aviso { padding: 20px; }
-  .pf-doc { grid-template-columns: minmax(0, 1fr) 36px; row-gap: 10px; padding: 16px 0; }
-  .pf-doc .pf-etiqueta { grid-column: 1; grid-row: 1; justify-self: start; }
-  .pf-doc__t { grid-column: 1; grid-row: 2; font-size: 1.08rem; }
-  .pf-doc__y { grid-column: 1; grid-row: 3; text-align: left; margin-top: -2px; }
-  .pf-doc__y:empty { display: none; }
-  .pf-doc__d { grid-column: 2; grid-row: 1 / span 3; align-self: start; }
-  .pf-pie { margin-top: 80px; }
 }
 /*__PIE_CSS__*/
 </style>
