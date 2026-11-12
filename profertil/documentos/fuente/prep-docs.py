@@ -2,13 +2,16 @@
 """Arma docs.json: los documentos (título + PDF) del sitio actual de Profertil, desde el crawl.
 
 Entrada: urls.csv del relevamiento (URLS_CSV, por defecto el del repo de relevamiento).
-Salida:  docs.json (todos los documentos) y, con --bajar, copias de una muestra en ../pdf/.
+Salida:  tres archivos, uno por página del sitio nuevo, y con --bajar copias de una muestra en ../pdf/.
+  docs.json             la Biblioteca Virtual (cereales, oleaginosas, pasturas, industriales, biblioteca)
+  docs-msds.json        las hojas de seguridad
+  docs-inversores.json  los informes para inversores
 
 Qué es un documento acá: una página en español de las secciones de biblioteca, cuyo único
 contenido es un título y un PDF colgado (cantidad_descargas = 1). La categoría es la sección
 que declara la URL; no se inventa ninguna otra.
 
-  python3 profertil/documentos/fuente/prep-docs.py            # solo docs.json
+  python3 profertil/documentos/fuente/prep-docs.py            # solo los tres .json
   python3 profertil/documentos/fuente/prep-docs.py --bajar    # además baja la muestra de PDF
 """
 import csv, json, os, re, subprocess, sys, time, unicodedata
@@ -23,6 +26,9 @@ SECCIONES = {
     'cereales': 'cereales', 'oleaginosas': 'oleaginosas', 'pasturas': 'pasturas', 'industriales': 'industriales',
     'msds': 'msds', 'inversores': 'inversores', 'inversores-es': 'inversores', 'biblioteca': 'biblioteca',
 }
+# Cada página del sitio nuevo con su archivo de datos. Lo que no es msds ni inversores es Biblioteca.
+ARCHIVOS = {'msds': 'docs-msds.json', 'inversores': 'docs-inversores.json'}
+BIBLIOTECA = 'docs.json'
 SIGLAS = ['MSDS', 'UAN', 'CNV', 'NPK', 'PDF', 'INTA', 'BT', 'ETP', 'MPM', 'II', 'III', 'IV', 'VI', 'VII', 'VIII', 'IX', 'XI', 'XII', 'CFP', 'ISO', 'CO2', 'N', 'P', 'S', 'K', 'US$']
 
 
@@ -85,7 +91,6 @@ def main():
         unicos.append(d)
     docs = sorted(unicos, key=lambda d: plano(d['t']))
     print(len(docs), 'documentos')
-    out = {'docs': docs}
 
     # Muestra local: se necesita porque profertil.com.ar no manda cabeceras CORS y pdf.js no puede leer PDF de otro dominio.
     if '--bajar' in sys.argv:
@@ -106,13 +111,24 @@ def main():
                 os.remove(dest)
         print(sum(1 for d in docs if d.get('l')), 'copias locales')
     else:
-        previo = os.path.join(AQUI, 'docs.json')
-        if os.path.exists(previo):
-            l = {d['id']: d['l'] for d in json.load(open(previo))['docs'] if d.get('l')}
-            for d in docs:
-                if d['id'] in l:
-                    d['l'] = l[d['id']]
-    json.dump(out, open(os.path.join(AQUI, 'docs.json'), 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+        # Conserva las copias locales ya bajadas, estén en el archivo que estén.
+        l = {}
+        for f in [BIBLIOTECA] + list(ARCHIVOS.values()):
+            previo = os.path.join(AQUI, f)
+            if os.path.exists(previo):
+                l.update({d['id']: d['l'] for d in json.load(open(previo, encoding='utf-8'))['docs'] if d.get('l')})
+        for d in docs:
+            if d['id'] in l:
+                d['l'] = l[d['id']]
+
+    partes = {BIBLIOTECA: []}
+    for f in ARCHIVOS.values():
+        partes[f] = []
+    for d in docs:
+        partes[ARCHIVOS.get(d['c'], BIBLIOTECA)].append(d)
+    for f, lst in partes.items():
+        json.dump({'docs': lst}, open(os.path.join(AQUI, f), 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+        print('  %-22s %d' % (f, len(lst)))
 
 
 def peso(url):
