@@ -176,7 +176,16 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 
 /* --- Grupos del panel: acordeón. Un grupo abierto por vez; cerrado muestra sus filtros activos (se sacan tocándolos).
    Dentro de un grupo las opciones suman (o); entre grupos se cruzan (y). Las que darían 0 resultados quedan atenuadas. */
-@media (min-width: 641px) { .pf-filters { min-width: min(100% - 32px - var(--a), 680px); } }
+/* Desktop: cerrada, la barra abraza sus cinco pastillas (con un ancho fijo
+   quedaba un hueco entre Nutriente y la flecha); abierta crece a 680 para
+   que entren los grupos. Lo que se anima es el min-width (el width sigue en
+   fit-content), con la misma curva y tiempos que el alto del panel. Parte del
+   ancho cerrado medido (--f-w-cerrada, lo pone abrirFiltros): desde 0 la
+   barra no se movía hasta que el min-width pasaba su ancho. */
+@media (min-width: 641px) {
+  .pf-filters { min-width: var(--f-w-cerrada, 0px); transition: min-width var(--f-cerrar) var(--f-curva), border-radius var(--f-cerrar) var(--f-curva), transform 520ms var(--ease), opacity 300ms ease; }
+  .pf-filters.pf-abierto { min-width: min(100% - 32px - var(--a), 680px); transition-duration: var(--f-abrir), var(--f-abrir), 520ms, 300ms; }
+}
 .pf-f-in { gap: 10px; }
 .pf-f-grupos { display: grid; }
 .pf-f-gr + .pf-f-gr { border-top: 1px solid var(--line); }
@@ -1081,6 +1090,8 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   function abrirFiltros(si) {
     var f = $("pf-filters"), b = $("pf-fBody"), gr = $("pf-fGrupos");
     clearTimeout(tListo);
+    // Desktop: el min-width anima desde el ancho que tiene la barra cerrada (con o sin contadores en las pastillas).
+    if (si && !f.classList.contains("pf-abierto")) f.style.setProperty("--f-w-cerrada", f.getBoundingClientRect().width + "px");
     // El grupo que va a quedar abierto se abre antes de medir y sin su propia animación: el panel ya llega con su alto final.
     if (si) { gr.classList.add("pf-quieto"); abrirGrupo(abierto || primerGrupo()); void gr.offsetHeight; }
     var desde = b.offsetHeight, anchoAhora = b.firstElementChild.offsetWidth;
