@@ -316,8 +316,7 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 /* --- Columna: más angosta que la grilla de Novedades, para que el título y el año queden cerca. */
 .pf-col { width: min(100% - 32px, 1120px); margin-inline: auto; }
 
-/* --- Encabezado: banda azul como la portada del Lab, con la foto recortada en la Forma Lupa y la Hoja en amarillo
-   (primaria Azul, secundaria Amarillo). Más bajo que el de Novedades: la lista sigue a la vista sin scrollear mucho. */
+/* --- Encabezado: banda azul como la portada del Lab, con la foto recortada en la Forma Lupa. Más bajo que el de Novedades: la lista sigue a la vista sin scrollear mucho. */
 .pf-dh { position: relative; overflow: hidden; background: var(--azul); color: var(--tiza); padding: calc(132px + env(safe-area-inset-top, 0px)) 0 64px; }
 .pf-dh__in { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 560px); align-items: end; gap: 40px; }
 .pf-dh h1 { margin: 0; font: 600 clamp(40px, 6vw, 80px)/.95 var(--f-display); letter-spacing: -0.045em; color: var(--tiza); text-wrap: balance; }
@@ -325,20 +324,15 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 .pf-dh__arte { position: relative; aspect-ratio: 260 / 227; margin-bottom: -8px; }
 .pf-dh__foto { position: absolute; inset: 0; background: url("../novedades/fotos/demo-1.webp") 62% 40% / cover no-repeat var(--azul-oscuro, #002a73);
   -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20260%20227%22%3E%3Cpath%20d%3D%22M106.108%200C164.71%200%20212.217%2047.5063%20212.217%20106.108C212.217%20123.332%20208.111%20139.595%20200.828%20153.978L259.268%20212.417C239.93%20231.755%20208.578%20231.755%20189.24%20212.417L168.654%20191.831C151.116%20204.65%20129.496%20212.217%20106.108%20212.217C47.5063%20212.217%200%20164.711%200%20106.108C9.43891e-05%2047.5063%2047.5063%201.07058e-05%20106.108%200Z%22/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20260%20227%22%3E%3Cpath%20d%3D%22M106.108%200C164.71%200%20212.217%2047.5063%20212.217%20106.108C212.217%20123.332%20208.111%20139.595%20200.828%20153.978L259.268%20212.417C239.93%20231.755%20208.578%20231.755%20189.24%20212.417L168.654%20191.831C151.116%20204.65%20129.496%20212.217%20106.108%20212.217C47.5063%20212.217%200%20164.711%200%20106.108C9.43891e-05%2047.5063%2047.5063%201.07058e-05%20106.108%200Z%22/%3E%3C/svg%3E") center / contain no-repeat; }
-/* La Hoja va detrás de la foto, grande, asomando arriba a la derecha (lejos del texto). */
 .pf-dh__foto { z-index: 1; }
-.pf-dh__hoja { position: absolute; z-index: 0; right: -16%; top: -18%; width: 62%; color: var(--amarillo); fill: currentColor; }
-/* Paralaje: al bajar, la Lupa con la foto baja más lento que la página (se queda atrás) y la Hoja un poco menos,
-   así se separan en dos planos. Lo mueve el navegador atado al scroll, sin JS; sin soporte o con movimiento
+/* Paralaje: al bajar, la Lupa con la foto baja más lento que la página (se queda atrás). Lo mueve el navegador atado al scroll, sin JS; sin soporte o con movimiento
    reducido queda quieto. La banda azul recorta lo que se sale. */
 @supports (animation-timeline: scroll()) {
   @media (prefers-reduced-motion: no-preference) {
     .pf-dh__arte { animation: pf-dh-lupa linear both; animation-timeline: scroll(root block); animation-range: 0px 600px; }
-    .pf-dh__hoja { animation: pf-dh-hoja linear both; animation-timeline: scroll(root block); animation-range: 0px 600px; }
-  }
+      }
 }
 @keyframes pf-dh-lupa { to { translate: 0 var(--pf-dh-lupa, 200px); } }
-@keyframes pf-dh-hoja { to { translate: 0 var(--pf-dh-hoja, -90px); } }
 .pf-result-row { margin-top: 8px; }
 @media (max-width: 900px) {
   .pf-dh__in { grid-template-columns: minmax(0, 1fr) minmax(0, 340px); gap: 28px; }
@@ -374,9 +368,8 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   .pf-dh { padding: calc(96px + env(safe-area-inset-top, 0px)) 0 32px; }
   .pf-dh__in { display: block; }
   .pf-dh h1 { max-width: 6.2em; font-size: 44px; }
-  .pf-dh__arte { position: absolute; top: -18px; right: -10px; width: 40%; max-width: 200px; margin: 0; --pf-dh-lupa: 90px; --pf-dh-hoja: -40px; }
-  .pf-dh__hoja { right: -14%; top: -16%; width: 58%; }
-  .pf-dh p { margin-top: 30px; font-size: var(--texto-cuerpo); }
+  .pf-dh__arte { position: absolute; top: -18px; right: -10px; width: 40%; max-width: 200px; margin: 0; --pf-dh-lupa: 90px; }
+    .pf-dh p { margin-top: 30px; font-size: var(--texto-cuerpo); }
   .pf-doc { grid-template-columns: minmax(0, 1fr) 36px; row-gap: 10px; padding: 16px 0; }
   .pf-doc .pf-etiqueta { grid-column: 1; grid-row: 1; justify-self: start; }
   .pf-doc__t { grid-column: 1; grid-row: 2; font-size: 1.08rem; }
@@ -588,7 +581,6 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
     </div>
     <div class="pf-dh__arte" aria-hidden="true">
       <div class="pf-dh__foto"></div>
-      <svg class="pf-dh__hoja" viewBox="0 0 255 249" aria-hidden="true"><path d="M100.334 77.48C149.937 -9.94785 254.374 0.363473 254.604 0.38623C253.868 111.726 195.419 153.26 143.571 168.58C146.912 202.677 139.814 233.225 135.742 248.318C-50.3429 192.658 8.99902 30.3813 8.99902 30.3813C50.5227 41.3302 79.8541 58.0146 100.334 77.48Z"/></svg>
     </div>
   </div>
 </section>
