@@ -40,8 +40,23 @@ html { scroll-padding-top: 96px; }
 .pf-v-pag.pf-lista canvas { opacity: 1; }
 .pf-v-pag.pf-esqueleto { background: linear-gradient(100deg, transparent 35%, color-mix(in srgb, var(--color-blanco) 70%, transparent) 50%, transparent 65%) var(--card); background-size: 250% 100%; animation: pf-brillo 1.5s linear infinite; }
 @media (prefers-reduced-motion: reduce) { .pf-v-pag canvas, .pf-v-cuenta, .pf-aviso { transition: none; } }
-.pf-v-num { position: absolute; right: 10px; bottom: 8px; padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--ink) 62%, transparent); color: var(--tiza); font-size: var(--texto-mini); font-variant-numeric: tabular-nums; opacity: 0; transition: opacity 200ms ease; pointer-events: none; }
+.pf-v-num { position: absolute; z-index: 2; right: 10px; bottom: 8px; padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--ink) 62%, transparent); color: var(--tiza); font-size: var(--texto-mini); font-variant-numeric: tabular-nums; opacity: 0; transition: opacity 200ms ease; pointer-events: none; }
 @media (hover: hover) and (pointer: fine) { .pf-v-pag:hover .pf-v-num { opacity: 1; } }
+
+/* Capa de texto: el texto del PDF, invisible, encima del dibujo. Permite seleccionar y copiar, y que la búsqueda del
+   navegador (Cmd+F) encuentre palabras dentro del documento. Las posiciones son relativas a la página y el tamaño de
+   letra sale de --total-scale-factor (ancho en pantalla / ancho del PDF), así acompaña el zoom sin rehacerse.
+   Reglas de pdf.js (web/pdf_viewer.css), reducidas a lo que usa este visor. */
+.pf-v-pag .textLayer { position: absolute; inset: 0; width: 100% !important; height: 100% !important; overflow: clip; line-height: 1; text-align: initial; text-size-adjust: none; -webkit-text-size-adjust: none; forced-color-adjust: none; transform-origin: 0 0; z-index: 1; }
+.pf-v-pag .textLayer :is(span, br) { position: absolute; color: transparent; white-space: pre; cursor: text; transform-origin: 0% 0%; }
+.pf-v-pag .textLayer span.markedContent { top: 0; height: 0; }
+.pf-v-pag .textLayer ::selection { background: color-mix(in srgb, var(--azul) 28%, transparent); }
+.pf-v-pag .textLayer br::selection { background: transparent; }
+
+/* --- Zoom: las páginas crecen desde el ancho de la columna. El documento se come los márgenes (hasta 16 px del borde)
+   y, si no entra, se desplaza de costado. En pantallas anchas el índice y los datos se ocultan mientras dura. */
+body.pf-zoom .pf-v-doc { --w: min(var(--pw), 100vw - 32px); width: var(--w); margin-inline: min(0px, (100% - var(--w)) / 2); grid-template-columns: var(--pw); overflow-x: auto; overscroll-behavior-x: contain; }
+@media (min-width: 1101px) { body.pf-zoom :is(.pf-v-indice, .pf-v-datos) { visibility: hidden; } }
 
 /* Cuando el PDF no está en la maqueta o no se pudo leer: un aviso en el lugar del documento. */
 .pf-v-aviso { display: grid; justify-items: start; gap: 14px; padding: 28px; border-radius: var(--radio-tarjeta); background: var(--card); }
@@ -61,10 +76,24 @@ html { scroll-padding-top: 96px; }
 @media (hover: hover) and (pointer: fine) { .pf-v-foco:hover { background: var(--ink); } .pf-v-copiar:hover { color: var(--azul); border-color: var(--azul); } }
 .pf-v-bajar { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
 .pf-doc__d::after { content: ""; position: absolute; inset: -8px; border-radius: 999px; }
-/* Contador de página: donde no hay índice (pantallas medianas, celular y modo lectura) dice en qué página se está. Aparece al entrar al documento. */
-.pf-v-cuenta { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 50; translate: -50% 12px; padding: 7px 14px; border-radius: 999px; background: color-mix(in srgb, var(--ink) 86%, transparent); color: var(--tiza); font-size: var(--texto-chico); font-variant-numeric: tabular-nums; opacity: 0; pointer-events: none; transition: opacity 240ms ease, translate 320ms var(--ease); display: none; }
-.pf-v-cuenta.pf-on { opacity: 1; translate: -50% 0; }
-body.pf-foco .pf-v-cuenta { display: block; }
+/* Pastilla de abajo: aparece al entrar al documento. Dice en qué página se está (donde no hay índice: pantallas
+   medianas, celular, modo lectura y zoom) y, con mouse, lleva el zoom: alejar, nivel (vuelve al ancho) y acercar.
+   En pantallas táctiles el zoom es el de dos dedos y la página se vuelve a dibujar nítida al soltar. */
+.pf-v-cuenta { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 50; translate: -50% 12px; display: flex; align-items: center; gap: 2px; padding: 4px; border-radius: 999px; background: color-mix(in srgb, var(--ink) 86%, transparent); color: var(--tiza); font-size: var(--texto-chico); font-variant-numeric: tabular-nums; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 240ms ease, translate 320ms var(--ease), visibility 0s 320ms; }
+.pf-v-cuenta.pf-on { opacity: 1; visibility: visible; translate: -50% 0; pointer-events: auto; transition-delay: 0s; }
+.pf-v-cuenta__n { padding: 0 10px; line-height: 30px; pointer-events: none; }
+.pf-v-cuenta__sep { width: 1px; height: 16px; margin-inline: 2px; background: color-mix(in srgb, var(--tiza) 28%, transparent); }
+.pf-v-zoom { display: flex; align-items: center; gap: 2px; }
+.pf-v-zoom button { display: grid; place-items: center; min-width: 30px; height: 30px; padding: 0; border: 0; border-radius: 999px; background: transparent; color: inherit; font: inherit; font-size: var(--texto-mini); cursor: pointer; transition: background 160ms ease, opacity 160ms ease; }
+.pf-v-zoom button svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.pf-v-zoom .pf-v-zoom__nivel { min-width: 48px; }
+.pf-v-zoom button:disabled { opacity: .38; cursor: default; }
+.pf-v-zoom button:focus-visible { outline: 2px solid var(--tiza); outline-offset: -2px; }
+@media (hover: hover) and (pointer: fine) { .pf-v-zoom button:not(:disabled):hover { background: color-mix(in srgb, var(--tiza) 14%, transparent); } }
+@media (hover: none), (pointer: coarse) { .pf-v-zoom, .pf-v-cuenta__sep { display: none; } .pf-v-cuenta { padding: 3px 4px; } }
+.pf-v-cuenta.pf-una :is(.pf-v-cuenta__n, .pf-v-cuenta__sep) { display: none; }
+/* Con el índice a la vista, el número de página sobra: queda solo el zoom. */
+@media (min-width: 1101px) { body:not(.pf-foco):not(.pf-zoom) :is(.pf-v-cuenta__n, .pf-v-cuenta__sep) { display: none; } }
 .pf-v-bajar svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
 /* --- Índice de páginas, a la izquierda: fijo al bajar. El punto azul viaja con un resorte (el de la librería) hasta la página que se está leyendo. */
@@ -100,7 +129,6 @@ body.pf-foco .pf-v-doc { grid-column: 1; grid-row: 1; margin-top: 0; padding-bot
   .pf-v-datos { grid-row: 2; position: static; margin: 28px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
   .pf-v-doc { grid-row: 3; margin-top: 28px; }
   .pf-v-indice { display: none; }
-  .pf-v-cuenta { display: block; }
   /* Sin cursor fino, los controles redondos suben a 40 px (el alto del botón de descarga). */
   .pf-v-foco, .pf-v-copiar { width: 40px; height: 40px; }
   .pf-v-pags { height: 40px; padding: 0 14px 0 11px; }
@@ -164,7 +192,14 @@ body.pf-foco .pf-v-doc { grid-column: 1; grid-row: 1; margin-top: 0; padding-bot
 /*__PIE_HTML__*/
 
 <button class="pf-v-salir" id="pf-focoSalir" type="button" hidden>Salir del modo lectura <kbd>Esc</kbd></button>
-<div class="pf-v-cuenta" id="pf-cuenta" aria-hidden="true"></div>
+<div class="pf-v-cuenta" id="pf-cuenta">
+  <span class="pf-v-cuenta__n" id="pf-cuentaN" aria-hidden="true"></span><i class="pf-v-cuenta__sep" aria-hidden="true"></i>
+  <span class="pf-v-zoom" role="group" aria-label="Zoom">
+    <button type="button" id="pf-zMenos" aria-label="Alejar" title="Alejar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12"/></svg></button>
+    <button type="button" class="pf-v-zoom__nivel" id="pf-zNivel" aria-label="Volver al ancho de la página" title="Volver al ancho de la página">100%</button>
+    <button type="button" id="pf-zMas" aria-label="Acercar" title="Acercar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v12M6 12h12"/></svg></button>
+  </span>
+</div>
 <div class="pf-aviso" id="pf-aviso" role="status" aria-live="polite"></div>
 
 <script>
@@ -291,16 +326,29 @@ body.pf-foco .pf-v-doc { grid-column: 1; grid-row: 1; margin-top: 0; padding-bot
     $("pf-visor").removeAttribute("aria-busy");
   }
 
-  // Dibuja una página al ancho de su caja (con la densidad de la pantalla, hasta 2x).
+  // Densidad con la que se dibuja una página: la de la pantalla (hasta 2x) y, si se agrandó con dos dedos y la página
+  // está a la vista, también ese aumento (hasta 3x). Las que no se ven no lo pagan.
+  var vv = window.visualViewport;
+  function escala(p) {
+    var e = Math.min(window.devicePixelRatio || 1, 2);
+    if (vv && vv.scale > 1.05) {
+      var r = p.el.getBoundingClientRect();
+      if (r.bottom > vv.offsetTop && r.top < vv.offsetTop + vv.height) e *= Math.min(vv.scale, 3);
+    }
+    return Math.round(e * 100) / 100;
+  }
+  // Dibuja una página al ancho de su caja. El lienzo no pasa de 16 millones de píxeles (el tope de Safari en iPhone).
   function dibujar(p) {
     if (p.dibujando) return;
     var w = p.el.clientWidth; if (!w) return;
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    if (p.ancho && Math.abs(p.ancho - w) < 24 && p.hecha) return;
+    var e = escala(p);
+    if (p.hecha && p.ancho && Math.abs(p.ancho - w) < 24 && p.esc === e) return;
     p.dibujando = true;
     pdfDoc.getPage(p.n).then(function (pg) {
       var base = pg.getViewport({ scale: 1 });
-      var vp = pg.getViewport({ scale: (w * dpr) / base.width });
+      var s = (w * e) / base.width, area = base.width * base.height * s * s;
+      if (area > 16e6) s *= Math.sqrt(16e6 / area);
+      var vp = pg.getViewport({ scale: s });
       var c = document.createElement("canvas");
       c.width = Math.floor(vp.width); c.height = Math.floor(vp.height);
       return pg.render({ canvasContext: c.getContext("2d"), viewport: vp, canvas: c }).promise.then(function () {
@@ -308,11 +356,23 @@ body.pf-foco .pf-v-doc { grid-column: 1; grid-row: 1; margin-top: 0; padding-bot
         if (p.lejos) { c.width = c.height = 0; return; }   // se alejó mientras se dibujaba
         if (p.canvas) p.canvas.remove();
         p.canvas = c; p.el.insertBefore(c, p.el.firstChild);
-        p.ancho = w; p.hecha = true;
+        p.ancho = w; p.esc = e; p.hecha = true;
         p.el.classList.remove("pf-esqueleto"); void c.offsetWidth; p.el.classList.add("pf-lista");
       });
-    }).catch(function () {}).then(function () { p.dibujando = false; });
+    }).catch(function () {}).then(function () {
+      p.dibujando = false;
+      // Si mientras se dibujaba cambió el ancho (zoom, ventana) o el aumento, se vuelve a dibujar.
+      if (p.hecha && !p.lejos && p.el.clientWidth && (Math.abs(p.el.clientWidth - p.ancho) >= 24 || escala(p) !== p.esc)) dibujar(p);
+    });
   }
+  // Vuelve a dibujar las páginas cercanas a la pantalla (después de un cambio de ancho o de zoom).
+  function redibujar() {
+    paginas.forEach(function (p) {
+      var r = p.el.getBoundingClientRect();
+      if (r.top < innerHeight * 3 && r.bottom > -innerHeight * 2) dibujar(p);
+    });
+  }
+  if (vv) { var tVv; vv.addEventListener("resize", function () { clearTimeout(tVv); tVv = setTimeout(redibujar, 220); }); }
   var vigia = "IntersectionObserver" in window ? new IntersectionObserver(function (en) {
     en.forEach(function (e) { if (e.isIntersecting) dibujar(e.target.__p); });
   }, { rootMargin: "1400px 0px" }) : null;
@@ -327,9 +387,87 @@ body.pf-foco .pf-v-doc { grid-column: 1; grid-row: 1; margin-top: 0; padding-bot
     en.forEach(function (e) { var p = e.target.__p; p.lejos = !e.isIntersecting; if (p.lejos) soltar(p); });
   }, { rootMargin: "5000px 0px" }) : null;
 
+  /* --- Zoom ---------------------------------------------------------------------------------- */
+  var NIVELES = [1, 1.25, 1.5, 2], nivel = 0;
+  var CON_ZOOM = matchMedia("(hover: hover) and (pointer: fine)").matches;
+  // Ancho de la columna del documento, leído de la grilla (no cambia con el zoom).
+  function anchoBase() {
+    var t = getComputedStyle($("pf-grilla")).gridTemplateColumns.split(" ").map(parseFloat);
+    return t.length >= 3 ? t[1] : t[0];
+  }
+  // Ancho de las páginas según el zoom, y la escala de la capa de texto de cada una.
+  function medidas() {
+    var doc = $("pf-doc");
+    if (NIVELES[nivel] > 1) doc.style.setProperty("--pw", Math.round(anchoBase() * NIVELES[nivel]) + "px");
+    else doc.style.removeProperty("--pw");
+    if (!paginas.length) return;
+    var w = paginas[0].el.clientWidth;
+    paginas.forEach(function (p) { if (p.w0) p.el.style.setProperty("--total-scale-factor", (w / p.w0).toFixed(5)); });
+  }
+  // Cambia el nivel sin perder el punto de lectura: la línea que estaba a 40% de la pantalla sigue ahí, y de costado
+  // se conserva el centro.
+  var tZoom;
+  function zoom(i) {
+    i = Math.max(0, Math.min(NIVELES.length - 1, i));
+    if (i === nivel || !paginas.length) return;
+    var doc = $("pf-doc"), ref = paginas[Math.max(0, actual)], y0 = innerHeight * 0.4;
+    var r = ref.el.getBoundingClientRect(), fy = (y0 - r.top) / r.height;
+    var fx = doc.scrollWidth > doc.clientWidth ? (doc.scrollLeft + doc.clientWidth / 2) / doc.scrollWidth : 0.5;
+    nivel = i;
+    document.body.classList.toggle("pf-zoom", NIVELES[i] > 1);
+    medidas();
+    r = ref.el.getBoundingClientRect();
+    window.scrollBy(0, r.top + fy * r.height - y0);
+    doc.scrollLeft = fx * doc.scrollWidth - doc.clientWidth / 2;
+    botonesZoom();
+    alScroll(); marcar(); cuenta();
+    clearTimeout(tZoom); tZoom = setTimeout(redibujar, 120);
+  }
+  function botonesZoom() {
+    $("pf-zNivel").textContent = Math.round(NIVELES[nivel] * 100) + "%";
+    $("pf-zNivel").disabled = nivel === 0;
+    $("pf-zMenos").disabled = nivel === 0;
+    $("pf-zMas").disabled = nivel === NIVELES.length - 1;
+  }
+  botonesZoom();
+  $("pf-zMenos").addEventListener("click", function () { zoom(nivel - 1); });
+  $("pf-zMas").addEventListener("click", function () { zoom(nivel + 1); });
+  $("pf-zNivel").addEventListener("click", function () { zoom(0); });
+  // Cmd/Ctrl + y − (y 0 para volver al ancho) manejan el zoom del documento en vez del de la página.
+  document.addEventListener("keydown", function (e) {
+    if (!CON_ZOOM || !paginas.length || !(e.metaKey || e.ctrlKey) || e.altKey) return;
+    var k = e.key;
+    if (k === "+" || k === "=") zoom(nivel + 1);
+    else if (k === "-" || k === "_") zoom(nivel - 1);
+    else if (k === "0") zoom(0);
+    else return;
+    e.preventDefault();
+  });
+
   var tAncho;
-  function anchoCambio() { clearTimeout(tAncho); tAncho = setTimeout(function () { paginas.forEach(function (p) { if (p.hecha) { p.hecha = false; if (p.el.getBoundingClientRect().top < innerHeight * 3 && p.el.getBoundingClientRect().bottom > -innerHeight * 2) dibujar(p); } }); }, 160); }
+  function anchoCambio() { medidas(); clearTimeout(tAncho); tAncho = setTimeout(redibujar, 160); }
   window.addEventListener("resize", anchoCambio);
+
+  /* --- Capa de texto -------------------------------------------------------------------------- */
+  // Se arma una vez por página, de a una y en los ratos libres, empezando por la que se está leyendo. No se suelta al
+  // alejarse (pesa poco) para que la búsqueda del navegador encuentre palabras en todo el documento.
+  function textos() {
+    if (!lib.TextLayer) return;
+    var desde = Math.max(0, actual), orden = paginas.slice(desde).concat(paginas.slice(0, desde)), i = 0;
+    var luego = window.requestIdleCallback || function (f) { setTimeout(f, 30); };
+    (function sig() {
+      var p = orden[i++]; if (!p) return;
+      pdfDoc.getPage(p.n).then(function (pg) {
+        return pg.getTextContent().then(function (tc) {
+          if (!tc.items.length) return;
+          var capa = document.createElement("div");
+          capa.className = "textLayer";
+          p.el.appendChild(capa);
+          return new lib.TextLayer({ textContentSource: tc, container: capa, viewport: pg.getViewport({ scale: 1 }) }).render();
+        });
+      }).catch(function () {}).then(function () { luego(sig); });
+    })();
+  }
 
   function armar(pdf) {
     pdfDoc = pdf;
@@ -339,19 +477,19 @@ body.pf-foco .pf-v-doc { grid-column: 1; grid-row: 1; margin-top: 0; padding-bot
     for (var i = 1; i <= n; i++) {
       var el = document.createElement("div");
       el.className = "pf-v-pag pf-esqueleto"; el.id = "pf-p" + i;
-      el.setAttribute("role", "img"); el.setAttribute("aria-label", "Página " + i + " de " + n);
+      el.setAttribute("role", "group"); el.setAttribute("aria-label", "Página " + i + " de " + n);
       el.insertAdjacentHTML("beforeend", '<span class="pf-v-num" aria-hidden="true">' + i + " / " + n + "</span>");
       var p = { el: el, n: i, canvas: null }; el.__p = p; paginas.push(p);
       $("pf-doc").appendChild(el);
     }
     // La proporción de cada página, para reservar su lugar sin saltos (las páginas pueden tener tamaños distintos).
     var ratios = paginas.map(function (p) {
-      return pdf.getPage(p.n).then(function (pg) { var v = pg.getViewport({ scale: 1 }); p.el.style.setProperty("--r", (v.width / v.height).toFixed(5)); });
+      return pdf.getPage(p.n).then(function (pg) { var v = pg.getViewport({ scale: 1 }); p.w0 = v.width; p.el.style.setProperty("--r", (v.width / v.height).toFixed(5)); });
     });
     paginas.forEach(function (p) { if (vigia) { vigia.observe(p.el); lejos.observe(p.el); } else dibujar(p); });
     indice(n);
     $("pf-visor").removeAttribute("aria-busy");
-    Promise.all(ratios).then(function () { alScroll(); irAHash(); });
+    Promise.all(ratios).then(function () { medidas(); alScroll(); irAHash(); marcar(); textos(); });
   }
 
   // Índice de páginas, a la izquierda: solo si el documento tiene más de una.
@@ -377,10 +515,15 @@ body.pf-foco .pf-v-doc { grid-column: 1; grid-row: 1; margin-top: 0; padding-bot
     if (m && paginas[Number(m[1]) - 1]) paginas[Number(m[1]) - 1].el.scrollIntoView({ behavior: "auto" });
   }
   function cuenta() {
-    var c = $("pf-cuenta"); if (paginas.length < 2) { c.classList.remove("pf-on"); return; }
+    var c = $("pf-cuenta"), varias = paginas.length > 1;
+    if (!paginas.length || (!varias && !CON_ZOOM)) { c.classList.remove("pf-on"); return; }
     var r = $("pf-doc").getBoundingClientRect();
-    c.textContent = (Math.max(0, actual) + 1) + " / " + paginas.length;
-    c.classList.toggle("pf-on", r.top < innerHeight * 0.5 && r.bottom > innerHeight * 0.6);
+    $("pf-cuentaN").textContent = (Math.max(0, actual) + 1) + " / " + paginas.length;
+    c.classList.toggle("pf-una", !varias);
+    var dentro = r.top < innerHeight * 0.5 && r.bottom > innerHeight * 0.6;
+    // Si el foco del teclado está en la pastilla, no se esconde debajo.
+    if (!dentro && c.contains(document.activeElement)) document.activeElement.blur();
+    c.classList.toggle("pf-on", dentro);
   }
   function marcar() {
     if (!paginas.length) return;
