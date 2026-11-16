@@ -101,6 +101,13 @@ def main():
     for nombre, valor, uso in FORMA:
         l.append(f"  --{nombre}: {valor};  /* {uso} */")
     l.append("}")
+    # Las curvas escritas con linear() (resortes) no las entienden los navegadores viejos (Safari antes de 17.2):
+    # ahí la transición entera se anula y todo salta. Para ellos, la curva base, que es parecida en forma.
+    lineales = [n for n, t in datos["tokens"].items() if str(t["valor"]).startswith("linear(")]
+    if lineales:
+        l.append("@supports not (transition-timing-function: linear(0, 1)) {")
+        l.append("  :root { " + " ".join("--%s: var(--ease);" % n for n in lineales) + " }")
+        l.append("}")
     SALIDA.write_text("\n".join(l) + "\n", encoding="utf-8")
     print(f"{SALIDA.name}: {len(datos['tokens']) + len(SEMANTICOS)} tokens, {len(FAMILIAS)} familias, {len(CATEGORIAS)} categorías")
 

@@ -99,3 +99,6 @@
   --sombra-flotante: 0 24px 60px -24px rgba(10, 30, 74, 0.5);  /* Docks, menús y paneles que flotan */
   --sombra-control: 0 1px 3px rgba(10, 30, 74, 0.12);  /* Indicador del Selector y botones elevados */
 }
+@supports not (transition-timing-function: linear(0, 1)) {
+  :root { --f-curva: var(--ease); }
+}
