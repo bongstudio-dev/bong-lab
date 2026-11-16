@@ -169,7 +169,7 @@ La Nota lleva la cabecera en una tarjeta sobre un campo fijo de Formas que crece
 - Color: el de la etiqueta del tipo de nota (azul, verde, amarillo o terra para Comercial), con su figura y su acento.
 - Formas: una sola, la de la categoría (la del badge de la etiqueta).
 - Alto: 70% de la pantalla.
-- Cursor: dentro de un radio de 3,6 celdas en escritorio (3 en celular) las Formas cambian de color, la figura al acento y el acento a la figura. Todo o nada, sin fundido.
+- Cursor: sin área visible. Cada Forma tiene un valor fijo al azar y el cursor sube en todo el campo la chance de que pase al otro color (figura a acento, acento a figura): `PICO` 0,45 debajo del mouse, cae con la distancia elevada a `CURVA` 4 sobre la diagonal de la pantalla. Las que cambian quedan salteadas, sin borde. Cada Forma cambia o no, sin fundido, y el cursor se lee 10 veces por segundo (`PASO_CURSOR`).
 - En escritorio la hoja de la nota va de borde a borde. En modo lectura el campo desaparece.
 - Para probar: `?p=azul|verde|amarillo|naranja`, `?formas=varias` (mezcla del tema), `?alto=40..100`.
 

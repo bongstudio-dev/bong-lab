@@ -1221,7 +1221,7 @@ body.pf-foco #pf-nota { border-radius: 0; margin-inline: 0; }
       while (g.borde.length) {
         var p = g.borde.splice(Math.floor(Math.random() * g.borde.length), 1)[0];
         if (p[0] < 0 || p[1] < 0 || p[0] >= cols || p[1] >= filas || grilla[idx(p[0], p[1])]) continue;
-        var c = { x: p[0], y: p[1], nace: ahora, muere: 0, forma: g.forma, color: Math.random() < 0.08 ? paleta.acento : paleta.figura };
+        var c = { x: p[0], y: p[1], nace: ahora, muere: 0, forma: g.forma, color: Math.random() < 0.08 ? paleta.acento : paleta.figura, v: Math.random() };
         grilla[idx(p[0], p[1])] = c; g.celdas.push(c);
         VEC.forEach(function (v) { g.borde.push([p[0] + v[0], p[1] + v[1]]); });
         break;
@@ -1250,31 +1250,37 @@ body.pf-foco #pf-nota { border-radius: 0; margin-inline: 0; }
   }
   function suave(t) { return 1 - Math.pow(1 - t, 3); }
 
-  // Cursor: un área de influencia alrededor del mouse donde las Formas cambian de color
-  // (la figura pasa al acento y el acento a la figura). Cada Forma está adentro o afuera: sin fundido.
-  var raton = null;
-  function radio() { return CELDA * (W < 720 ? 3 : 3.6); }
+  // Cursor: no hay un área visible. Cada Forma tiene un valor fijo al azar (v) y el cursor sube, en todo
+  // el campo, la chance de que pase al otro color (figura a acento y acento a figura): mucho debajo del
+  // mouse, casi nada lejos, sin borde. Las que cambian quedan salteadas. Cada Forma cambia o no, sin
+  // fundido, y el cursor se lee a saltos (10 veces por segundo) para que no se sienta un efecto que lo sigue.
+  var raton = null, muestra = null, ultima = 0;
+  var PICO = 0.45, CURVA = 4, PASO_CURSOR = 100;
   addEventListener("pointermove", function (e) {
     if (e.pointerType !== "mouse") return;
     raton = { x: e.clientX, y: e.clientY };
-    if (reducir && W) dibujar(performance.now());
+    if (reducir && W) { muestra = raton; dibujar(performance.now()); }
   }, { passive: true });
-  document.documentElement.addEventListener("pointerleave", function () { raton = null; if (reducir && W) dibujar(performance.now()); });
+  document.documentElement.addEventListener("pointerleave", function () { raton = null; if (reducir && W) { muestra = null; dibujar(performance.now()); } });
+  function cambia(c, D) {
+    if (!muestra) return false;
+    var d = Math.hypot(c.x * CELDA + CELDA / 2 - muestra.x, c.y * CELDA + CELDA / 2 - muestra.y);
+    return c.v < PICO * Math.pow(Math.max(0, 1 - d / D), CURVA);
+  }
   function otro(color) { return color === paleta.acento ? paleta.figura : paleta.acento; }
   function dibujar(ahora) {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = paleta.fondo; ctx.fillRect(0, 0, W, H);
-    var lado = CELDA * 0.72, R = radio();
+    if (!reducir && ahora - ultima >= PASO_CURSOR) { muestra = raton; ultima = ahora; }
+    var lado = CELDA * 0.72, D = Math.hypot(W, H);
     for (var k = 0; k < grilla.length; k++) {
       var c = grilla[k]; if (!c) continue;
       var s = c.muere ? 1 - suave(Math.min(1, (ahora - c.muere) / 300)) : suave(Math.min(1, (ahora - c.nace) / 260));
-      // Dentro del radio la Forma cambia de color; fuera, no. Sin tonos intermedios.
-      var dentro = raton && Math.hypot(c.x * CELDA + CELDA / 2 - raton.x, c.y * CELDA + CELDA / 2 - raton.y) < R;
       var im = tenida(c.forma, c.color);
       if (s <= 0 || !im.complete) continue;
       var r = prop[c.forma], w = r >= 1 ? lado : lado * r, h = r >= 1 ? lado / r : lado;
       var x = c.x * CELDA + (CELDA - w * s) / 2, y = c.y * CELDA + (CELDA - h * s) / 2;
-      if (dentro) { var im2 = tenida(c.forma, otro(c.color)); if (im2.complete) im = im2; }
+      if (cambia(c, D)) { var im2 = tenida(c.forma, otro(c.color)); if (im2.complete) im = im2; }
       ctx.drawImage(im, x, y, w * s, h * s);
     }
   }
