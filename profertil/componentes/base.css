@@ -118,14 +118,20 @@ a.pf-etiqueta { text-decoration: none; }
 /* @pieza barra
    Web/Barra navegación: logo, menú en cápsula de vidrio y buscador en la lupa.
    Transparente sobre el header de foto o color; .pf-barra--solida toma el azul (al bajar, o siempre).
-   Markup: header.pf-barra > .pf-barra__in > nav.pf-barra__nav > logo, menú, menú mobile, buscador y su cerrar. */
+   Markup: header.pf-barra > .pf-barra__in > nav.pf-barra__nav > logo, menú, menú mobile, buscador y su cerrar.
+   El menú va centrado en la página, no en el espacio que queda entre el logo y la lupa: como esos dos costados
+   no miden lo mismo, centrarlo entre ellos lo corre hacia un lado y deja de alinear con la columna de texto.
+   Por eso el nav es una grilla de tres columnas iguales (1fr auto 1fr): logo a la izquierda, menú al medio y
+   a la derecha la reserva de la lupa, que va en absoluto. Cada costado tiene un mínimo (el logo, y 44 + 14 de
+   separación = 58 para la lupa). Si el menú es tan ancho que centrado pisaría uno de los dos, ese costado queda
+   en su mínimo y el menú se corre hacia donde haya lugar: nunca se superpone. */
 .pf-barra { position: fixed; inset: 0 0 auto; z-index: 50; padding-top: env(safe-area-inset-top, 0px); transition: background 260ms ease, box-shadow 260ms ease; }
 .pf-barra--solida { background: var(--barra); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 10px 30px -18px rgba(0, 20, 60, .7); }
 .pf-barra__in { width: min(100% - 32px, 1320px); margin-inline: auto; }
-.pf-barra__nav { position: relative; display: flex; align-items: center; gap: 14px; height: 76px; padding-right: 58px; transition: height 260ms var(--ease); }
-.pf-barra__logo { display: block; flex: none; color: var(--tiza); fill: currentColor; line-height: 0; }
+.pf-barra__nav { position: relative; display: grid; grid-template-columns: minmax(max-content, 1fr) auto minmax(44px, 1fr); align-items: center; column-gap: 14px; height: 76px; transition: height 260ms var(--ease); }
+.pf-barra__logo { grid-column: 1; justify-self: start; display: block; color: var(--tiza); fill: currentColor; line-height: 0; }
 .pf-barra__logo svg { width: 74px; height: auto; aspect-ratio: 1458 / 1021; transition: width 260ms var(--ease); }
-.pf-barra__menu, .pf-barra__menu-mobile { margin-left: auto; margin-right: auto; }
+.pf-barra__menu, .pf-barra__menu-mobile { grid-column: 2; grid-row: 1; justify-self: center; min-width: 0; }
 .pf-barra__menu { display: flex; gap: 2px; padding: 7px; border-radius: 999px; background: var(--foto-fondo); border: 1px solid var(--foto-borde); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); transition: opacity 220ms ease; }
 .pf-barra__menu > * { padding: 7px 14px; border: 0; border-radius: 999px; background: none; color: var(--foto-texto); font: 400 var(--texto-chico)/1.5 var(--f-body); white-space: nowrap; cursor: pointer; transition: background 200ms ease, color 200ms ease; }
 .pf-barra__menu > [aria-current] { background: var(--tiza); color: var(--azul); font-weight: 500; }
@@ -163,7 +169,7 @@ a.pf-etiqueta { text-decoration: none; }
   .pf-barra__nav { height: 66px; }
   .pf-barra__logo svg { width: 62px; }
   .pf-barra__busca.pf-abierto { width: calc(100% - 134px); }
-  .pf-barra__menu.pf-barra__menu--deslizable { display: flex; min-width: 0; margin-right: 0; overflow-x: auto; scrollbar-width: none; }
+  .pf-barra__menu.pf-barra__menu--deslizable { display: flex; max-width: 100%; overflow-x: auto; scrollbar-width: none; }
   .pf-barra__menu--deslizable::-webkit-scrollbar { display: none; }
   .pf-barra__menu--deslizable > * { flex: none; padding: 7px 10px; font-size: var(--texto-mini); }
 }

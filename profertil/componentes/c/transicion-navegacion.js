@@ -19,7 +19,7 @@
     nota: "Tocá el menú de arriba, adentro del escenario, para pasar de página.",
     variantes: [["persiana", "Persiana con logo", "Un paño de color sube con el logo en el medio, cambia la página y el paño sigue de largo."], ["animada", "Persiana con logo animado", "Mientras sube el paño el logo se arma: brota la espiga, la P crece desde el pie del tallo y suben las letras. La página cambia cuando el logo termina de armarse."], ["fundido", "Fundido", "La página vieja se va hacia arriba y la nueva sube. Usa View Transitions si el navegador las tiene."]],
     tamano: "media",
-    claves: ["Dos tramos de la misma duración: tapar y destapar; la página cambia en el medio.", "Mientras corre una transición no se puede disparar otra.", "Curva fuerte por defecto (la de los filtros de Novedades): arranca lenta y frena suave."],
+    claves: ["Dos tramos de la misma duración: tapar y destapar; la página cambia en el medio.", "Mientras corre una transición no se puede disparar otra.", "Curva fuerte por defecto (la de los filtros de Novedades): arranca lenta y frena suave.", "El menú de la barra va centrado en la página, no entre el logo y la lupa. Si no entra centrado, se corre hacia donde hay lugar y nunca se superpone."],
     accesibilidad: "Con movimiento reducido la página cambia directo, sin paño. El menú marca la página actual con aria-current.",
     controles: [
       { id: "color", tipo: "seg", etiqueta: "Color", solo: ["persiana", "animada"], def: "azul", aplica: { attr: "data-color" }, opciones: [["azul", "Azul"], ["verde", "Verde"], ["amarillo", "Amarillo"], ["terra", "Terra"]], desc: "Color del paño." },
