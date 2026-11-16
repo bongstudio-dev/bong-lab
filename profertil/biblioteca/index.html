@@ -444,7 +444,6 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
 </div>
 
 <section class="pf-filters" id="pf-filters" aria-label="Filtros">
-  <button class="pf-f-x" id="pf-fX" type="button" aria-label="Cerrar filtros"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg></button>
   <div class="pf-f-body" id="pf-fBody"><div class="pf-f-in">
     <div class="pf-f-grupos" id="pf-fGrupos"></div>
     <button class="pf-f-clear" id="pf-fClear" type="button" hidden>Limpiar filtros</button>
@@ -1039,10 +1038,9 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
   }
   $("pf-fBody").addEventListener("transitionend", function (e) { if (e.target === this && e.propertyName === "height") terminar(); });
   $("pf-fToggle").addEventListener("click", function () { abrirFiltros(!$("pf-filters").classList.contains("pf-abierto")); });
-  // Se cierra con la cruz, con Escape y tocando afuera. El toque de afuera solo cierra: el clic que le sigue se descarta
+  // Se cierra con el botón de la barra, con Escape y tocando afuera. El toque de afuera solo cierra: el clic que le sigue se descarta
   // para no abrir de rebote el documento que estaba debajo (el ancla queda afuera de esto: cierra y además baja).
   function filtrosAbiertos() { return $("pf-filters").classList.contains("pf-abierto"); }
-  $("pf-fX").addEventListener("click", function () { abrirFiltros(false); $("pf-fToggle").focus(); });
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape" && filtrosAbiertos() && !$("pf-busca").classList.contains("pf-abierto")) { abrirFiltros(false); $("pf-fToggle").focus(); }
   });
