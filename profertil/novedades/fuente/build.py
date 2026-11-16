@@ -53,10 +53,16 @@ def firma(nombre, que, contexto):
     f = re.sub(r'      Prototipo del componente[^\n]*\n', '      %s\n' % contexto, f)
     return f
 
+import sys
+sys.path.insert(0, os.path.join(AQUI, '..', '..', 'componentes', 'fuente'))
+from versionar import versionar
+
+
 def firmar(ruta, nombre, que, contexto):
     s = open(ruta, encoding='utf-8').read()
     s = re.sub(r'\n?<!-- firma:bong.*?-->\n?', '\n', s, flags=re.S)
     s = s.replace('<!DOCTYPE html>\n', '<!DOCTYPE html>\n' + firma(nombre, que, contexto) + '\n', 1)
+    s = versionar(s, ruta)  # ?v= en los CSS y JS locales, para que la caché nunca mezcle versiones
     open(ruta, 'w', encoding='utf-8').write(s)
 
 firmar(os.path.join(AQUI, '..', 'index.html'), 'PROFERTIL · NOVEDADES',
