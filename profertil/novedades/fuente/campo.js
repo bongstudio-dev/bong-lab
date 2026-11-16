@@ -143,13 +143,12 @@
   }
   function suave(t) { return 1 - Math.pow(1 - t, 3); }
 
-  // Cursor: no hay un área visible. Cada Forma tiene un valor fijo al azar (v) y el cursor sube, en todo
-  // el campo, la chance de que pase al otro color (figura a acento y acento a figura): mucho debajo del
-  // mouse, casi nada lejos, sin borde. Las que cambian quedan salteadas. Cada Forma cambia o no, sin
-  // fundido, y el cursor se lee a saltos (cada 60 ms) para que no se sienta un efecto que lo sigue.
+  // Cursor: solo reaccionan las Formas en color de acento; el resto no se mueve. Cada una tiene un valor fijo
+  // al azar (v) y el cursor sube la chance de que pase al color de figura: casi todas debajo del mouse, menos
+  // a medida que se alejan, sin borde. Cada Forma cambia o no, sin fundido, y el cursor se lee a saltos (cada 60 ms).
   // PICO: cuántas cambian debajo del mouse. ALCANCE: hasta dónde llega, en fracción del lado corto de la pantalla.
   var raton = null, muestra = null, ultima = 0;
-  var PICO = 0.65, CURVA = 2, ALCANCE = 0.6, PASO_CURSOR = 60;
+  var PICO = 0.95, CURVA = 2, ALCANCE = 0.6, PASO_CURSOR = 60;
   addEventListener("pointermove", function (e) {
     if (e.pointerType !== "mouse") return;
     raton = { x: e.clientX, y: e.clientY };
@@ -157,7 +156,7 @@
   }, { passive: true });
   document.documentElement.addEventListener("pointerleave", function () { raton = null; if (reducir && W) { muestra = null; dibujar(performance.now()); } });
   function cambia(c, D) {
-    if (!muestra) return false;
+    if (!muestra || c.color !== paleta.acento) return false;
     var d = Math.hypot(c.x * CELDA + CELDA / 2 - muestra.x, c.y * CELDA + CELDA / 2 - muestra.y);
     return c.v < PICO * Math.pow(Math.max(0, 1 - d / D), CURVA);
   }
