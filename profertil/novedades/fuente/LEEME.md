@@ -170,6 +170,7 @@ La Nota lleva la cabecera en una tarjeta sobre un campo fijo de Formas que crece
 - Formas: una sola, la de la categoría (la del badge de la etiqueta).
 - Alto: 70% de la pantalla.
 - Cursor: solo reaccionan las Formas en color de acento, el resto no se mueve. Cada una tiene un valor fijo al azar y el cursor sube la chance de que pase al color de figura: `PICO` 0,95 debajo del mouse, cae con el cuadrado de la distancia hasta `ALCANCE` (60% del lado corto de la pantalla). Sin borde, sin fundido; el cursor se lee cada 60 ms (`PASO_CURSOR`).
+- Clic o toque en el campo (fuera de la tarjeta): nace un grupo ahí, que crece un poco más rápido. Hasta 5 grupos por encima de los 7 de siempre (`EXTRA`); si se pasa, el grupo quieto más viejo se deshace. Con movimiento reducido no hace nada.
 - En escritorio la hoja de la nota va de borde a borde. En modo lectura el campo desaparece.
 - Para probar: `?p=azul|verde|amarillo|naranja`, `?formas=varias` (mezcla del tema), `?alto=40..100`.
 

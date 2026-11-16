@@ -189,6 +189,26 @@
     if (!reducir) requestAnimationFrame(cuadro);
   }
 
+  // Clic (o toque) en el campo: nace un grupo ahí mismo, que crece un poco más rápido. Hasta 5 por encima
+  // de los 7 de siempre; si se pasa, el grupo quieto más viejo empieza a deshacerse. No cuenta sobre la tarjeta.
+  var EXTRA = 5;
+  sec.addEventListener("click", function (e) {
+    if (reducir || !W || e.target.closest("#pf-cab, a, button")) return;
+    var cx = Math.floor(e.clientX / CELDA), cy = Math.floor(e.clientY / CELDA), borde = [];
+    for (var dy = -1; dy <= 1; dy++) for (var dx = -1; dx <= 1; dx++) {
+      var x = cx + dx, y = cy + dy;
+      if (x >= 0 && y >= 0 && x < cols && y < filas && !grilla[idx(x, y)]) borde.push([x, y]);
+    }
+    if (!borde.length) return;
+    if (grupos.length >= MAX + EXTRA) {
+      var viejo = grupos.filter(function (g) { return g.estado === "quieto"; })[0];
+      if (viejo) { viejo.estado = "decrece"; viejo.proximo = 0; }
+    }
+    var ahora = performance.now();
+    grupos.push({ forma: unaForma(), celdas: [], borde: borde, meta: Math.floor(azar(10, 20)),
+      estado: "crece", proximo: ahora, ritmo: azar(40, 70), espera: azar(2500, 5000) });
+  });
+
   // Ahorro: cuando el texto tapa la cabecera, el campo deja de animar.
   addEventListener("scroll", function () { document.body.classList.toggle("pf-campo-bajo", scrollY > 40); }, { passive: true });
   // Fuera de pantalla también se esconde, para que no asome debajo del pie.
