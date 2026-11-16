@@ -1253,9 +1253,10 @@ body.pf-foco #pf-nota { border-radius: 0; margin-inline: 0; }
   // Cursor: no hay un área visible. Cada Forma tiene un valor fijo al azar (v) y el cursor sube, en todo
   // el campo, la chance de que pase al otro color (figura a acento y acento a figura): mucho debajo del
   // mouse, casi nada lejos, sin borde. Las que cambian quedan salteadas. Cada Forma cambia o no, sin
-  // fundido, y el cursor se lee a saltos (10 veces por segundo) para que no se sienta un efecto que lo sigue.
+  // fundido, y el cursor se lee a saltos (cada 60 ms) para que no se sienta un efecto que lo sigue.
+  // PICO: cuántas cambian debajo del mouse. ALCANCE: hasta dónde llega, en fracción del lado corto de la pantalla.
   var raton = null, muestra = null, ultima = 0;
-  var PICO = 0.45, CURVA = 4, PASO_CURSOR = 100;
+  var PICO = 0.65, CURVA = 2, ALCANCE = 0.6, PASO_CURSOR = 60;
   addEventListener("pointermove", function (e) {
     if (e.pointerType !== "mouse") return;
     raton = { x: e.clientX, y: e.clientY };
@@ -1272,7 +1273,7 @@ body.pf-foco #pf-nota { border-radius: 0; margin-inline: 0; }
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = paleta.fondo; ctx.fillRect(0, 0, W, H);
     if (!reducir && ahora - ultima >= PASO_CURSOR) { muestra = raton; ultima = ahora; }
-    var lado = CELDA * 0.72, D = Math.hypot(W, H);
+    var lado = CELDA * 0.72, D = Math.min(W, H) * ALCANCE;
     for (var k = 0; k < grilla.length; k++) {
       var c = grilla[k]; if (!c) continue;
       var s = c.muere ? 1 - suave(Math.min(1, (ahora - c.muere) / 300)) : suave(Math.min(1, (ahora - c.nace) / 260));
