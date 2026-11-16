@@ -252,6 +252,8 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
   // Qué nota: ?n=<archivo>. Sin parámetro, la más reciente.
   var pedida = new URLSearchParams(location.search).get("n");
   var n = NOTAS.filter(function (x) { return x.ar === pedida; })[0] || NOTAS[NOTAS.length - 1];
+  // Lo mínimo que necesita una variante de la página (por ejemplo, la cabecera con campo) para leer la nota y el sistema.
+  window.PF_NOTA = { n: n, formas: A.formas, formasDe: formasDe, PARES_CONTRA: PARES_CONTRA };
 
   function url(x) { return "./?n=" + encodeURIComponent(x.ar); }
   function lectura(w) { return Math.max(1, Math.round(w / 200)) + " min de lectura"; }

@@ -87,9 +87,20 @@ nt = nt.replace('/*__NOTAS__*/[]', n).replace('/*__ASSETS__*/{}', json.dumps(aj2
 nt = nt.replace('/*__PIE_CSS__*/', pie['css']).replace('/*__PIE_HTML__*/', pie['html'])
 head, rest = nt.split('</style>', 1)
 doc = armar(head, rest)
+# Cabecera con campo: la tarjeta con el título sobre un campo fijo de Formas (campo.css y campo.js).
+doc = doc.replace('</head>', '<style>\n' + open('campo.css', encoding='utf-8').read() + '</style>\n</head>', 1)
+i = doc.rfind('</body>')
+doc = doc[:i] + '<script>\n' + open('campo.js', encoding='utf-8').read() + '</script>\n' + doc[i:]
 os.makedirs(os.path.join(AQUI, '..', 'nota'), exist_ok=True)
 salida = os.path.join(AQUI, '..', 'nota', 'index.html')
 open(salida, 'w', encoding='utf-8').write(doc)
-firmar(salida, 'PROFERTIL · NOTA', 'Plantilla de nota de Novedades, con las notas reales del sitio actual.',
+firmar(salida, 'PROFERTIL · NOTA', 'Plantilla de nota de Novedades, con las notas reales del sitio actual y la cabecera sobre un campo de Formas.',
        'Prototipo de la página de nota para la web de Profertil.')
 print('nota', len(doc))
+
+# nota-campo/ fue la prueba de la cabecera con campo; ahora es la Nota. La dirección vieja lleva a la nueva.
+os.makedirs(os.path.join(AQUI, '..', 'nota-campo'), exist_ok=True)
+open(os.path.join(AQUI, '..', 'nota-campo', 'index.html'), 'w', encoding='utf-8').write(
+    '<!doctype html><meta charset="utf-8"><title>Nota · Novedades Profertil</title>'
+    '<meta name="robots" content="noindex"><script>location.replace("../nota/" + location.search + location.hash);</script>'
+    '<a href="../nota/">Ir a la nota</a>\n')

@@ -161,3 +161,16 @@ Para cambiar un valor:
 
 Si el exportador informa `conflictos`, dos variables usan el mismo nombre de
 CSS con valores distintos: se corrige en Figma antes de exportar.
+
+## Cabecera con campo (`campo.css` y `campo.js`)
+
+La Nota lleva la cabecera en una tarjeta sobre un campo fijo de Formas que crecen en grupos; foto, texto, relacionadas y pie suben por encima al hacer scroll. `build.py` la suma a la Nota compilada (no tiene plantilla propia) y lee la nota desde `window.PF_NOTA`.
+
+- Color: el de la etiqueta del tipo de nota (azul, verde, amarillo o terra para Comercial), con su figura y su acento.
+- Formas: una sola, la de la categoría (la del badge de la etiqueta).
+- Alto: 70% de la pantalla.
+- Cursor: dentro de un radio de 3,6 celdas en escritorio (3 en celular) las Formas cambian de color, la figura al acento y el acento a la figura. Todo o nada, sin fundido.
+- En escritorio la hoja de la nota va de borde a borde. En modo lectura el campo desaparece.
+- Para probar: `?p=azul|verde|amarillo|naranja`, `?formas=varias` (mezcla del tema), `?alto=40..100`.
+
+`../nota-campo/` fue la prueba de esta cabecera: ahora redirige a `../nota/` con la misma dirección.

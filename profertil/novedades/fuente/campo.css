@@ -1,0 +1,53 @@
+/* ==========================================================================
+   Nota con campo: variante de la página de Nota.
+   Detrás de todo, un campo fijo con las Formas del sistema que crecen en grupos.
+   La cabecera de la nota pasa a una tarjeta sobre el campo y el resto de la
+   página (foto, texto, relacionadas y pie) sube por encima al hacer scroll.
+   ========================================================================== */
+#pf-campo { position: fixed; inset: 0; width: 100%; height: 100lvh; z-index: 0; display: block; pointer-events: none; }
+
+.pf-campo-cab {
+  position: relative; z-index: 1;
+  min-height: var(--pf-campo-alto, 70svh);
+  padding: calc(var(--pf-barra-h, 64px) + 12px) 12px 88px;
+}
+.pf-campo-cab .pf-n-cab { width: min(100%, 1268px); margin-inline: auto; }
+.pf-campo-cab .pf-n-in {
+  max-width: 760px; gap: 16px;
+  background: var(--pf-papel, #fff); border-radius: var(--radio-tarjeta, 24px);
+  padding: 22px 20px 26px;
+}
+/* Volver y etiqueta más juntos que en la Nota (ahí la etiqueta toma aire del título; acá la tarjeta ya lo da). */
+.pf-campo-cab .pf-n-in .pf-etiqueta { margin-top: -6px; }
+/* Sin el panel de ajuste de la transición. */
+.pf-tr-panel { display: none !important; }
+
+/* Pista de scroll */
+.pf-campo-seguir {
+  position: absolute; left: 50%; bottom: 24px; translate: -50% 0;
+  width: 44px; height: 44px; border-radius: 50%; background: var(--pf-papel, #fff); color: var(--ink, #111);
+  display: grid; place-items: center; transition: opacity 300ms ease;
+}
+.pf-campo-seguir svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.pf-campo-bajo .pf-campo-seguir { opacity: 0; }
+
+/* El resto de la página es opaco y tapa el campo. */
+#pf-nota { position: relative; z-index: 2; background: var(--pf-papel, #fff); border-radius: var(--radio-tarjeta, 24px) var(--radio-tarjeta, 24px) 0 0; }
+/* Arriba de la foto, el mismo aire que a los costados (16 en celular, la separación de columnas en escritorio). */
+#pf-nota .pf-n-grilla { padding-top: 0; }
+#pf-nota .pf-n-foto { margin-top: 16px; }
+#pf-nota .pf-n-grilla:not(.pf-con-foto) { padding-top: 16px; }
+.pf-pie { position: relative; z-index: 2; }
+
+@media (min-width: 720px) {
+  .pf-campo-cab { padding: calc(var(--pf-barra-h, 64px) + 24px) 24px 96px; }
+  .pf-campo-cab .pf-n-cab { margin-inline: 0; }
+  .pf-campo-cab .pf-n-in { max-width: none; padding: 32px 36px 36px; }
+  #pf-nota .pf-n-foto { margin-top: 64px; }
+  #pf-nota .pf-n-grilla:not(.pf-con-foto) { padding-top: 64px; }
+}
+
+/* Modo lectura: sin campo, la tarjeta queda como cabecera común. */
+body.pf-foco #pf-campo, body.pf-foco .pf-campo-seguir { display: none; }
+body.pf-foco .pf-campo-cab { min-height: 0; padding-bottom: 0; background: var(--pf-papel, #fff); }
+body.pf-foco #pf-nota { border-radius: 0; margin-inline: 0; }
