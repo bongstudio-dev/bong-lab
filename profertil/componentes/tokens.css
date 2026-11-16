@@ -40,7 +40,7 @@
   --carrusel-dura: 7000ms;  /* Web/Movimiento/Carrusel duración */
   --carrusel-pase: 700ms;  /* Web/Movimiento/Carrusel pase */
   --ease: cubic-bezier(0.22, 1, 0.36, 1);  /* Web/Movimiento/Curva base */
-  --f-curva: cubic-bezier(0.67, 0, 0.24, 0.99);  /* Web/Movimiento/Curva filtros */
+  --f-curva: linear(0, 0.019 2.5%, 0.067 5%, 0.132 7.5%, 0.205 10%, 0.282 12.5%, 0.359 15%, 0.500 20%, 0.620 25%, 0.717 30%, 0.792 35%, 0.849 40%, 0.923 50%, 0.963 60%, 0.983 70%, 0.993 80%, 1);  /* Web/Movimiento/Curva filtros */
   --curva-vista: cubic-bezier(0.67, 0, 0.24, 0.99);  /* Web/Movimiento/Curva vista */
   --f-chica-curva: cubic-bezier(0.32, 0.72, 0, 1);  /* Web/Movimiento/Curva compacto */
   --carrusel-curva: cubic-bezier(0.65, 0, 0.25, 1);  /* Web/Movimiento/Curva carrusel */
