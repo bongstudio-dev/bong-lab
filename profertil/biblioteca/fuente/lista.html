@@ -559,7 +559,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
   function cortarAcordeon() {
     if (!acordeon) return;
     cancelAnimationFrame(acordeon.raf);
-    acordeon.cuerpos.forEach(function (c) { c.style.height = c.style.gridTemplateRows = c.style.visibility = c.style.overflow = ""; });
+    acordeon.cuerpos.forEach(function (c) { c.style.height = c.style.gridTemplateRows = c.style.visibility = c.style.overflow = c.firstElementChild.style.cssText = ""; });
     acordeon = null;
   }
   function cambiarGrupo(g, ancla) {
@@ -575,6 +575,20 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
     var y0 = ancla ? arriba() : 0;
     // Altos fijos en lo que se ve ahora; recién después cambia el estado (las flechas y el fundido siguen en CSS).
     cuerpos.forEach(function (c, i) { c.style.gridTemplateRows = "1fr"; c.style.visibility = "visible"; c.style.overflow = "hidden"; c.style.height = desde[i] + "px"; });
+    // Lo que no se ve de los grupos que se cierran se saca ya, sin que nada cambie en pantalla: lo de abajo del borde,
+    // y lo de arriba compensando el scroll y pegando el contenido abajo (así lo visible queda quieto). Si no, un grupo
+    // largo como Zona gasta la mitad del tiempo cerrando lo que no se ve y después cierra lo visible de golpe.
+    var scR = sc.getBoundingClientRect();
+    cuerpos.forEach(function (c, i) {
+      if (!desde[i] || grupos[i].dataset.grupo === g) return;
+      var r = c.getBoundingClientRect();
+      var fueraArriba = Math.max(0, Math.min(desde[i], scR.top - r.top, sc.scrollTop));
+      var fueraAbajo = Math.max(0, Math.min(desde[i] - fueraArriba, r.bottom - scR.bottom));
+      if (!fueraArriba && !fueraAbajo) return;
+      desde[i] -= fueraArriba + fueraAbajo;
+      c.style.height = desde[i] + "px";
+      if (fueraArriba) { var dentro = c.firstElementChild.style; dentro.display = "flex"; dentro.flexDirection = "column"; dentro.justifyContent = "flex-end"; sc.scrollTop -= fueraArriba; }
+    });
     abrirGrupo(g);
     var hasta = grupos.map(function (el) { return el.classList.contains("pf-abierto") ? el.querySelector(".pf-f-gr__in").offsetHeight : 0; });
     // Lo que se ve del panel cuando llega a su alto máximo (con los grupos cerrados es más bajo y crece con ellos).
@@ -589,7 +603,13 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
     // Sube solo si arriba se cierra algo (si no, el encabezado no se mueve y el grupo abre debajo).
     var cierraArriba = abre > -1 && desde.some(function (h, i) { return i < abre && h > 0; });
     var yFin = y0;
-    if (ancla && cierraArriba && ancla.dataset.grupo === g) yFin = Math.max(0, Math.min(y0, vista - alto - hasta[abre]));
+    if (ancla && cierraArriba && ancla.dataset.grupo === g) {
+      // Con el scroll en 0 el encabezado no puede quedar más abajo de su lugar en la lista: el destino se acota ahí.
+      // Si no, el scroll toca el tope a mitad de camino y el encabezado cambia de ritmo de golpe.
+      var yMax = arriba() + sc.scrollTop;
+      for (var k = 0; k < abre; k++) yMax -= desde[k] - hasta[k];
+      yFin = Math.min(yMax, Math.max(0, Math.min(y0, vista - alto - hasta[abre])));
+    }
     var tope = Math.max(0, vista - Math.max(0, yFin) - alto);
     var meta = hasta.map(function (h, i) { return h > desde[i] ? Math.min(h, Math.max(desde[i], tope)) : h; });
     // El tiempo crece un poco con lo que se recorre a la vista (hasta el del panel): un cambio chico es rápido y uno
@@ -598,6 +618,11 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
     meta.forEach(function (m, i) { recorrido = Math.max(recorrido, Math.abs(Math.min(m, vista, innerHeight) - Math.min(desde[i], vista, innerHeight))); });
     var tope_dur = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--f-abrir")) || 600;
     dur = Math.min(tope_dur, dur + recorrido * 0.4);
+    // El fundido del contenido (CSS) acompaña el tiempo real del cambio: al cerrar se va en el primer 60 %, al abrir
+    // aparece en todo el recorrido. Con un tiempo fijo, un grupo largo quedaba como una franja vacía que se achica.
+    cuerpos.forEach(function (c, i) {
+      c.firstElementChild.getAnimations().forEach(function (a) { a.effect.updateTiming({ duration: Math.round(hasta[i] > 0 ? dur : dur * 0.6) }); });
+    });
     var t0 = performance.now();
     var este = acordeon = { cuerpos: cuerpos };
     (function cuadro(now) {
