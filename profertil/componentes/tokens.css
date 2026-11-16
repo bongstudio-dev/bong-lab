@@ -34,6 +34,7 @@
   --f-fundido: 360ms;  /* Web/Movimiento/Filtros fundido */
   --f-fundido-retraso: 160ms;  /* Web/Movimiento/Filtros fundido retraso */
   --f-flecha: 460ms;  /* Web/Movimiento/Filtros flecha */
+  --f-acordeon: 260ms;  /* Web/Movimiento/Filtros acordeón */
   --f-chica: 280ms;  /* Web/Movimiento/Compacto */
   --t-buscador: 420ms;  /* Web/Movimiento/Buscador */
   --t-vista: 420ms;  /* Web/Movimiento/Vista */
