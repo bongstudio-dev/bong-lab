@@ -1105,14 +1105,27 @@ body.pf-foco #pf-nota { border-radius: 0; margin-inline: 0; }
 })();
 </script>
 <script>
-/* Nota con campo: el campo generativo detrás de la cabecera.
+/* Cabecera con campo (Nota y Biblioteca): el campo generativo detrás de la cabecera.
    Grilla de Formas que crecen en grupos (una Forma por grupo), se quedan quietas
-   un rato y se deshacen mientras nacen otras. El color sale del tipo de nota (el de
-   su etiqueta) y las Formas, del tema de la nota. */
+   un rato y se deshacen mientras nacen otras. En la Nota el color sale del tipo de nota
+   (el de su etiqueta) y la Forma, de su categoría; otras páginas los pasan en window.PF_CAMPO. */
 (function () {
   "use strict";
-  var P = window.PF_NOTA; if (!P) return;
-  var n = P.n;
+  // Configuración: la página puede pasar window.PF_CAMPO (la Biblioteca); la Nota la arma desde su nota (PF_NOTA).
+  //   formas: las Formas del sistema · color: azul|verde|amarillo|naranja · forma: la del badge · tema: Formas para el modo "varias"
+  //   cab: id de la tarjeta · main: id del contenido que sube encima · columna: id de la columna a la que se alinea la tarjeta (escritorio)
+  var Q = new URLSearchParams(location.search);
+  var P = window.PF_CAMPO || (function () {
+    var N = window.PF_NOTA; if (!N) return null;
+    var n = N.n, tema = [];
+    // Automático: el color de la etiqueta del tipo de nota (la familia del componente Etiqueta).
+    var FAMILIA = { institucional: "azul", financiera: "azul", somos: "verde", tecnico: "verde", aviso: "amarillo", comercial: "naranja" };
+    // Modo "una": todo el campo con la forma de la categoría (la del badge de la etiqueta).
+    var FORMA_TIPO = { institucional: "escudo", comercial: "barras", somos: "circulos", tecnico: "lupa", aviso: "casco", financiera: "grafico" };
+    try { tema = N.formasDe(n) || []; } catch (e) {}
+    return { formas: N.formas, color: FAMILIA[n.tp], forma: FORMA_TIPO[n.tp], tema: tema, cab: "pf-cab", main: "pf-nota", columna: "pf-texto" };
+  })();
+  if (!P) return;
 
   // --- Paleta: fondo, figura y acento. El fondo es siempre azul, verde, amarillo o terra.
   var PALETAS = {
@@ -1121,23 +1134,17 @@ body.pf-foco #pf-nota { border-radius: 0; margin-inline: 0; }
     amarillo: { fondo: "#EABA2C", figura: "#E57F19", acento: "#003DA5" },
     naranja:  { fondo: "#8A4818", figura: "#E57F19", acento: "#EABA2C" }
   };
-  var pedida = new URLSearchParams(location.search).get("p");
-  // Automático: el color de la etiqueta del tipo de nota (la familia del componente Etiqueta).
-  var FAMILIA = { institucional: "azul", financiera: "azul", somos: "verde", tecnico: "verde", aviso: "amarillo", comercial: "naranja" };
-  var AUTO = FAMILIA[n.tp] || "azul";
+  var pedida = Q.get("p");
   // ?p=azul|verde|amarillo|naranja fuerza otro color (solo para probar).
-  var paleta = PALETAS[PALETAS[pedida] ? pedida : AUTO];
+  var paleta = PALETAS[PALETAS[pedida] ? pedida : (PALETAS[P.color] ? P.color : "azul")];
 
-  // --- Formas: las del tema de la nota pesan más; el resto aparece de vez en cuando.
+  // --- Formas: las del tema pesan más; el resto aparece de vez en cuando.
   var TODAS = Object.keys(P.formas);
-  var TEMA = [];
-  try { TEMA = (P.formasDe(n) || []).filter(function (f) { return P.formas[f]; }); } catch (e) {}
+  var TEMA = (P.tema || []).filter(function (f) { return P.formas[f]; });
   if (!TEMA.length) TEMA = TODAS;
-  // Modo "una": todo el campo con la forma de la categoría (la del badge de la etiqueta).
-  var FORMA_TIPO = { institucional: "escudo", comercial: "barras", somos: "circulos", tecnico: "lupa", aviso: "casco", financiera: "grafico" };
-  var DEL_TIPO = P.formas[FORMA_TIPO[n.tp]] ? FORMA_TIPO[n.tp] : TEMA[0];
+  var DEL_TIPO = P.formas[P.forma] ? P.forma : TEMA[0];
   // Por defecto "una"; ?formas=varias vuelve a la mezcla.
-  var modoFormas = new URLSearchParams(location.search).get("formas") === "varias" ? "varias" : "una";
+  var modoFormas = Q.get("formas") === "varias" ? "varias" : "una";
   function unaForma() { if (modoFormas === "una") return DEL_TIPO; return Math.random() < 0.7 ? TEMA[Math.floor(Math.random() * TEMA.length)] : TODAS[Math.floor(Math.random() * TODAS.length)]; }
 
   var cache = {}, prop = {};
@@ -1155,7 +1162,7 @@ body.pf-foco #pf-nota { border-radius: 0; margin-inline: 0; }
   var cv = document.createElement("canvas");
   cv.id = "pf-campo"; cv.setAttribute("aria-hidden", "true");
   document.body.insertBefore(cv, document.body.firstChild);
-  var main = document.getElementById("pf-nota"), cab = document.getElementById("pf-cab");
+  var main = document.getElementById(P.main), cab = document.getElementById(P.cab);
   var papel = getComputedStyle(document.body).backgroundColor;
   document.documentElement.style.setProperty("--pf-papel", papel === "rgba(0, 0, 0, 0)" ? "#fff" : papel);
   var sec = document.createElement("section");
@@ -1164,12 +1171,12 @@ body.pf-foco #pf-nota { border-radius: 0; margin-inline: 0; }
   sec.insertAdjacentHTML("beforeend", '<span class="pf-campo-seguir" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></svg></span>');
   main.parentNode.insertBefore(sec, main);
   // Alto de la cabecera: 70% de la pantalla. Para probar otro, ?alto=60 (de 40 a 100).
-  var alto = +new URLSearchParams(location.search).get("alto") || 70;
+  var alto = +Q.get("alto") || 70;
   document.documentElement.style.setProperty("--pf-campo-alto", Math.max(40, Math.min(100, Math.round(alto))) + "svh");
 
   // Escritorio: la tarjeta toma el ancho y la posición de la columna central (la del texto).
   function alinear() {
-    var t = document.getElementById("pf-texto");
+    var t = P.columna && document.getElementById(P.columna);
     if (!t || window.innerWidth < 720) { cab.style.width = ""; cab.style.marginLeft = ""; return; }
     var r = t.getBoundingClientRect(), s = sec.getBoundingClientRect();
     if (!r.width) return;
@@ -1300,7 +1307,7 @@ body.pf-foco #pf-nota { border-radius: 0; margin-inline: 0; }
   // de los 7 de siempre; si se pasa, el grupo quieto más viejo empieza a deshacerse. No cuenta sobre la tarjeta.
   var EXTRA = 5;
   sec.addEventListener("click", function (e) {
-    if (reducir || !W || e.target.closest("#pf-cab, a, button")) return;
+    if (reducir || !W || e.target.closest("#" + P.cab + ", a, button")) return;
     var cx = Math.floor(e.clientX / CELDA), cy = Math.floor(e.clientY / CELDA), borde = [];
     for (var dy = -1; dy <= 1; dy++) for (var dx = -1; dx <= 1; dx++) {
       var x = cx + dx, y = cy + dy;

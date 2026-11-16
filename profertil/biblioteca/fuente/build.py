@@ -86,8 +86,12 @@ comun = re.search(r'  /\* @comun.*?\*/\n(.*?)  /\* @fin-comun \*/', lista, re.S)
 t = (lista.replace('/*__LOGOS__*/', LOGOS).replace('/*__DOCS__*/[]', docs).replace('/*__GRUPOS__*/[]', grupos)
      .replace('/*__ASSETS__*/{}', assets))
 head, rest = t.split('</style>', 1)
+doc = armar(head, rest)
+# Cabecera con campo: el mismo campo de Formas de la Nota (novedades/fuente/campo.js), configurado con window.PF_CAMPO.
+i = doc.rfind('</body>')
+doc = doc[:i] + '<script>\n' + open(os.path.join(NOV, 'campo.js'), encoding='utf-8').read() + '</script>\n' + doc[i:]
 salida = os.path.join(AQUI, '..', 'index.html')
-open(salida, 'w', encoding='utf-8').write(armar(head, rest))
+open(salida, 'w', encoding='utf-8').write(doc)
 firmar(salida, 'PROFERTIL · BIBLIOTECA VIRTUAL', 'Maqueta de la Biblioteca Virtual: los PDF reales del sitio actual, con sus etiquetas.',
        'Prototipo de la Biblioteca Virtual para la web de Profertil.')
 print('lista', os.path.getsize(salida))

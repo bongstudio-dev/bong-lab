@@ -10,7 +10,7 @@
 <script src="../buscador/alcance.js" data-seccion="documentos" data-nombre="Biblioteca" data-en="la Biblioteca" defer></script>
 <style>
 /* Biblioteca Virtual Profertil: los documentos técnicos del sitio actual (boletines, ensayos, informes de campaña).
-   Misma lógica que Novedades (barra, filtros en el dock, buscador en la lupa, ancla); en vez de tarjetas, filas.
+   Misma lógica que Novedades (barra, filtros en el dock, buscador en la lupa, ancla) y la cabecera de la Nota (campo de Formas con tarjeta); en vez de tarjetas, filas.
    Los filtros son las etiquetas del sitio actual: cultivo, zona, año y nutriente. */
 
 html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar de la barra de scroll queda reservado: si aparece y desaparece según el largo de la lista, el contenido se corre de costado */
@@ -121,27 +121,30 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
      borde + 1 del borde del f-body. */
 }
 
-/* --- Encabezado: banda azul como la portada del Lab, con la foto recortada en la Forma Lupa. Más bajo que el de Novedades: la lista sigue a la vista sin scrollear mucho. */
-.pf-dh { position: relative; overflow: hidden; background: var(--azul); color: var(--tiza); padding: calc(132px + env(safe-area-inset-top, 0px)) 0 64px; }
-.pf-dh__in { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 560px); align-items: end; gap: 40px; }
-.pf-dh h1 { margin: 0; font: 600 clamp(40px, 6vw, 80px)/.95 var(--f-display); letter-spacing: -0.045em; color: var(--tiza); text-wrap: balance; }
-.pf-dh p { margin: 18px 0 0; max-width: 54ch; font-size: var(--texto-destacado); line-height: 1.5; color: color-mix(in srgb, var(--tiza) 86%, transparent); text-wrap: pretty; }
-.pf-dh__arte { position: relative; aspect-ratio: 260 / 227; margin-bottom: -8px; }
-.pf-dh__foto { position: absolute; inset: 0; background: url("../novedades/fotos/demo-1.webp") 62% 40% / cover no-repeat var(--azul-oscuro, #002a73);
-  -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20260%20227%22%3E%3Cpath%20d%3D%22M106.108%200C164.71%200%20212.217%2047.5063%20212.217%20106.108C212.217%20123.332%20208.111%20139.595%20200.828%20153.978L259.268%20212.417C239.93%20231.755%20208.578%20231.755%20189.24%20212.417L168.654%20191.831C151.116%20204.65%20129.496%20212.217%20106.108%20212.217C47.5063%20212.217%200%20164.711%200%20106.108C9.43891e-05%2047.5063%2047.5063%201.07058e-05%20106.108%200Z%22/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20260%20227%22%3E%3Cpath%20d%3D%22M106.108%200C164.71%200%20212.217%2047.5063%20212.217%20106.108C212.217%20123.332%20208.111%20139.595%20200.828%20153.978L259.268%20212.417C239.93%20231.755%20208.578%20231.755%20189.24%20212.417L168.654%20191.831C151.116%20204.65%20129.496%20212.217%20106.108%20212.217C47.5063%20212.217%200%20164.711%200%20106.108C9.43891e-05%2047.5063%2047.5063%201.07058e-05%20106.108%200Z%22/%3E%3C/svg%3E") center / contain no-repeat; }
-.pf-dh__foto { z-index: 1; }
-/* Paralaje: al bajar, la Lupa con la foto baja más lento que la página (se queda atrás). Lo mueve el navegador atado al scroll, sin JS; sin soporte o con movimiento
-   reducido queda quieto. La banda azul recorta lo que se sale. */
-@supports (animation-timeline: scroll()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .pf-dh__arte { animation: pf-dh-lupa linear both; animation-timeline: scroll(root block); animation-range: 0px 600px; }
-      }
+/* --- Encabezado: la cabecera de la Nota. Un campo fijo de Formas (campo.js, el mismo de la Nota) con el título y la bajada
+   en una tarjeta; la lista sube por encima al hacer scroll. */
+#pf-campo { position: fixed; inset: 0; width: 100%; height: 100lvh; z-index: 0; display: block; pointer-events: none; }
+.pf-campo-cab { position: relative; z-index: 1; min-height: var(--pf-campo-alto, 70svh); padding: calc(var(--pf-barra-h, 64px) + 12px) 12px 88px; }
+.pf-bh { display: grid; gap: 16px; justify-items: start; width: min(100%, 760px); margin-inline: auto;
+  background: var(--pf-papel, #fff); border-radius: var(--radio-tarjeta, 24px); padding: 22px 20px 26px; }
+.pf-bh h1 { margin: 0; font: 600 2.1rem/1.02 var(--f-display); letter-spacing: -0.035em; color: var(--azul); text-wrap: balance; }
+.pf-bh p { margin: 0; max-width: 60ch; font-size: var(--texto-cuerpo); line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
+/* Pista de scroll */
+.pf-campo-seguir { position: absolute; left: 50%; bottom: 24px; translate: -50% 0; width: 44px; height: 44px; border-radius: 50%;
+  background: var(--pf-papel, #fff); color: var(--ink, #111); display: grid; place-items: center; transition: opacity 300ms ease; }
+.pf-campo-seguir svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.pf-campo-bajo .pf-campo-seguir { opacity: 0; }
+/* La hoja con la lista es opaca y tapa el campo; de borde a borde, con la columna adentro. */
+.pf-hoja { position: relative; z-index: 2; min-height: 100svh; padding-top: 8px; background: var(--pf-papel, #fff);
+  border-radius: var(--radio-tarjeta, 24px) var(--radio-tarjeta, 24px) 0 0; }
+@media (min-width: 720px) {
+  .pf-campo-cab { padding: calc(var(--pf-barra-h, 64px) + 24px) 24px 96px; }
+  .pf-bh { margin-inline: 0; width: auto; padding: 32px 36px 36px; gap: 18px; }
+  .pf-bh h1 { font-size: clamp(36px, 4.4vw, 60px); }
+  .pf-bh p { font-size: var(--texto-destacado); }
+  .pf-hoja { padding-top: 24px; }
 }
-@keyframes pf-dh-lupa { to { translate: 0 var(--pf-dh-lupa, 200px); } }
 .pf-result-row { margin-top: 8px; }
-@media (max-width: 900px) {
-  .pf-dh__in { grid-template-columns: minmax(0, 1fr) minmax(0, 340px); gap: 28px; }
-}
 
 /* --- Filas: una por documento, separadas por una línea (sin cajas ni sombras). */
 .pf-docs:not(:empty) { min-height: 60vh; }
@@ -155,13 +158,6 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
 .pf-herramientas .pf-selector button { position: relative; }
 .pf-herramientas .pf-selector button::after { content: ""; position: absolute; inset: -9px 0; }
 .pf-doc__d:active { scale: .94; }
-@media (max-width: 640px) {
-  /* Celular: la Lupa sube al lado del título y el texto pasa abajo a todo el ancho, para que la lista llegue rápido. */
-  .pf-dh { padding: calc(96px + env(safe-area-inset-top, 0px)) 0 32px; }
-  .pf-dh__in { display: block; }
-  .pf-dh h1 { max-width: 6.2em; font-size: 44px; }
-  .pf-dh__arte { position: absolute; top: -18px; right: -10px; width: 40%; max-width: 200px; margin: 0; --pf-dh-lupa: 90px; }
-    .pf-dh p { margin-top: 30px; font-size: var(--texto-cuerpo); }
 }
 
 /* --- Filtros activos: un chip por filtro (categoría, año y búsqueda); tocarlo lo saca. */
@@ -263,17 +259,12 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
   </div>
 </header>
 
-<section class="pf-dh">
-  <div class="pf-dh__in pf-col">
-    <div>
-      <h1>Biblioteca Virtual</h1>
-      <p>Accedé a investigaciones sobre nutrición de cultivos, eficiencia de nutrientes y cuidado del suelo, agua y aire, elaboradas por Investigación y Desarrollo de Profertil, instituciones técnicas y especialistas de trayectoria.</p>
-    </div>
-    <div class="pf-dh__arte" aria-hidden="true">
-      <div class="pf-dh__foto"></div>
-    </div>
-  </div>
-</section>
+<header class="pf-bh" id="pf-cab">
+  <h1>Biblioteca Virtual</h1>
+  <p>Accedé a investigaciones sobre nutrición de cultivos, eficiencia de nutrientes y cuidado del suelo, agua y aire, elaboradas por Investigación y Desarrollo de Profertil, instituciones técnicas y especialistas de trayectoria.</p>
+</header>
+
+<div class="pf-hoja" id="pf-hoja">
 
 <main class="pf-col" id="pf-lista" tabindex="-1">
   <div class="pf-result-row">
@@ -303,6 +294,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
   </div>
   <div class="pf-sentinel" id="pf-sentinel"></div>
 </main>
+</div>
 
 <section class="pf-filters" id="pf-filters" aria-label="Filtros">
   <button class="pf-f-x" id="pf-fX" type="button" aria-label="Cerrar filtros"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg></button>
@@ -330,6 +322,8 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
   var GRUPOS = /*__GRUPOS__*/[];
   var A = /*__ASSETS__*/{};
   var $ = function (id) { return document.getElementById(id); };
+  /* Cabecera con campo (campo.js): azul y la Forma del badge de la Biblioteca, como en la Nota. */
+  window.PF_CAMPO = { formas: A.formas, color: "azul", forma: "lupa", tema: ["lupa", "suelo", "capas"], cab: "pf-cab", main: "pf-hoja", columna: "pf-lista" };
 
   var defs = $("pf-defs"), simbolos = "";
   Object.keys(A.formas).forEach(function (k) { simbolos += '<symbol id="pf-forma-' + k + '" viewBox="' + A.formas[k].vb + '">' + A.formas[k].d + "</symbol>"; });
@@ -855,7 +849,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
     q: R(1, tk("ancla-apretar-k"), tk("ancla-apretar-c")),
     r: R(90, tk("ancla-giro-k"), tk("ancla-giro-c"))
   };
-  function inicioLista() { return Math.max(0, document.querySelector("main").offsetTop - $("pf-top").offsetHeight - 8); }
+  function inicioLista() { return Math.max(0, document.querySelector("main").getBoundingClientRect().top + window.scrollY - $("pf-top").offsetHeight - 8); }
   function arriba() { return window.scrollY > inicioLista() + window.innerHeight * CAMBIO; }
   function medir() {
     var r = $("pf-filters").getBoundingClientRect();

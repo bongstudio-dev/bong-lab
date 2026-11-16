@@ -57,7 +57,7 @@
 <script src="../buscador/alcance.js" data-seccion="documentos" data-nombre="Biblioteca" data-en="la Biblioteca" defer></script>
 <style>
 /* Biblioteca Virtual Profertil: los documentos técnicos del sitio actual (boletines, ensayos, informes de campaña).
-   Misma lógica que Novedades (barra, filtros en el dock, buscador en la lupa, ancla); en vez de tarjetas, filas.
+   Misma lógica que Novedades (barra, filtros en el dock, buscador en la lupa, ancla) y la cabecera de la Nota (campo de Formas con tarjeta); en vez de tarjetas, filas.
    Los filtros son las etiquetas del sitio actual: cultivo, zona, año y nutriente. */
 
 html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar de la barra de scroll queda reservado: si aparece y desaparece según el largo de la lista, el contenido se corre de costado */
@@ -168,27 +168,30 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
      borde + 1 del borde del f-body. */
 }
 
-/* --- Encabezado: banda azul como la portada del Lab, con la foto recortada en la Forma Lupa. Más bajo que el de Novedades: la lista sigue a la vista sin scrollear mucho. */
-.pf-dh { position: relative; overflow: hidden; background: var(--azul); color: var(--tiza); padding: calc(132px + env(safe-area-inset-top, 0px)) 0 64px; }
-.pf-dh__in { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 560px); align-items: end; gap: 40px; }
-.pf-dh h1 { margin: 0; font: 600 clamp(40px, 6vw, 80px)/.95 var(--f-display); letter-spacing: -0.045em; color: var(--tiza); text-wrap: balance; }
-.pf-dh p { margin: 18px 0 0; max-width: 54ch; font-size: var(--texto-destacado); line-height: 1.5; color: color-mix(in srgb, var(--tiza) 86%, transparent); text-wrap: pretty; }
-.pf-dh__arte { position: relative; aspect-ratio: 260 / 227; margin-bottom: -8px; }
-.pf-dh__foto { position: absolute; inset: 0; background: url("../novedades/fotos/demo-1.webp") 62% 40% / cover no-repeat var(--azul-oscuro, #002a73);
-  -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20260%20227%22%3E%3Cpath%20d%3D%22M106.108%200C164.71%200%20212.217%2047.5063%20212.217%20106.108C212.217%20123.332%20208.111%20139.595%20200.828%20153.978L259.268%20212.417C239.93%20231.755%20208.578%20231.755%20189.24%20212.417L168.654%20191.831C151.116%20204.65%20129.496%20212.217%20106.108%20212.217C47.5063%20212.217%200%20164.711%200%20106.108C9.43891e-05%2047.5063%2047.5063%201.07058e-05%20106.108%200Z%22/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20260%20227%22%3E%3Cpath%20d%3D%22M106.108%200C164.71%200%20212.217%2047.5063%20212.217%20106.108C212.217%20123.332%20208.111%20139.595%20200.828%20153.978L259.268%20212.417C239.93%20231.755%20208.578%20231.755%20189.24%20212.417L168.654%20191.831C151.116%20204.65%20129.496%20212.217%20106.108%20212.217C47.5063%20212.217%200%20164.711%200%20106.108C9.43891e-05%2047.5063%2047.5063%201.07058e-05%20106.108%200Z%22/%3E%3C/svg%3E") center / contain no-repeat; }
-.pf-dh__foto { z-index: 1; }
-/* Paralaje: al bajar, la Lupa con la foto baja más lento que la página (se queda atrás). Lo mueve el navegador atado al scroll, sin JS; sin soporte o con movimiento
-   reducido queda quieto. La banda azul recorta lo que se sale. */
-@supports (animation-timeline: scroll()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .pf-dh__arte { animation: pf-dh-lupa linear both; animation-timeline: scroll(root block); animation-range: 0px 600px; }
-      }
+/* --- Encabezado: la cabecera de la Nota. Un campo fijo de Formas (campo.js, el mismo de la Nota) con el título y la bajada
+   en una tarjeta; la lista sube por encima al hacer scroll. */
+#pf-campo { position: fixed; inset: 0; width: 100%; height: 100lvh; z-index: 0; display: block; pointer-events: none; }
+.pf-campo-cab { position: relative; z-index: 1; min-height: var(--pf-campo-alto, 70svh); padding: calc(var(--pf-barra-h, 64px) + 12px) 12px 88px; }
+.pf-bh { display: grid; gap: 16px; justify-items: start; width: min(100%, 760px); margin-inline: auto;
+  background: var(--pf-papel, #fff); border-radius: var(--radio-tarjeta, 24px); padding: 22px 20px 26px; }
+.pf-bh h1 { margin: 0; font: 600 2.1rem/1.02 var(--f-display); letter-spacing: -0.035em; color: var(--azul); text-wrap: balance; }
+.pf-bh p { margin: 0; max-width: 60ch; font-size: var(--texto-cuerpo); line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
+/* Pista de scroll */
+.pf-campo-seguir { position: absolute; left: 50%; bottom: 24px; translate: -50% 0; width: 44px; height: 44px; border-radius: 50%;
+  background: var(--pf-papel, #fff); color: var(--ink, #111); display: grid; place-items: center; transition: opacity 300ms ease; }
+.pf-campo-seguir svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.pf-campo-bajo .pf-campo-seguir { opacity: 0; }
+/* La hoja con la lista es opaca y tapa el campo; de borde a borde, con la columna adentro. */
+.pf-hoja { position: relative; z-index: 2; min-height: 100svh; padding-top: 8px; background: var(--pf-papel, #fff);
+  border-radius: var(--radio-tarjeta, 24px) var(--radio-tarjeta, 24px) 0 0; }
+@media (min-width: 720px) {
+  .pf-campo-cab { padding: calc(var(--pf-barra-h, 64px) + 24px) 24px 96px; }
+  .pf-bh { margin-inline: 0; width: auto; padding: 32px 36px 36px; gap: 18px; }
+  .pf-bh h1 { font-size: clamp(36px, 4.4vw, 60px); }
+  .pf-bh p { font-size: var(--texto-destacado); }
+  .pf-hoja { padding-top: 24px; }
 }
-@keyframes pf-dh-lupa { to { translate: 0 var(--pf-dh-lupa, 200px); } }
 .pf-result-row { margin-top: 8px; }
-@media (max-width: 900px) {
-  .pf-dh__in { grid-template-columns: minmax(0, 1fr) minmax(0, 340px); gap: 28px; }
-}
 
 /* --- Filas: una por documento, separadas por una línea (sin cajas ni sombras). */
 .pf-docs:not(:empty) { min-height: 60vh; }
@@ -202,13 +205,6 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
 .pf-herramientas .pf-selector button { position: relative; }
 .pf-herramientas .pf-selector button::after { content: ""; position: absolute; inset: -9px 0; }
 .pf-doc__d:active { scale: .94; }
-@media (max-width: 640px) {
-  /* Celular: la Lupa sube al lado del título y el texto pasa abajo a todo el ancho, para que la lista llegue rápido. */
-  .pf-dh { padding: calc(96px + env(safe-area-inset-top, 0px)) 0 32px; }
-  .pf-dh__in { display: block; }
-  .pf-dh h1 { max-width: 6.2em; font-size: 44px; }
-  .pf-dh__arte { position: absolute; top: -18px; right: -10px; width: 40%; max-width: 200px; margin: 0; --pf-dh-lupa: 90px; }
-    .pf-dh p { margin-top: 30px; font-size: var(--texto-cuerpo); }
 }
 
 /* --- Filtros activos: un chip por filtro (categoría, año y búsqueda); tocarlo lo saca. */
@@ -407,17 +403,12 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
   </div>
 </header>
 
-<section class="pf-dh">
-  <div class="pf-dh__in pf-col">
-    <div>
-      <h1>Biblioteca Virtual</h1>
-      <p>Accedé a investigaciones sobre nutrición de cultivos, eficiencia de nutrientes y cuidado del suelo, agua y aire, elaboradas por Investigación y Desarrollo de Profertil, instituciones técnicas y especialistas de trayectoria.</p>
-    </div>
-    <div class="pf-dh__arte" aria-hidden="true">
-      <div class="pf-dh__foto"></div>
-    </div>
-  </div>
-</section>
+<header class="pf-bh" id="pf-cab">
+  <h1>Biblioteca Virtual</h1>
+  <p>Accedé a investigaciones sobre nutrición de cultivos, eficiencia de nutrientes y cuidado del suelo, agua y aire, elaboradas por Investigación y Desarrollo de Profertil, instituciones técnicas y especialistas de trayectoria.</p>
+</header>
+
+<div class="pf-hoja" id="pf-hoja">
 
 <main class="pf-col" id="pf-lista" tabindex="-1">
   <div class="pf-result-row">
@@ -447,6 +438,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
   </div>
   <div class="pf-sentinel" id="pf-sentinel"></div>
 </main>
+</div>
 
 <section class="pf-filters" id="pf-filters" aria-label="Filtros">
   <button class="pf-f-x" id="pf-fX" type="button" aria-label="Cerrar filtros"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg></button>
@@ -474,6 +466,8 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
   var GRUPOS = [{"id":"cultivo","nombre":"Cultivo","opciones":[{"id":"arroz","nombre":"Arroz","sub":"Cereales"},{"id":"avena","nombre":"Avena","sub":"Cereales"},{"id":"cebada-cervecera","nombre":"Cebada Cervecera","sub":"Cereales"},{"id":"maiz","nombre":"Maíz","sub":"Cereales"},{"id":"sorgo","nombre":"Sorgo","sub":"Cereales"},{"id":"trigo","nombre":"Trigo","sub":"Cereales"},{"id":"colza-canola","nombre":"Colza-Canola","sub":"Oleaginosas"},{"id":"girasol","nombre":"Girasol","sub":"Oleaginosas"},{"id":"soja","nombre":"Soja","sub":"Oleaginosas"},{"id":"cana-de-azucar","nombre":"Caña de Azúcar","sub":"Industriales"},{"id":"tabaco","nombre":"Tabaco","sub":"Industriales"},{"id":"citricos","nombre":"Cítricos","sub":"Industriales"},{"id":"campos-naturales","nombre":"Campos naturales","sub":"Pasturas"},{"id":"pasturas-consociadas","nombre":"Pasturas consociadas","sub":"Pasturas"},{"id":"pasturas-puras","nombre":"Pasturas puras","sub":"Pasturas"},{"id":"verdeos-de-invierno","nombre":"Verdeos de invierno","sub":"Pasturas"}]},{"id":"zona","nombre":"Zona","opciones":[{"id":"buenos-aires","nombre":"Buenos Aires","sub":"Buenos Aires","provincia":true},{"id":"bahia-blanca","nombre":"Bahía Blanca","sub":"Buenos Aires"},{"id":"bajo-hondo","nombre":"Bajo Hondo","sub":"Buenos Aires"},{"id":"balcarce","nombre":"Balcarce","sub":"Buenos Aires"},{"id":"bolivar","nombre":"Bolívar","sub":"Buenos Aires"},{"id":"bordenave","nombre":"Bordenave","sub":"Buenos Aires"},{"id":"bragado","nombre":"Bragado","sub":"Buenos Aires"},{"id":"chacabuco","nombre":"Chacabuco","sub":"Buenos Aires"},{"id":"colon","nombre":"Colón","sub":"Buenos Aires"},{"id":"coronel-suarez","nombre":"Coronel Suárez","sub":"Buenos Aires"},{"id":"daireaux","nombre":"Daireaux","sub":"Buenos Aires"},{"id":"general-arenales","nombre":"General Arenales","sub":"Buenos Aires"},{"id":"general-villegas","nombre":"General Villegas","sub":"Buenos Aires"},{"id":"lincoln","nombre":"Lincoln","sub":"Buenos Aires"},{"id":"loberia","nombre":"Lobería","sub":"Buenos Aires"},{"id":"necochea","nombre":"Necochea","sub":"Buenos Aires"},{"id":"nueve-de-julio","nombre":"Nueve De Julio","sub":"Buenos Aires"},{"id":"olavarria","nombre":"Olavarría","sub":"Buenos Aires"},{"id":"pehuajo","nombre":"Pehuajó","sub":"Buenos Aires"},{"id":"pergamino","nombre":"Pergamino","sub":"Buenos Aires"},{"id":"san-antonio-de-areco","nombre":"San Antonio De Areco","sub":"Buenos Aires"},{"id":"san-pedro","nombre":"San Pedro","sub":"Buenos Aires"},{"id":"tandil","nombre":"Tandil","sub":"Buenos Aires"},{"id":"tres-arroyos","nombre":"Tres Arroyos","sub":"Buenos Aires"},{"id":"chaco","nombre":"Chaco","sub":"Chaco","provincia":true},{"id":"departamento-maipu","nombre":"Departamento Maipú","sub":"Chaco"},{"id":"cordoba","nombre":"Córdoba","sub":"Córdoba","provincia":true},{"id":"rio-cuarto","nombre":"Río Cuarto","sub":"Córdoba"},{"id":"marcos-juarez","nombre":"Marcos Juárez","sub":"Córdoba"},{"id":"entre-rios","nombre":"Entre Ríos","sub":"Entre Ríos","provincia":true},{"id":"departamento-gualeguaychu","nombre":"Departamento Gualeguaychú","sub":"Entre Ríos"},{"id":"departamento-parana","nombre":"Departamento Paraná","sub":"Entre Ríos"},{"id":"la-pampa","nombre":"La Pampa","sub":"La Pampa","provincia":true},{"id":"salta","nombre":"Salta","sub":"Salta","provincia":true},{"id":"santa-fe","nombre":"Santa Fe","sub":"Santa Fe","provincia":true},{"id":"la-capital","nombre":"La Capital","sub":"Santa Fe"},{"id":"san-justo","nombre":"San Justo","sub":"Santa Fe"},{"id":"tucuman","nombre":"Tucumán","sub":"Tucumán","provincia":true},{"id":"departamento-burruyacu","nombre":"Departamento Burruyacú","sub":"Tucumán"}]},{"id":"anio","nombre":"Año","opciones":[{"id":"2010","nombre":"2010"},{"id":"2011","nombre":"2011"},{"id":"2012","nombre":"2012"},{"id":"2013","nombre":"2013"},{"id":"2014","nombre":"2014"},{"id":"2015","nombre":"2015"},{"id":"2016","nombre":"2016"},{"id":"2017","nombre":"2017"},{"id":"2018","nombre":"2018"},{"id":"2019","nombre":"2019"},{"id":"2020","nombre":"2020"}]},{"id":"nutriente","nombre":"Nutriente","opciones":[{"id":"k","nombre":"K"},{"id":"micro","nombre":"Micro"},{"id":"n","nombre":"N"},{"id":"np","nombre":"NP"},{"id":"npk","nombre":"NPK"},{"id":"npks","nombre":"NPKS"},{"id":"nps","nombre":"NPS"},{"id":"ns","nombre":"NS"},{"id":"p","nombre":"P"},{"id":"ps","nombre":"PS"},{"id":"s","nombre":"S"},{"id":"suelos","nombre":"Suelos"}]}];
   var A = {"formas":{"barras":{"vb":"0 0 217 235","d":"<path d=\"M0 102.901C0 78.1579 20.0582 58.0997 44.8012 58.0997H64.3985V234.82H0V102.901Z\"/> <path d=\"M75.3335 0H139.732V234.82H75.3335V0Z\"/> <path d=\"M151.883 125.883H216.282V193.108C216.282 216.145 197.607 234.82 174.57 234.82H151.883V125.883Z\"/>"},"c":{"vb":"0 0 252 204","d":"<path d=\"M97.1621 203.028C96.2867 202.99 95.4104 202.943 94.535 202.882C77.8732 201.726 61.7537 196.478 47.6041 187.604C33.4543 178.73 21.7097 166.504 13.4137 152.008C5.1181 137.512 0.52565 121.194 0.0424727 104.499C-0.440492 87.8041 3.20178 71.2456 10.6458 56.2941C18.0898 41.3431 29.1065 28.4587 42.7192 18.7819C56.3324 9.105 72.1229 2.93359 88.6903 0.816508C93.8441 0.157956 99.0237 -0.0991858 104.184 0.0340506L251.821 0.0340377C251.821 56.2035 206.286 101.739 150.117 101.739H150.031C206.122 101.739 251.593 147.209 251.593 203.301L97.1621 203.301V203.028Z\"/>"},"capas":{"vb":"0 0 223 285","d":"<path d=\"M111.131 0C125.725 -6.37923e-07 140.176 2.8751 153.659 8.45996C167.142 14.0448 179.393 22.2304 189.713 32.5498C200.032 42.8693 208.219 55.1204 213.804 68.6035C219.389 82.0866 222.263 96.5379 222.263 111.132H178.911C182.704 114.047 186.314 117.209 189.713 120.604C200.032 130.91 208.219 143.145 213.804 156.61C219.389 170.076 222.263 184.508 222.263 199.083H182.663C185.101 201.133 187.453 203.291 189.713 205.551C200.032 215.87 208.219 228.121 213.804 241.604C219.389 255.088 222.263 269.539 222.263 284.133H0C-1.27584e-06 269.539 2.87415 255.088 8.45898 241.604C14.0439 228.121 22.2303 215.87 32.5498 205.551C34.8096 203.291 37.1619 201.133 39.5996 199.083H0C1.43212e-05 184.508 2.87412 170.076 8.45898 156.61C14.0439 143.145 22.2303 130.91 32.5498 120.604C35.9488 117.209 39.5585 114.047 43.3516 111.132H0C6.2847e-06 96.5379 2.87411 82.0866 8.45898 68.6035C14.0439 55.1205 22.2303 42.8693 32.5498 32.5498C42.8691 22.2306 55.1198 14.0448 68.6025 8.45996C82.0855 2.87512 96.537 4.18031e-05 111.131 0Z\"/>"},"casco":{"vb":"0 0 267 234","d":"<path d=\"M1.82251e-05 131.956C1.82251e-05 81.3434 37.6371 40.3138 84.0648 40.3138V136.371C84.0648 159.022 67.2211 177.384 46.4434 177.384H1.82251e-05V131.956Z\"/> <path d=\"M265.103 131.956C265.103 81.3434 227.465 40.3138 181.038 40.3138V136.371C181.038 159.022 197.881 177.384 218.659 177.384H265.103V131.956Z\"/> <path d=\"M97.5252 34.1771C97.5252 15.3016 111.562 0 128.876 0H136.228C153.543 0 167.579 15.3016 167.579 34.1771V177.385H97.5252V34.1771Z\"/> <path d=\"M266.205 196.642C266.205 217.276 250.861 234.003 231.934 234.003L34.2716 234.003C15.3439 234.003 -1.56727e-06 217.276 0 196.642L2.24369e-07 193.688L266.205 193.688V196.642Z\"/>"},"circulos":{"vb":"0 0 275 184","d":"<path d=\"M45.8311 91.9197C20.5198 91.9197 0 71.3422 0 45.9599C0 20.5775 20.5198 0 45.8311 0C71.1424 0 91.6623 20.5775 91.6623 45.9599C91.6623 71.3422 71.1424 91.9197 45.8311 91.9197ZM137.493 91.9197C162.805 91.9197 183.325 71.3422 183.325 45.9599C183.325 20.5775 162.805 0 137.493 0C112.182 0 91.6623 20.5775 91.6623 45.9599C91.6623 71.3422 112.182 91.9197 137.493 91.9197ZM45.8311 91.9197C20.5198 91.9197 0 112.497 0 137.88C0 163.262 20.5198 183.839 45.8311 183.839C71.1424 183.839 91.6623 163.262 91.6623 137.88C91.6623 112.497 71.1424 91.9197 45.8311 91.9197ZM137.493 91.9197C112.182 91.9197 91.6623 112.497 91.6623 137.88C91.6623 163.262 112.182 183.839 137.493 183.839C162.805 183.839 183.325 163.262 183.325 137.88C183.325 112.497 162.805 91.9197 137.493 91.9197Z\"/> <path d=\"M137.493 91.9197C112.182 91.9197 91.6623 71.3422 91.6623 45.9599C91.6623 20.5775 112.182 0 137.493 0C162.805 0 183.325 20.5775 183.325 45.9599C183.325 71.3422 162.805 91.9197 137.493 91.9197ZM229.156 91.9197C254.467 91.9197 274.987 71.3422 274.987 45.9599C274.987 20.5775 254.467 0 229.156 0C203.844 0 183.325 20.5775 183.325 45.9599C183.325 71.3422 203.844 91.9197 229.156 91.9197ZM137.493 91.9197C112.182 91.9197 91.6623 112.497 91.6623 137.88C91.6623 163.262 112.182 183.839 137.493 183.839C162.805 183.839 183.325 163.262 183.325 137.88C183.325 112.497 162.805 91.9197 137.493 91.9197ZM229.156 91.9197C203.844 91.9197 183.325 112.497 183.325 137.88C183.325 163.262 203.844 183.839 229.156 183.839C254.467 183.839 274.987 163.262 274.987 137.88C274.987 112.497 254.467 91.9197 229.156 91.9197Z\"/>"},"escudo":{"vb":"0 0 246 285","d":"<path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M245.423 42.9531C245.493 42.953 245.564 42.9531 245.634 42.9531V175.186H245.305C245.259 176.168 245.2 177.151 245.127 178.133C243.731 196.838 237.39 214.934 226.669 230.818C215.948 246.703 201.174 259.886 183.66 269.199C166.146 278.511 146.43 283.669 126.26 284.212C106.089 284.754 86.0812 280.665 68.0167 272.308C49.9525 263.951 34.3842 251.582 22.6925 236.301C11.0012 221.019 3.54538 203.293 0.987451 184.695C0.254784 179.368 -0.0604958 174.015 0.0188685 168.678H0V0H245.423V42.9531ZM25.2125 28.1141V108.448C25.2131 140.016 50.8056 165.606 82.3736 165.607H121.029V251.458H145.916C186.017 251.458 218.524 218.95 218.524 178.85V95.2733H175.1C145.238 95.2737 121.029 119.482 121.029 149.344V69.826C121.029 46.7894 102.354 28.1141 79.3169 28.1141H25.2125Z\"/>"},"estrella":{"vb":"0 0 285 285","d":"<path d=\"M142.164 0C143.399 0 144.399 1.00066 144.399 2.23535C144.399 51.4455 154.9 85.7075 177.049 107.713C199.201 129.721 233.467 139.929 282.094 139.929C283.328 139.929 284.329 140.93 284.329 142.164C284.329 143.399 283.328 144.399 282.094 144.399C233.482 144.399 199.211 154.896 177.054 177.054C154.896 199.211 144.399 233.482 144.399 282.094C144.399 283.328 143.399 284.329 142.164 284.329C140.93 284.329 139.929 283.328 139.929 282.094C139.929 233.486 129.36 199.215 107.165 177.056C84.9695 154.896 50.6977 144.399 2.23535 144.399C1.00066 144.399 0 143.399 0 142.164C0.000112018 140.929 1.00073 139.929 2.23535 139.929C50.7125 139.929 84.9798 129.721 107.17 107.711C129.356 85.7042 139.929 51.4418 139.929 2.23535C139.929 1.00072 140.929 0.000103465 142.164 0Z\"/>"},"flor":{"vb":"0 0 269 279","d":"<path d=\"M0.122525 0C104.518 6.16695 129.089 71.9464 134.315 111.945C139.551 71.9428 164.14 6.20302 268.503 0.0380859C269.392 27.8878 267.823 119.947 166.907 139.112C267.841 158.27 269.41 250.339 268.522 278.19C164.051 272.019 139.519 206.15 134.318 166.159C129.107 206.153 104.56 271.988 0.117642 278.158C-0.770961 250.306 0.797104 158.234 101.737 139.078C0.802177 119.92 -0.766054 27.8514 0.122525 0Z\"/>"},"grafico":{"vb":"0 0 228 229","d":"<path d=\"M115.314 0.00433095L114.32 114.32L114.318 114.325L227.094 114.722C227.018 136.314 220.828 157.443 209.242 175.664C197.656 193.884 181.147 208.45 161.625 217.677L114.29 117.53L113.325 228.637C83.0067 228.373 54.0353 216.075 32.7834 194.45C11.5316 172.825 -0.259414 143.644 0.00433126 113.325C0.268304 83.007 12.5645 54.0351 34.1892 32.7834C55.8141 11.5315 84.9957 -0.259404 115.314 0.00433095Z\"/>"},"hoja":{"vb":"0 0 255 249","d":"<path d=\"M100.334 77.48C149.937 -9.94785 254.374 0.363473 254.604 0.38623C253.868 111.726 195.419 153.26 143.571 168.58C146.912 202.677 139.814 233.225 135.742 248.318C-50.3429 192.658 8.99902 30.3813 8.99902 30.3813C50.5227 41.3302 79.8541 58.0146 100.334 77.48Z\"/>"},"industria":{"vb":"0 0 252 239","d":"<path d=\"M176.673 48.244C217.821 48.2445 251.177 81.6257 251.177 122.803V238.297H42.366C18.9681 238.297 0.000369796 219.315 0 195.9V77.4833H126.026V48.244H176.673Z\"/> <path d=\"M23.3744 0C45.1589 0 62.8187 17.6724 62.8187 39.4724V77.4833H23.3744L23.3744 0Z\"/>"},"lupa":{"vb":"0 0 260 227","d":"<path d=\"M106.108 0C164.71 0 212.217 47.5063 212.217 106.108C212.217 123.332 208.111 139.595 200.828 153.978L259.268 212.417C239.93 231.755 208.578 231.755 189.24 212.417L168.654 191.831C151.116 204.65 129.496 212.217 106.108 212.217C47.5063 212.217 0 164.711 0 106.108C9.43891e-05 47.5063 47.5063 1.07058e-05 106.108 0Z\"/>"},"ondas":{"vb":"0 0 288 142","d":"<path d=\"M287.673 70.8449C239.728 23.615 191.782 23.615 143.837 70.8449C95.8911 23.615 47.9456 23.615 0 70.8449V35.4225C47.9456 -11.8075 95.8911 -11.8075 143.837 35.4225C191.782 -11.8075 239.728 -11.8075 287.673 35.4225M287.673 141.69C239.728 94.4599 191.782 94.4599 143.837 141.69C95.8911 94.4599 47.9456 94.4599 0 141.69V106.267C47.9456 59.0374 95.8911 59.0374 143.837 106.267C191.782 59.0374 239.728 59.0374 287.673 106.267\"/>"},"plantas":{"vb":"0 0 269 291","d":"<path d=\"M3.26108e-08 225.696C29.4699 255.337 138.816 354.778 268.196 225.696C268.196 225.696 150.704 84.9006 3.26108e-08 225.696Z\"/> <path d=\"M0 144.123C29.4699 174.107 138.816 274.698 268.196 144.123C268.196 144.123 150.704 1.70041 0 144.123Z\"/> <path d=\"M3.26108e-08 62.5756C29.4699 92.2166 138.816 191.658 268.196 62.5757C268.196 62.5757 150.704 -78.2195 3.26108e-08 62.5756Z\"/>"},"sol":{"vb":"0 0 262 265","d":"<path d=\"M130.956 204.045C112.011 204.045 93.8427 196.458 80.4469 182.952C67.051 169.447 59.5254 151.129 59.5254 132.029C59.5254 112.929 67.051 94.6118 80.4469 81.1062C93.8427 67.6006 112.011 60.0133 130.956 60.0133C149.9 60.0133 168.069 67.6006 181.465 81.1062C194.861 94.6118 202.386 112.929 202.386 132.029C202.386 151.129 194.861 169.447 181.465 182.952C168.069 196.458 149.9 204.045 130.956 204.045ZM119.051 0H142.861V36.008H119.051V0ZM119.051 228.05H142.861V264.058H119.051V228.05ZM29.9413 47.1584L46.775 30.1867L72.0257 55.6443L55.1919 72.6161L29.9413 47.1584ZM189.886 208.414L206.72 191.442L231.97 216.9L215.137 233.872L189.886 208.414ZM215.137 30.1747L231.97 47.1584L206.72 72.6161L189.886 55.6443L215.137 30.1747ZM55.1919 191.442L72.0257 208.414L46.775 233.872L29.9413 216.9L55.1919 191.442ZM261.912 120.027V144.032H226.196V120.027H261.912ZM35.7152 120.027V144.032H0V120.027H35.7152Z\"/>"},"suelo":{"vb":"0 0 256 140","d":"<path d=\"M36.8051 108.912V139.543H0V108.912H36.8051ZM255.471 108.912V139.543H61.5481V108.912H255.471ZM112.58 54.4557V85.0871H0.308558V54.4557H112.58ZM255.47 54.4559V85.0871H142.271V54.4557L255.47 54.4559ZM193.923 0V30.6315H0V0H193.923ZM255.471 0V30.6315H218.666V0H255.471Z\"/>"},"trigo":{"vb":"0 0 263 292","d":"<path d=\"M0.269531 152.09C102.309 158.14 126.099 222.86 131.089 261.95C136.089 222.85 159.889 158.159 261.909 152.109C262.859 181.969 260.929 287.27 131.839 291.47C131.319 291.47 130.849 291.47 130.329 291.45C1.24927 287.24 -0.670468 181.94 0.269531 152.09ZM141.531 10.6104C188.391 57.4704 188.391 133.45 141.531 180.32L130.911 190.93L120.301 180.32C73.441 133.46 73.4412 57.4804 120.301 10.6104L130.911 0L141.531 10.6104Z\"/>"},"urea":{"vb":"0 0 235 273","d":"<path d=\"M177.988 0C209.042 0 234.217 25.174 234.217 56.2275C234.217 79.3312 220.281 99.1793 200.358 107.828C210.345 124.2 216.101 143.436 216.101 164.017C216.101 223.691 167.724 272.067 108.05 272.067C48.3754 272.067 0 223.691 0 164.017C0.000154623 104.342 48.3755 55.967 108.05 55.9668C112.696 55.9668 117.273 56.2602 121.765 56.8291C121.763 56.6289 121.761 56.4282 121.761 56.2275C121.761 25.1742 146.935 0.000239177 177.988 0Z\"/>"}}};
   var $ = function (id) { return document.getElementById(id); };
+  /* Cabecera con campo (campo.js): azul y la Forma del badge de la Biblioteca, como en la Nota. */
+  window.PF_CAMPO = { formas: A.formas, color: "azul", forma: "lupa", tema: ["lupa", "suelo", "capas"], cab: "pf-cab", main: "pf-hoja", columna: "pf-lista" };
 
   var defs = $("pf-defs"), simbolos = "";
   Object.keys(A.formas).forEach(function (k) { simbolos += '<symbol id="pf-forma-' + k + '" viewBox="' + A.formas[k].vb + '">' + A.formas[k].d + "</symbol>"; });
@@ -999,7 +993,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
     q: R(1, tk("ancla-apretar-k"), tk("ancla-apretar-c")),
     r: R(90, tk("ancla-giro-k"), tk("ancla-giro-c"))
   };
-  function inicioLista() { return Math.max(0, document.querySelector("main").offsetTop - $("pf-top").offsetHeight - 8); }
+  function inicioLista() { return Math.max(0, document.querySelector("main").getBoundingClientRect().top + window.scrollY - $("pf-top").offsetHeight - 8); }
   function arriba() { return window.scrollY > inicioLista() + window.innerHeight * CAMBIO; }
   function medir() {
     var r = $("pf-filters").getBoundingClientRect();
@@ -1114,6 +1108,244 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
     ocupado = false; velo.className = "pf-tr-velo"; d.classList.remove("pf-tr-fuera", "pf-tr-llega", "pf-tr-tapa");
   });
 
+})();
+</script>
+<script>
+/* Cabecera con campo (Nota y Biblioteca): el campo generativo detrás de la cabecera.
+   Grilla de Formas que crecen en grupos (una Forma por grupo), se quedan quietas
+   un rato y se deshacen mientras nacen otras. En la Nota el color sale del tipo de nota
+   (el de su etiqueta) y la Forma, de su categoría; otras páginas los pasan en window.PF_CAMPO. */
+(function () {
+  "use strict";
+  // Configuración: la página puede pasar window.PF_CAMPO (la Biblioteca); la Nota la arma desde su nota (PF_NOTA).
+  //   formas: las Formas del sistema · color: azul|verde|amarillo|naranja · forma: la del badge · tema: Formas para el modo "varias"
+  //   cab: id de la tarjeta · main: id del contenido que sube encima · columna: id de la columna a la que se alinea la tarjeta (escritorio)
+  var Q = new URLSearchParams(location.search);
+  var P = window.PF_CAMPO || (function () {
+    var N = window.PF_NOTA; if (!N) return null;
+    var n = N.n, tema = [];
+    // Automático: el color de la etiqueta del tipo de nota (la familia del componente Etiqueta).
+    var FAMILIA = { institucional: "azul", financiera: "azul", somos: "verde", tecnico: "verde", aviso: "amarillo", comercial: "naranja" };
+    // Modo "una": todo el campo con la forma de la categoría (la del badge de la etiqueta).
+    var FORMA_TIPO = { institucional: "escudo", comercial: "barras", somos: "circulos", tecnico: "lupa", aviso: "casco", financiera: "grafico" };
+    try { tema = N.formasDe(n) || []; } catch (e) {}
+    return { formas: N.formas, color: FAMILIA[n.tp], forma: FORMA_TIPO[n.tp], tema: tema, cab: "pf-cab", main: "pf-nota", columna: "pf-texto" };
+  })();
+  if (!P) return;
+
+  // --- Paleta: fondo, figura y acento. El fondo es siempre azul, verde, amarillo o terra.
+  var PALETAS = {
+    azul:     { fondo: "#003DA5", figura: "#4086FF", acento: "#EABA2C" },
+    verde:    { fondo: "#2D8035", figura: "#5EB53A", acento: "#EABA2C" },
+    amarillo: { fondo: "#EABA2C", figura: "#E57F19", acento: "#003DA5" },
+    naranja:  { fondo: "#8A4818", figura: "#E57F19", acento: "#EABA2C" }
+  };
+  var pedida = Q.get("p");
+  // ?p=azul|verde|amarillo|naranja fuerza otro color (solo para probar).
+  var paleta = PALETAS[PALETAS[pedida] ? pedida : (PALETAS[P.color] ? P.color : "azul")];
+
+  // --- Formas: las del tema pesan más; el resto aparece de vez en cuando.
+  var TODAS = Object.keys(P.formas);
+  var TEMA = (P.tema || []).filter(function (f) { return P.formas[f]; });
+  if (!TEMA.length) TEMA = TODAS;
+  var DEL_TIPO = P.formas[P.forma] ? P.forma : TEMA[0];
+  // Por defecto "una"; ?formas=varias vuelve a la mezcla.
+  var modoFormas = Q.get("formas") === "varias" ? "varias" : "una";
+  function unaForma() { if (modoFormas === "una") return DEL_TIPO; return Math.random() < 0.7 ? TEMA[Math.floor(Math.random() * TEMA.length)] : TODAS[Math.floor(Math.random() * TODAS.length)]; }
+
+  var cache = {}, prop = {};
+  TODAS.forEach(function (k) { var v = P.formas[k].vb.split(/\s+/); prop[k] = +v[2] / +v[3]; });
+  function tenida(k, color) {
+    var c = k + color;
+    if (cache[c]) return cache[c];
+    var im = new Image();
+    im.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + P.formas[k].vb + '" fill="' + color + '">' + P.formas[k].d + "</svg>");
+    return (cache[c] = im);
+  }
+  TODAS.forEach(function (k) { tenida(k, paleta.figura); tenida(k, paleta.acento); });
+
+  // --- Armado: la cabecera sale de la grilla y pasa a una tarjeta sobre el campo.
+  var cv = document.createElement("canvas");
+  cv.id = "pf-campo"; cv.setAttribute("aria-hidden", "true");
+  document.body.insertBefore(cv, document.body.firstChild);
+  var main = document.getElementById(P.main), cab = document.getElementById(P.cab);
+  var papel = getComputedStyle(document.body).backgroundColor;
+  document.documentElement.style.setProperty("--pf-papel", papel === "rgba(0, 0, 0, 0)" ? "#fff" : papel);
+  var sec = document.createElement("section");
+  sec.className = "pf-campo-cab";
+  sec.appendChild(cab);
+  sec.insertAdjacentHTML("beforeend", '<span class="pf-campo-seguir" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></svg></span>');
+  main.parentNode.insertBefore(sec, main);
+  // Alto de la cabecera: 70% de la pantalla. Para probar otro, ?alto=60 (de 40 a 100).
+  var alto = +Q.get("alto") || 70;
+  document.documentElement.style.setProperty("--pf-campo-alto", Math.max(40, Math.min(100, Math.round(alto))) + "svh");
+
+  // Escritorio: la tarjeta toma el ancho y la posición de la columna central (la del texto).
+  function alinear() {
+    var t = P.columna && document.getElementById(P.columna);
+    if (!t || window.innerWidth < 720) { cab.style.width = ""; cab.style.marginLeft = ""; return; }
+    var r = t.getBoundingClientRect(), s = sec.getBoundingClientRect();
+    if (!r.width) return;
+    cab.style.width = r.width + "px";
+    cab.style.marginLeft = (r.left - s.left - parseFloat(getComputedStyle(sec).paddingLeft)) + "px";
+  }
+
+  function barra() { var b = document.getElementById("pf-top"); if (b) document.documentElement.style.setProperty("--pf-barra-h", b.offsetHeight + "px"); }
+  barra();
+
+  // --- Campo
+  var ctx = cv.getContext("2d");
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var reducir = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var W, H, CELDA, cols, filas, grilla, grupos = [], sembrado = false;
+  var VEC = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+  function azar(a, b) { return a + Math.random() * (b - a); }
+  function idx(x, y) { return y * cols + x; }
+
+  function medir() {
+    W = window.innerWidth; H = Math.max(window.innerHeight, document.documentElement.clientHeight);
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); cv.style.height = H + "px";
+    CELDA = W < 720 ? 26 : 34;
+    cols = Math.ceil(W / CELDA) + 1; filas = Math.ceil(H / CELDA) + 1;
+    grilla = new Array(cols * filas).fill(null);
+    grupos = []; sembrado = false;
+  }
+  // Donde conviene que nazcan: entre la tarjeta y el final de la cabecera (se mide cada vez: la tarjeta cambia de alto al llegar el texto).
+  function zona() {
+    var t = cab.getBoundingClientRect(), c = sec.getBoundingClientRect();
+    var z = { y0: Math.floor((t.bottom + 8) / CELDA), y1: Math.min(filas - 1, Math.floor(c.bottom / CELDA)) };
+    return z.y1 - z.y0 < 3 ? { y0: 0, y1: filas - 1 } : z;
+  }
+  function nuevoGrupo(ahora) {
+    var z = zona();
+    for (var i = 0; i < 30; i++) {
+      var x = Math.floor(azar(0, cols - 1));
+      var y = Math.random() < 0.25 ? Math.floor(azar(0, filas - 1)) : Math.floor(azar(z.y0, z.y1));
+      if (grilla[idx(x, y)]) continue;
+      grupos.push({ forma: unaForma(), celdas: [], borde: [[x, y]], meta: Math.floor(azar(8, 26)),
+        estado: "crece", proximo: ahora, ritmo: azar(70, 140), espera: azar(2500, 5000) });
+      return grupos[grupos.length - 1];
+    }
+  }
+  function paso(g, ahora) {
+    if (ahora < g.proximo) return;
+    g.proximo = ahora + g.ritmo;
+    if (g.estado === "crece") {
+      while (g.borde.length) {
+        var p = g.borde.splice(Math.floor(Math.random() * g.borde.length), 1)[0];
+        if (p[0] < 0 || p[1] < 0 || p[0] >= cols || p[1] >= filas || grilla[idx(p[0], p[1])]) continue;
+        var c = { x: p[0], y: p[1], nace: ahora, muere: 0, forma: g.forma, color: Math.random() < 0.08 ? paleta.acento : paleta.figura, v: Math.random() };
+        grilla[idx(p[0], p[1])] = c; g.celdas.push(c);
+        VEC.forEach(function (v) { g.borde.push([p[0] + v[0], p[1] + v[1]]); });
+        break;
+      }
+      if (g.celdas.length >= g.meta || !g.borde.length) { g.estado = "quieto"; g.proximo = ahora + g.espera; }
+    } else if (g.estado === "quieto") {
+      g.estado = "decrece";
+    } else if (g.estado === "decrece") {
+      var m = g.celdas.shift();
+      if (m) { m.muere = ahora; setTimeout(function () { if (grilla[idx(m.x, m.y)] === m) grilla[idx(m.x, m.y)] = null; }, 320); }
+      if (!g.celdas.length) g.estado = "fin";
+    }
+  }
+  var MAX = 7;
+  function sembrar() {
+    var t = performance.now();
+    for (var i = 0; i < MAX; i++) {
+      var g = nuevoGrupo(t); if (!g) continue;
+      var k = Math.floor(g.meta * azar(0.4, 1));
+      for (var j = 0; j < k; j++) { g.proximo = 0; g.estado = "crece"; paso(g, t - 1000); }
+      g.estado = g.celdas.length >= g.meta ? "quieto" : "crece";
+      g.celdas.forEach(function (c) { c.nace = t - 1000; });
+      g.proximo = t + (g.estado === "quieto" ? g.espera * azar(0.3, 1) : azar(0, 2000));
+    }
+    sembrado = true;
+  }
+  function suave(t) { return 1 - Math.pow(1 - t, 3); }
+
+  // Cursor: solo reaccionan las Formas en color de acento; el resto no se mueve. Cada una tiene un valor fijo
+  // al azar (v) y el cursor sube la chance de que pase al color de figura: casi todas debajo del mouse, menos
+  // a medida que se alejan, sin borde. Cada Forma cambia o no, sin fundido, y el cursor se lee a saltos (cada 60 ms).
+  // PICO: cuántas cambian debajo del mouse. ALCANCE: hasta dónde llega, en fracción del lado corto de la pantalla.
+  var raton = null, muestra = null, ultima = 0;
+  var PICO = 0.95, CURVA = 2, ALCANCE = 0.6, PASO_CURSOR = 60;
+  addEventListener("pointermove", function (e) {
+    if (e.pointerType !== "mouse") return;
+    raton = { x: e.clientX, y: e.clientY };
+    if (reducir && W) { muestra = raton; dibujar(performance.now()); }
+  }, { passive: true });
+  document.documentElement.addEventListener("pointerleave", function () { raton = null; if (reducir && W) { muestra = null; dibujar(performance.now()); } });
+  function cambia(c, D) {
+    if (!muestra || c.color !== paleta.acento) return false;
+    var d = Math.hypot(c.x * CELDA + CELDA / 2 - muestra.x, c.y * CELDA + CELDA / 2 - muestra.y);
+    return c.v < PICO * Math.pow(Math.max(0, 1 - d / D), CURVA);
+  }
+  function otro(color) { return color === paleta.acento ? paleta.figura : paleta.acento; }
+  function dibujar(ahora) {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = paleta.fondo; ctx.fillRect(0, 0, W, H);
+    if (!reducir && ahora - ultima >= PASO_CURSOR) { muestra = raton; ultima = ahora; }
+    var lado = CELDA * 0.72, D = Math.min(W, H) * ALCANCE;
+    for (var k = 0; k < grilla.length; k++) {
+      var c = grilla[k]; if (!c) continue;
+      var s = c.muere ? 1 - suave(Math.min(1, (ahora - c.muere) / 300)) : suave(Math.min(1, (ahora - c.nace) / 260));
+      var im = tenida(c.forma, c.color);
+      if (s <= 0 || !im.complete) continue;
+      var r = prop[c.forma], w = r >= 1 ? lado : lado * r, h = r >= 1 ? lado / r : lado;
+      var x = c.x * CELDA + (CELDA - w * s) / 2, y = c.y * CELDA + (CELDA - h * s) / 2;
+      if (cambia(c, D)) { var im2 = tenida(c.forma, otro(c.color)); if (im2.complete) im = im2; }
+      ctx.drawImage(im, x, y, w * s, h * s);
+    }
+  }
+  var activo = true;
+  function cuadro(ahora) {
+    if (!sembrado) sembrar();
+    if (activo) {
+      while (grupos.length < MAX && nuevoGrupo(ahora + azar(0, 1500))) {}
+      grupos.forEach(function (g) { paso(g, ahora); });
+      grupos = grupos.filter(function (g) { return g.estado !== "fin"; });
+      dibujar(ahora);
+    }
+    if (!reducir) requestAnimationFrame(cuadro);
+  }
+
+  // Clic (o toque) en el campo: nace un grupo ahí mismo, que crece un poco más rápido. Hasta 5 por encima
+  // de los 7 de siempre; si se pasa, el grupo quieto más viejo empieza a deshacerse. No cuenta sobre la tarjeta.
+  var EXTRA = 5;
+  sec.addEventListener("click", function (e) {
+    if (reducir || !W || e.target.closest("#" + P.cab + ", a, button")) return;
+    var cx = Math.floor(e.clientX / CELDA), cy = Math.floor(e.clientY / CELDA), borde = [];
+    for (var dy = -1; dy <= 1; dy++) for (var dx = -1; dx <= 1; dx++) {
+      var x = cx + dx, y = cy + dy;
+      if (x >= 0 && y >= 0 && x < cols && y < filas && !grilla[idx(x, y)]) borde.push([x, y]);
+    }
+    if (!borde.length) return;
+    if (grupos.length >= MAX + EXTRA) {
+      var viejo = grupos.filter(function (g) { return g.estado === "quieto"; })[0];
+      if (viejo) { viejo.estado = "decrece"; viejo.proximo = 0; }
+    }
+    var ahora = performance.now();
+    grupos.push({ forma: unaForma(), celdas: [], borde: borde, meta: Math.floor(azar(10, 20)),
+      estado: "crece", proximo: ahora, ritmo: azar(40, 70), espera: azar(2500, 5000) });
+  });
+
+  // Ahorro: cuando el texto tapa la cabecera, el campo deja de animar.
+  addEventListener("scroll", function () { document.body.classList.toggle("pf-campo-bajo", scrollY > 40); }, { passive: true });
+  // Fuera de pantalla también se esconde, para que no asome debajo del pie.
+  new IntersectionObserver(function (e) { activo = e[0].isIntersecting; cv.style.visibility = activo ? "" : "hidden"; }).observe(sec);
+  var ancho = window.innerWidth;
+  addEventListener("resize", function () {
+    barra(); alinear();
+    if (window.innerWidth === ancho) return; // en celular la barra del navegador cambia el alto: no reiniciar
+    ancho = window.innerWidth; medir();
+  });
+
+  alinear();
+  if (document.fonts) document.fonts.ready.then(alinear);
+  addEventListener("load", alinear);
+  medir();
+  if (reducir) setTimeout(function () { sembrar(); dibujar(performance.now()); }, 300);
+  else requestAnimationFrame(cuadro);
 })();
 </script>
 </body>
