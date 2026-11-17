@@ -49,6 +49,8 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
 .pf-f-gr.pf-abierto .pf-f-gr__cab svg { transform: none; }
 @media (hover: hover) and (pointer: fine) { .pf-f-gr__cab:hover .pf-f-label { color: var(--azul); } }
 .pf-f-gr__cab .pf-f-n { position: static; }
+/* La pastilla sube su texto .039em para centrar la mayúscula; el contador es una forma y vuelve al centro geométrico. */
+.pf-pastilla .pf-f-n { translate: 0 calc(var(--h) * .47 * .0195); }
 .pf-f-gr__activos { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 0 12px; }
 .pf-f-gr__activos:empty, .pf-f-gr.pf-abierto .pf-f-gr__activos { display: none; }
 /* Acordeón: el alto lo anima cambiarGrupo() cuadro a cuadro (ver ahí por qué); el CSS solo da los dos estados.
@@ -65,7 +67,8 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
 /* Zona: una fila por provincia; la primera pastilla es la provincia entera, separada de sus localidades. */
 .pf-f-prov { margin-right: 6px; }
 .pf-f-gr .pf-pastilla, .pf-f-gr .pf-chip { gap: 7px; }
-.pf-pastilla__n { font: 400 0.86em/1 var(--f-body); font-variant-numeric: tabular-nums; opacity: .72; }
+/* El número va en DM Sans, más chico: el translate lo apoya en la misma línea de base que el nombre. */
+.pf-pastilla__n { font: 400 0.86em/1 var(--f-body); font-variant-numeric: tabular-nums; opacity: .72; translate: 0 .065em; }
 .pf-f-gr .pf-cero:not([aria-pressed="true"]) { opacity: .34; cursor: default; }
 .pf-f-gr .pf-cero:not([aria-pressed="true"]):active { transform: none; }
 /* Contador de filtros activos en la barra y en cada grupo. */
@@ -73,7 +76,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
    en medio píxel dentro de la pastilla de 30 y la cifra, ajustada al píxel,
    se corría. 18 px de alto, cuerpo de 11 px y 1 px de padding arriba: la tinta
    queda a 0,1 px del centro (medido). Cifras proporcionales: el 1 tabular queda corrido. */
-.pf-f-n { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 1px 4px 0; border-radius: 999px; background: var(--verde); color: #fff; font: 400 11px/1 var(--f-body); }
+.pf-f-n { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: .064em 4px 0; border-radius: 999px; background: var(--verde); color: #fff; font: 400 11px/1 var(--f-body); }
 .pf-f-main .pf-pastilla { gap: 6px; }
 .pf-f-main .pf-pastilla[aria-expanded="true"] { background: var(--line); }
 @media (max-width: 640px) {

@@ -31,8 +31,9 @@
 
 /* @pieza pastilla
    Web/Pastilla filtro: redonda, rellena con el color de la familia (--pc) y texto tiza. La elegida en tinta;
-   "Todas" sin elegir va transparente. Alto 30, texto al 47% del alto, aire al 48%. */
-.pf-pastilla { --h: 30px; display: inline-flex; align-items: center; flex: none; height: var(--h); padding: 0 calc(var(--h) * .48); border: 0; border-radius: 999px;
+   "Todas" sin elegir va transparente. Alto 30, texto al 47% del alto, aire al 48%.
+   En un contenedor flex el text-box no recorta: el .039em de abajo sube el texto lo justo para centrar la altura de mayúscula. */
+.pf-pastilla { --h: 30px; display: inline-flex; align-items: center; flex: none; height: var(--h); padding: 0 calc(var(--h) * .48) .039em; border: 0; border-radius: 999px;
   background: var(--pc, var(--azul)); color: var(--sobre-color); font: 400 calc(var(--h) * .47)/1 var(--f-display); white-space: nowrap; cursor: pointer;
   transition: background 240ms var(--ease), color 240ms var(--ease), box-shadow 240ms var(--ease), transform .15s var(--ease); text-box: trim-both cap alphabetic; }
 @media (hover: hover) and (pointer: fine) { .pf-pastilla:hover { background: color-mix(in srgb, var(--pc, var(--azul)) 86%, var(--ink)); } .pf-pastilla--todas:hover { background: var(--line); } }
@@ -147,7 +148,7 @@ a.pf-etiqueta { text-decoration: none; }
 .pf-barra__lupa { width: 46px; height: 46px; flex: none; padding: 0; border: 0; border-radius: 999px; background: transparent; color: var(--tiza); cursor: pointer; display: grid; place-items: center; }
 .pf-barra__busca.pf-abierto .pf-barra__lupa { color: var(--azul); }
 .pf-barra__lupa svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
-.pf-barra__busca input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font: 400 var(--texto-cuerpo)/1.2 var(--f-display); color: var(--ink); padding: 0 4px; opacity: 0; transition: opacity 200ms ease; }
+.pf-barra__busca input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font: 400 var(--texto-cuerpo)/1.2 var(--f-display); color: var(--ink); padding: 0 4px .1em; opacity: 0; transition: opacity 200ms ease; }
 .pf-barra__busca.pf-abierto input { opacity: 1; }
 .pf-barra__busca input::placeholder { color: var(--ink-3); }
 .pf-barra__busca input::-webkit-search-cancel-button { display: none; }
@@ -271,9 +272,9 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 .pf-f-row { display: flex; flex-wrap: wrap; gap: 7px; padding: 3px; }
 .pf-f-in { padding: 18px 20px 14px; display: grid; gap: 14px; }
 .pf-f-label { margin: 0; font-size: 0.74rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); }
-/* Contador de filtros activos. Centrado del número: todo cae en píxel entero (18 px de alto, cuerpo de 11 px y
-   1 px arriba en DM Sans); con 17 px quedaba en medio píxel dentro de la pastilla de 30 y la cifra se corría. */
-.pf-f-count { position: absolute; top: 2px; right: 2px; min-width: 18px; height: 18px; padding: 1px 4px 0; border-radius: 999px; background: var(--verde); color: #fff; display: grid; place-items: center; font-size: 11px; line-height: 1; }
+/* Contador de filtros activos: 18 px de alto y cuerpo de 11 px (con 17 px quedaba en medio píxel dentro de la
+   pastilla de 30). En Familjen la cifra cae baja: el .078em de abajo la centra por altura de mayúscula. */
+.pf-f-count { position: absolute; top: 2px; right: 2px; min-width: 18px; height: 18px; padding: 0 4px .078em; border-radius: 999px; background: var(--verde); color: #fff; display: grid; place-items: center; font-size: 11px; line-height: 1; }
 .pf-f-clear { justify-self: start; margin-top: 2px; border: 0; background: transparent; cursor: pointer; padding: 4px 0; color: var(--azul); font-size: 0.88rem; text-decoration: underline; text-underline-offset: 3px; }
 /* El panel abierto se cierra con el mismo botón de la barra que lo abrió, tocando afuera o con Escape. */
 .pf-f-bar { flex: none; display: flex; align-items: center; gap: 4px; padding: 5px 5px 5px 6px; }
@@ -285,7 +286,7 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   background: transparent; color: var(--ink-2); cursor: pointer;
   display: flex; align-items: center; justify-content: center; gap: 8px;
 }
-.pf-f-txt { display: none; }
+.pf-f-txt { display: none; text-box: trim-both cap alphabetic; }
 @media (hover: hover) and (pointer: fine) {
   .pf-f-toggle:hover { background: var(--line); }
 }
