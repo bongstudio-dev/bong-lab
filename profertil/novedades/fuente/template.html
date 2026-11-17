@@ -1010,8 +1010,11 @@ a.pf-card, a.pf-d-cta { text-decoration: none; }
   function rot(k) { return (k + dest.length) % dest.length; }
   // Pone la placa i en f anchos de pantalla (0 en el centro, 1 a la derecha).
   // Las capas de adentro leen --sx y --tr para moverse a su propia velocidad.
-  function poner(i, f, animar) {
-    var tr = animar ? "transform " + PASE + "ms " + CURVA : "none", s = slides[i].style;
+  // tr (opcional) reemplaza la transicion del pase: la usa el dedo al soltar.
+  function poner(i, f, animar, tr) {
+    tr = animar ? (tr || "transform " + PASE + "ms " + CURVA) : "none";
+    var s = slides[i].style;
+    slides[i]._g = (slides[i]._g || 0) + 1; // cada movimiento nuevo invalida los "esconder" pendientes
     s.transition = tr;
     s.transform = "translateX(" + f * 100 + "%)";
     s.setProperty("--sx", f);
@@ -1019,22 +1022,23 @@ a.pf-card, a.pf-d-cta { text-decoration: none; }
   }
   // Pasa a la nota k. dir: 1 entra por la derecha, -1 por la izquierda.
   // yaPuesta: la placa nueva ya esta donde la dejo el dedo.
-  function irA(k, dir, yaPuesta) {
+  function irA(k, dir, yaPuesta, tr) {
     k = rot(k);
     var viejo = dk;
     transcurrido = 0;
-    if (k === viejo) { poner(k, 0, true); return; }
+    if (k === viejo) { poner(k, 0, true, tr); return; }
     dir = dir || (k > viejo ? 1 : -1);
     for (var i = 0; i < slides.length; i++) if (i !== viejo && i !== k) slides[i].classList.remove("pf-vis");
     if (!yaPuesta) poner(k, dir, false);
     slides[k].classList.add("pf-vis");
     void slides[k].offsetWidth;
-    poner(k, 0, viejo >= 0);
+    poner(k, 0, viejo >= 0, tr);
     slides[k].classList.add("pf-on"); slides[k].inert = false;
     if (viejo >= 0) {
-      poner(viejo, -dir, true);
+      poner(viejo, -dir, true, tr);
       slides[viejo].classList.remove("pf-on"); slides[viejo].inert = true;
-      setTimeout(function () { if (viejo !== dk && !arrastre) slides[viejo].classList.remove("pf-vis"); }, PASE + 40);
+      var g = slides[viejo]._g, T = tr ? parseFloat(tr.split(" ")[1]) : PASE;
+      setTimeout(function () { if (viejo !== dk && !arrastre && slides[viejo]._g === g) slides[viejo].classList.remove("pf-vis"); }, T + 40);
     }
     for (var j = 0; j < segs.length; j++) {
       segs[j].classList.toggle("pf-on", j === k);
@@ -1070,45 +1074,111 @@ a.pf-card, a.pf-d-cta { text-decoration: none; }
 
   /* Gestos de stories sobre las placas (no sobre botones ni indicadores):
      toque corto a la derecha pasa y a la izquierda vuelve; mantener apretado
-     pausa; en touch, arrastrar de costado mueve la placa con el dedo. */
+     pausa; en touch, arrastrar de costado mueve la placa con el dedo.
+     El dedo manda: si toca a mitad de un pase, la placa queda donde estaba
+     (no salta) y sigue desde ahi. Al soltar, la placa sale con la velocidad
+     que traia el dedo y frena suave: la curva arranca con esa pendiente y la
+     duracion depende de lo que falta recorrer. Asi no hay un corte entre el
+     arrastre y la animacion. */
   var arrastre = null;
+  // Donde esta la placa i ahora (en anchos de pantalla), aunque este animando.
+  function dondeEsta(i) {
+    var m = getComputedStyle(slides[i]).transform;
+    if (!m || m === "none") return 0;
+    return new DOMMatrixReadOnly(m).m41 / dEl.clientWidth;
+  }
   dEl.addEventListener("pointerdown", function (e) {
     if (e.button > 0 || e.target.closest("button, a, .pf-d-nav")) return;
-    arrastre = { x0: e.clientX, y0: e.clientY, t0: Date.now(), dx: 0, mueve: false, vecino: -1, touch: e.pointerType !== "mouse" };
+    var a = arrastre = { x0: e.clientX, y0: e.clientY, t0: Date.now(), dx: 0, mueve: false, vecino: -1, base: 0, agarro: false, muestras: [], touch: e.pointerType !== "mouse" };
     pausa("toque", true);
+    if (!a.touch) return;
+    // Congela el pase si estaba en marcha: la placa actual y la que la acompaña.
+    var p = dondeEsta(dk);
+    if (Math.abs(p) > 0.002) {
+      a.agarro = true; a.base = p;
+      for (var i = 0; i < slides.length; i++) {
+        if (i === dk || !slides[i].classList.contains("pf-vis")) continue;
+        poner(i, dondeEsta(i), false); a.vecino = i;
+      }
+      poner(dk, p, false);
+    }
   });
   dEl.addEventListener("pointermove", function (e) {
     var a = arrastre; if (!a || !a.touch) return;
     a.dx = e.clientX - a.x0;
     if (!a.mueve) {
-      if (Math.abs(a.dx) < 8) return;
-      if (Math.abs(e.clientY - a.y0) > Math.abs(a.dx)) { soltar(e, true); return; }
+      if (Math.abs(a.dx) < 8 && !a.agarro) return;
+      if (!a.agarro && Math.abs(e.clientY - a.y0) > Math.abs(a.dx)) { soltar(e, true); return; }
+      if (Math.abs(a.dx) < 1) return;
       a.mueve = true;
+      // Sin salto: el recorrido cuenta desde donde se decidio que es arrastre.
+      a.x0 = e.clientX; a.dx = 0;
       try { dEl.setPointerCapture(e.pointerId); } catch (err) {}
     }
-    var dir = a.dx < 0 ? 1 : -1, v = rot(dk + dir);
+    var t = performance.now();
+    a.muestras.push([t, e.clientX]);
+    while (a.muestras.length > 2 && t - a.muestras[0][0] > 100) a.muestras.shift();
+    var f = a.base + a.dx / dEl.clientWidth;
+    var dir = f < 0 ? 1 : -1, v = rot(dk + dir);
     if (a.vecino !== v && a.vecino !== -1 && a.vecino !== dk) slides[a.vecino].classList.remove("pf-vis");
     a.vecino = v; a.dir = dir;
-    poner(dk, a.dx / dEl.clientWidth, false);
-    if (v !== dk) { slides[v].classList.add("pf-vis"); poner(v, dir + a.dx / dEl.clientWidth, false); }
+    poner(dk, f, false);
+    if (v !== dk) { slides[v].classList.add("pf-vis"); poner(v, f + dir, false); }
   });
+  // Velocidad del dedo en los ultimos 100 ms (px por ms; positiva hacia la derecha).
+  function velocidad(a) {
+    var m = a.muestras; if (m.length < 2) return 0;
+    var u = m[m.length - 1], p = m[0];
+    if (performance.now() - u[0] > 80) return 0; // se quedo quieto antes de soltar
+    return (u[1] - p[1]) / Math.max(1, u[0] - p[0]);
+  }
+  // Transicion que continua el movimiento del dedo: d = px que faltan, v = px/ms a favor.
+  function salida(d, v) {
+    var w = dEl.clientWidth;
+    var T = Math.round(Math.max(260, Math.min(PASE, PASE * Math.sqrt(d / w) * 1.1)));
+    var x1 = 0.3, y1 = d > 1 ? Math.min(1, Math.max(0, v) * T / d * x1) : 0;
+    return { T: T, tr: "transform " + T + "ms cubic-bezier(" + x1 + ", " + y1.toFixed(3) + ", 0.25, 1)" };
+  }
   function soltar(e, cancelar) {
     var a = arrastre; if (!a) return;
     arrastre = null;
     pausa("toque", false);
-    if (cancelar && !a.mueve) return;
-    if (a.mueve) {
-      var rapido = Math.abs(a.dx) / Math.max(1, Date.now() - a.t0) > 0.5;
-      if (!cancelar && (Math.abs(a.dx) > dEl.clientWidth * 0.2 || rapido)) irA(a.vecino, a.dir, true);
-      else {
-        poner(dk, 0, true);
-        if (a.vecino !== dk) { poner(a.vecino, a.dir, true); var v = a.vecino; setTimeout(function () { if (v !== dk) slides[v].classList.remove("pf-vis"); }, PASE + 40); }
+    var w = dEl.clientWidth;
+    if (!a.mueve) {
+      if (a.agarro) {
+        // Lo toco a mitad del pase y no lo movio: si fue un toque corto pasa
+        // o vuelve como siempre; si no, el pase sigue desde donde quedo.
+        if (!cancelar && Date.now() - a.t0 < 300) { if (e.clientX < w * 0.3) irA(dk - 1, -1); else irA(dk + 1, 1); return; }
+        a.mueve = true; a.dx = 0;
+      } else {
+        if (cancelar) return;
+        // Toque corto: pasa o vuelve. Mantenido: solo fue una pausa.
+        if (Date.now() - a.t0 < 300) { if (e.clientX < w * 0.3) irA(dk - 1, -1); else irA(dk + 1, 1); }
+        return;
       }
+    }
+    var vel = cancelar ? 0 : velocidad(a);
+    var f = a.base + a.dx / w;
+    // A donde va: un tiron rapido o mas de un 20% de recorrido en una direccion
+    // pasa a la vecina de ese lado; si no, vuelve a la actual.
+    var rapido = Math.abs(vel) > 0.5, lejos = Math.abs(a.dx) > w * 0.2;
+    var hacia = rapido ? (vel < 0 ? 1 : -1) : a.dx < 0 ? 1 : -1;
+    var pasa = !cancelar && (rapido || lejos) && (hacia === 1 ? f < 0 : f > 0);
+    if (pasa) {
+      var s1 = salida(Math.abs(f + hacia) * w, -hacia * vel);
+      var k = rot(dk + hacia);
+      if (a.vecino !== k && a.vecino !== -1 && a.vecino !== dk) slides[a.vecino].classList.remove("pf-vis");
+      if (k !== dk) { slides[k].classList.add("pf-vis"); poner(k, f + hacia, false); }
+      irA(k, hacia, true, s1.tr);
       return;
     }
-    // Toque corto: pasa o vuelve. Mantenido: solo fue una pausa.
-    if (Date.now() - a.t0 < 300) {
-      if (e.clientX < dEl.clientWidth * 0.3) irA(dk - 1, -1); else irA(dk + 1, 1);
+    var s2 = salida(Math.abs(f) * w, f > 0 ? -vel : vel);
+    poner(dk, 0, true, s2.tr);
+    if (a.vecino !== -1 && a.vecino !== dk) {
+      var d = f < 0 ? 1 : -1;
+      poner(a.vecino, d, true, s2.tr);
+      var vv = a.vecino, g = slides[vv]._g;
+      setTimeout(function () { if (vv !== dk && !arrastre && slides[vv]._g === g) slides[vv].classList.remove("pf-vis"); }, s2.T + 40);
     }
   }
   dEl.addEventListener("pointerup", function (e) { soltar(e, false); });
