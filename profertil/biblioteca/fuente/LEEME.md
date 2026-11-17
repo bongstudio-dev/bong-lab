@@ -26,9 +26,15 @@ python3 profertil/biblioteca/fuente/build.py
   cantidad de páginas, modo lectura, copiar el link). Cierra con documentos de la misma categoría y el pie.
   Las páginas se dibujan con pdf.js al ancho de la columna, solo las cercanas a la pantalla; cada una reserva su
   lugar con la proporción de su PDF y muestra el brillo de carga hasta que se dibuja.
+- **Hojas de seguridad** (`../../hojas-de-seguridad/index.html`): la misma `lista.html` con otros datos y textos (lo arma
+  `build.py`, ver `hacer_lista`). 22 documentos de `docs-msds.json`, uno por producto: sin filtros, sin ancla y sin orden por
+  año; la fila es ícono, producto y descarga. El nombre se muestra sin "MSDS" y con las siglas entre paréntesis en
+  mayúscula (lo mismo en el visor y en el buscador). Los enlaces van al visor y a los PDF de la Biblioteca; el visor
+  vuelve a esta lista. `window.PF_CAMPO` amarillo con la Forma casco, la de su badge.
+  En `lista.html`, `PAG` (vacío en la Biblioteca) trae la base del visor, cómo se nombran los documentos y el campo.
 - `docs.json`: los 627 documentos de la Biblioteca (secciones cereales, oleaginosas, pasturas, industriales y
   biblioteca). `docs-msds.json` (22 hojas de seguridad) y `docs-inversores.json` (19 informes) son de otras páginas
-  del sitio nuevo: no van en la lista, pero el visor los abre igual. Los tres los arma `prep-docs.py` desde el crawl.
+  del sitio nuevo: no van en la lista, pero el visor los abre igual. Las hojas de seguridad tienen su lista (arriba). Los tres los arma `prep-docs.py` desde el crawl.
 - `etiquetas.json`: las etiquetas de la Biblioteca Virtual del sitio actual por documento. Lo arma `prep-etiquetas.py`.
 - `../vendor/`: pdf.js (Apache 2.0), versión legacy para que ande también en Safari viejos.
 - `../pdf/`: copia de todos los PDF (ver "Los PDF" abajo).

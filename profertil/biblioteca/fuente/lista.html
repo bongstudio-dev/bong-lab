@@ -326,9 +326,15 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
   var DOCS = /*__DOCS__*/[];
   var GRUPOS = /*__GRUPOS__*/[];
   var A = /*__ASSETS__*/{};
+  /* La misma plantilla arma otras listas de documentos (build.py): Hojas de seguridad pasa acá dónde están el visor y los PDF,
+     cómo se nombran sus documentos y el campo de su cabecera. Vacío, es la Biblioteca. */
+  var PAG = /*__PAG__*/{};
+  var BASE = PAG.base || "";
+  var NOMBRE_TODO = PAG.todo || "Toda la Biblioteca", UNO = PAG.uno || "documento", VARIOS = PAG.varios || "documentos";
   var $ = function (id) { return document.getElementById(id); };
-  /* Cabecera con campo (campo.js): azul y la Forma del badge de la Biblioteca, como en la Nota. */
-  window.PF_CAMPO = { formas: A.formas, color: "azul", forma: "lupa", tema: ["lupa", "suelo", "capas"], cab: "pf-cab", main: "pf-hoja", columna: "pf-lista" };
+  /* Cabecera con campo (campo.js): el color y la Forma del badge de la sección, como en la Nota. */
+  var CAMPO = PAG.campo || { color: "azul", forma: "lupa", tema: ["lupa", "suelo", "capas"] };
+  window.PF_CAMPO = { formas: A.formas, color: CAMPO.color, forma: CAMPO.forma, tema: CAMPO.tema, cab: "pf-cab", main: "pf-hoja", columna: "pf-lista" };
 
   var defs = $("pf-defs"), simbolos = "";
   Object.keys(A.formas).forEach(function (k) { simbolos += '<symbol id="pf-forma-' + k + '" viewBox="' + A.formas[k].vb + '">' + A.formas[k].d + "</symbol>"; });
@@ -470,9 +476,9 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
     var li = document.createElement("li");
     li.className = "pf-doc" + (sinEntrada ? " pf-quieta" : "");
     li.dataset.k = d.k;
-    var bajar = d.l ? 'href="' + esc(/^https?:\/\//.test(d.l) ? d.l : "pdf/" + encodeURIComponent(d.l)) + '" download' : 'href="' + esc(d.u) + '" target="_blank" rel="noopener"';
+    var bajar = d.l ? 'href="' + esc(/^https?:\/\//.test(d.l) ? d.l : BASE + "pdf/" + encodeURIComponent(d.l)) + '" download' : 'href="' + esc(d.u) + '" target="_blank" rel="noopener"';
     li.innerHTML = (vista === "mini" ? '<div class="pf-doc__arte">' + arte(d) + "</div>" : "") + etq(d.c, vista === "mini" ? "" : "").replace('class="pf-etiqueta"', 'class="pf-etiqueta" title="' + POR[d.c].nombre + '"') +
-      '<h2 class="pf-doc__t"' + (vista === "compacta" ? ' title="' + esc(d.t) + '"' : "") + '><a href="ver/?d=' + encodeURIComponent(d.id) + '">' + resaltar(d.t, q) + "</a></h2>" +
+      '<h2 class="pf-doc__t"' + (vista === "compacta" ? ' title="' + esc(d.t) + '"' : "") + '><a href="' + BASE + 'ver/?d=' + encodeURIComponent(d.id) + '">' + resaltar(d.t, q) + "</a></h2>" +
       '<span class="pf-doc__y">' + (d.y || "") + "</span>" +
       '<a class="pf-doc__d" ' + bajar + ' aria-label="Descargar PDF: ' + esc(d.t) + '">' + BAJAR + "</a>";
     return li;
@@ -688,19 +694,19 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
   function resumen() {
     var q = estado.q.trim();
     var nf = nFiltros();
-    var t = "<b>" + lista.length + "</b> " + (lista.length === 1 ? "documento" : "documentos");
-    if (!q && !nf) t = "Toda la Biblioteca · <b>" + lista.length + "</b>";
+    var t = "<b>" + lista.length + "</b> " + (lista.length === 1 ? UNO : VARIOS);
+    if (!q && !nf) t = NOMBRE_TODO + " · <b>" + lista.length + "</b>";
     $("pf-resultText").innerHTML = t;
     $("pf-qCount").textContent = lista.length;
     // En el celular el botón del dock dice cuántos filtros hay; abierto, muestra el resultado y cierra el panel.
     var nsub = esMobile.matches ? nf : 0;
     $("pf-fCount").hidden = nsub === 0; $("pf-fCount").textContent = nsub;
     $("pf-fTxt").textContent = esMobile.matches && $("pf-filters").classList.contains("pf-abierto")
-      ? "Ver " + lista.length + (lista.length === 1 ? " documento" : " documentos") : "Filtros";
+      ? "Ver " + lista.length + " " + (lista.length === 1 ? UNO : VARIOS) : "Filtros";
     $("pf-fClear").hidden = nf === 0;
     activosChips(q);
     $("pf-emptyText").textContent = q
-      ? "Ningún documento coincide con «" + q + "»" + (nf ? " con esos filtros" : "") + ". Probá con otra palabra o limpiá los filtros."
+      ? "Nada coincide con «" + q + "»" + (nf ? " con esos filtros" : "") + ". Probá con otra palabra" + (GRUPOS.length ? " o limpiá los filtros." : ".")
       : "Ningún documento cumple esa combinación de filtros. Sacá alguno para ver más.";
   }
   // La selección vive en la dirección (#cultivo=…&zona=…&anio=…&nutriente=…&q=…&orden=anio): se puede compartir, y al volver del
@@ -927,7 +933,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
   // Al abrir el panel queda abierto el primer grupo con filtros elegidos; si no hay ninguno, Cultivo.
   function primerGrupo() {
     for (var i = 0; i < GRUPOS.length; i++) if (activos(estado.sel[GRUPOS[i].id]).length) return GRUPOS[i].id;
-    return GRUPOS[0].id;
+    return GRUPOS.length ? GRUPOS[0].id : null;
   }
   armarFiltros();
   abrirFiltros(false);

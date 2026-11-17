@@ -234,12 +234,18 @@ body.pf-foco .pf-v-doc { grid-column: 1; grid-row: 1; margin-top: 0; padding-bot
   var url = copia(d);
   // La Biblioteca es la lista de esta maqueta. Las hojas de seguridad y los informes para inversores tienen su propia página
   // (fuera de esta maqueta): el visor los abre igual, sin el link de vuelta a una lista.
+  // Cada documento vuelve a su lista: la Biblioteca o Hojas de seguridad. Inversores todavía no tiene la suya en la maqueta.
+  var LISTAS = {
+    biblioteca: { href: "../", nombre: "Biblioteca", titulo: "Biblioteca Virtual Profertil", todos: "Ver toda la Biblioteca" },
+    msds: { href: "../../hojas-de-seguridad/", nombre: "Hojas de seguridad", titulo: "Hojas de seguridad Profertil", todos: "Ver todas las hojas", mas: "Más hojas de seguridad" }
+  };
   var enBiblioteca = d.c !== "msds" && d.c !== "inversores";
-  document.title = d.t + (enBiblioteca ? " · Biblioteca Virtual Profertil" : " · Profertil");
+  var suLista = enBiblioteca ? LISTAS.biblioteca : LISTAS[d.c] || null;
+  document.title = d.t + " · " + (suLista ? suLista.titulo : "Profertil");
 
   /* --- Cabecera y datos -------------------------------------------------------------- */
   $("pf-cabIn").innerHTML =
-    (enBiblioteca ? '<a class="pf-v-volver" href="../">' + FLECHA_IZQ + "Biblioteca</a>" : "") + etq(d.c, d.y || "") +
+    (suLista ? '<a class="pf-v-volver" href="' + suLista.href + '">' + FLECHA_IZQ + suLista.nombre + "</a>" : "") + etq(d.c, d.y || "") +
     "<h1" + (d.t.length > 90 ? ' class="pf-largo"' : "") + ">" + esc(d.t) + "</h1>";
   var bajarHref = url || d.u;
   function datos(paginas) {
@@ -297,8 +303,8 @@ body.pf-foco .pf-v-doc { grid-column: 1; grid-row: 1; margin-top: 0; padding-bot
       return Math.abs(DOCS.indexOf(a) - pos) - Math.abs(DOCS.indexOf(b) - pos);
     });
     otros.slice(0, 4).forEach(function (x) { $("pf-rel").appendChild(fila(x)); });
-    $("pf-sigueT").textContent = "Más de " + cat.nombre.toLowerCase();
-    if (enBiblioteca) $("pf-sigueTodos").innerHTML = "Ver toda la Biblioteca " + FLECHA_DER;
+    $("pf-sigueT").textContent = (suLista && suLista.mas) || "Más de " + cat.nombre.toLowerCase();
+    if (suLista) { $("pf-sigueTodos").href = suLista.href; $("pf-sigueTodos").innerHTML = suLista.todos + " " + FLECHA_DER; }
     else $("pf-sigueTodos").hidden = true;
   })();
 

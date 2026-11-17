@@ -7,7 +7,7 @@ Cada tipo de contenido es un grupo con su nombre, su lista y sus ítems. Un íte
 la url es relativa a profertil/ (la carpeta de la maqueta) o absoluta si apunta al sitio actual.
 Para sumar un tipo nuevo: escribir una función que devuelva sus ítems y agregarla a GRUPOS, abajo.
 """
-import json, os, sys, urllib.request
+import json, os, re, sys, urllib.request
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 RAIZ = os.path.normpath(os.path.join(AQUI, '..', '..'))   # profertil/
@@ -38,6 +38,17 @@ def documentos():
     docs.sort(key=lambda d: d['t'].lower())
     return [[d['t'], 'biblioteca/ver/?d=' + d['id'], ' · '.join(x for x in [CATEGORIAS.get(d['c'], ''), d.get('y', '')] if x)]
             for d in docs]
+
+
+# --- Hojas de seguridad (biblioteca/fuente/docs-msds.json): una por producto, abren en el visor de la Biblioteca ---
+def hojas():
+    docs = leer('biblioteca/fuente/docs-msds.json')['docs']
+    out = []
+    for d in docs:
+        t = re.sub(r'\s*\bMSDS\b\s*', ' ', d['t']).strip()   # el mismo nombre que la lista (build.py de la Biblioteca)
+        t = re.sub(r'\(([a-z]{2,4})\)', lambda m: '(' + m.group(1).upper() + ')', t)
+        out.append([t, 'biblioteca/ver/?d=' + d['id'], 'Hoja de seguridad'])
+    return sorted(out, key=lambda x: x[0].lower())
 
 
 # --- Notas de Novedades (novedades/fuente/notas.json), de la más reciente a la más vieja ---
@@ -90,6 +101,7 @@ def paginas():
 # id, nombre del grupo, singular, plural, artículo del plural, lista con la búsqueda aplicada (vacío: el panel muestra todos), fuente
 GRUPOS = [
     ('documentos', 'Biblioteca', 'documento', 'documentos', 'los', 'biblioteca/#q=', documentos),
+    ('hojas', 'Hojas de seguridad', 'hoja', 'hojas', 'las', 'hojas-de-seguridad/#q=', hojas),
     ('notas', 'Notas', 'nota', 'notas', 'las', 'novedades/#q=', notas),
     ('paginas', 'Páginas', 'página', 'páginas', 'las', '', paginas),
 ]
