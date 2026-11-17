@@ -229,6 +229,7 @@
 /* --- Grilla --------------------------------------------------------------- */
 .pf-grid { display: flex; gap: 16px; align-items: flex-start; padding-bottom: 170px; }
 .pf-gcol { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+.pf-gcol.pf-medidor { position: absolute; left: 0; top: 0; visibility: hidden; pointer-events: none; }
 
 a.pf-card, a.pf-d-cta { text-decoration: none; }
 .pf-card {
@@ -821,8 +822,7 @@ a.pf-card, a.pf-d-cta { text-decoration: none; }
     var q = plano(estado.q.trim());
     // Cada tarjeta es un enlace a su página de Nota.
     var b = document.createElement("a");
-    b.href = "nota/?n=" + encodeURIComponent(n.ar); b.className = "pf-card"; b.dataset.idx = idx;
-    b.style.viewTransitionName = "pf-nota-" + n.id;
+    b.href = "nota/?n=" + encodeURIComponent(n.ar); b.className = "pf-card"; b.dataset.idx = idx; b.dataset.id = n.id;
     var when = '<p class="pf-when"><b>' + fecha(n.f) + "</b></p>";
     var h;
     if (conArte(n)) {
@@ -844,13 +844,42 @@ a.pf-card, a.pf-d-cta { text-decoration: none; }
     b.setAttribute("aria-label", n.t + ". " + POR[n.tp].nombre + ", " + fecha(n.f, true));
     return b;
   }
+  // Cada tarjeta se arma una sola vez y se reusa al cambiar de vista o de
+  // filtro: la foto ya cargada no se vuelve a decodificar ni a fundir. Si
+  // cambia la búsqueda se rehacen, porque el título lleva el resaltado.
+  var hechas = {}, hechasQ = null;
+  function tarjetaDe(n, idx) {
+    var q = estado.q.trim();
+    if (q !== hechasQ) { hechas = {}; hechasQ = q; }
+    var b = hechas[n.id] || (hechas[n.id] = tarjeta(n, idx));
+    b.dataset.idx = idx;
+    return b;
+  }
+  // Masonry por tandas. Las tarjetas nuevas se miden todas juntas en una
+  // columna invisible del mismo ancho y se reparten con esas alturas: el
+  // navegador hace una sola cuenta por tanda y no una por tarjeta.
   function pintarTanda() {
     var hasta = Math.min(pintadas + TANDA, lista.length);
-    for (var i = pintadas; i < hasta; i++) {
-      var corta = cols[0];
-      for (var c = 1; c < cols.length; c++) if (cols[c].offsetHeight < corta.offsetHeight) corta = cols[c];
-      corta.appendChild(tarjeta(lista[i], i));
-    }
+    if (hasta <= pintadas) return;
+    var nuevas = [];
+    for (var i = pintadas; i < hasta; i++) nuevas.push(tarjetaDe(lista[i], i));
+    var alto = cols.map(function (c) { return c.offsetHeight; });
+    var cuantas = cols.map(function (c) { return c.childElementCount; });
+    var med = document.createElement("div");
+    med.className = "pf-gcol pf-medidor"; med.style.width = cols[0].offsetWidth + "px";
+    nuevas.forEach(function (b) { med.appendChild(b); });
+    grid.appendChild(med);
+    var gap = parseFloat(getComputedStyle(med).rowGap) || 0;
+    var hs = nuevas.map(function (b) { return b.offsetHeight; });
+    grid.removeChild(med);
+    var destino = cols.map(function () { return document.createDocumentFragment(); });
+    nuevas.forEach(function (b, k) {
+      var c = 0;
+      for (var j = 1; j < cols.length; j++) if (alto[j] < alto[c]) c = j;
+      alto[c] += (cuantas[c] ? gap : 0) + hs[k]; cuantas[c]++;
+      destino[c].appendChild(b);
+    });
+    cols.forEach(function (c, j) { c.appendChild(destino[j]); });
     pintadas = hasta;
   }
   // Rehace la grilla sin mover la página. Mientras se arma, la grilla queda
@@ -1039,6 +1068,12 @@ a.pf-card, a.pf-d-cta { text-decoration: none; }
   if ("IntersectionObserver" in window) {
     new IntersectionObserver(function (en) { if (en[0].isIntersecting && pintadas < lista.length) pintarTanda(); }, { rootMargin: "900px 0px" }).observe($("pf-sentinel"));
   } else { TANDA = 1000; }
+  function enPantalla() {
+    var h = window.innerHeight, out = [];
+    grid.querySelectorAll(".pf-card").forEach(function (b) { var r = b.getBoundingClientRect(); if (r.bottom > 0 && r.top < h) out.push(b); });
+    return out;
+  }
+  function nombrar(tarjetas, si) { tarjetas.forEach(function (b) { b.style.viewTransitionName = si ? "pf-nota-" + b.dataset.id : ""; }); }
   var nCols = cuantasCols();
   window.addEventListener("resize", function () { moverInds(); var n = cuantasCols(); if (n !== nCols) { nCols = n; repintar(true); } });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(moverInds);
@@ -1051,8 +1086,16 @@ a.pf-card, a.pf-d-cta { text-decoration: none; }
     // Las tarjetas viajan a su lugar nuevo (View Transitions) y el indicador
     // viaja con ellas; sin soporte, el indicador se desliza y la grilla cambia directo.
     if (cambia && document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      // Viajan solo las tarjetas que se ven: las que estaban en pantalla y las
+      // que entran. El resto cambia de golpe fuera de vista. Con todas
+      // nombradas, el navegador fotografiaba cientos de tarjetas en cada cambio.
       var raiz = document.documentElement; raiz.classList.add("pf-vt-vista");
-      document.startViewTransition(function () { marcarVista(false); repintar(true); }).finished.finally(function () { raiz.classList.remove("pf-vt-vista"); });
+      var nombradas = enPantalla();
+      nombrar(nombradas, true);
+      document.startViewTransition(function () {
+        marcarVista(false); repintar(true);
+        var nuevas = enPantalla(); nombrar(nuevas, true); nombradas = nombradas.concat(nuevas);
+      }).finished.finally(function () { raiz.classList.remove("pf-vt-vista"); nombrar(nombradas, false); });
     }
     else { marcarVista(true); if (cambia) repintar(true); }
   });
