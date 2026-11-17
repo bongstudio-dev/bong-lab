@@ -220,6 +220,11 @@
    Transitions donde hay. En mobile no hay "chico". */
 @media (max-width: 640px) { .pf-selector.pf-vista [data-vista="chico"] { display: none; } }
 ::view-transition-group(*) { animation-duration: var(--t-vista); animation-timing-function: var(--curva-vista); }
+/* La transición entre páginas mueve la foto de toda la página (root). En el cambio de
+   vista esa foto no tiene nada que animar: se cambia de golpe y solo viajan las tarjetas
+   y el indicador; si no, la página entera se corre junto con ellas. */
+:root.pf-vt-vista::view-transition-old(root) { display: none; }
+:root.pf-vt-vista::view-transition-new(root) { animation: none; }
 
 /* --- Grilla --------------------------------------------------------------- */
 .pf-grid { display: flex; gap: 16px; align-items: flex-start; padding-bottom: 170px; }
@@ -1021,7 +1026,10 @@ a.pf-card, a.pf-d-cta { text-decoration: none; }
     nCols = n;
     // Las tarjetas viajan a su lugar nuevo (View Transitions) y el indicador
     // viaja con ellas; sin soporte, el indicador se desliza y la grilla cambia directo.
-    if (cambia && document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches) document.startViewTransition(function () { marcarVista(false); repintar(true); });
+    if (cambia && document.startViewTransition && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      var raiz = document.documentElement; raiz.classList.add("pf-vt-vista");
+      document.startViewTransition(function () { marcarVista(false); repintar(true); }).finished.finally(function () { raiz.classList.remove("pf-vt-vista"); });
+    }
     else { marcarVista(true); if (cambia) repintar(true); }
   });
   // En mobile no hay chico: si estaba elegido, se ve como medio.
