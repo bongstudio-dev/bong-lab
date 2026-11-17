@@ -399,7 +399,7 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
 
   // Tarjeta: la de Novedades sin el fondo. Foto de la nota 4:3 (si no tiene, el arte) con la etiqueta y el año adentro; fecha y título abajo.
   function mini(x) {
-    var img = x.imgL ? "../" + x.imgL : x.img;
+    var img = x.mi ? "../fotos/mini/" + encodeURIComponent(x.ar) + ".webp" : x.imgL ? "../" + x.imgL : x.img;
     var m = img ? '<img src="' + esc(img) + '" alt="" loading="lazy" decoding="async">' : arte(x, 240, 180, x.id * 7919 + 13);
     return '<a class="pf-n-mini" href="' + url(x) + '"><div class="pf-n-mini__img">' + m + etq(x.tp, { dato: x.anio }) + "</div>" +
       '<div class="pf-n-mini__txt"><p class="pf-when">' + fecha(x.f) + '</p><p class="pf-ttl">' + esc(x.t) + "</p></div></a>";

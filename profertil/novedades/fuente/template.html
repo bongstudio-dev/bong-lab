@@ -198,6 +198,10 @@ a.pf-card, a.pf-d-cta { text-decoration: none; }
 
 .pf-media { position: relative; margin: 8px 8px 0; border-radius: 19px; overflow: hidden; line-height: 0; max-width: 100%; }
 .pf-media > svg { display: block; width: 100%; height: auto; }
+/* Foto de la nota (copia local en fotos/mini). Reserva su lugar con la
+   proporcion de la foto, acotada entre 3:4 y 16:9, y entra con un fundido. */
+.pf-media > img { display: block; width: 100%; height: auto; object-fit: cover; background: var(--card); opacity: 0; transition: opacity 500ms ease; }
+.pf-media > img.pf-lista { opacity: 1; }
 .pf-media .pf-etiqueta { position: absolute; top: 10px; left: 10px; }
 .pf-play { position: absolute; top: 10px; right: 10px; width: 36px; height: 36px; border-radius: 999px; background: rgba(255, 254, 239, 0.94); display: grid; place-items: center; }
 .pf-play svg { width: 12px; height: 12px; fill: var(--azul); margin-left: 2px; }
@@ -644,6 +648,11 @@ a.pf-card, a.pf-d-cta { text-decoration: none; }
     grid.innerHTML = ""; cols = [];
     for (var i = 0, n = cuantasCols(); i < n; i++) { var c = document.createElement("div"); c.className = "pf-gcol"; grid.appendChild(c); cols.push(c); }
   }
+  // Miniatura local de la foto de la nota (fuente/bajar-miniaturas.py); n.mi = [ancho, alto].
+  function fotoMini(n) {
+    var r = Math.min(Math.max(n.mi[0] / n.mi[1], 3 / 4), 16 / 9);
+    return '<img src="fotos/mini/' + encodeURIComponent(n.ar) + '.webp" alt="" loading="lazy" decoding="async" style="aspect-ratio:' + r.toFixed(4) + '">';
+  }
   function conArte(n) { return n.v || ((n.id * 2654435761) >>> 0) % 100 < 46; }
 
   function tarjeta(n, idx) {
@@ -656,13 +665,20 @@ a.pf-card, a.pf-d-cta { text-decoration: none; }
     var h;
     if (conArte(n)) {
       var pr = PROP[n.id % PROP.length];
-      h = '<div class="pf-media">' + arte(n, pr[0] * 60, pr[1] * 60, n.id * 7919 + 13) + etq(n.tp, { dato: n.anio }) +
+      h = '<div class="pf-media">' + (n.mi ? fotoMini(n) : arte(n, pr[0] * 60, pr[1] * 60, n.id * 7919 + 13)) + etq(n.tp, { dato: n.anio }) +
         (n.v ? '<span class="pf-play"><svg viewBox="0 0 12 14"><path d="M0 0l12 7-12 7Z"/></svg></span>' : "") + "</div>" +
         '<div class="pf-meta">' + when + '<p class="pf-ttl">' + resaltar(n.t, q) + "</p></div>";
     } else {
       h = '<div class="pf-lead">' + etq(n.tp, { dato: n.anio }) + "<h3>" + resaltar(n.t, q) + '</h3></div><div class="pf-meta">' + when + "</div>";
     }
     b.innerHTML = h;
+    var im = b.querySelector(".pf-media > img");
+    if (im) {
+      var lista = function () { im.classList.add("pf-lista"); };
+      if (im.complete && im.naturalWidth) lista(); else im.addEventListener("load", lista);
+      // Si la foto no carga, vuelve el arte.
+      im.addEventListener("error", function () { var pr = PROP[n.id % PROP.length]; im.outerHTML = arte(n, pr[0] * 60, pr[1] * 60, n.id * 7919 + 13); });
+    }
     b.setAttribute("aria-label", n.t + ". " + POR[n.tp].nombre + ", " + fecha(n.f, true));
     return b;
   }

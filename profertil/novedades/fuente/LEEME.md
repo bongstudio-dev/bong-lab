@@ -110,6 +110,17 @@ Regenerar la página:
 python3 profertil/novedades/fuente/build.py
 ```
 
+Fotos de las tarjetas: cada tarjeta con imagen muestra la foto de su nota,
+copiada en `../fotos/mini/<ar>.webp` (720 px de ancho, WebP, unos 10 MB las
+469). La reserva de lugar usa `mi` ([ancho, alto]) de `notas.json`, acotada
+entre 3:4 y 16:9. Sin foto, o si no carga, va el arte. Las relacionadas de la
+Nota usan las mismas. Para bajar las que falten (por ejemplo, despues de
+rehacer `notas.json`):
+
+```bash
+python3 profertil/novedades/fuente/bajar-miniaturas.py
+```
+
 Rehacer `notas.json` desde el crawl:
 
 ```bash
