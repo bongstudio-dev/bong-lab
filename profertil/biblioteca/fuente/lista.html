@@ -486,10 +486,16 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
   function repintar(mantener) {
     // Al cambiar de vista se mantiene lo ya cargado (si no, la lista se acorta de golpe y se pierde el lugar).
     var objetivo = mantener ? Math.max(pintadas, TANDA) : TANDA;
+    // Mientras se rehace, la lista queda vacía un instante: Safari mide ahí, ve una página corta y recorta el scroll (sin anclaje de
+    // scroll, no lo recupera). La lista guarda su alto hasta terminar y el scroll vuelve a donde estaba.
+    var y = window.scrollY;
+    docs.style.minHeight = docs.offsetHeight + "px";
     docs.dataset.vista = vista;
     docs.innerHTML = ""; pintadas = 0;
     while (pintadas < Math.min(objetivo, lista.length)) pintarTanda();
     $("pf-empty").hidden = lista.length > 0;
+    docs.style.minHeight = "";
+    if (window.scrollY !== y) window.scrollTo({ top: y, behavior: "instant" });
   }
 
   /* --- Filtros ------------------------------------------------------------
@@ -777,6 +783,10 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
       var r = filas[i].getBoundingClientRect();
       if (r.bottom > tope && r.top < alto) { antes[filas[i].dataset.k] = r; if (!ref) ref = { k: filas[i].dataset.k, top: r.top }; }
     }
+    // Lo que queda quieto: si el principio de la lista está a la vista, la página no se mueve (cada vista arranca unos px más arriba o
+    // más abajo, y seguir a la primera fila corría el encabezado y el campo). Solo cuando ya se bajó dentro de la lista se mantiene en su
+    // lugar la primera fila visible.
+    if (docs.getBoundingClientRect().top >= tope) ref = null;
     sinEntrada = true; repintar(true); sinEntrada = false;
     var el = ref && docs.querySelector('[data-k="' + ref.k + '"]');
     if (el) window.scrollTo({ top: Math.max(0, window.scrollY + el.getBoundingClientRect().top - ref.top), behavior: "instant" });
