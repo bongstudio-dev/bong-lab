@@ -675,11 +675,19 @@ a.pf-card, a.pf-d-cta { text-decoration: none; }
     }
     pintadas = hasta;
   }
+  // Rehace la grilla sin mover la página. Mientras se arma, la grilla queda
+  // vacía un instante: Safari mide ahí, ve una página corta y recorta el
+  // scroll (sin anclaje de scroll, no lo recupera). Por eso la grilla guarda
+  // su alto hasta terminar y el scroll vuelve a donde estaba.
   function repintar(mantener) {
     var objetivo = mantener ? Math.max(pintadas, TANDA) : TANDA;
+    var y = window.scrollY;
+    grid.style.minHeight = grid.offsetHeight + "px";
     armarCols(); pintadas = 0;
     while (pintadas < Math.min(objetivo, lista.length)) pintarTanda();
     $("pf-empty").hidden = lista.length > 0;
+    grid.style.minHeight = "";
+    if (window.scrollY !== y) window.scrollTo(window.scrollX, y);
   }
 
   /* --- Años ----------------------------------------------------------------- */
