@@ -32,10 +32,11 @@
 /* @pieza pastilla
    Web/Pastilla filtro: redonda, rellena con el color de la familia (--pc) y texto tiza. La elegida en tinta;
    "Todas" sin elegir va transparente. Alto 30, texto al 47% del alto, aire al 48%.
-   En un contenedor flex el text-box no recorta: el .039em de abajo sube el texto lo justo para centrar la altura de mayúscula. */
-.pf-pastilla { --h: 30px; display: inline-flex; align-items: center; flex: none; height: var(--h); padding: 0 calc(var(--h) * .48) .039em; border: 0; border-radius: 999px;
-  background: var(--pc, var(--azul)); color: var(--sobre-color); font: 400 calc(var(--h) * .47)/1 var(--f-display); white-space: nowrap; cursor: pointer;
-  transition: background 240ms var(--ease), color 240ms var(--ease), box-shadow 240ms var(--ease), transform .15s var(--ease); text-box: trim-both cap alphabetic; }
+   Pastillas y chips van en DM Sans: con interlínea 1 su altura de mayúscula cae centrada en la caja, sin correcciones.
+   El cuerpo se redondea a par (alto par menos cuerpo par): sobra lo mismo arriba y abajo, en píxeles enteros. */
+.pf-pastilla { --h: 30px; display: inline-flex; align-items: center; flex: none; height: var(--h); padding: 0 calc(var(--h) * .48); border: 0; border-radius: 999px;
+  background: var(--pc, var(--azul)); color: var(--sobre-color); font: 400 14px/1 var(--f-body); font-size: round(calc(var(--h) * .47), 2px); white-space: nowrap; cursor: pointer;
+  transition: background 240ms var(--ease), color 240ms var(--ease), box-shadow 240ms var(--ease), transform .15s var(--ease); }
 @media (hover: hover) and (pointer: fine) { .pf-pastilla:hover { background: color-mix(in srgb, var(--pc, var(--azul)) 86%, var(--ink)); } .pf-pastilla--todas:hover { background: var(--line); } }
 .pf-pastilla:active { transform: scale(.96); }
 .pf-pastilla[aria-pressed="true"], .pf-pastilla[aria-pressed="true"]:hover { background: var(--activo); color: var(--sobre-color); box-shadow: none; }
@@ -45,8 +46,8 @@
 /* @pieza chip
    Web/Chip año: radio 32% del alto, azul tenue con texto azul; el elegido, azul con texto tiza. Alto 32. */
 .pf-chip { --h: 32px; display: inline-flex; align-items: center; gap: 6px; flex: none; height: var(--h); padding: 0 calc(var(--h) * .42); border: 0; border-radius: calc(var(--h) * .32);
-  background: var(--chip-fondo); color: var(--chip-texto); font: 500 calc(var(--h) * .5)/1 var(--f-body); font-variant-numeric: tabular-nums; white-space: nowrap; cursor: pointer;
-  transition: background 160ms ease, color 160ms ease; text-box: trim-both cap alphabetic; }
+  background: var(--chip-fondo); color: var(--chip-texto); font: 500 16px/1 var(--f-body); font-size: round(down, calc(var(--h) * .5), 2px); font-variant-numeric: tabular-nums; white-space: nowrap; cursor: pointer;
+  transition: background 160ms ease, color 160ms ease; }
 @media (hover: hover) and (pointer: fine) { .pf-chip:hover { background: color-mix(in srgb, var(--azul) 28%, #fff); } }
 .pf-chip[aria-pressed="true"] { background: var(--chip-activo); color: var(--sobre-color); }
 .pf-chip__n { font-weight: 400; opacity: .7; }
@@ -276,8 +277,8 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 .pf-f-label { margin: 0; font-size: 0.74rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); }
 /* Contador de filtros activos: 18 px de alto y cuerpo de 11 px (con 17 px quedaba en medio píxel dentro de la
    pastilla de 30). Cifras y textos chicos siempre en DM Sans: Familjen se descentra en cuerpos tan chicos.
-   Mismo dibujo que el contador de cada grupo (.pf-f-n). */
-.pf-f-count { position: absolute; top: 2px; right: 2px; min-width: 18px; height: 18px; padding: .064em 4px 0; border-radius: 999px; background: var(--verde); color: #fff; display: grid; place-items: center; font: 400 11px/1 var(--f-body); font-variant-numeric: tabular-nums; }
+   Mismo dibujo que el contador de cada grupo (.pf-f-n). Interlínea 12 en la caja de 18: 3 px arriba y 3 abajo. */
+.pf-f-count { position: absolute; top: 2px; right: 2px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 999px; background: var(--verde); color: #fff; display: grid; place-items: center; font: 400 11px/12px var(--f-body); font-variant-numeric: tabular-nums; }
 .pf-f-clear { justify-self: start; margin-top: 2px; border: 0; background: transparent; cursor: pointer; padding: 4px 0; color: var(--azul); font-size: 0.88rem; text-decoration: underline; text-underline-offset: 3px; }
 /* El panel abierto se cierra con el mismo botón de la barra que lo abrió, tocando afuera o con Escape. */
 .pf-f-bar { flex: none; display: flex; align-items: center; gap: 4px; padding: 5px 5px 5px 6px; }
