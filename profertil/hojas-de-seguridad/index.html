@@ -223,15 +223,17 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
 /* Van en la misma fila que el contador (con el alto de los selectores): al sumar o sacar un filtro la lista no se corre. */
 .pf-result-main { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; min-width: 0; min-height: 36px; }
 .pf-activos { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-/* Celular: los selectores van arriba y el contador con los chips en una sola línea que se desplaza de costado. El alto no cambia
-   al sumar o sacar filtros y no queda un hueco reservado entre el contador y la lista. */
+/* Celular: los selectores van arriba y el contador con los chips en una sola línea. El contador queda fijo y solo los chips se
+   desplazan de costado, hasta el borde de la pantalla. El alto no cambia al sumar o sacar filtros y no queda un hueco reservado
+   entre el contador y la lista. */
 @media (max-width: 640px) {
   .pf-result-row { padding-block: 18px 12px; gap: 12px; }
   .pf-herramientas { order: -1; width: 100%; justify-content: space-between; flex-wrap: nowrap; }
-  .pf-result-main { width: 100%; min-height: 32px; flex-wrap: nowrap; gap: 12px; overflow-x: auto; scrollbar-width: none; margin-inline: -16px; padding-inline: 16px; width: calc(100% + 32px); }
-  .pf-result-main::-webkit-scrollbar { display: none; }
+  .pf-result-main { min-height: 32px; flex-wrap: nowrap; gap: 12px; margin-right: -16px; width: calc(100% + 16px); }
   .pf-result-text { flex: none; white-space: nowrap; }
-  .pf-activos { flex-wrap: nowrap; flex: none; }
+  .pf-activos { flex-wrap: nowrap; flex: 1; min-width: 0; align-self: stretch; overflow-x: auto; scrollbar-width: none; padding-right: 16px; }
+  .pf-activos::-webkit-scrollbar { display: none; }
+  .pf-activos > * { flex: none; }
   .pf-activos__limpiar { flex: none; white-space: nowrap; }
 }
 /* Tenues y bajos: dicen qué está filtrando sin competir con la lista. El tono es el del chip sin elegir. */
