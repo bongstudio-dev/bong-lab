@@ -1289,12 +1289,13 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
   })();
   if (!P) return;
 
-  // --- Paleta: fondo, figura y acento. El fondo es siempre azul, verde, amarillo o terra.
+  // --- Paleta: fondo, figura y acento, siempre una combinación del sistema. El fondo es azul, verde, amarillo o terra.
+  // Azul, Celeste y Verde · Verde, Verde Claro y Amarillo · Amarillo, Naranja y Verde · Naranja con Terra (secundaria: sin acento).
   var PALETAS = {
-    azul:     { fondo: "#003DA5", figura: "#4086FF", acento: "#EABA2C" },
+    azul:     { fondo: "#003DA5", figura: "#4086FF", acento: "#2D8035" },
     verde:    { fondo: "#2D8035", figura: "#5EB53A", acento: "#EABA2C" },
     amarillo: { fondo: "#EABA2C", figura: "#E57F19", acento: "#2D8035" },
-    naranja:  { fondo: "#8A4818", figura: "#E57F19", acento: "#EABA2C" }
+    naranja:  { fondo: "#8A4818", figura: "#E57F19", acento: null }
   };
   var pedida = Q.get("p");
   // ?p=azul|verde|amarillo|naranja fuerza otro color (solo para probar).
@@ -1318,7 +1319,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
     im.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + P.formas[k].vb + '" fill="' + color + '">' + P.formas[k].d + "</svg>");
     return (cache[c] = im);
   }
-  TODAS.forEach(function (k) { tenida(k, paleta.figura); tenida(k, paleta.acento); });
+  TODAS.forEach(function (k) { tenida(k, paleta.figura); if (paleta.acento) tenida(k, paleta.acento); });
 
   // --- Armado: la cabecera sale de la grilla y pasa a una tarjeta sobre el campo.
   var cv = document.createElement("canvas");
@@ -1390,7 +1391,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
       while (g.borde.length) {
         var p = g.borde.splice(Math.floor(Math.random() * g.borde.length), 1)[0];
         if (p[0] < 0 || p[1] < 0 || p[0] >= cols || p[1] >= filas || grilla[idx(p[0], p[1])]) continue;
-        var c = { x: p[0], y: p[1], nace: ahora, muere: 0, forma: g.forma, color: Math.random() < 0.08 ? paleta.acento : paleta.figura, v: Math.random() };
+        var c = { x: p[0], y: p[1], nace: ahora, muere: 0, forma: g.forma, color: paleta.acento && Math.random() < 0.08 ? paleta.acento : paleta.figura, v: Math.random() };
         grilla[idx(p[0], p[1])] = c; g.celdas.push(c);
         VEC.forEach(function (v) { g.borde.push([p[0] + v[0], p[1] + v[1]]); });
         break;
@@ -1432,7 +1433,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
   }, { passive: true });
   document.documentElement.addEventListener("pointerleave", function () { raton = null; if (reducir && W) { muestra = null; dibujar(performance.now()); } });
   function cambia(c, D) {
-    if (!muestra || c.color !== paleta.acento) return false;
+    if (!muestra || !paleta.acento || c.color !== paleta.acento) return false;
     var d = Math.hypot(c.x * CELDA + CELDA / 2 - muestra.x, c.y * CELDA + CELDA / 2 - muestra.y);
     return c.v < PICO * Math.pow(Math.max(0, 1 - d / D), CURVA);
   }
