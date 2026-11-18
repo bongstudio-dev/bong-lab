@@ -277,8 +277,9 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 .pf-f-label { margin: 0; font-size: 0.74rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); }
 /* Contador de filtros activos: 18 px de alto y cuerpo de 11 px (con 17 px quedaba en medio píxel dentro de la
    pastilla de 30). Cifras y textos chicos siempre en DM Sans: Familjen se descentra en cuerpos tan chicos.
-   Mismo dibujo que el contador de cada grupo (.pf-f-n). Interlínea 12 en la caja de 18: 3 px arriba y 3 abajo. */
-.pf-f-count { position: absolute; top: 2px; right: 2px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 999px; background: var(--verde); color: #fff; display: grid; place-items: center; font: 400 11px/12px var(--f-body); font-variant-numeric: tabular-nums; }
+   Mismo dibujo que el contador de cada grupo (.pf-f-n). Con el medio píxel de arriba la línea de base cae en 13 justos (centrada sola quedaba en 12,75 y Safari
+   la redondeaba distinto según la posición). */
+.pf-f-count { position: absolute; top: 2px; right: 2px; min-width: 18px; height: 18px; padding: .5px 4px 0; border-radius: 999px; background: var(--verde); color: #fff; display: grid; place-items: center; font: 400 11px/12px var(--f-body); font-variant-numeric: tabular-nums; }
 .pf-f-clear { justify-self: start; margin-top: 2px; border: 0; background: transparent; cursor: pointer; padding: 4px 0; color: var(--azul); font-size: 0.88rem; text-decoration: underline; text-underline-offset: 3px; }
 /* El panel abierto se cierra con el mismo botón de la barra que lo abrió, tocando afuera o con Escape. */
 .pf-f-bar { flex: none; display: flex; align-items: center; gap: 4px; padding: 5px 5px 5px 6px; }
