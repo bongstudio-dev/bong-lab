@@ -291,7 +291,7 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   background: transparent; color: var(--ink-2); cursor: pointer;
   display: flex; align-items: center; justify-content: center; gap: 8px;
 }
-.pf-f-txt { display: none; text-box: trim-both cap alphabetic; }
+.pf-f-txt { display: none; white-space: nowrap; text-box: trim-both cap alphabetic; }
 @media (hover: hover) and (pointer: fine) {
   .pf-f-toggle:hover { background: var(--line); }
 }
@@ -306,9 +306,10 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   .pf-filters.pf-abierto { width: calc(100% - 32px - var(--ancla-gap) - var(--a)); transition-duration: var(--f-abrir), var(--f-abrir), var(--f-abrir), 520ms, 300ms; }
   .pf-f-main { display: none; }
   .pf-f-bar { justify-content: center; padding: 4px; }
-  /* Toda la pastilla es el botón: ocupa la barra y su zona de toque cubre también el borde de 4 px. */
+  /* Toda la pastilla es el botón: ocupa la barra y su zona de toque cubre también el borde de 4 px. No se angosta ni
+     parte el texto mientras la pastilla cambia de ancho ("Ver 25 / documentos" a mitad de la transición): lo que no entra lo recorta la caja. */
   .pf-f-toggle::after { content: ""; position: absolute; inset: -4px; border-radius: inherit; }
-  .pf-f-toggle { flex: 1 1 auto; min-width: 0; width: auto; height: 46px; padding: 0 22px 0 26px; color: var(--ink); font-family: var(--f-display); font-size: 1.04rem; transition: height var(--f-chica) var(--f-chica-curva), padding var(--f-chica) var(--f-chica-curva), gap var(--f-chica) var(--f-chica-curva), font-size var(--f-chica) var(--f-chica-curva); }
+  .pf-f-toggle { flex: 1 0 auto; width: auto; height: 46px; padding: 0 22px 0 26px; color: var(--ink); font-family: var(--f-display); font-size: 1.04rem; transition: height var(--f-chica) var(--f-chica-curva), padding var(--f-chica) var(--f-chica-curva), gap var(--f-chica) var(--f-chica-curva), font-size var(--f-chica) var(--f-chica-curva); }
   .pf-f-toggle svg { transition: transform var(--f-flecha) var(--f-curva), width var(--f-chica) var(--f-chica-curva), height var(--f-chica) var(--f-chica-curva); }
   .pf-filters.pf-chica:not(.pf-abierto) { width: 104px; bottom: calc(6px + env(safe-area-inset-bottom, 0px)); }
   .pf-filters.pf-chica:not(.pf-abierto):has(.pf-f-count:not([hidden])) { width: 128px; }
