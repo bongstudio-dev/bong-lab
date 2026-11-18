@@ -48,7 +48,8 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
 .rotulo { margin: 0; font-size: 0.72rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
 
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.chip { height: 32px; padding: 0 14px; border: 0; border-radius: 999px; background: rgba(0, 61, 165, 0.1); color: var(--azul); cursor: pointer; font-size: 0.86rem; transition: background 200ms ease, color 200ms ease; }
+/* Interlínea 1 y cuerpo par en la caja de 32: el texto queda centrado en píxel entero. */
+.chip { display: inline-flex; align-items: center; height: 32px; padding: 0 14px; border: 0; border-radius: 999px; background: rgba(0, 61, 165, 0.1); color: var(--azul); cursor: pointer; font: 400 14px/1 var(--f-body); white-space: nowrap; transition: background 200ms ease, color 200ms ease; }
 .chip:hover { background: rgba(0, 61, 165, 0.18); }
 .chip[aria-pressed="true"] { background: var(--ink); color: var(--tiza); }
 
