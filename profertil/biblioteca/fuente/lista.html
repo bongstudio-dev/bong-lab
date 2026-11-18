@@ -66,8 +66,10 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
 /* Zona: una fila por provincia; la primera pastilla es la provincia entera, separada de sus localidades. */
 .pf-f-prov { margin-right: 6px; }
 .pf-f-gr .pf-pastilla, .pf-f-gr .pf-chip { gap: 7px; }
-/* El número va más chico, en la misma línea de base que el nombre. */
-.pf-pastilla__n { font: 400 0.86em/1 var(--f-body); font-variant-numeric: tabular-nums; opacity: .72; }
+/* El número va más chico. Centrados por separado, el número quedaba 1 px más alto que el nombre: con número, la pastilla alinea
+   por línea de base y el nombre sube 1 px (padding de arriba = aire parejo - 1), así los dos se apoyan en la misma línea. */
+.pf-pastilla__n { font: 400 round(0.86em, 1px)/1 var(--f-body); font-variant-numeric: tabular-nums; opacity: .72; }
+.pf-pastilla:has(> .pf-pastilla__n) { align-items: baseline; padding-top: calc((var(--h) - var(--fs)) / 2 - 1px); }
 .pf-f-gr .pf-cero:not([aria-pressed="true"]) { opacity: .34; cursor: default; }
 .pf-f-gr .pf-cero:not([aria-pressed="true"]):active { transform: none; }
 /* Contador de filtros activos en la barra y en cada grupo. */
