@@ -92,7 +92,9 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 .pf-activos__limpiar { align-self: center; border: 0; background: transparent; cursor: pointer; padding: 4px 6px; color: var(--azul); font-size: var(--texto-chico); text-decoration: underline; text-underline-offset: 3px; }
 /* Selectores de vista: el de la Biblioteca en Gacetillas (compacta, lista, miniaturas) y el de Novedades en Fotos (chicas, medianas,
    grandes). Cada uno aparece solo en su pestaña; en Logos no hay. */
-.pf-herramientas { display: flex; align-items: center; gap: 10px; }
+/* Nunca se achican (los botones del Selector traen min-width 0): si la fila los apretaba, el indicador se medía angosto y corrido. */
+.pf-herramientas { display: flex; flex: none; align-items: center; gap: 10px; }
+.pf-herramientas .pf-selector, .pf-herramientas .pf-selector button { flex: none; }
 .pf-herramientas:not(:has(.pf-selector:not([hidden]))) { display: none; }
 .pf-herramientas .pf-selector[hidden] { display: none; }
 .pf-herramientas .pf-selector button { position: relative; }
@@ -1055,7 +1057,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
     if (!corriendo) { corriendo = true; requestAnimationFrame(anim); }
   }
   window.addEventListener("scroll", function () { despertar(200); }, { passive: true });
-  window.addEventListener("resize", function () { despertar(700); moverInd(pest, false); marcarVistas(false); });
+  window.addEventListener("resize", function () { despertar(700); moverInd(pest, false); ubicarHerr(); });
   $("pf-filters").addEventListener("click", function () { despertar(900); });
   $("pf-filters").addEventListener("transitionend", function () { despertar(120); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { despertar(300); moverInd(pest, false); marcarVistas(false); });
