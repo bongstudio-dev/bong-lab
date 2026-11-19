@@ -163,6 +163,8 @@ def contacto():
     # Tildes que faltan en el sitio actual.
     for p in personas:
         p['cargo'] = p['cargo'].replace('Lider', 'Líder').replace('Comunicacion ', 'Comunicación ')
+        # El área se llama Comunicación Corporativa, en singular (el sitio actual dice Comunicaciones Corporativas en un cargo).
+        p['cargo'] = p['cargo'].replace('Comunicaciones Corporativas', 'Comunicación Corporativa')
         # Foto de la persona: la misma del sitio actual pero en color (allá viene con el verde aplicado sobre la imagen),
         # recortada a la cara, 144 px. Vive en fotos/contacto/<usuario del mail>.webp.
         f = 'fotos/contacto/%s.webp' % p['mail'].split('@')[0]
