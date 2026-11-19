@@ -42,8 +42,8 @@ Gacetilla), hoja de borde a borde, buscador en la lupa, filtros en el dock y anc
 - **Saltos de scroll propios:** el cambio de vista, de pestaña o de filtro reacomoda el scroll con `saltar()`, que no cuenta
   como scroll del usuario (antes el dock se achicaba y agrandaba con cada cambio de vista). El cambio de vista toma de
   referencia la primera fila visible debajo de la fila fija. Al cambiar de pestaña el indicador viaja y lo
-  de abajo (resultado y panel) se funde afuera, cambia sin verse (también el salto al principio de la lista) y se funde
-  adentro. Cada una con su ancla: `#gacetillas`, `#fotos`, `#logos`. Filtros y búsqueda en la dirección:
+  de abajo (resultado y panel) se funde afuera, cambia sin verse (también el salto al principio de la lista) y entra
+  fundiéndose con un ascenso de 12 px (la curva base `--ease`, como el dock). Cada una con su ancla: `#gacetillas`, `#fotos`, `#logos`. Filtros y búsqueda en la dirección:
   `#gacetillas&tipo=aviso&anio=2023&q=planta`, `#fotos&galeria=urea`. Alias para redirigir las direcciones viejas:
   `#videos` (abre Fotos), `#documentos`, `#_fotos`, `#_documentos`, `#_videos`, `#_gacetillas-de-prensa`.
 - **Dock con pocos grupos**: si la pestaña tiene dos grupos de filtros o menos (hoy todas), la barra no lleva una pastilla
@@ -58,6 +58,10 @@ Gacetilla), hoja de borde a borde, buscador en la lupa, filtros en el dock y anc
   (flechas, Esc, deslizar, descarga del original). Filtro Galería. Selector de tamaño como el de Novedades (chicas,
   medianas, grandes: 6 y 3 columnas en escritorio (sin medianas), 3/2/1 en el celular; se recuerda en `prensa-fotos-vista`).
   Al cambiar, las fotos viajan a su lugar nuevo.
+- **Cambio de vista (Gacetillas y Fotos):** solo se anima lo que queda a la vista. Lo que ya se veía viaja a su lugar nuevo
+  (las gacetillas, que cambian de forma, además se funden desde 35%); lo que no se veía y ahora sí entra fundiéndose con un
+  ascenso de 12 px, escalonado de a 30 ms (tope 8). Todo con `opacity` y `transform` (`el.animate()`), nada de layout animado,
+  y nada con `prefers-reduced-motion`. Si la foto pasa a la versión grande, se ve la miniatura hasta que la grande carga.
 - **Logos**: una tarjeta por versión con su vista previa y las descargas en SVG, PNG y PDF. Sin filtros ni selector
   (el dock no aparece).
 

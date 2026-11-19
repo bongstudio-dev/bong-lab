@@ -86,10 +86,14 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 }
 .pf-panel[hidden] { display: none; }
 @keyframes pf-entra { from { opacity: 0; } } /* solo aparece: sin desplazamiento, como en la Biblioteca */
-/* Cambio de pestaña: lo de abajo de las pestañas (resultado y panel) se funde afuera, cambia mientras no se ve y se funde adentro.
+/* Cambio de pestaña: lo de abajo de las pestañas (resultado y panel) se funde afuera, cambia mientras no se ve y entra fundiéndose
+   con un leve ascenso (la curva base, como el dock). El selector de vistas de la fila fija solo se funde.
    Las filas y fotos de la pestaña nueva no suman su propia entrada (pf-quieta): entra el panel entero, una sola vez. */
-.pf-cambia { transition: opacity 260ms var(--ease); }
-.pf-cambia.pf-oculto { opacity: 0; transition-duration: 140ms; transition-timing-function: ease; }
+.pf-cambia { transition: opacity 300ms ease, transform 460ms var(--ease); }
+/* Afuera solo se funde; el desplazamiento se pone de golpe ya oculto, así la pestaña nueva sube 12 px mientras aparece. */
+.pf-cambia.pf-oculto { opacity: 0; transform: translateY(12px); transition: opacity 140ms ease, transform 0s linear 130ms; }
+#pf-herr.pf-oculto { transform: none; }
+@media (prefers-reduced-motion: reduce) { .pf-cambia, .pf-cambia.pf-oculto { transform: none; } }
 .pf-doc.pf-quieta, .pf-fo.pf-quieta { animation: none; }
 
 /* --- Resultado y filtros activos (como la Biblioteca) */
@@ -579,10 +583,16 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
       '<a class="pf-doc__d" ' + bajar + ' aria-label="Descargar PDF: ' + esc(x.t) + '">' + BAJAR + "</a></li>";
   }
   function fotoSrc(x, grande) { return "fotos/" + x.g.id + "/" + x.f.n + (grande ? "" : "-mini") + ".webp"; }
+  // Al cambiar de vista la foto no queda en gris mientras baja la grande: muestra la miniatura (ya cargada) y la cambia al llegar.
+  function imgSrc(x) {
+    var grande = $("pf-lista").clientWidth / nCols > 380;
+    if (sinEntrada && grande) return ' src="' + fotoSrc(x, false) + '" data-grande="' + fotoSrc(x, true) + '"';
+    return ' src="' + fotoSrc(x, grande) + '"';
+  }
   function tileFoto(x, j) {
     var conGal = !activos(T().sel.galeria).length || activos(T().sel.galeria).length > 1;
     return '<li class="pf-fo' + (sinEntrada ? " pf-quieta" : "") + '" data-k="' + x.k + '"><button class="pf-fo__b" type="button" data-j="' + j + '" aria-label="Ver ' + esc(x.g.nombre) + ", foto " + x.i + " de " + x.de + '">' +
-      '<img' + (sinEntrada ? ' class="pf-lista"' : "") + ' src="' + fotoSrc(x, $("pf-lista").clientWidth / nCols > 380) + '" width="' + x.f.mi[0] + '" height="' + x.f.mi[1] + '" loading="lazy" decoding="async" alt="' + esc(x.g.nombre) + ", foto " + x.i + '"></button>' +
+      '<img' + (sinEntrada ? ' class="pf-lista"' : "") + imgSrc(x) + ' width="' + x.f.mi[0] + '" height="' + x.f.mi[1] + '" loading="lazy" decoding="async" alt="' + esc(x.g.nombre) + ", foto " + x.i + '"></button>' +
       '<a class="pf-doc__d pf-fo__d" href="' + esc(x.f.u) + '" download target="_blank" rel="noopener" aria-label="Descargar la foto original">' + BAJAR + "</a>" +
       (conGal ? '<span class="pf-fo__g">' + esc(x.g.nombre) + "</span>" : "") + "</li>";
   }
@@ -608,6 +618,9 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
   // Solo con el panel de Fotos a la vista: durante el fundido de pestaña la lista todavía puede ser la de otra.
   window.addEventListener("resize", function () { if (!$("fotos").hidden && lista[0] && lista[0].f && columnasFotos() !== nCols) { repartirFotos(); listas(); } });
   function listas() {
+    $("pf-fotos").querySelectorAll("img[data-grande]").forEach(function (im) {
+      var g = new Image(); g.onload = function () { if (im.isConnected) im.src = g.src; }; g.src = im.dataset.grande; im.removeAttribute("data-grande");
+    });
     $("pf-fotos").querySelectorAll("img").forEach(function (im) {
       if (im.complete) im.classList.add("pf-lista"); else im.addEventListener("load", function () { im.classList.add("pf-lista"); }, { once: true });
     });
@@ -759,8 +772,8 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
       if (!sel.hidden) moverInd(sel, animar);
     });
   }
-  /* Cambio de pestaña: el indicador viaja enseguida; lo de abajo se funde afuera (140 ms), cambia sin verse (también el salto al
-     principio de la lista, si se estaba más abajo) y se funde adentro (260 ms). Un clic nuevo en el medio toma el último pedido. */
+  /* Cambio de pestaña: el indicador viaja enseguida; lo de abajo se funde afuera (140 ms; el cambio espera 170), cambia sin verse (también el salto al
+     principio de la lista, si se estaba más abajo) y entra fundiéndose y subiendo 12 px (300 y 460 ms). Un clic nuevo en el medio toma el último pedido. */
   var cambia = $("pf-cambia"), tCambio = 0;
   function irA(t, animar) {
     if (!TABS[t]) return;
@@ -780,7 +793,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
     if (!animar || quieto.matches) { cambiar(); return; }
     cambia.classList.add("pf-oculto"); $("pf-herr").classList.add("pf-oculto");
     $("pf-filters").classList.add("pf-fuera");   // el dock se va y vuelve (o no, en Logos) con la pestaña nueva
-    tCambio = setTimeout(cambiar, 150);
+    tCambio = setTimeout(cambiar, 170);
   }
   pest.addEventListener("click", function (e) { var b = e.target.closest("[data-tab]"); if (b && b.dataset.tab !== tab) irA(b.dataset.tab, true); });
   pest.addEventListener("keydown", function (e) {
@@ -789,9 +802,10 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
     i = (i + ks.length) % ks.length; irA(ks[i], true); $("pf-t-" + ks[i]).focus();
   });
 
-  /* Cambiar de vista (la lógica de la Biblioteca): cada fila o foto visible se arma en su lugar nuevo y viaja desde donde estaba. Las que
-     no se veían aparecen directo. Si el principio de la lista está a la vista, la página no se mueve; si ya se bajó, la primera visible
-     queda en su lugar. */
+  /* Cambiar de vista (la lógica de la Biblioteca): cada fila o foto visible se arma en su lugar nuevo y viaja desde donde estaba. Las
+     filas cambian de forma (aparece la miniatura, se achica el título), así que además se funden desde 35%. Las que no se veían y ahora
+     sí entran fundiéndose con un leve ascenso, escalonadas de a 30 ms, después de las que viajan. Solo se anima lo que queda a la
+     vista. Si el principio de la lista está a la vista, la página no se mueve; si ya se bajó, la primera visible queda en su lugar. */
   function cambiarVista(cont, rehacer, escala) {
     // Lo que tapa arriba: la barra azul o, si está a la vista, la fila fija de pestañas.
     var tope = Math.max($("pf-top").offsetHeight, $("pf-pest").classList.contains("pf-escondida") ? 0 : $("pf-pest").getBoundingClientRect().bottom) + 8;
@@ -809,12 +823,20 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
     if (el) saltar(Math.max(0, window.scrollY + el.getBoundingClientRect().top - ref.top));
     else if (window.scrollY !== y) saltar(y);
     if (!cont.animate || quieto.matches) return;
+    var curva = getComputedStyle(document.documentElement).getPropertyValue("--ease").trim() || "cubic-bezier(.22,1,.36,1)", nuevas = 0;
     cont.querySelectorAll("[data-k]").forEach(function (n) {
-      var o = antes[n.dataset.k]; if (!o) return;
-      var r = n.getBoundingClientRect(), dx = o.left - r.left, dy = o.top - r.top, s = escala && r.width ? o.width / r.width : 1;
-      if (!dx && !dy && s === 1) return;
-      n.animate([{ transform: "translate(" + dx + "px," + dy + "px) scale(" + s + ")", transformOrigin: "0 0" }, { transform: "none", transformOrigin: "0 0" }],
-        { duration: 380, easing: "cubic-bezier(.2,.8,.2,1)" });
+      var o = antes[n.dataset.k], r = n.getBoundingClientRect();
+      if (r.bottom <= tope || r.top >= alto) { if (!o) return; }   // fuera de la vista: solo viaja la que venía de estar visible
+      if (!o) {
+        n.animate([{ opacity: 0, transform: "translateY(12px)" }, { opacity: 1, transform: "none" }],
+          { duration: 420, delay: 80 + Math.min(nuevas++, 8) * 30, easing: curva, fill: "backwards" });
+        return;
+      }
+      var dx = Math.round(o.left - r.left), dy = Math.round(o.top - r.top), s = escala && r.width ? o.width / r.width : 1;
+      var desde = { transform: "translate(" + dx + "px," + dy + "px) scale(" + s + ")", transformOrigin: "0 0" }, hasta = { transform: "none", transformOrigin: "0 0" };
+      if (!escala) { desde.opacity = .35; hasta.opacity = 1; }
+      else if (!dx && !dy && s === 1) return;
+      n.animate([desde, hasta], { duration: 420, easing: curva });
     });
   }
   document.querySelector(".pf-vista").addEventListener("click", function (e) {
