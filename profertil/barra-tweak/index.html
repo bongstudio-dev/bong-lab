@@ -151,8 +151,15 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
       <div class="chips" id="paginas">
         <button class="chip" type="button" data-url="../hojas-de-seguridad/" aria-pressed="true">Hojas de seguridad</button>
         <button class="chip" type="button" data-url="../biblioteca/" aria-pressed="false">Biblioteca · azul</button>
-        <button class="chip" type="button" data-url="../novedades/nota/" aria-pressed="false">Nota</button>
         <button class="chip" type="button" data-url="../novedades/" aria-pressed="false">Novedades · foto</button>
+      </div>
+      <p class="rotulo">Notas reales, una por tipo</p>
+      <div class="chips" id="notas">
+        <button class="chip" type="button" data-url="../novedades/nota/?n=profertil-recibio-a-su-visitante-numero-60-000" aria-pressed="false">Institucional</button>
+        <button class="chip" type="button" data-url="../novedades/nota/?n=profertil-realizo-su-segunda-emision-de-obligaciones-negociables" aria-pressed="false">Financiera</button>
+        <button class="chip" type="button" data-url="../novedades/nota/?n=nuevo-boletin-tecnico-del-departamento-de-id" aria-pressed="false">Técnico</button>
+        <button class="chip" type="button" data-url="../novedades/nota/?n=parada-de-planta-programada-2025" aria-pressed="false">Aviso</button>
+        <button class="chip" type="button" data-url="../novedades/nota/?n=profertil-excelencia-tecnico-2025" aria-pressed="false">Comercial</button>
       </div>
     </div>
 
@@ -165,7 +172,8 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
       <p class="rotulo">Título de la cabecera</p>
       <div class="chips" id="titulos">
         <button class="chip" type="button" data-titulo="azul" aria-pressed="true">Azul</button>
-        <button class="chip" type="button" data-titulo="campo" aria-pressed="false">Color del fondo del campo</button>
+        <button class="chip" type="button" data-titulo="campo" aria-pressed="false">Fondo del campo</button>
+        <button class="chip" type="button" data-titulo="etiqueta" aria-pressed="false">Texto de la etiqueta</button>
       </div>
     </div>
 
@@ -278,7 +286,14 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
     st.textContent = ".pf-barra__menu, .pf-barra__busca, .pf-barra__cerrar { backdrop-filter: " + f + "; -webkit-backdrop-filter: " + f + "; }" +
       (estado.modo === "blanca" ? BLANCA : "") +
       // Título del color del fondo del campo (campo.js deja --pf-campo-fondo en :root); Biblioteca, Hojas y Nota.
-      (estado.titulo === "campo" ? "#pf-cab h1 { color: var(--pf-campo-fondo, var(--azul)); }" : "");
+      (estado.titulo === "campo" ? "#pf-cab h1 { color: var(--pf-campo-fondo, var(--azul)); }" : "") +
+      (estado.titulo === "etiqueta" ? "#pf-cab h1 { color: " + colorEtiqueta(doc) + "; }" : "");
+  }
+  // El texto de la etiqueta de la cabecera (--tx, el color del tipo de nota). Las listas no tienen etiqueta: fondo del campo.
+  function colorEtiqueta(doc) {
+    var e = doc.querySelector("#pf-cab .pf-etiqueta");
+    var tx = e && e.style.getPropertyValue("--tx");
+    return tx ? tx.trim() : "var(--pf-campo-fondo, var(--azul))";
   }
   // Sólida blanca: la barra sigue transparente; lo que hoy es vidrio (menú, lupa, cruz y menú del celular) pasa al color de fondo de la página
   // (--bg), sólido, con el texto y los íconos en azul. La página actual del menú, pastilla azul con el texto en ese mismo color. El logo no cambia.
@@ -305,7 +320,7 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
     if (estado.modo === "blanca") lineas = ["Sobre la cabecera · piezas sólidas", "Menú, lupa y cruz · fondo de la página (--bg), sin desenfoque", "Texto e íconos · Marca/Azul", "Página actual · pastilla azul, texto en el fondo de la página", "Barra y logo · sin cambios"];
     document.querySelector(".app").dataset.modo = estado.modo || "vidrio";
     $("modos").querySelectorAll(".chip").forEach(function (c) { c.setAttribute("aria-pressed", c.dataset.modo === (estado.modo || "vidrio") ? "true" : "false"); });
-    lineas.push("", "Campo · " + tri.nombre, "Título · " + (estado.titulo === "campo" ? "color del fondo del campo" : "Marca/Azul"));
+    lineas.push("", "Campo · " + tri.nombre, "Título · " + ({ campo: "fondo del campo", etiqueta: "texto de la etiqueta (en las listas, fondo del campo)" }[estado.titulo] || "Marca/Azul"));
     $("titulos").querySelectorAll(".chip").forEach(function (c) { c.setAttribute("aria-pressed", c.dataset.titulo === (estado.titulo || "azul") ? "true" : "false"); });
     $("salida").textContent = lineas.join("\n");
     try { localStorage.setItem(CLAVE, JSON.stringify(estado)); } catch (err) {}
@@ -314,10 +329,10 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
 
   // Tríadas: cada una recarga Hojas con ?campo=fondo-figura-acento (campo.js la toma solo para probar).
   function urlPagina() {
-    var b = $("paginas").querySelector('[aria-pressed="true"]'), u = b.dataset.url;
+    var b = document.querySelector('#paginas [aria-pressed="true"], #notas [aria-pressed="true"]'), u = b.dataset.url;
     if (u.indexOf("hojas") === -1 && u.indexOf("nota") === -1) return u;
     var t = TRIADAS.filter(function (x) { return x.id === estado.triada; })[0];
-    return t && t.id !== "hoy" ? u + "?campo=" + t.c.join("-") : u;
+    return t && t.id !== "hoy" ? u + (u.indexOf("?") === -1 ? "?" : "&") + "campo=" + t.c.join("-") : u;
   }
   TRIADAS.forEach(function (t) {
     var b = document.createElement("button");
@@ -337,14 +352,16 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
     }, function () {});
   });
 
-  function grupoChips(id, alElegir) {
+  function grupoChips(id, alElegir, juntos) {
     $(id).addEventListener("click", function (e) {
       var b = e.target.closest(".chip"); if (!b) return;
-      $(id).querySelectorAll(".chip").forEach(function (c) { c.setAttribute("aria-pressed", c === b ? "true" : "false"); });
+      document.querySelectorAll(juntos || "#" + id + " .chip").forEach(function (c) { c.setAttribute("aria-pressed", c === b ? "true" : "false"); });
       alElegir(b);
     });
   }
-  grupoChips("paginas", function (b) { $("grupoTriada").classList.toggle("apagado", !/hojas|nota/.test(b.dataset.url)); $("frame").src = urlPagina(); });
+  function elegirPagina(b) { $("grupoTriada").classList.toggle("apagado", !/hojas|nota/.test(b.dataset.url)); $("frame").src = urlPagina(); }
+  grupoChips("paginas", elegirPagina, "#paginas .chip, #notas .chip");
+  grupoChips("notas", elegirPagina, "#paginas .chip, #notas .chip");
   grupoChips("titulos", function (b) { estado.titulo = b.dataset.titulo; pintar(); });
   grupoChips("modos", function (b) { estado.modo = b.dataset.modo; pintar(); });
   grupoChips("anchos", function (b) { $("marco").classList.toggle("celu", b.dataset.ancho === "celu"); });
