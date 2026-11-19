@@ -1546,12 +1546,14 @@
    {
     "nombre": "Valeria Caliva",
     "cargo": "Líder de Comunicación Corporativa",
-    "mail": "vcaliva@profertil.com.ar"
+    "mail": "vcaliva@profertil.com.ar",
+    "foto": "fotos/contacto/vcaliva.webp"
    },
    {
     "nombre": "Agustina Diaz",
     "cargo": "Analista de Comunicaciones Corporativas",
-    "mail": "agdiaz@profertil.com.ar"
+    "mail": "agdiaz@profertil.com.ar",
+    "foto": "fotos/contacto/agdiaz.webp"
    }
   ],
   "telefono": "+54 9 291 459-8000",
