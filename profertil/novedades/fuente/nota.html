@@ -194,7 +194,7 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
   <symbol id="pf-badge-bg" viewBox="0 0 100 100"><path d="M32 0H68C76.4869 0 84.6263 3.37142 90.6274 9.37258C96.6286 15.3737 100 23.5131 100 32V68C100 76.4869 96.6286 84.6263 90.6274 90.6274C84.6263 96.6286 76.4869 100 68 100H32C23.5131 100 15.3737 96.6286 9.37258 90.6274C3.37142 84.6263 0 76.4869 0 68V32C0 23.5131 3.37142 15.3737 9.37258 9.37258C15.3737 3.37142 23.5131 0 32 0Z"/></symbol>
 </defs></svg>
 
-<header class="pf-barra pf-barra--solida" id="pf-top">
+<header class="pf-barra" id="pf-top">
   <div class="pf-barra__in">
     <nav class="pf-barra__nav" id="pf-nav" aria-label="Sitio">
       <a class="pf-barra__logo" href="../" aria-label="Profertil, ir a Novedades">
@@ -462,6 +462,16 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
     ol.style.setProperty("--y", Math.round(a.getBoundingClientRect().top - ol.getBoundingClientRect().top + parseFloat(getComputedStyle(a).lineHeight) / 2 - 3.5) + "px");
   }
   window.addEventListener("scroll", function () { alScroll(); marcar(); }, { passive: true });
+  // Barra transparente sobre la cabecera, así se ve entero el color del campo; toma el azul cuando termina, como en Novedades.
+  // Se mide contra el contenido que sube sobre el campo (#pf-nota): azul cuando llega a la barra.
+  function barraSolida() {
+    var t = document.getElementById("pf-top"), m = document.getElementById("pf-nota");
+    t.classList.toggle("pf-barra--solida", !m || m.getBoundingClientRect().top <= t.offsetHeight);
+  }
+  window.addEventListener("scroll", barraSolida, { passive: true });
+  window.addEventListener("resize", barraSolida);
+  window.addEventListener("load", barraSolida);
+  requestAnimationFrame(barraSolida);
   window.addEventListener("resize", alScroll);
 
   var base = { ante: "", b: n.b, lg: n.lg, img: n.img, imgG: n.imgG, et: n.et };
