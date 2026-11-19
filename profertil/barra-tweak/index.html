@@ -151,13 +151,22 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
       <div class="chips" id="paginas">
         <button class="chip" type="button" data-url="../hojas-de-seguridad/" aria-pressed="true">Hojas de seguridad</button>
         <button class="chip" type="button" data-url="../biblioteca/" aria-pressed="false">Biblioteca · azul</button>
+        <button class="chip" type="button" data-url="../novedades/nota/" aria-pressed="false">Nota</button>
         <button class="chip" type="button" data-url="../novedades/" aria-pressed="false">Novedades · foto</button>
       </div>
     </div>
 
     <div class="grupo" id="grupoTriada">
-      <p class="rotulo">Tríada del campo · Hojas</p>
+      <p class="rotulo">Tríada del campo · Hojas y Nota</p>
       <div class="triadas" id="triadas"></div>
+    </div>
+
+    <div class="grupo" id="grupoTitulo">
+      <p class="rotulo">Título de la cabecera</p>
+      <div class="chips" id="titulos">
+        <button class="chip" type="button" data-titulo="azul" aria-pressed="true">Azul</button>
+        <button class="chip" type="button" data-titulo="campo" aria-pressed="false">Color del fondo del campo</button>
+      </div>
     </div>
 
     <div class="grupo">
@@ -222,9 +231,10 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
   // o el naranja ya probados). Orden: fondo, figura (las Formas), acento (sin acento, el cursor no cambia nada).
   var C = { azul: "003DA5", celeste: "4086FF", verde: "2D8035", verdeClaro: "5EB53A", amarillo: "EABA2C", naranja: "E57F19", terra: "8A4818", verdeOscuro: "154B1A" };
   var TRIADAS = [
-    { id: "hoy", nombre: "Amarillo, Naranja y Verde", tipo: "Terciaria · la de hoy", c: [C.amarillo, C.naranja, C.verde] },
+    { id: "hoy", nombre: "La de cada página", tipo: "Hojas · Verde, Verde Claro y Amarillo · la Nota, según su tipo", c: [C.verde, C.verdeClaro, C.amarillo] },
+    { id: "a-n-v", nombre: "Amarillo, Naranja y Verde", tipo: "Terciaria", c: [C.amarillo, C.naranja, C.verde] },
     { id: "v-a-t", nombre: "Verde, Amarillo y Terra", tipo: "Terciaria · cascos amarillos", c: [C.verde, C.amarillo, C.terra] },
-    { id: "v-vc-a", nombre: "Verde, Verde Claro y Amarillo", tipo: "Terciaria", c: [C.verde, C.verdeClaro, C.amarillo] },
+    { id: "a-c-v", nombre: "Azul, Celeste y Verde", tipo: "Terciaria · la de la Biblioteca", c: [C.azul, C.celeste, C.verde] },
     { id: "v-vc", nombre: "Verde con Verde Claro", tipo: "Secundaria · sin acento", c: [C.verde, C.verdeClaro] },
     { id: "t-n", nombre: "Terra con Naranja", tipo: "Secundaria · sin acento", c: [C.terra, C.naranja] },
     { id: "vo-a-vc", nombre: "Verde Oscuro, Amarillo y Verde Claro", tipo: "Fuera del Master · Verde Oscuro es un observado", c: [C.verdeOscuro, C.amarillo, C.verdeClaro] }
@@ -266,7 +276,9 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
     if (!st) { st = doc.createElement("style"); st.id = "pf-tweak-barra"; (doc.head || doc.documentElement).appendChild(st); }
     var f = "blur(" + estado.blur + "px)";
     st.textContent = ".pf-barra__menu, .pf-barra__busca, .pf-barra__cerrar { backdrop-filter: " + f + "; -webkit-backdrop-filter: " + f + "; }" +
-      (estado.modo === "blanca" ? BLANCA : "");
+      (estado.modo === "blanca" ? BLANCA : "") +
+      // Título del color del fondo del campo (campo.js deja --pf-campo-fondo en :root); Biblioteca, Hojas y Nota.
+      (estado.titulo === "campo" ? "#pf-cab h1 { color: var(--pf-campo-fondo, var(--azul)); }" : "");
   }
   // Sólida blanca: la barra sigue transparente; lo que hoy es vidrio (menú, lupa, cruz y menú del celular) pasa al color de fondo de la página
   // (--bg), sólido, con el texto y los íconos en azul. La página actual del menú, pastilla azul con el texto en ese mismo color. El logo no cambia.
@@ -293,7 +305,8 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
     if (estado.modo === "blanca") lineas = ["Sobre la cabecera · piezas sólidas", "Menú, lupa y cruz · fondo de la página (--bg), sin desenfoque", "Texto e íconos · Marca/Azul", "Página actual · pastilla azul, texto en el fondo de la página", "Barra y logo · sin cambios"];
     document.querySelector(".app").dataset.modo = estado.modo || "vidrio";
     $("modos").querySelectorAll(".chip").forEach(function (c) { c.setAttribute("aria-pressed", c.dataset.modo === (estado.modo || "vidrio") ? "true" : "false"); });
-    lineas.push("", "Campo de Hojas · " + tri.nombre);
+    lineas.push("", "Campo · " + tri.nombre, "Título · " + (estado.titulo === "campo" ? "color del fondo del campo" : "Marca/Azul"));
+    $("titulos").querySelectorAll(".chip").forEach(function (c) { c.setAttribute("aria-pressed", c.dataset.titulo === (estado.titulo || "azul") ? "true" : "false"); });
     $("salida").textContent = lineas.join("\n");
     try { localStorage.setItem(CLAVE, JSON.stringify(estado)); } catch (err) {}
     aplicar();
@@ -302,7 +315,7 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
   // Tríadas: cada una recarga Hojas con ?campo=fondo-figura-acento (campo.js la toma solo para probar).
   function urlPagina() {
     var b = $("paginas").querySelector('[aria-pressed="true"]'), u = b.dataset.url;
-    if (u.indexOf("hojas") === -1) return u;
+    if (u.indexOf("hojas") === -1 && u.indexOf("nota") === -1) return u;
     var t = TRIADAS.filter(function (x) { return x.id === estado.triada; })[0];
     return t && t.id !== "hoy" ? u + "?campo=" + t.c.join("-") : u;
   }
@@ -331,7 +344,8 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
       alElegir(b);
     });
   }
-  grupoChips("paginas", function (b) { $("grupoTriada").classList.toggle("apagado", b.dataset.url.indexOf("hojas") === -1); $("frame").src = urlPagina(); });
+  grupoChips("paginas", function (b) { $("grupoTriada").classList.toggle("apagado", !/hojas|nota/.test(b.dataset.url)); $("frame").src = urlPagina(); });
+  grupoChips("titulos", function (b) { estado.titulo = b.dataset.titulo; pintar(); });
   grupoChips("modos", function (b) { estado.modo = b.dataset.modo; pintar(); });
   grupoChips("anchos", function (b) { $("marco").classList.toggle("celu", b.dataset.ancho === "celu"); });
 
