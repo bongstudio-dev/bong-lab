@@ -1119,7 +1119,7 @@ body.pf-foco #pf-nota { border-radius: 0; margin-inline: 0; }
     var N = window.PF_NOTA; if (!N) return null;
     var n = N.n, tema = [];
     // Automático: el color de la etiqueta del tipo de nota (la familia del componente Etiqueta).
-    var FAMILIA = { institucional: "azul", financiera: "azul", somos: "verde", tecnico: "verde", aviso: "amarillo", comercial: "naranja" };
+    var FAMILIA = { institucional: "azul", financiera: "azul", somos: "verde", tecnico: "verde", aviso: "aviso", comercial: "naranja" };
     // Modo "una": todo el campo con la forma de la categoría (la del badge de la etiqueta).
     var FORMA_TIPO = { institucional: "escudo", comercial: "barras", somos: "circulos", tecnico: "lupa", aviso: "casco", financiera: "grafico" };
     try { tema = N.formasDe(n) || []; } catch (e) {}
@@ -1133,10 +1133,13 @@ body.pf-foco #pf-nota { border-radius: 0; margin-inline: 0; }
     azul:     { fondo: "#003DA5", figura: "#4086FF", acento: "#2D8035" },
     verde:    { fondo: "#2D8035", figura: "#5EB53A", acento: "#EABA2C" },
     amarillo: { fondo: "#EABA2C", figura: "#E57F19", acento: "#2D8035" },
-    naranja:  { fondo: "#8A4818", figura: "#E57F19", acento: null }
+    naranja:  { fondo: "#8A4818", figura: "#E57F19", acento: null },
+    // Avisos: el amarillo de fondo no deja leer el texto naranja de la etiqueta sobre la tarjeta. Fondo naranja,
+    // Formas en amarillo y acento verde (los mismos tres colores de la terciaria Amarillo, Naranja y Verde).
+    aviso:    { fondo: "#E57F19", figura: "#EABA2C", acento: "#2D8035" }
   };
   var pedida = Q.get("p");
-  // ?p=azul|verde|amarillo|naranja fuerza otro color (solo para probar).
+  // ?p=azul|verde|amarillo|naranja|aviso fuerza otro color (solo para probar).
   var paleta = PALETAS[PALETAS[pedida] ? pedida : (PALETAS[P.color] ? P.color : "azul")];
   // ?campo=fondo-figura-acento (hex sin #, el acento puede faltar) prueba otra combinación (lo usa el tweak de la barra).
   var probada = (Q.get("campo") || "").split("-").filter(function (h) { return /^[0-9a-f]{6}$/i.test(h); });

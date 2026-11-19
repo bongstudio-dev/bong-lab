@@ -168,6 +168,14 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
       <div class="triadas" id="triadas"></div>
     </div>
 
+    <div class="grupo">
+      <p class="rotulo">Barra en la Nota</p>
+      <div class="chips" id="barrasNota">
+        <button class="chip" type="button" data-barra="azul" aria-pressed="true">Azul fija</button>
+        <button class="chip" type="button" data-barra="transparente" aria-pressed="false">Transparente sobre la cabecera</button>
+      </div>
+    </div>
+
     <div class="grupo" id="grupoTitulo">
       <p class="rotulo">Título de la cabecera</p>
       <div class="chips" id="titulos">
@@ -279,6 +287,16 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
   function aplicar() {
     var doc; try { doc = $("frame").contentDocument; } catch (err) { return; }
     if (!doc || !doc.documentElement) return;
+    // Barra transparente en la Nota: la misma regla que Novedades, Biblioteca y Hojas (toma el azul al terminar la cabecera).
+    var win = $("frame").contentWindow;
+    if (estado.barraNota === "transparente" && /\/nota\//.test(win.location.pathname) && !win.pfTweakBarra) {
+      var top = doc.getElementById("pf-top"), cab = doc.getElementById("pf-cab");
+      if (top && cab) {
+        win.pfTweakBarra = function () { top.classList.toggle("pf-barra--solida", win.scrollY > cab.offsetHeight - 80); };
+        win.addEventListener("scroll", win.pfTweakBarra, { passive: true });
+        win.pfTweakBarra();
+      }
+    }
     Object.keys(HOY).forEach(function (k) { doc.documentElement.style.setProperty("--" + k, rgba(estado[k])); });
     var st = doc.getElementById("pf-tweak-barra");
     if (!st) { st = doc.createElement("style"); st.id = "pf-tweak-barra"; (doc.head || doc.documentElement).appendChild(st); }
@@ -321,6 +339,7 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
     document.querySelector(".app").dataset.modo = estado.modo || "vidrio";
     $("modos").querySelectorAll(".chip").forEach(function (c) { c.setAttribute("aria-pressed", c.dataset.modo === (estado.modo || "vidrio") ? "true" : "false"); });
     lineas.push("", "Campo · " + tri.nombre, "Título · " + ({ campo: "fondo del campo", etiqueta: "texto de la etiqueta (en las listas, fondo del campo)" }[estado.titulo] || "Marca/Azul"));
+    $("barrasNota").querySelectorAll(".chip").forEach(function (c) { c.setAttribute("aria-pressed", c.dataset.barra === (estado.barraNota || "azul") ? "true" : "false"); });
     $("titulos").querySelectorAll(".chip").forEach(function (c) { c.setAttribute("aria-pressed", c.dataset.titulo === (estado.titulo || "azul") ? "true" : "false"); });
     $("salida").textContent = lineas.join("\n");
     try { localStorage.setItem(CLAVE, JSON.stringify(estado)); } catch (err) {}
@@ -362,6 +381,7 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
   function elegirPagina(b) { $("grupoTriada").classList.toggle("apagado", !/hojas|nota/.test(b.dataset.url)); $("frame").src = urlPagina(); }
   grupoChips("paginas", elegirPagina, "#paginas .chip, #notas .chip");
   grupoChips("notas", elegirPagina, "#paginas .chip, #notas .chip");
+  grupoChips("barrasNota", function (b) { var antes = estado.barraNota; estado.barraNota = b.dataset.barra; pintar(); if (antes === "transparente") $("frame").src = urlPagina(); });
   grupoChips("titulos", function (b) { estado.titulo = b.dataset.titulo; pintar(); });
   grupoChips("modos", function (b) { estado.modo = b.dataset.modo; pintar(); });
   grupoChips("anchos", function (b) { $("marco").classList.toggle("celu", b.dataset.ancho === "celu"); });
