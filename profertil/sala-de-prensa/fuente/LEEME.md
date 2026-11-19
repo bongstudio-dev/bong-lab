@@ -56,7 +56,8 @@ Gacetilla), hoja de borde a borde, buscador en la lupa, filtros en el dock y anc
   (`../biblioteca/ver/?d=prensa-...`), que vuelve a la Sala de prensa. Filtros Tipo (Gacetilla o Aviso a la comunidad,
   las mismas etiquetas que esos tipos en Novedades) y Año. Selector de vistas de la Biblioteca (compacta, lista,
   miniaturas; se recuerda en `prensa-vista`): en miniaturas va la foto de la gacetilla si tiene (8 de 47) y si no el arte
-  de Formas de la Biblioteca.
+  de Formas de la Biblioteca. En miniaturas del celular la etiqueta de Aviso a la comunidad se
+  abrevia «Aviso comunidad» (sobre el arte no entra entera); en el resto de las vistas y en escritorio va completa.
 - **Fotos**: masonry por filas (cada foto a la columna más corta, por su proporción) con visor propio
   (flechas, Esc, deslizar, descarga del original). Filtro Galería. Selector de tamaño como el de Novedades (chicas,
   medianas, grandes: 6 y 3 columnas en escritorio (sin medianas), 3/2/1 en el celular; se recuerda en `prensa-fotos-vista`).

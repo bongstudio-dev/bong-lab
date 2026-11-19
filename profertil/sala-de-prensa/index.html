@@ -201,6 +201,15 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 .pf-docs[data-vista="mini"] .pf-doc__arte img { object-fit: cover; }
 .pf-docs[data-vista="mini"] .pf-doc .pf-etiqueta { position: absolute; top: 10px; left: 10px; z-index: 1; max-width: calc(100% - 56px); pointer-events: none; }
 .pf-docs[data-vista="mini"] .pf-etiqueta__rotulo { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+/* Nombre corto, solo en miniaturas del celular (la etiqueta va sobre el arte y no entra entera): «Aviso comunidad». */
+.pf-etiqueta__corto { display: none; }
+@media (max-width: 640px) {
+  .pf-docs[data-vista="mini"] .pf-etiqueta__largo { display: none; }
+  .pf-docs[data-vista="mini"] .pf-etiqueta__corto { display: inline; }
+  /* Para que entre entero junto a la descarga: la etiqueta 2 px más a la izquierda y el rótulo con 6 px de aire a los lados. */
+  .pf-docs[data-vista="mini"] .pf-doc .pf-etiqueta { left: 8px; max-width: calc(100% - 48px); }
+  .pf-docs[data-vista="mini"] .pf-etiqueta__rotulo { padding-inline: 6px; }
+}
 .pf-docs[data-vista="mini"] .pf-doc__t { grid-row: 2; padding: 0 2px; font-size: 1.04rem; line-height: 1.18; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .pf-docs[data-vista="mini"] .pf-doc__t a::after { inset: 0 0 -8px 0; }
 .pf-docs[data-vista="mini"] .pf-doc__y { grid-row: 3; padding: 0 2px; text-align: left; margin-top: -4px; }
@@ -578,12 +587,12 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
     azul: { bg: "#003DA5", fo: "#4086FF", tx: "#003DA5" },
     amarillo: { bg: "#EABA2C", fo: "#E57F19", tx: "#E57F19" }
   };
-  var CATS = { gacetilla: { nombre: "Gacetilla", forma: "escudo", f: FAM.azul }, aviso: { nombre: "Aviso a la comunidad", forma: "casco", f: FAM.amarillo } };
+  var CATS = { gacetilla: { nombre: "Gacetilla", forma: "escudo", f: FAM.azul }, aviso: { nombre: "Aviso a la comunidad", corto: "Aviso comunidad", forma: "casco", f: FAM.amarillo } };
   function etq(id) {
     var x = CATS[id];
     return '<span class="pf-etiqueta" style="--eb:' + x.f.bg + ";--fo:" + x.f.fo + ";--tx:" + x.f.tx + '">' +
       '<svg class="pf-etiqueta__badge" viewBox="0 0 100 100" aria-hidden="true"><use href="#pf-badge-bg" width="100" height="100" fill="' + x.f.bg + '"/>' +
-      '<use href="#pf-forma-' + x.forma + '" x="21" y="21" width="58" height="58" fill="' + x.f.fo + '"/></svg><span class="pf-etiqueta__rotulo">' + x.nombre + "</span></span>";
+      '<use href="#pf-forma-' + x.forma + '" x="21" y="21" width="58" height="58" fill="' + x.f.fo + '"/></svg><span class="pf-etiqueta__rotulo">' + (x.corto ? '<span class="pf-etiqueta__largo">' + x.nombre + '</span><span class="pf-etiqueta__corto">' + x.corto + "</span>" : x.nombre) + "</span></span>";
   }
 
   function plano(s) { return String(s).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(); }
