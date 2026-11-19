@@ -155,7 +155,7 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
       <p class="rotulo">Barra sobre la cabecera</p>
       <div class="chips" id="modos">
         <button class="chip" type="button" data-modo="vidrio" aria-pressed="true">Vidrio</button>
-        <button class="chip" type="button" data-modo="blanca" aria-pressed="false">Sólida blanca</button>
+        <button class="chip" type="button" data-modo="blanca" aria-pressed="false">Sólida</button>
       </div>
     </div>
 
@@ -240,13 +240,13 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
     st.textContent = ".pf-barra__menu, .pf-barra__busca, .pf-barra__cerrar { backdrop-filter: " + f + "; -webkit-backdrop-filter: " + f + "; }" +
       (estado.modo === "blanca" ? BLANCA : "");
   }
-  // Sólida blanca: la barra sigue transparente; lo que hoy es vidrio (menú, lupa, cruz y menú del celular) pasa a blanco
-  // sólido con el texto y los íconos en azul. La página actual del menú, pastilla azul con texto blanco. El logo no cambia.
+  // Sólida blanca: la barra sigue transparente; lo que hoy es vidrio (menú, lupa, cruz y menú del celular) pasa al color de fondo de la página
+  // (--bg), sólido, con el texto y los íconos en azul. La página actual del menú, pastilla azul con el texto en ese mismo color. El logo no cambia.
   var S = ".pf-barra:not(.pf-barra--solida) ";
   var BLANCA =
-    S + ".pf-barra__menu, " + S + ".pf-barra__menu-mobile, " + S + ".pf-barra__busca, " + S + ".pf-barra__cerrar { background: var(--color-blanco); border-color: var(--color-blanco); backdrop-filter: none; -webkit-backdrop-filter: none; }" +
+    S + ".pf-barra__menu, " + S + ".pf-barra__menu-mobile, " + S + ".pf-barra__busca, " + S + ".pf-barra__cerrar { background: var(--bg); border-color: var(--bg); backdrop-filter: none; -webkit-backdrop-filter: none; }" +
     S + ".pf-barra__menu > *, " + S + ".pf-barra__menu-mobile, " + S + ".pf-barra__lupa, " + S + ".pf-barra__cerrar { color: var(--azul); }" +
-    S + ".pf-barra__menu > [aria-current] { background: var(--azul); color: var(--color-blanco); }";
+    S + ".pf-barra__menu > [aria-current] { background: var(--azul); color: var(--bg); }";
 
   function pintar() {
     var lineas = [];
@@ -260,7 +260,7 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
     $("blur").value = estado.blur; $("blurNum").textContent = estado.blur + "px";
     $("blurVar").classList.toggle("cambiado", estado.blur !== BLUR_HOY);
     lineas.push("", "base.css · blur(" + estado.blur + "px)");
-    if (estado.modo === "blanca") lineas = ["Sobre la cabecera · piezas en blanco sólido", "Menú, lupa y cruz · fondo Neutro/Blanco, sin desenfoque", "Texto e íconos · Marca/Azul", "Página actual · pastilla azul, texto blanco", "Barra y logo · sin cambios"];
+    if (estado.modo === "blanca") lineas = ["Sobre la cabecera · piezas sólidas", "Menú, lupa y cruz · fondo de la página (--bg), sin desenfoque", "Texto e íconos · Marca/Azul", "Página actual · pastilla azul, texto en el fondo de la página", "Barra y logo · sin cambios"];
     document.querySelector(".app").dataset.modo = estado.modo || "vidrio";
     $("modos").querySelectorAll(".chip").forEach(function (c) { c.setAttribute("aria-pressed", c.dataset.modo === (estado.modo || "vidrio") ? "true" : "false"); });
     $("salida").textContent = lineas.join("\n");
