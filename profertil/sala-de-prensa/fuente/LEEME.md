@@ -33,7 +33,9 @@ Gacetilla), hoja de borde a borde, buscador en la lupa, filtros en el dock y anc
 - **Pestañas** con el Selector de `base.css`, fijas debajo de la barra al bajar. La fila no tiene fondo: queda solo la
   cápsula, con su tono hecho opaco para que se lea sobre fotos y miniaturas. En escritorio el selector de vistas de la
   pestaña va en la misma fila fija, a la derecha y con el mismo alto; en el celular no entra al lado y va en la línea del
-  contador (el JS lo mueve según el ancho). Al cambiar de pestaña el indicador viaja y lo
+  contador (el JS lo mueve según el ancho). En el celular esa línea (contador, chips y selector) es una pastilla fija debajo
+  de las pestañas, del mismo ancho y tono: al bajar se esconde por detrás de ellas y al subir vuelve. Adentro el selector va
+  sin su cápsula, los chips se deslizan con un fundido en el borde y "Limpiar todo" queda en el panel de filtros. Al cambiar de pestaña el indicador viaja y lo
   de abajo (resultado y panel) se funde afuera, cambia sin verse (también el salto al principio de la lista) y se funde
   adentro. Cada una con su ancla: `#gacetillas`, `#fotos`, `#logos`. Filtros y búsqueda en la dirección:
   `#gacetillas&tipo=aviso&anio=2023&q=planta`, `#fotos&galeria=urea`. Alias para redirigir las direcciones viejas:
