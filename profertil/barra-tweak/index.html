@@ -106,6 +106,8 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
 .var__num { font-family: var(--f-mono); font-size: 12px; text-align: right; font-variant-numeric: tabular-nums; }
 .var__valor { font-family: var(--f-mono); font-size: 11px; color: var(--ink-2); }
 .var.cambiado { border-color: var(--celeste); }
+/* Con la barra sólida blanca, el vidrio no se usa: sus controles quedan apagados. */
+.app[data-modo="blanca"] .vidrio { opacity: .4; pointer-events: none; }
 
 .acciones { display: flex; gap: 8px; flex-wrap: wrap; }
 .boton { height: 38px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--azul); color: var(--tiza); cursor: pointer; font-size: 14px; line-height: 1; }
@@ -149,11 +151,19 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
       </div>
     </div>
 
-    <div class="grupo" id="vars">
+    <div class="grupo">
+      <p class="rotulo">Barra sobre la cabecera</p>
+      <div class="chips" id="modos">
+        <button class="chip" type="button" data-modo="vidrio" aria-pressed="true">Vidrio</button>
+        <button class="chip" type="button" data-modo="blanca" aria-pressed="false">Sólida blanca</button>
+      </div>
+    </div>
+
+    <div class="grupo vidrio" id="vars">
       <p class="rotulo">Variables · Web/Sobre foto</p>
     </div>
 
-    <div class="grupo">
+    <div class="grupo vidrio">
       <p class="rotulo">Desenfoque · valor fijo en base.css</p>
       <div class="var" id="blurVar">
         <div class="var__cab"><span class="var__nombre">Desenfoque del vidrio</span><span class="var__token">backdrop-filter</span></div>
@@ -227,8 +237,20 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
     var st = doc.getElementById("pf-tweak-barra");
     if (!st) { st = doc.createElement("style"); st.id = "pf-tweak-barra"; (doc.head || doc.documentElement).appendChild(st); }
     var f = "blur(" + estado.blur + "px)";
-    st.textContent = ".pf-barra__menu, .pf-barra__busca, .pf-barra__cerrar { backdrop-filter: " + f + "; -webkit-backdrop-filter: " + f + "; }";
+    st.textContent = ".pf-barra__menu, .pf-barra__busca, .pf-barra__cerrar { backdrop-filter: " + f + "; -webkit-backdrop-filter: " + f + "; }" +
+      (estado.modo === "blanca" ? BLANCA : "");
   }
+  // Sólida blanca: mientras la barra está sobre la cabecera (sin .pf-barra--solida) es blanca, con logo, menú y lupa en azul.
+  // La página actual del menú pasa a pastilla azul con texto blanco. Al bajar sigue tomando el azul de siempre.
+  var S = ".pf-barra:not(.pf-barra--solida) ";
+  var BLANCA =
+    ".pf-barra:not(.pf-barra--solida) { background: var(--color-blanco); }" +
+    S + ".pf-barra__logo, " + S + ".pf-barra__lupa, " + S + ".pf-barra__menu-mobile, " + S + ".pf-barra__cerrar { color: var(--azul); }" +
+    S + ".pf-barra__menu, " + S + ".pf-barra__menu-mobile { background: transparent; border-color: var(--line); backdrop-filter: none; -webkit-backdrop-filter: none; }" +
+    S + ".pf-barra__menu > * { color: var(--azul); }" +
+    S + ".pf-barra__menu > [aria-current] { background: var(--azul); color: var(--color-blanco); }" +
+    S + ".pf-barra__busca:not(.pf-abierto), " + S + ".pf-barra__cerrar { background: transparent; border-color: var(--line); backdrop-filter: none; -webkit-backdrop-filter: none; }" +
+    S + ".pf-barra__busca.pf-abierto { border-color: var(--line); }";
 
   function pintar() {
     var lineas = [];
@@ -242,6 +264,9 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
     $("blur").value = estado.blur; $("blurNum").textContent = estado.blur + "px";
     $("blurVar").classList.toggle("cambiado", estado.blur !== BLUR_HOY);
     lineas.push("", "base.css · blur(" + estado.blur + "px)");
+    if (estado.modo === "blanca") lineas = ["Sobre la cabecera · sólida blanca", "Fondo Neutro/Blanco · logo, menú y lupa Marca/Azul", "Página actual · pastilla azul, texto blanco", "Filo del menú y la lupa · Web/Línea"];
+    document.querySelector(".app").dataset.modo = estado.modo || "vidrio";
+    $("modos").querySelectorAll(".chip").forEach(function (c) { c.setAttribute("aria-pressed", c.dataset.modo === (estado.modo || "vidrio") ? "true" : "false"); });
     $("salida").textContent = lineas.join("\n");
     try { localStorage.setItem(CLAVE, JSON.stringify(estado)); } catch (err) {}
     aplicar();
@@ -264,6 +289,7 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
     });
   }
   grupoChips("paginas", function (b) { $("frame").src = b.dataset.url; });
+  grupoChips("modos", function (b) { estado.modo = b.dataset.modo; pintar(); });
   grupoChips("anchos", function (b) { $("marco").classList.toggle("celu", b.dataset.ancho === "celu"); });
 
   pintar();
