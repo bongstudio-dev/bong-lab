@@ -34,7 +34,9 @@ Gacetilla), hoja de borde a borde, buscador en la lupa, filtros en el dock y anc
   cápsula, con su tono hecho opaco para que se lea sobre fotos y miniaturas. En escritorio el selector de vistas de la
   pestaña va en la misma fila fija, a la derecha y con el mismo alto, en escritorio y en el celular. Las pestañas no
   llevan número (el total ya está en el contador). En el celular la cápsula de pestañas mide lo suyo, así no cambia de
-  ancho entre pestañas, y el selector siempre tiene tres opciones (en Fotos, chicas son 3 columnas). Al bajar, la fila fija
+  ancho entre pestañas, y el selector tiene tres opciones (en Fotos, chicas son 3 columnas). En escritorio, para que la
+  fila ocupe menos, cada selector tiene dos: Gacetillas compacta y miniaturas, Fotos chicas y grandes (si estaba elegida
+  la del medio, pasa a compacta o a grandes). Al bajar, la fila fija
   se esconde por detrás de la barra azul y al subir vuelve (como el dock, que se achica al bajar); en su lugar, con el panel
   de filtros o el buscador abiertos, se ve siempre.
 - **Saltos de scroll propios:** el cambio de vista, de pestaña o de filtro reacomoda el scroll con `saltar()`, que no cuenta
@@ -54,7 +56,7 @@ Gacetilla), hoja de borde a borde, buscador en la lupa, filtros en el dock y anc
   de Formas de la Biblioteca.
 - **Fotos**: masonry por filas (cada foto a la columna más corta, por su proporción) con visor propio
   (flechas, Esc, deslizar, descarga del original). Filtro Galería. Selector de tamaño como el de Novedades (chicas,
-  medianas, grandes: 6/4/3 columnas en escritorio, 3/2/1 en el celular; se recuerda en `prensa-fotos-vista`).
+  medianas, grandes: 6 y 3 columnas en escritorio (sin medianas), 3/2/1 en el celular; se recuerda en `prensa-fotos-vista`).
   Al cambiar, las fotos viajan a su lugar nuevo.
 - **Logos**: una tarjeta por versión con su vista previa y las descargas en SVG, PNG y PDF. Sin filtros ni selector
   (el dock no aparece).

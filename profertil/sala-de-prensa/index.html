@@ -116,6 +116,8 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 .pf-pest .pf-selector { pointer-events: auto; background: linear-gradient(var(--line), var(--line)), var(--pf-papel, #fff); } /* el mismo tono, opaco: fija, pasa sobre fotos y miniaturas */
 .pf-pest .pf-pestanas button { padding-inline: 16px; font-size: var(--texto-cuerpo); }
 .pf-selector__ind { box-shadow: none; }
+/* Escritorio: dos opciones por selector (sin la del medio), para que la fila fija ocupe menos. En el celular van las tres. */
+@media (min-width: 641px) { .pf-vista [data-vista="lista"], .pf-densidad [data-vista="medio"] { display: none; } }
 /* Al bajar, la fila fija se va por detrás de la barra azul; al subir vuelve (la misma regla que el dock, que se achica al bajar).
    Solo cuando ya está fija: en su lugar se ve siempre. */
 .pf-pest { transition: transform 380ms var(--ease), opacity 260ms ease; }
@@ -701,6 +703,15 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
   function leerVista(clave, ok, def) { var v = def; try { v = localStorage.getItem(clave) || def; } catch (e) {} return ok.indexOf(v) === -1 ? def : v; }
   var vista = leerVista("prensa-vista", ["compacta", "lista", "mini"], "lista");
   var tamFotos = leerVista("prensa-fotos-vista", ["chico", "medio", "grande"], "medio");
+  // En escritorio no están las del medio: lista pasa a compacta y medianas a grandes (sin tocar lo guardado para el celular).
+  function vistasDeEscritorio() {
+    if (esMobile.matches) return false;
+    var cambio = false;
+    if (vista === "lista") { vista = "compacta"; cambio = true; }
+    if (tamFotos === "medio") { tamFotos = "grande"; cambio = true; }
+    return cambio;
+  }
+  vistasDeEscritorio();
   var sinEntrada = false;   // al cambiar de vista o de pestaña las filas nacen sin su entrada
   function filaGacetilla(x) {
     var d = x.d, qq = plano(q.trim());
@@ -1217,7 +1228,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
     if (!corriendo) { corriendo = true; requestAnimationFrame(anim); }
   }
   window.addEventListener("scroll", function () { despertar(200); }, { passive: true });
-  window.addEventListener("resize", function () { despertar(700); moverInd(pest, false); marcarVistas(false); });
+  window.addEventListener("resize", function () { despertar(700); moverInd(pest, false); if (vistasDeEscritorio()) pintar(); marcarVistas(false); });
   $("pf-filters").addEventListener("click", function () { despertar(900); });
   $("pf-filters").addEventListener("transitionend", function () { despertar(120); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { despertar(300); moverInd(pest, false); marcarVistas(false); });
