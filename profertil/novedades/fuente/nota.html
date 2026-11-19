@@ -46,7 +46,11 @@
 .pf-barra--desliza, .pf-barra--desliza.pf-barra--solida { background: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
 .pf-barra--desliza::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--barra); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); transform: translateY(-100%); transition: transform 520ms var(--ease); }
 .pf-barra--desliza.pf-barra--solida::before { transform: none; }
-@media (prefers-reduced-motion: reduce) { .pf-barra--desliza::before { transition: opacity 200ms ease; transform: none; opacity: 0; } .pf-barra--desliza.pf-barra--solida::before { opacity: 1; } }
+/* La línea amarilla viaja con el borde de abajo del azul: arriba mientras la barra es transparente y baja con él
+   (--alto lo pone el JS con la altura de la barra). */
+.pf-barra--desliza .pf-progreso, .pf-barra--desliza:not(.pf-barra--solida) .pf-progreso { top: auto; bottom: 0; transform: translateY(calc(4px - var(--alto, 76px))); transition: transform 520ms var(--ease); }
+.pf-barra--desliza.pf-barra--solida .pf-progreso { transform: none; }
+@media (prefers-reduced-motion: reduce) { .pf-barra--desliza::before { transition: opacity 200ms ease; transform: none; opacity: 0; } .pf-barra--desliza .pf-progreso { transition: none; } .pf-barra--desliza.pf-barra--solida::before { opacity: 1; } }
 .pf-n-bajada { margin: 0; max-width: 60ch; font-size: var(--texto-destacado); line-height: 1.5; color: var(--ink-2); }
 
 /* --- Foto principal: entera, sin recorte, con radio, siempre al ancho de la columna (aunque sea chica). */
@@ -484,6 +488,7 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
     t.classList.toggle("pf-barra--solida", solida);
     t.classList.toggle("pf-barra--sobre", modoBarra === "b" && !solida && window.scrollY > 4);
     t.classList.toggle("pf-barra--desliza", modoBarra === "c");
+    if (modoBarra === "c") t.style.setProperty("--alto", t.offsetHeight + "px");
   }
   window.addEventListener("scroll", barraSolida, { passive: true });
   window.addEventListener("resize", barraSolida);
