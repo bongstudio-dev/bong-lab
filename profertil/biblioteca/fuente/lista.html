@@ -19,6 +19,19 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
 
 /* --- Resultado ------------------------------------------------------------ */
 .pf-herramientas { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+/* Selectores fijos al bajar (la lógica de la Sala de prensa): cuando la fila de selectores llega a la barra azul pasa a position: fixed,
+   no sticky (en el celular lo sticky tiembla un píxel contra la barra cuando la del navegador se achica o se agranda). En su lugar
+   queda un hueco del mismo tamaño (.pf-herr-lugar, lo arma el JS). Al bajar se va por detrás de la barra; al subir vuelve. La fila deja
+   pasar los clics y los selectores los toman; los selectores con su tono opaco, para leerse sobre la lista. */
+.pf-herr-lugar { display: none; flex: none; }
+.pf-herr-lugar.pf-activo { display: block; }
+.pf-herramientas { position: relative; z-index: 20; transition: transform 380ms var(--ease), opacity 260ms ease; will-change: transform; }
+.pf-herramientas .pf-selector { background: linear-gradient(var(--line), var(--line)), var(--pf-papel, #fff); }
+.pf-herramientas.pf-fija { position: fixed; top: calc(var(--pf-barra-h, 76px) + 9px); pointer-events: none; }
+.pf-herramientas.pf-fija .pf-selector { pointer-events: auto; }
+.pf-herramientas.pf-escondida { transform: translateY(calc(-100% - 18px)); opacity: 0; }
+.pf-herramientas.pf-escondida .pf-selector { pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .pf-herramientas { transition: opacity 200ms ease; } .pf-herramientas.pf-escondida { transform: none; } }
 
 /* --- Panel de filtros: barra fija full rounded con los cuatro
    grupos (cultivo, zona, año, nutriente); arriba se despliega el panel con los
@@ -184,6 +197,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
 @media (max-width: 640px) {
   .pf-result-row { padding-block: 18px 12px; gap: 12px; }
   .pf-herramientas { order: -1; width: 100%; justify-content: space-between; flex-wrap: nowrap; }
+  .pf-herr-lugar { order: -1; }
   .pf-result-main { min-height: 32px; flex-wrap: nowrap; gap: 12px; margin-right: -16px; width: calc(100% + 16px); }
   .pf-result-text { flex: none; white-space: nowrap; }
   .pf-activos { flex-wrap: nowrap; flex: 1; min-width: 0; align-self: stretch; overflow-x: auto; scrollbar-width: none; padding-right: 16px; }
@@ -522,7 +536,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
     $("pf-empty").hidden = lista.length > 0;
     $("pf-filters").classList.toggle("pf-vacio", !lista.length);
     docs.style.minHeight = "";
-    if (window.scrollY !== y) window.scrollTo({ top: y, behavior: "instant" });
+    if (window.scrollY !== y) saltar(y);
   }
 
   /* --- Filtros ------------------------------------------------------------
@@ -771,7 +785,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
     // Con la lista más corta el scroll quedaría pegado al final: se vuelve al principio de los resultados.
     var bajo = window.scrollY > inicioLista();
     filtrar(); resumen(); pintarFiltros(); repintar(); aUrl(); despertar(700);
-    if (bajo) window.scrollTo({ top: inicioLista(), behavior: "instant" });
+    if (bajo) saltar(inicioLista());
   }
 
   /* --- Chips de filtros activos --------------------------------------------------- */
@@ -831,7 +845,8 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
     vista = b.dataset.vista;
     try { localStorage.setItem("documentos-vista", vista); } catch (err) {}
     marcarVista(true);
-    var tope = $("pf-top").offsetHeight + 8, alto = window.innerHeight, filas = docs.children, ref = null, antes = {};
+    // Lo que tapa arriba: la barra azul o, si está a la vista, la fila fija de selectores.
+    var tope = Math.max($("pf-top").offsetHeight, herrFija() && !herr.classList.contains("pf-escondida") ? herr.getBoundingClientRect().bottom : 0) + 8, alto = window.innerHeight, filas = docs.children, ref = null, antes = {};
     for (var i = 0; i < filas.length; i++) {
       var r = filas[i].getBoundingClientRect();
       if (r.bottom > tope && r.top < alto) { antes[filas[i].dataset.k] = r; if (!ref) ref = { k: filas[i].dataset.k, top: r.top }; }
@@ -842,7 +857,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
     if (docs.getBoundingClientRect().top >= tope) ref = null;
     sinEntrada = true; repintar(true); sinEntrada = false;
     var el = ref && docs.querySelector('[data-k="' + ref.k + '"]');
-    if (el) window.scrollTo({ top: Math.max(0, window.scrollY + el.getBoundingClientRect().top - ref.top), behavior: "instant" });
+    if (el) saltar(Math.max(0, window.scrollY + el.getBoundingClientRect().top - ref.top));
     if (!docs.animate || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     var nuevas = docs.children;
     for (var j = 0; j < nuevas.length; j++) {
@@ -882,16 +897,54 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
     if (e.key === "/" && document.activeElement !== $("pf-q") && !/^(input|textarea)$/i.test(document.activeElement.tagName)) { e.preventDefault(); abrirBusca(true); }
   });
 
+  /* --- Selectores fijos (la lógica de la Sala de prensa) --------------------------------------------- */
+  // La fila pasa a fixed cuando llega a la barra y vuelve a su lugar cuando baja. El hueco guarda su tamaño (la página no se mueve) y le
+  // da a la fila su izquierda y su ancho.
+  var herr = document.querySelector(".pf-herramientas"), herrLugar = document.createElement("div");
+  herrLugar.className = "pf-herr-lugar";
+  herr.parentNode.insertBefore(herrLugar, herr);
+  function topFijo() { var v = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--pf-barra-h")); return (isNaN(v) ? 76 : v) + 9; }
+  function herrFija() { return herr.classList.contains("pf-fija"); }
+  function mostrarHerr(si) { herr.classList.toggle("pf-escondida", !si); }
+  function soltarHerr() {
+    herr.classList.remove("pf-fija"); herrLugar.classList.remove("pf-activo");
+    herrLugar.style.width = herrLugar.style.height = herr.style.left = herr.style.width = "";
+    mostrarHerr(true);
+  }
+  function fijarHerr() {
+    var fija = herrFija(), r = (fija ? herrLugar : herr).getBoundingClientRect(), debe = r.top <= topFijo();
+    if (debe === fija) return;
+    if (!debe) { soltarHerr(); return; }
+    herrLugar.style.width = r.width + "px"; herrLugar.style.height = r.height + "px"; herrLugar.classList.add("pf-activo");
+    herr.style.left = r.left + "px"; herr.style.width = r.width + "px"; herr.classList.add("pf-fija");
+  }
+  window.addEventListener("scroll", fijarHerr, { passive: true });
+  window.addEventListener("resize", function () { if (herrFija()) soltarHerr(); fijarHerr(); });
+  herr.addEventListener("focusin", function () { mostrarHerr(true); });
+  fijarHerr();
+  // Saltos de scroll que hace la página (filtrar, cambiar de vista): no son del usuario, así que ni el dock ni la fila los leen como bajar o
+  // subir (si no, al cambiar de vista la fila se escondía y el dock se achicaba).
+  var hastaSinDir = 0;
+  function saltar(y) {
+    hastaSinDir = performance.now() + 150;
+    mostrarHerr(true);
+    window.scrollTo({ top: y, behavior: "instant" });
+  }
+
   /* --- Dock de filtros ---------------------------------------------------------- */
   // Mobile: el dock se achica al bajar y vuelve al subir (umbral para que el rebote no lo haga titilar).
+  // La fila de selectores se esconde al bajar (solo cuando ya está fija) y vuelve al subir, con la misma lectura de dirección.
   var yAntes = window.scrollY;
   window.addEventListener("scroll", function () {
-    var y = window.scrollY, dy = y - yAntes;
+    var y = window.scrollY;
+    if (performance.now() < hastaSinDir) { yAntes = y; return; }
+    var dy = y - yAntes;
     if (Math.abs(dy) < 8) return;
     yAntes = y;
-    var f = $("pf-filters");
-    if (!esMobile.matches || f.classList.contains("pf-abierto")) { f.classList.remove("pf-chica"); return; }
+    var f = $("pf-filters"), abiertos = f.classList.contains("pf-abierto");
     var alFinal = y + window.innerHeight >= document.documentElement.scrollHeight - 4;
+    mostrarHerr(!(dy > 0 && !alFinal && herrFija() && !abiertos && !$("pf-busca").classList.contains("pf-abierto")));
+    if (!esMobile.matches || abiertos) { f.classList.remove("pf-chica"); return; }
     f.classList.toggle("pf-chica", dy > 0 && y > 40 && !alFinal);
   }, { passive: true });
   $("pf-filters").addEventListener("click", function (e) {
