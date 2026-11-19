@@ -34,7 +34,12 @@ Gacetilla), hoja de borde a borde, buscador en la lupa, filtros en el dock y anc
   cápsula, con su tono hecho opaco para que se lea sobre fotos y miniaturas. En escritorio el selector de vistas de la
   pestaña va en la misma fila fija, a la derecha y con el mismo alto, en escritorio y en el celular. Las pestañas no
   llevan número (el total ya está en el contador). En el celular la cápsula de pestañas mide lo suyo, así no cambia de
-  ancho entre pestañas, y el selector siempre tiene tres opciones (en Fotos, chicas son 3 columnas). Al cambiar de pestaña el indicador viaja y lo
+  ancho entre pestañas, y el selector siempre tiene tres opciones (en Fotos, chicas son 3 columnas). Al bajar, la fila fija
+  se esconde por detrás de la barra azul y al subir vuelve (como el dock, que se achica al bajar); en su lugar, con el panel
+  de filtros o el buscador abiertos, se ve siempre.
+- **Saltos de scroll propios:** el cambio de vista, de pestaña o de filtro reacomoda el scroll con `saltar()`, que no cuenta
+  como scroll del usuario (antes el dock se achicaba y agrandaba con cada cambio de vista). El cambio de vista toma de
+  referencia la primera fila visible debajo de la fila fija. Al cambiar de pestaña el indicador viaja y lo
   de abajo (resultado y panel) se funde afuera, cambia sin verse (también el salto al principio de la lista) y se funde
   adentro. Cada una con su ancla: `#gacetillas`, `#fotos`, `#logos`. Filtros y búsqueda en la dirección:
   `#gacetillas&tipo=aviso&anio=2023&q=planta`, `#fotos&galeria=urea`. Alias para redirigir las direcciones viejas:

@@ -69,6 +69,12 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 .pf-pest .pf-selector { pointer-events: auto; background: linear-gradient(var(--line), var(--line)), var(--pf-papel, #fff); } /* el mismo tono, opaco: fija, pasa sobre fotos y miniaturas */
 .pf-pest .pf-pestanas button { padding-inline: 16px; font-size: var(--texto-cuerpo); }
 .pf-selector__ind { box-shadow: none; }
+/* Al bajar, la fila fija se va por detrás de la barra azul; al subir vuelve (la misma regla que el dock, que se achica al bajar).
+   Solo cuando ya está fija: en su lugar se ve siempre. */
+.pf-pest { transition: transform 380ms var(--ease), opacity 260ms ease; }
+.pf-pest.pf-escondida { transform: translateY(calc(-100% - 8px)); opacity: 0; }
+.pf-pest.pf-escondida .pf-selector { pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .pf-pest { transition: opacity 200ms ease; } .pf-pest.pf-escondida { transform: none; } }
 @media (max-width: 640px) {
   /* Pestañas y selector en la misma fila: la cápsula de pestañas mide lo suyo (no cambia de ancho entre pestañas) y el
      selector va a la derecha, siempre con tres opciones. */
@@ -698,11 +704,19 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
     if (qq) p.push("q=" + encodeURIComponent(qq));
     try { history.replaceState(null, "", "#" + p.join("&")); } catch (e) {}
   }
+  /* Saltos de scroll que hace la página (cambio de vista, de pestaña o de filtro): no son del usuario, así que ni el dock ni la fila
+     fija los leen como bajar o subir. Antes el dock se achicaba y agrandaba con cada cambio de vista. */
+  var hastaSinDir = 0;
+  function saltar(y) {
+    hastaSinDir = performance.now() + 150;
+    mostrarPest(true);
+    window.scrollTo({ top: y, behavior: "instant" });
+  }
   function inicioLista() { return Math.max(0, $("pf-lista").getBoundingClientRect().top + window.scrollY - $("pf-top").offsetHeight + 2); }
   function aplicar() {
     var bajo = window.scrollY > inicioLista();
     pintar(); resumen(); pintarFiltros(); aUrl(); despertar(700);
-    if (bajo) window.scrollTo({ top: inicioLista(), behavior: "instant" });
+    if (bajo) saltar(inicioLista());
   }
   $("pf-activos").addEventListener("click", function (e) {
     var b = e.target.closest("[data-quitar]"); if (!b) return;
@@ -739,6 +753,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
   var cambia = $("pf-cambia"), tCambio = 0;
   function irA(t, animar) {
     if (!TABS[t]) return;
+    mostrarPest(true);
     if ($("pf-filters").classList.contains("pf-abierto")) abrirFiltros(false);
     tab = t;
     pest.querySelectorAll("[data-tab]").forEach(function (b) { var si = b.dataset.tab === t; b.setAttribute("aria-pressed", String(si)); b.setAttribute("aria-selected", String(si)); b.tabIndex = si ? 0 : -1; });
@@ -767,7 +782,9 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
      no se veían aparecen directo. Si el principio de la lista está a la vista, la página no se mueve; si ya se bajó, la primera visible
      queda en su lugar. */
   function cambiarVista(cont, rehacer, escala) {
-    var tope = $("pf-top").offsetHeight + 8, alto = window.innerHeight, ref = null, antes = {};
+    // Lo que tapa arriba: la barra azul o, si está a la vista, la fila fija de pestañas.
+    var tope = Math.max($("pf-top").offsetHeight, $("pf-pest").classList.contains("pf-escondida") ? 0 : $("pf-pest").getBoundingClientRect().bottom) + 8;
+    var alto = window.innerHeight, ref = null, antes = {};
     cont.querySelectorAll("[data-k]").forEach(function (el) {
       var r = el.getBoundingClientRect();
       if (r.bottom > tope && r.top < alto) { antes[el.dataset.k] = r; if (!ref) ref = { k: el.dataset.k, top: r.top }; }
@@ -778,8 +795,8 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
     sinEntrada = true; rehacer(); sinEntrada = false;
     cont.style.minHeight = "";
     var el = ref && cont.querySelector('[data-k="' + ref.k + '"]');
-    if (el) window.scrollTo({ top: Math.max(0, window.scrollY + el.getBoundingClientRect().top - ref.top), behavior: "instant" });
-    else if (window.scrollY !== y) window.scrollTo({ top: y, behavior: "instant" });
+    if (el) saltar(Math.max(0, window.scrollY + el.getBoundingClientRect().top - ref.top));
+    else if (window.scrollY !== y) saltar(y);
     if (!cont.animate || quieto.matches) return;
     cont.querySelectorAll("[data-k]").forEach(function (n) {
       var o = antes[n.dataset.k]; if (!o) return;
@@ -879,15 +896,22 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
   });
 
   /* --- Dock de filtros (el de la Biblioteca) --------------------------------------------------- */
-  var yAntes = window.scrollY;
+  /* Dirección del scroll del usuario: al bajar el dock se achica (celular) y la fila fija se esconde; al subir vuelven. */
+  var yAntes = window.scrollY, pestEl = $("pf-pest");
+  function mostrarPest(si) { $("pf-pest").classList.toggle("pf-escondida", !si); }   // se llama también antes de esta línea (saltar, irA)
+  function pestFija() { return $("pf-lista").getBoundingClientRect().top < parseFloat(getComputedStyle(pestEl).top) - 2; }
+  pestEl.addEventListener("focusin", function () { mostrarPest(true); });
   window.addEventListener("scroll", function () {
-    var y = window.scrollY, dy = y - yAntes;
+    var y = window.scrollY;
+    if (performance.now() < hastaSinDir) { yAntes = y; return; }
+    var dy = y - yAntes;
     if (Math.abs(dy) < 8) return;
     yAntes = y;
-    var f = $("pf-filters");
-    if (!esMobile.matches || f.classList.contains("pf-abierto")) { f.classList.remove("pf-chica"); return; }
+    var f = $("pf-filters"), abiertos = f.classList.contains("pf-abierto");
     var alFinal = y + window.innerHeight >= document.documentElement.scrollHeight - 4;
-    f.classList.toggle("pf-chica", dy > 0 && y > 40 && !alFinal);
+    var baja = dy > 0 && !alFinal;
+    if (!esMobile.matches || abiertos) f.classList.remove("pf-chica"); else f.classList.toggle("pf-chica", baja && y > 40);
+    mostrarPest(!(baja && pestFija() && !abiertos && !$("pf-busca").classList.contains("pf-abierto")));
   }, { passive: true });
   function abrirGrupo(g) {
     abierto = g;
@@ -1086,7 +1110,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
   if (location.hash && !conBusca) aUrl();
   if (conBusca) abrirBusca(true);
   // Con una pestaña en la dirección se baja hasta ella cuando la página terminó de armarse (el campo cambia el alto de la cabecera).
-  function bajarAPestana() { window.scrollTo({ top: inicioLista(), behavior: "instant" }); }
+  function bajarAPestana() { saltar(inicioLista()); }
   if (/^#(gacetillas|fotos|videos|logos|documentos|_)/.test(location.hash)) {
     if (document.readyState === "complete") requestAnimationFrame(bajarAPestana); else window.addEventListener("load", function () { requestAnimationFrame(bajarAPestana); }, { once: true });
   }
