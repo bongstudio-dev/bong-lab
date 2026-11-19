@@ -108,13 +108,18 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 /* --- Pestañas: el Selector de base.css, fijo arriba de la hoja al bajar (debajo de la barra azul). La fila no tiene fondo: queda
    solo la cápsula, con el suyo. La fila deja pasar los clics a lo que tiene debajo; la cápsula los toma. */
 .pf-pest { position: sticky; top: calc(var(--pf-barra-h, 76px) - 1px); z-index: 20; padding-block: 10px; pointer-events: none; }
+/* Escritorio: los selectores de vista van en la misma fila fija, a la derecha de las pestañas y con su mismo alto (el JS los
+   mueve acá; en el celular quedan en la línea del contador, porque al lado de las pestañas no entran). */
+.pf-pest { display: flex; align-items: stretch; justify-content: space-between; gap: 12px; }
+.pf-pest .pf-herramientas { align-items: stretch; }
+.pf-pest .pf-selector--iconos button { padding-inline: 13px; }
 .pf-pest .pf-selector { pointer-events: auto; background: linear-gradient(var(--line), var(--line)), var(--pf-papel, #fff); } /* el mismo tono, opaco: fija, pasa sobre fotos y miniaturas */
-.pf-pest .pf-selector button { gap: 7px; padding-inline: 16px; font-size: var(--texto-cuerpo); }
-.pf-pest .pf-selector button .pf-pastilla__n { font-size: 12px; }
+.pf-pest .pf-pestanas button { gap: 7px; padding-inline: 16px; font-size: var(--texto-cuerpo); }
+.pf-pest .pf-pestanas button .pf-pastilla__n { font-size: 12px; }
 .pf-selector__ind { box-shadow: none; }
 @media (max-width: 640px) {
-  .pf-pest .pf-selector { display: flex; }
-  .pf-pest .pf-selector button { flex: 1 1 0; padding-inline: 8px; font-size: var(--texto-chico); }
+  .pf-pest .pf-pestanas { display: flex; flex: 1; }
+  .pf-pest .pf-pestanas button { flex: 1 1 0; padding-inline: 8px; font-size: var(--texto-chico); }
 }
 .pf-panel[hidden] { display: none; }
 @keyframes pf-entra { from { opacity: 0; } } /* solo aparece: sin desplazamiento, como en la Biblioteca */
@@ -290,8 +295,12 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 .pf-filters.pf-pocos .pf-f-bar { justify-content: center; }
 @media (min-width: 641px) {
   /* El botón Filtros del celular (base.css), con su texto y el contador al lado. */
+  .pf-filters.pf-pocos:not(.pf-abierto) { border-radius: 28px; }
   .pf-filters.pf-pocos .pf-f-bar { padding: 4px; }
   .pf-filters.pf-pocos .pf-f-toggle { width: auto; height: 46px; padding: 0 22px 0 26px; color: var(--ink); font-family: var(--f-display); font-size: 1.04rem; }
+  /* Toda la pastilla es el botón, sin fondo propio al pasar el mouse (como en el celular). */
+  .pf-filters.pf-pocos .pf-f-toggle:hover { background: transparent; }
+  .pf-filters.pf-pocos .pf-f-toggle::after { inset: -4px; border-radius: inherit; }
   .pf-filters.pf-pocos .pf-f-txt { display: inline; }
   .pf-filters.pf-pocos .pf-f-count { position: static; order: 2; }
 }
@@ -440,7 +449,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 
 <div class="pf-hoja" id="pf-hoja">
 <main class="pf-col" id="pf-lista" tabindex="-1">
-  <div class="pf-pest">
+  <div class="pf-pest" id="pf-pest">
     <div class="pf-selector pf-pestanas" role="tablist" aria-label="Material de prensa">
       <span class="pf-selector__ind" aria-hidden="true"></span>
       <button type="button" role="tab" id="pf-t-gacetillas" data-tab="gacetillas" aria-controls="gacetillas" aria-pressed="true" aria-selected="true">Gacetillas<b class="pf-pastilla__n"></b></button>
@@ -455,7 +464,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
       <p class="pf-result-text" id="pf-resultText" aria-live="polite"></p>
       <div class="pf-activos" id="pf-activos"></div>
     </div>
-    <div class="pf-herramientas">
+    <div class="pf-herramientas pf-cambia" id="pf-herr">
       <div class="pf-selector pf-selector--iconos pf-vista" data-para="gacetillas" role="group" aria-label="Cómo se ven las gacetillas">
         <span class="pf-selector__ind" aria-hidden="true"></span>
         <button type="button" data-vista="compacta" aria-pressed="false" aria-label="Lista compacta" title="Compacta"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0.5" width="15" height="2" rx="1"/><rect x="0" y="4.5" width="15" height="2" rx="1"/><rect x="0" y="8.5" width="15" height="2" rx="1"/><rect x="0" y="12.5" width="15" height="2" rx="1"/></svg></button>
@@ -879,11 +888,11 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
       marcarVistas(false);
       armarFiltros(); abrirFiltros(false);
       sinEntrada = animar; aplicar(); sinEntrada = false;
-      cambia.classList.remove("pf-oculto");
+      cambia.classList.remove("pf-oculto"); $("pf-herr").classList.remove("pf-oculto");
     }
     clearTimeout(tCambio);
     if (!animar || quieto.matches) { cambiar(); return; }
-    cambia.classList.add("pf-oculto");
+    cambia.classList.add("pf-oculto"); $("pf-herr").classList.add("pf-oculto");
     $("pf-filters").classList.add("pf-fuera");   // el dock se va y vuelve (o no, en Logos) con la pestaña nueva
     tCambio = setTimeout(cambiar, 150);
   }
@@ -934,6 +943,14 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
     marcarVistas(true);
     cambiarVista($("pf-fotos"), function () { repartirFotos(); listas(); }, true);
   });
+  // Dónde van los selectores de vista: en escritorio, en la fila fija de las pestañas; en el celular, en la línea del contador.
+  function ubicarHerr() {
+    var herr = $("pf-herr"), dest = esMobile.matches ? document.querySelector(".pf-result-row") : $("pf-pest");
+    if (herr.parentNode !== dest) dest.appendChild(herr);
+    marcarVistas(false);
+  }
+  esMobile.addEventListener("change", ubicarHerr);
+  ubicarHerr();
   // En el celular no hay fotos chicas: si quedó elegida, se ven medianas.
   if (esMobile.matches && tamFotos === "chico") tamFotos = "medio";
 

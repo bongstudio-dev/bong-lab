@@ -31,13 +31,15 @@ Gacetilla), hoja de borde a borde, buscador en la lupa, filtros en el dock y anc
 
 - **Contacto de prensa** dentro de la tarjeta de la cabecera, siempre a la vista (a la derecha en escritorio ancho).
 - **Pestañas** con el Selector de `base.css`, fijas debajo de la barra al bajar. La fila no tiene fondo: queda solo la
-  cápsula, con su tono hecho opaco para que se lea sobre fotos y miniaturas. Al cambiar de pestaña el indicador viaja y lo
+  cápsula, con su tono hecho opaco para que se lea sobre fotos y miniaturas. En escritorio el selector de vistas de la
+  pestaña va en la misma fila fija, a la derecha y con el mismo alto; en el celular no entra al lado y va en la línea del
+  contador (el JS lo mueve según el ancho). Al cambiar de pestaña el indicador viaja y lo
   de abajo (resultado y panel) se funde afuera, cambia sin verse (también el salto al principio de la lista) y se funde
   adentro. Cada una con su ancla: `#gacetillas`, `#fotos`, `#logos`. Filtros y búsqueda en la dirección:
   `#gacetillas&tipo=aviso&anio=2023&q=planta`, `#fotos&galeria=urea`. Alias para redirigir las direcciones viejas:
   `#videos` (abre Fotos), `#documentos`, `#_fotos`, `#_documentos`, `#_videos`, `#_gacetillas-de-prensa`.
 - **Dock con pocos grupos**: si la pestaña tiene dos grupos de filtros o menos (hoy todas), la barra no lleva una pastilla
-  por grupo, queda solo el botón Filtros (el del celular, con el contador) y el panel muestra todos los grupos abiertos,
+  por grupo, queda solo el botón Filtros (el del celular, con el contador, pastilla entera y sin hover de fondo) y el panel muestra todos los grupos abiertos,
   sin acordeón. Con tres o más vuelve el dock de la Biblioteca tal cual.
 - **Gacetillas**: la fila de documento de `base.css` con la fecha completa. Abren en el visor de la Biblioteca
   (`../biblioteca/ver/?d=prensa-...`), que vuelve a la Sala de prensa. Filtros Tipo (Gacetilla o Aviso a la comunidad,
