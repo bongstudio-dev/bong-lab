@@ -76,7 +76,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 .pf-campo-seguir svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .pf-campo-bajo .pf-campo-seguir { opacity: 0; }
 .pf-hoja { position: relative; z-index: 2; min-height: 100svh; padding-top: 8px; background: var(--pf-papel, #fff); overflow-x: clip;
-  border-radius: var(--radio-tarjeta, 24px) var(--radio-tarjeta, 24px) 0 0; }
+  border-radius: var(--radio-tarjeta, 24px) var(--radio-tarjeta, 24px) 0 0; margin-top: var(--pf-ajuste, 0px); } /* --pf-ajuste: ver enteroLista() */
 
 /* Contacto de prensa: dentro de la tarjeta, separado por un filete. Las personas y, abajo, el mail y el teléfono del área. */
 .pf-contacto { display: grid; gap: 14px; width: 100%; padding-top: 18px; border-top: 1px solid var(--line); }
@@ -153,7 +153,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 @media (min-width: 641px) { .pf-vista [data-vista="lista"], .pf-densidad [data-vista="medio"] { display: none; } }
 /* Al bajar, la fila fija se va por detrás de la barra azul; al subir vuelve (la misma regla que el dock, que se achica al bajar).
    Solo cuando ya está fija: en su lugar se ve siempre. */
-.pf-pest { transition: transform 380ms var(--ease), opacity 260ms ease; }
+.pf-pest { transition: transform 380ms var(--ease), opacity 260ms ease; will-change: transform; } /* capa propia siempre: no se arma y desarma al esconderse */
 .pf-pest.pf-escondida { transform: translateY(calc(-100% - 8px)); opacity: 0; }
 .pf-pest.pf-escondida .pf-selector { pointer-events: none; }
 @media (prefers-reduced-motion: reduce) { .pf-pest { transition: opacity 200ms ease; } .pf-pest.pf-escondida { transform: none; } }
@@ -621,6 +621,20 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
   window.addEventListener("scroll", barraSolida, { passive: true });
   window.addEventListener("resize", barraSolida);
   barraSolida();
+
+  /* La fila fija tiene que empezar en un píxel entero. El título (cuerpo fluido) y el contacto dejan la cabecera con alto fraccionario
+     (p. ej. 583,75 a 375 px), y en el celular la fila fija y la barra azul redondeaban distinto mientras se scrolleaba: la fila subía y
+     bajaba un píxel. La hoja baja lo que falta para llegar al entero (menos de 1 px), y se recalcula si la cabecera cambia de alto. */
+  function enteroLista() {
+    var raiz = document.documentElement, hoja = $("pf-hoja") || document.querySelector(".pf-hoja");
+    var ya = parseFloat(raiz.style.getPropertyValue("--pf-ajuste")) || 0;
+    var top = hoja.getBoundingClientRect().top + window.scrollY - ya, aj = Math.ceil(top - 0.001) - top;
+    aj = aj < 0.01 ? 0 : Math.round(aj * 1000) / 1000;
+    if (Math.abs(aj - ya) > 0.001) raiz.style.setProperty("--pf-ajuste", aj + "px");
+  }
+  if (window.ResizeObserver && $("pf-cab")) new ResizeObserver(enteroLista).observe($("pf-cab"));
+  window.addEventListener("resize", enteroLista);
+  enteroLista();
 
   var defs = $("pf-defs"), simbolos = "";
   Object.keys(A.formas).forEach(function (k) { simbolos += '<symbol id="pf-forma-' + k + '" viewBox="' + A.formas[k].vb + '">' + A.formas[k].d + "</symbol>"; });
