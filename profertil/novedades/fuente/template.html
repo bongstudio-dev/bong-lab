@@ -158,6 +158,19 @@
 
 /* --- Resultado ------------------------------------------------------------ */
 .pf-herramientas { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+/* Selectores fijos al bajar (la lógica de la Sala de prensa): cuando la fila de selectores llega a la barra azul pasa a position: fixed,
+   no sticky (en el celular lo sticky tiembla un píxel contra la barra cuando la del navegador se achica o se agranda). En su lugar
+   queda un hueco del mismo tamaño (.pf-herr-lugar, lo arma el JS). Al bajar se va por detrás de la barra; al subir vuelve. La fila deja
+   pasar los clics y los selectores los toman; los selectores con su tono opaco, para leerse sobre las tarjetas. */
+.pf-herr-lugar { display: none; flex: none; }
+.pf-herr-lugar.pf-activo { display: block; }
+.pf-herramientas { position: relative; z-index: 20; transition: transform 380ms var(--ease), opacity 260ms ease; will-change: transform; }
+.pf-herramientas .pf-selector { background: linear-gradient(var(--line), var(--line)), var(--pf-papel, #fff); }
+.pf-herramientas.pf-fija { position: fixed; top: calc(var(--pf-barra-h, 76px) + 9px); pointer-events: none; }
+.pf-herramientas.pf-fija .pf-selector { pointer-events: auto; }
+.pf-herramientas.pf-escondida { transform: translateY(calc(-100% - 18px)); opacity: 0; }
+.pf-herramientas.pf-escondida .pf-selector { pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .pf-herramientas { transition: opacity 200ms ease; } .pf-herramientas.pf-escondida { transform: none; } }
 /* El Selector es la pieza "selector" de base.css. Al cambiar de vista el indicador lo mueve la View
    Transition, junto con las tarjetas; al cambiar el orden, su transición. */
 .pf-selector.pf-vista .pf-selector__ind { view-transition-name: pf-ind-vista; }
@@ -732,7 +745,7 @@ a.pf-card, a.pf-d-cta { text-decoration: none; }
     while (pintadas < Math.min(objetivo, lista.length)) pintarTanda();
     $("pf-empty").hidden = lista.length > 0;
     grid.style.minHeight = "";
-    if (window.scrollY !== y) window.scrollTo(window.scrollX, y);
+    if (window.scrollY !== y) saltar(y);
   }
 
   /* --- Años ----------------------------------------------------------------- */
@@ -822,16 +835,55 @@ a.pf-card, a.pf-d-cta { text-decoration: none; }
   window.addEventListener("scroll", barraSolida, { passive: true });
   // Mobile: el dock de filtros se achica al bajar y vuelve al subir. Umbral de
   // unos px para que el rebote del scroll no lo haga titilar.
+  // La fila de selectores se esconde al bajar (solo cuando ya está fija) y vuelve al subir, con la misma lectura de dirección.
   var yAntes = window.scrollY;
   window.addEventListener("scroll", function () {
-    var y = window.scrollY, dy = y - yAntes;
+    var y = window.scrollY;
+    if (performance.now() < hastaSinDir) { yAntes = y; return; }
+    var dy = y - yAntes;
     if (Math.abs(dy) < 8) return;
     yAntes = y;
-    var f = $("pf-filters");
-    if (!esMobile.matches || f.classList.contains("pf-abierto")) { f.classList.remove("pf-chica"); return; }
+    var f = $("pf-filters"), abiertos = f.classList.contains("pf-abierto");
     var alFinal = y + window.innerHeight >= document.documentElement.scrollHeight - 4;
+    mostrarHerr(!(dy > 0 && !alFinal && herrFija() && !abiertos && !$("pf-busca").classList.contains("pf-abierto")));
+    if (!esMobile.matches || abiertos) { f.classList.remove("pf-chica"); return; }
     f.classList.toggle("pf-chica", dy > 0 && y > 40 && !alFinal);
   }, { passive: true });
+
+  /* --- Selectores fijos (la lógica de la Sala de prensa) --------------------------------------------- */
+  // La fila pasa a fixed cuando llega a la barra y vuelve a su lugar cuando baja. El hueco guarda su tamaño (la página no se mueve) y le
+  // da a la fila su izquierda y su ancho.
+  var herr = document.querySelector(".pf-herramientas"), herrLugar = document.createElement("div");
+  herrLugar.className = "pf-herr-lugar";
+  herr.parentNode.insertBefore(herrLugar, herr);
+  // Acá no hay --pf-barra-h (lo arma el campo de la cabecera, que Novedades no tiene): se mide la barra.
+  function topFijo() { return $("pf-top").offsetHeight + 9; }
+  function herrFija() { return herr.classList.contains("pf-fija"); }
+  function mostrarHerr(si) { if (herr) herr.classList.toggle("pf-escondida", !si); }
+  function soltarHerr() {
+    herr.classList.remove("pf-fija"); herrLugar.classList.remove("pf-activo");
+    herrLugar.style.width = herrLugar.style.height = herr.style.left = herr.style.width = herr.style.top = "";
+    mostrarHerr(true);
+  }
+  function fijarHerr() {
+    var fija = herrFija(), r = (fija ? herrLugar : herr).getBoundingClientRect(), debe = r.top <= topFijo();
+    if (debe === fija) return;
+    if (!debe) { soltarHerr(); return; }
+    herrLugar.style.width = r.width + "px"; herrLugar.style.height = r.height + "px"; herrLugar.classList.add("pf-activo");
+    herr.style.left = r.left + "px"; herr.style.width = r.width + "px"; herr.style.top = topFijo() + "px"; herr.classList.add("pf-fija");
+  }
+  window.addEventListener("scroll", fijarHerr, { passive: true });
+  window.addEventListener("resize", function () { if (herrFija()) soltarHerr(); fijarHerr(); });
+  herr.addEventListener("focusin", function () { mostrarHerr(true); });
+  fijarHerr();
+  // Saltos de scroll que hace la página (rehacer la grilla, ir a la lista): no son del usuario, así que ni el dock ni la fila los leen
+  // como bajar o subir.
+  var hastaSinDir = 0;
+  function saltar(y) {
+    hastaSinDir = performance.now() + 150;
+    mostrarHerr(true);
+    window.scrollTo({ top: y, behavior: "instant" });
+  }
   barraSolida();
   $("pf-filters").addEventListener("click", function (e) {
     var b = e.target.closest("[data-f]"); if (!b) return;
@@ -1271,10 +1323,10 @@ a.pf-card, a.pf-d-cta { text-decoration: none; }
   if (pedido.indexOf("q=") === 0 && pedido.length > 2) {
     $("pf-q").value = estado.q = pedido.slice(2);
     aplicar(); abrirBusca(true);
-    window.scrollTo({ top: inicioLista(), behavior: "instant" });
+    saltar(inicioLista());
   } else if (pedido === "buscar") {
     abrirBusca(true);
-    window.scrollTo({ top: inicioLista(), behavior: "instant" });
+    saltar(inicioLista());
   }
 })();
 </script>
