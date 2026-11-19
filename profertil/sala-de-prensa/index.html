@@ -81,19 +81,48 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 /* Contacto de prensa: dentro de la tarjeta, separado por un filete. Las personas y, abajo, el mail y el teléfono del área. */
 .pf-contacto { display: grid; gap: 14px; width: 100%; padding-top: 18px; border-top: 1px solid var(--line); }
 .pf-contacto h2 { margin: 0; font: 500 var(--texto-destacado)/1.2 var(--f-display); color: var(--azul); letter-spacing: -0.01em; }
-.pf-personas { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
-.pf-persona { display: grid; gap: 1px; font-size: var(--texto-chico); line-height: 1.4; }
-/* Con foto, tarjeta de usuario: la cara chica y redonda a la izquierda, centrada con las tres líneas. */
-.pf-persona--cara { grid-template-columns: 48px minmax(0, 1fr); column-gap: 14px; align-items: center; }
-.pf-persona--cara > :not(img) { grid-column: 2; }
-.pf-persona__cara { grid-row: 1 / span 3; width: 48px; height: 48px; border-radius: 50%; object-fit: cover; background: var(--line); }
+/* Encabezado del contacto. En el celular es un botón que despliega las personas: cerrado muestra sus caras chicas
+   superpuestas y los nombres; al abrir, las caras chicas y los nombres se funden (cada cara se ve una sola vez).
+   En pantallas más anchas las personas están siempre a la vista y el botón queda como título (disabled por JS). */
+.pf-ct-cab { display: flex; align-items: center; gap: 12px; width: 100%; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.pf-ct-cab:disabled { cursor: default; }
+.pf-ct-caras { display: flex; flex: none; width: 46px; transition: width 300ms var(--ease), margin 300ms var(--ease), opacity 200ms ease; }
+.pf-ct-caras img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; outline: 2px solid var(--pf-papel, #fff); background: var(--line); }
+.pf-ct-caras img + img { margin-left: -10px; }
+.pf-ct-tit { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.pf-ct-nombres { font: 400 13px/1.3 var(--f-body); letter-spacing: 0; color: var(--ink-2); transition: opacity 200ms ease; }
+.pf-ct-flecha { width: 32px; height: 32px; flex: none; border-radius: 50%; display: grid; place-items: center; background: var(--tiza); color: var(--azul); transition: transform 300ms var(--ease); }
+.pf-ct-flecha svg, .pf-copiar svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.pf-ct-cab[aria-expanded="true"] .pf-ct-flecha { transform: rotate(180deg); }
+.pf-ct-cab[aria-expanded="true"] .pf-ct-caras { width: 0; margin-right: -12px; opacity: 0; }
+.pf-ct-cab[aria-expanded="true"] .pf-ct-nombres { opacity: 0; }
+.pf-ct-cab:disabled .pf-ct-caras, .pf-ct-cab:disabled .pf-ct-nombres, .pf-ct-cab:disabled .pf-ct-flecha { display: none; }
+/* El alto del desplegable lo anima el JS (de 0 a lo que mide y después auto): la grilla 0fr/1fr medía mal en Safari. */
+/* Margen negativo = el gap del contacto: cerrado no deja hueco; el aire vuelve con el padding de la lista. */
+.pf-ct-det { overflow: hidden; margin-top: -14px; transition: height 300ms var(--ease); }
+.pf-ct-det[hidden] { display: block !important; height: 0; visibility: hidden; }
+.pf-personas { display: grid; gap: 12px; margin: 0; padding: 16px 0 0; list-style: none; }
+/* Persona: cara, nombre, cargo y mail escrito; a la derecha, copiar el mail. */
+.pf-persona { display: flex; align-items: center; gap: 12px; font-size: var(--texto-chico); line-height: 1.35; }
+.pf-persona__cara { width: 44px; height: 44px; flex: none; border-radius: 50%; object-fit: cover; background: var(--line); }
+.pf-persona__txt { flex: 1; min-width: 0; display: grid; gap: 1px; }
 .pf-persona b { font-weight: 500; color: var(--ink); }
-.pf-persona span { color: var(--ink-2); }
+.pf-persona span { color: var(--ink-2); font-size: 13px; }
 .pf-persona a, .pf-area a { color: var(--azul); text-decoration: none; overflow-wrap: anywhere; }
-@media (hover: hover) and (pointer: fine) { .pf-persona a:hover, .pf-area a:hover { text-decoration: underline; text-underline-offset: 3px; } }
-.pf-area { display: flex; flex-wrap: wrap; gap: 8px; }
-.pf-area .pf-boton { color: var(--ink); }
-.pf-area .pf-boton svg { color: var(--azul); }
+.pf-persona a { font-size: 13px; }
+.pf-copiar { width: 40px; height: 40px; flex: none; display: grid; place-items: center; border: 0; border-radius: 50%; background: var(--tiza); color: var(--azul); cursor: pointer; transition: transform .15s var(--ease); }
+.pf-copiar:active { transform: scale(.94); }
+/* Mail y teléfono del área, escritos (se leen, se copian y se indexan): una pastilla por dato, el dato a la izquierda y copiar a la derecha. */
+.pf-area { display: grid; gap: 8px; width: 100%; }
+.pf-dato { display: flex; align-items: stretch; height: 44px; border-radius: var(--radio-control); background: var(--tiza); min-width: 0; }
+.pf-area .pf-dato a { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; padding: 0 10px 0 14px; color: var(--ink); font: 500 var(--texto-chico)/1 var(--f-body); font-variant-numeric: tabular-nums; overflow-wrap: normal; white-space: nowrap; }
+.pf-dato a svg { width: 16px; height: 16px; flex: none; fill: none; stroke: var(--azul); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.pf-dato .pf-copiar { width: 44px; height: auto; border-radius: 0 var(--radio-control) var(--radio-control) 0; background: none; border-left: 1px solid var(--line); color: var(--ink-2); }
+@media (hover: hover) and (pointer: fine) {
+  .pf-persona a:hover, .pf-area a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .pf-copiar:hover { color: var(--azul); }
+}
+@media (prefers-reduced-motion: reduce) { .pf-ct-caras, .pf-ct-nombres, .pf-ct-flecha, .pf-ct-det { transition: none; } }
 
 @media (min-width: 720px) {
   .pf-campo-cab { padding: calc(var(--pf-barra-h, 64px) + 24px) 24px 96px; }
@@ -104,7 +133,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 }
 /* Escritorio ancho: el contacto pasa a una columna a la derecha del texto. */
 @media (min-width: 1000px) {
-  .pf-bh { grid-template-columns: minmax(0, 1fr) minmax(250px, 300px); grid-template-rows: auto 1fr; column-gap: 48px; align-items: start; }
+  .pf-bh { grid-template-columns: minmax(0, 1fr) minmax(290px, 330px); grid-template-rows: auto 1fr; column-gap: 48px; align-items: start; }
   .pf-bh h1, .pf-bh > p { grid-column: 1; }
   .pf-contacto { grid-column: 2; grid-row: 1 / span 2; padding: 2px 0 0 28px; border-top: 0; border-left: 1px solid var(--line); }
 }
@@ -483,8 +512,12 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
   <h1>Sala de prensa</h1>
   <p>Muchas gracias por ayudarnos a difundir nuestro propósito de cuidar el suelo para generar alimentos sanos y nutritivos. Acá encontrás gacetillas, fotos y logos para tu trabajo periodístico.</p>
   <section class="pf-contacto" aria-labelledby="pf-contacto-t">
-    <h2 id="pf-contacto-t">Contacto de prensa</h2>
-    <ul class="pf-personas" id="pf-personas"></ul>
+    <h2 id="pf-contacto-t"><button type="button" class="pf-ct-cab" id="pf-ct-cab" aria-expanded="false" aria-controls="pf-ct-det">
+      <span class="pf-ct-caras" id="pf-ct-caras" aria-hidden="true"></span>
+      <span class="pf-ct-tit">Contacto de prensa<span class="pf-ct-nombres" id="pf-ct-nombres"></span></span>
+      <span class="pf-ct-flecha" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>
+    </button></h2>
+    <div class="pf-ct-det" id="pf-ct-det" hidden><ul class="pf-personas" id="pf-personas"></ul></div>
     <div class="pf-area" id="pf-area"></div>
   </section>
 </header>
@@ -623,13 +656,54 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
   var TEL = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 3.5h3l1.5 4-2 1.3a11 11 0 0 0 6.1 6.1l1.3-2 4 1.5v3a2 2 0 0 1-2.2 2A17 17 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2z"/></svg>';
 
   /* --- Contacto ------------------------------------------------------------- */
-  $("pf-personas").innerHTML = P.contacto.personas.map(function (p) {
-    var cara = p.foto ? '<img class="pf-persona__cara" src="' + esc(p.foto) + '" alt="" width="48" height="48" loading="lazy" decoding="async">' : "";
-    return '<li class="pf-persona' + (cara ? " pf-persona--cara" : "") + '">' + cara + "<b>" + esc(p.nombre) + "</b><span>" + esc(p.cargo) + '</span><a href="mailto:' + esc(p.mail) + '">' + esc(p.mail) + "</a></li>";
+  var COPIAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="3"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>';
+  var PERS = P.contacto.personas;
+  $("pf-personas").innerHTML = PERS.map(function (p) {
+    var cara = p.foto ? '<img class="pf-persona__cara" src="' + esc(p.foto) + '" alt="" width="44" height="44" decoding="async">' : "";
+    return '<li class="pf-persona">' + cara + '<div class="pf-persona__txt"><b>' + esc(p.nombre) + "</b><span>" + esc(p.cargo) + '</span><a href="mailto:' + esc(p.mail) + '">' + esc(p.mail) + "</a></div>" +
+      '<button type="button" class="pf-copiar" data-copiar="' + esc(p.mail) + '" aria-label="Copiar el mail de ' + esc(p.nombre) + '">' + COPIAR + "</button></li>";
   }).join("");
-  $("pf-area").innerHTML =
-    '<a class="pf-boton pf-boton--chico" href="mailto:' + esc(P.contacto.mail) + '">' + MAIL + esc(P.contacto.mail) + "</a>" +
-    (P.contacto.telefono ? '<a class="pf-boton pf-boton--chico" href="tel:' + P.contacto.telefono.replace(/[^\d+]/g, "") + '">' + TEL + esc(P.contacto.telefono) + "</a>" : "");
+  $("pf-ct-caras").innerHTML = PERS.filter(function (p) { return p.foto; }).map(function (p) { return '<img src="' + esc(p.foto) + '" alt="" width="28" height="28" decoding="async">'; }).join("");
+  $("pf-ct-nombres").textContent = PERS.map(function (p) { return p.nombre; }).join(" y ").replace(/ y (?=.* y )/g, ", ");
+  function dato(href, icono, texto, etiqueta) {
+    return '<span class="pf-dato"><a href="' + href + '">' + icono + esc(texto) + '</a><button type="button" class="pf-copiar" data-copiar="' + esc(texto) + '" aria-label="Copiar ' + etiqueta + '">' + COPIAR + "</button></span>";
+  }
+  $("pf-area").innerHTML = dato("mailto:" + esc(P.contacto.mail), MAIL, P.contacto.mail, "el mail de prensa") +
+    (P.contacto.telefono ? dato("tel:" + P.contacto.telefono.replace(/[^\d+]/g, ""), TEL, P.contacto.telefono, "el teléfono") : "");
+
+  /* Copiar: aviso de la base (.pf-aviso). Si el navegador no deja copiar, el aviso muestra el dato para copiarlo a mano. */
+  var aviso = document.createElement("div"); aviso.className = "pf-aviso"; aviso.setAttribute("role", "status"); document.body.appendChild(aviso);
+  var avisoReloj;
+  function avisar(t) { aviso.textContent = t; aviso.classList.add("pf-on"); clearTimeout(avisoReloj); avisoReloj = setTimeout(function () { aviso.classList.remove("pf-on"); }, 1800); }
+  document.querySelector(".pf-contacto").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-copiar]"); if (!b) return;
+    var t = b.getAttribute("data-copiar");
+    var ok = function () { avisar(t.indexOf("@") > -1 ? "Mail copiado" : "Teléfono copiado"); };
+    try { navigator.clipboard.writeText(t).then(ok, function () { avisar(t); }); } catch (err) { avisar(t); }
+  });
+
+  /* Desplegable del contacto: solo en el celular. En pantallas más anchas, abierto y el botón queda como título. */
+  (function () {
+    var cab = $("pf-ct-cab"), det = $("pf-ct-det"), mq = window.matchMedia("(max-width: 640px)");
+    var corto = matchMedia("(prefers-reduced-motion: reduce)");
+    function fin() { det.style.height = ""; }
+    function poner(abre, animar) {
+      cab.setAttribute("aria-expanded", String(abre));
+      if (!animar || corto.matches) { det.hidden = !abre; fin(); return; }
+      var desde = abre ? 0 : det.offsetHeight;
+      det.hidden = false;
+      var hasta = abre ? det.scrollHeight : 0;
+      det.style.height = desde + "px"; det.offsetHeight; det.style.height = hasta + "px";
+      var hecho = false, reloj;
+      var listo = function (e) { if (hecho || (e && e.propertyName !== "height")) return; hecho = true; clearTimeout(reloj); det.removeEventListener("transitionend", listo); if (!abre) det.hidden = true; fin(); };
+      det.addEventListener("transitionend", listo);
+      reloj = setTimeout(listo, 450); /* por si la transición no corre (pestaña en segundo plano) */
+    }
+    function segunAncho() { cab.disabled = !mq.matches; poner(!mq.matches, false); }
+    cab.addEventListener("click", function () { if (!cab.disabled) poner(cab.getAttribute("aria-expanded") !== "true", true); });
+    if (mq.addEventListener) mq.addEventListener("change", segunAncho); else mq.addListener(segunAncho);
+    segunAncho();
+  })();
 
   /* --- Ítems de cada pestaña -------------------------------------------------- */
   var GAC = P.gacetillas.map(function (d, k) {
