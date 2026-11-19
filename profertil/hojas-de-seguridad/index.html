@@ -86,6 +86,9 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
   .pf-filters { min-width: var(--f-w-cerrada, 0px); transition: min-width var(--f-cerrar) var(--f-curva), border-radius var(--f-cerrar) var(--f-curva), transform 520ms var(--ease), opacity 300ms ease; }
   .pf-filters.pf-abierto { min-width: min(100% - 32px - var(--a), 680px); transition-duration: var(--f-abrir), var(--f-abrir), 520ms, 300ms; }
 }
+/* El dock no aparece mientras la cabecera muestra su flecha de bajar (repetiría lo que dice la flecha) ni cuando la lista quedó
+   vacía (el aviso ya ofrece Ver todo). Si el panel está abierto, se queda. Igual que en la Sala de prensa. */
+.pf-filters.pf-arriba:not(.pf-abierto), .pf-filters.pf-vacio:not(.pf-abierto) { transform: translateY(calc(100% + 40px)); opacity: 0; pointer-events: none; }
 .pf-f-in { gap: 10px; }
 .pf-f-grupos { display: grid; grid-template-columns: minmax(0, 1fr); }
 .pf-f-gr + .pf-f-gr { border-top: 1px solid var(--line); }
@@ -674,6 +677,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
     docs.innerHTML = ""; pintadas = 0;
     while (pintadas < Math.min(objetivo, lista.length)) pintarTanda();
     $("pf-empty").hidden = lista.length > 0;
+    $("pf-filters").classList.toggle("pf-vacio", !lista.length);
     docs.style.minHeight = "";
     if (window.scrollY !== y) window.scrollTo({ top: y, behavior: "instant" });
   }
@@ -1160,10 +1164,15 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
     r: R(90, tk("ancla-giro-k"), tk("ancla-giro-c"))
   };
   function inicioLista() { return Math.max(0, document.querySelector("main").getBoundingClientRect().top + window.scrollY - $("pf-top").offsetHeight - 8); }
+  // La flecha de la cabecera (campo.js) se ve hasta los 40 px de scroll: mientras tanto, ni dock ni ancla.
+  function conFlecha() { return window.scrollY <= 40; }
+  function marcarFlecha() { $("pf-filters").classList.toggle("pf-arriba", conFlecha()); }
+  window.addEventListener("scroll", marcarFlecha, { passive: true });
+  marcarFlecha();
   function arriba() { return window.scrollY > inicioLista() + window.innerHeight * CAMBIO; }
   function medir() {
     var r = $("pf-filters").getBoundingClientRect();
-    M.s.t = !lista.length ? 0 : 1;
+    M.s.t = !lista.length || conFlecha() ? 0 : 1;
     var sube = arriba();
     M.r.t = sube ? -90 : 90;
     ancla.setAttribute("aria-label", sube ? "Volver al principio de la lista" : "Bajar");
