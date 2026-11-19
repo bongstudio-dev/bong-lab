@@ -50,7 +50,8 @@ Gacetilla), hoja de borde a borde, buscador en la lupa, filtros en el dock y anc
   `#gacetillas&tipo=aviso&anio=2023&q=planta`, `#fotos&galeria=urea`. Alias para redirigir las direcciones viejas:
   `#videos` (abre Fotos), `#documentos`, `#_fotos`, `#_documentos`, `#_videos`, `#_gacetillas-de-prensa`.
 - **Dock con pocos grupos**: si la pestaña tiene dos grupos de filtros o menos (hoy todas), la barra no lleva una pastilla
-  por grupo, queda solo el botón Filtros (el del celular, con el contador, pastilla entera y sin hover de fondo) y el panel muestra todos los grupos abiertos,
+  por grupo, queda solo el botón Filtros (el del celular, con el contador, pastilla entera y sin hover de fondo; en escritorio de 38 px
+  para que el dock mida 49, lo mismo que el ancla) y el panel muestra todos los grupos abiertos,
   sin acordeón. Con tres o más vuelve el dock de la Biblioteca tal cual.
 - **Gacetillas**: la fila de documento de `base.css` con la fecha completa. Abren en el visor de la Biblioteca
   (`../biblioteca/ver/?d=prensa-...`), que vuelve a la Sala de prensa. Filtros Tipo (Gacetilla o Aviso a la comunidad,
@@ -59,7 +60,10 @@ Gacetilla), hoja de borde a borde, buscador en la lupa, filtros en el dock y anc
   de Formas de la Biblioteca. En miniaturas del celular la etiqueta de Aviso a la comunidad se
   abrevia «Aviso comunidad» (sobre el arte no entra entera); en el resto de las vistas y en escritorio va completa.
 - **Fotos**: masonry por filas (cada foto a la columna más corta, por su proporción) con visor propio
-  (flechas, Esc, deslizar, descarga del original). Filtro Galería. Selector de tamaño como el de Novedades (chicas,
+  (flechas, Esc, deslizar, descarga del original). En el visor la foto crece desde su miniatura al abrir y vuelve a ella al
+  cerrar (si no está a la vista, se achica un poco y se funde); el fondo y los controles se funden aparte. Entre fotos, la
+  actual sale 48 px hacia un lado y la otra entra desde el opuesto; con el dedo la foto sigue el arrastre y pasados 50 px
+  cambia. El tamaño en el visor sale de la proporción (no espera a la carga) y se ve la miniatura hasta que baja la grande. Filtro Galería. Selector de tamaño como el de Novedades (chicas,
   medianas, grandes: 6 y 3 columnas en escritorio (sin medianas), 3/2/1 en el celular; se recuerda en `prensa-fotos-vista`).
   Al cambiar, las fotos viajan a su lugar nuevo.
 - **Cambio de vista (Gacetillas y Fotos):** solo se anima lo que queda a la vista. Lo que ya se veía viaja a su lugar nuevo

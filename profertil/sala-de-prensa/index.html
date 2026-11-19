@@ -267,9 +267,13 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 .pf-logos-pie a { color: var(--azul); }
 
 /* --- Visor de fotos: un diálogo a pantalla completa sobre tinta. Flechas, Esc, deslizar con el dedo. */
-.pf-vf { position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: color-mix(in srgb, var(--ink) 94%, transparent); color: var(--tiza); overflow: hidden; }
+/* El fondo va en ::before para fundirlo aparte: la foto crece desde su miniatura al abrir y vuelve a ella al cerrar (JS, verFoto
+   y cerrarFoto), y los controles se funden después. Con menos movimiento, todo el visor solo se funde. */
+.pf-vf { position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: transparent; color: var(--tiza); overflow: hidden; isolation: isolate; }
+.pf-vf::before { content: ""; position: absolute; inset: 0; z-index: -1; background: color-mix(in srgb, var(--ink) 94%, transparent); }
 .pf-vf::backdrop { background: transparent; }
-.pf-vf[open] { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; animation: pf-entra 240ms ease; }
+.pf-vf[open] { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+@media (prefers-reduced-motion: reduce) { .pf-vf[open] { animation: pf-entra 240ms ease; } }
 .pf-vf__cab { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: calc(14px + env(safe-area-inset-top, 0px)) 16px 10px; }
 .pf-vf__t { margin: 0; font-size: var(--texto-chico); color: color-mix(in srgb, var(--tiza) 76%, transparent); }
 .pf-vf__t b { font-weight: 500; color: var(--tiza); }
@@ -277,8 +281,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 .pf-vf .pf-boton-icono { background: color-mix(in srgb, var(--tiza) 14%, transparent); color: var(--tiza); text-decoration: none; }
 @media (hover: hover) and (pointer: fine) { .pf-vf .pf-boton-icono:hover:not(:disabled) { background: var(--tiza); color: var(--azul); } }
 .pf-vf__esc { position: relative; display: grid; place-items: center; min-height: 0; padding: 0 72px; touch-action: pan-y; }
-.pf-vf__esc img { width: auto; height: auto; max-width: 100%; max-height: calc(100dvh - 150px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); object-fit: contain; border-radius: var(--radio-aviso); transition: opacity 220ms ease; }
-.pf-vf__esc img.pf-cargando { opacity: .35; }
+.pf-vf__esc img { width: auto; height: auto; max-width: 100%; max-height: calc(100dvh - 150px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); object-fit: contain; border-radius: var(--radio-aviso); user-select: none; -webkit-user-drag: none; }
 .pf-vf__ant, .pf-vf__sig { position: absolute; top: 50%; translate: 0 -50%; }
 .pf-vf__ant { left: 16px; } .pf-vf__sig { right: 16px; }
 .pf-vf__pie { padding: 10px 16px calc(16px + env(safe-area-inset-bottom, 0px)); text-align: center; font-size: var(--texto-mini); color: color-mix(in srgb, var(--tiza) 60%, transparent); }
@@ -328,7 +331,8 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
   /* El botón Filtros del celular (base.css), con su texto y el contador al lado. */
   .pf-filters.pf-pocos:not(.pf-abierto) { border-radius: 28px; }
   .pf-filters.pf-pocos .pf-f-bar { padding: 4px; }
-  .pf-filters.pf-pocos .pf-f-toggle { width: auto; height: 46px; padding: 0 22px 0 26px; color: var(--ink); font-family: var(--f-display); font-size: 1.04rem; }
+  /* Alto 38: el dock queda en 49, el mismo diámetro del ancla de escritorio (--a), 38 + 2 x 4 de f-bar + 2 de borde + 1 del f-body. */
+  .pf-filters.pf-pocos .pf-f-toggle { width: auto; height: 38px; padding: 0 20px 0 24px; color: var(--ink); font-family: var(--f-display); font-size: 1.04rem; }
   /* Toda la pastilla es el botón, sin fondo propio al pasar el mouse (como en el celular). */
   .pf-filters.pf-pocos .pf-f-toggle:hover { background: transparent; }
   .pf-filters.pf-pocos .pf-f-toggle::after { inset: -4px; border-radius: inherit; }
@@ -1030,47 +1034,127 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
     if (e.metaKey || e.ctrlKey || e.shiftKey) window.open(a.href, "_blank", "noopener"); else a.click();
   });
 
-  /* --- Visor de fotos: recorre las fotos de la lista filtrada ------------------------------------- */
-  var vf = $("pf-vf"), vfI = -1;
-  function verFoto(j) {
-    if (!lista.length || !lista[0].f) return;   // un toque durante el cambio de pestaña
-    vfI = (j + lista.length) % lista.length;
-    var x = lista[vfI], img = $("pf-vfImg");
-    if (!img) { img = document.createElement("img"); img.id = "pf-vfImg"; $("pf-vfEsc").prepend(img); }
-    img.classList.add("pf-cargando");
-    img.onload = function () { img.classList.remove("pf-cargando"); };
-    img.src = fotoSrc(x, true); img.width = x.f.gr[0]; img.height = x.f.gr[1];
+  /* --- Visor de fotos: recorre las fotos de la lista filtrada -------------------------------------
+     Al abrir, la foto crece desde su miniatura (FLIP con transform) mientras el fondo se funde; al cerrar vuelve a la miniatura si
+     está a la vista (si no, se achica un poco y se funde). Entre fotos, la actual sale 48 px hacia un lado y la otra entra desde el
+     opuesto; deslizando con el dedo la foto lo sigue y, pasados 50 px, sigue de largo. Mientras baja la grande se ve la miniatura,
+     que ya está cargada. Solo transform y opacity, con la curva base. */
+  var vf = $("pf-vf"), vfI = -1, vfTok = 0, desplazado = 0, cerrando = false;
+  var curvaV = getComputedStyle(document.documentElement).getPropertyValue("--ease").trim() || "cubic-bezier(.22,1,.36,1)";
+  function imgVf() {
+    var img = $("pf-vfImg");
+    if (!img) { img = document.createElement("img"); img.id = "pf-vfImg"; img.draggable = false; img.decoding = "async"; $("pf-vfEsc").prepend(img); }
+    return img;
+  }
+  // Tamaño de la foto en el visor por su proporción, sin esperar a que cargue: el vuelo desde la miniatura necesita el lugar final.
+  function medirVf() {
+    var img = $("pf-vfImg"), x = lista[vfI], esc = $("pf-vfEsc");
+    if (!img || !x || !vf.open) return;
+    var cs = getComputedStyle(esc), w = esc.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight), h = esc.clientHeight;
+    var k = Math.min(w / x.f.gr[0], h / x.f.gr[1]);
+    img.style.width = Math.floor(x.f.gr[0] * k) + "px"; img.style.height = Math.floor(x.f.gr[1] * k) + "px";
+  }
+  window.addEventListener("resize", medirVf);
+  function ponerFoto() {
+    var x = lista[vfI], img = imgVf(), grande = fotoSrc(x, true), g = new Image();
+    img.dataset.k = x.k; img.width = x.f.gr[0]; img.height = x.f.gr[1]; medirVf();
     img.alt = x.g.nombre + ", foto " + x.i;
+    g.src = grande;
+    if (g.complete) img.src = grande;
+    else { img.src = fotoSrc(x, false); g.onload = function () { if (img.dataset.k === x.k) img.src = grande; }; }
     $("pf-vfT").innerHTML = "<b>" + esc(x.g.nombre) + "</b> · " + x.i + " de " + x.de;
     $("pf-vfBajar").href = x.f.u;
     var otra = new Image(); otra.src = fotoSrc(lista[(vfI + 1) % lista.length], true);
   }
+  function verFoto(j, dir) {
+    if (!lista.length || !lista[0].f) return;   // un toque durante el cambio de pestaña
+    vfI = (j + lista.length) % lista.length;
+    var img = imgVf(), dx = desplazado; desplazado = 0; img.style.transform = "";
+    img.getAnimations().forEach(function (a) { a.cancel(); });
+    if (!dir || quieto.matches || !img.animate) { ponerFoto(); return; }
+    var tok = ++vfTok;
+    var sale = img.animate([{ transform: "translateX(" + dx + "px)", opacity: 1 }, { transform: "translateX(" + (dx - dir * 48) + "px)", opacity: 0 }],
+      { duration: 150, easing: "cubic-bezier(.4,0,1,1)", fill: "forwards" });
+    sale.onfinish = function () {
+      if (tok !== vfTok) return;
+      ponerFoto(); sale.cancel();
+      img.animate([{ transform: "translateX(" + dir * 48 + "px)", opacity: 0 }, { transform: "none", opacity: 1 }], { duration: 360, easing: curvaV });
+    };
+  }
+  function cromo() { return [vf.querySelector(".pf-vf__cab"), vf.querySelector(".pf-vf__pie"), $("pf-vfAnt"), $("pf-vfSig")]; }
+  // La miniatura de la foto j, solo si está a la vista (si no, no hay de dónde salir ni adónde volver).
+  function miniatura(j) {
+    var b = $("pf-fotos").querySelector('.pf-fo__b[data-j="' + j + '"]'), r = b && b.getBoundingClientRect();
+    return r && r.width && r.bottom > 0 && r.top < window.innerHeight ? r : null;
+  }
+  function haciaMini(r, img) {
+    var f = img.getBoundingClientRect();
+    return "translate(" + (r.left - f.left) + "px," + (r.top - f.top) + "px) scale(" + r.width / f.width + ")";
+  }
   $("pf-fotos").addEventListener("click", function (e) {
     var b = e.target.closest(".pf-fo__b"); if (!b) return;
-    verFoto(+b.dataset.j);
+    vfTok++; cerrando = false;
+    vf.getAnimations({ subtree: true }).forEach(function (a) { a.cancel(); });
     if (vf.showModal) vf.showModal(); else vf.setAttribute("open", "");
+    verFoto(+b.dataset.j);
     $("pf-vfCerrar").focus();
+    var img = imgVf();
+    if (quieto.matches || !img.animate) return;
+    var r = miniatura(vfI);
+    vf.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: "ease", pseudoElement: "::before" });
+    cromo().forEach(function (el) { el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 260, delay: 160, easing: "ease", fill: "backwards" }); });
+    if (r) img.animate([{ transform: haciaMini(r, img), transformOrigin: "0 0" }, { transform: "none", transformOrigin: "0 0" }], { duration: 480, easing: curvaV });
+    else img.animate([{ opacity: 0, transform: "scale(.96)" }, { opacity: 1, transform: "none" }], { duration: 360, easing: curvaV });
   });
-  function cerrarFoto() { if (vf.close) vf.close(); else vf.removeAttribute("open"); }
+  function cerrarFoto() {
+    if (!vf.open || cerrando) return;
+    var img = $("pf-vfImg");
+    if (quieto.matches || !img || !img.animate) { vf.close ? vf.close() : vf.removeAttribute("open"); return; }
+    cerrando = true; vfTok++;
+    img.getAnimations().forEach(function (a) { a.cancel(); });
+    img.style.transform = ""; desplazado = 0;
+    var r = miniatura(vfI), dur = r ? 400 : 240;
+    var a = r ? img.animate([{ transform: "none", transformOrigin: "0 0" }, { transform: haciaMini(r, img), transformOrigin: "0 0" }], { duration: dur, easing: curvaV, fill: "forwards" })
+              : img.animate([{ opacity: 1 }, { opacity: 0, transform: "scale(.96)" }], { duration: dur, easing: "ease", fill: "forwards" });
+    vf.animate([{ opacity: 1 }, { opacity: 0 }], { duration: dur, easing: "ease", fill: "forwards", pseudoElement: "::before" });
+    cromo().forEach(function (el) { el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 160, easing: "ease", fill: "forwards" }); });
+    a.onfinish = function () {
+      if (!cerrando) return;
+      cerrando = false;
+      vf.close ? vf.close() : vf.removeAttribute("open");
+      vf.getAnimations({ subtree: true }).forEach(function (x) { x.cancel(); });
+    };
+  }
   $("pf-vfCerrar").addEventListener("click", cerrarFoto);
-  $("pf-vfAnt").addEventListener("click", function () { verFoto(vfI - 1); });
-  $("pf-vfSig").addEventListener("click", function () { verFoto(vfI + 1); });
+  $("pf-vfAnt").addEventListener("click", function () { verFoto(vfI - 1, -1); });
+  $("pf-vfSig").addEventListener("click", function () { verFoto(vfI + 1, 1); });
+  vf.addEventListener("cancel", function (e) { e.preventDefault(); cerrarFoto(); });   // Esc, con la misma salida
   vf.addEventListener("close", function () {
     var t = $("pf-fotos").querySelector('[data-j="' + vfI + '"]'); if (t) t.focus({ preventScroll: true });
   });
   vf.addEventListener("keydown", function (e) {
-    if (e.key === "ArrowLeft") verFoto(vfI - 1);
-    if (e.key === "ArrowRight") verFoto(vfI + 1);
+    if (e.key === "ArrowLeft") verFoto(vfI - 1, -1);
+    if (e.key === "ArrowRight") verFoto(vfI + 1, 1);
   });
-  // Tocar el fondo (fuera de la foto y los botones) cierra; deslizar de costado cambia de foto.
-  var x0 = null;
-  $("pf-vfEsc").addEventListener("pointerdown", function (e) { x0 = e.clientX; });
-  $("pf-vfEsc").addEventListener("pointerup", function (e) {
+  // Tocar el fondo (fuera de la foto y los botones) cierra; deslizar de costado arrastra la foto y, pasados 50 px, cambia.
+  var x0 = null, t0 = null;
+  $("pf-vfEsc").addEventListener("pointerdown", function (e) { if (cerrando) return; x0 = e.clientX; t0 = e.target; desplazado = 0; });
+  $("pf-vfEsc").addEventListener("pointermove", function (e) {
+    if (x0 === null || quieto.matches) return;
+    var dx = e.clientX - x0;
+    if (Math.abs(dx) < 6 && !desplazado) return;
+    desplazado = dx; imgVf().style.transform = "translateX(" + dx + "px)";
+  });
+  function soltar(e, vale) {
     if (x0 === null) return;
-    var dx = e.clientX - x0; x0 = null;
-    if (Math.abs(dx) > 50) { verFoto(vfI + (dx < 0 ? 1 : -1)); return; }
-    if (e.target === this) cerrarFoto();
-  });
+    var dx = e.clientX - x0, img = imgVf(); x0 = null;
+    if (vale && Math.abs(dx) > 50) { verFoto(vfI + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1); return; }
+    if (desplazado && img.animate) img.animate([{ transform: "translateX(" + desplazado + "px)" }, { transform: "none" }], { duration: 300, easing: curvaV });
+    img.style.transform = ""; desplazado = 0;
+    if (vale && t0 === this && Math.abs(dx) < 6) cerrarFoto();
+  }
+  $("pf-vfEsc").addEventListener("pointerup", function (e) { soltar.call(this, e, true); });
+  $("pf-vfEsc").addEventListener("pointercancel", function (e) { soltar.call(this, e, false); });
 
   /* --- Buscador en la lupa (filtra la pestaña abierta) ------------------------------------------ */
   esMobile.addEventListener("change", function () { resumen(); pintarFiltros(); });
