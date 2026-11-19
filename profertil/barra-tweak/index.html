@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<!-- firma:bong
+
+      ##########         #########
+      ###########      #############
+      ############   #################
+      ###########   ###################
+      ##########    ###################
+      ############  ###################
+      #############  #################
+      #############   ###############
+      ############      ###########
+
+                            #####
+      ##     ######     ##########
+      ####   ######   ###########
+      #####  ######  ###########
+      #############  ##########
+      #############  ###################
+      #############  ##################
+      #############   #################
+      #############     #############
+      #############        #######
+
+      PROFERTIL · TWEAK DE LA BARRA
+      Ajuste en vivo de la barra de navegación sobre la cabecera.
+
+      Hola. Si estás leyendo esto, te gusta ver cómo están hechas las cosas.
+      A nosotros también.
+
+      Diseño y desarrollo: Bong Studio
+      Estudio de branding. Córdoba, Argentina. Desde 2019.
+      Herramienta para ajustar los valores de la barra de la web de Profertil.
+
+      CRÉDITOS
+      María Lopez / Brand Designer
+      Marcos Cousseau / Creative Director
+
+      CONTACTO
+      https://bongstudio.ar
+
+      BONG STUDIO · 2026 — Brutally Clear Branding — bongstudio.ar
+-->
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tweak de la barra</title>
+<meta name="description" content="Ajuste en vivo de la barra de navegación transparente de Profertil: fondo, botón, borde, texto y desenfoque, sobre las páginas reales.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=DM+Mono&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+   Tweak de la barra transparente (pieza "barra" de componentes/base.css).
+   Carga una página real en un iframe del mismo origen y le escribe en :root
+   las cuatro variables Web/Sobre foto/* del Figma Master. El desenfoque no es
+   variable: en base.css es un valor fijo (blur 14px en el menú, la lupa y la
+   cruz del buscador); acá se pisa con una regla para probarlo.
+   No suma propiedades: solo mueve los valores que la barra ya usa.
+   ========================================================================== */
+:root {
+  color-scheme: light;
+  --azul: #003DA5;
+  --celeste: #4086FF;
+  --tiza: #FFFEEF;
+  --bg: #E9E7D6;
+  --ink: #0A1E4A;
+  --ink-2: #44506E;
+  --ink-3: #737D96;
+  --line: rgba(10, 30, 74, 0.12);
+  --f-display: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "DM Sans", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "DM Mono", ui-monospace, Menlo, monospace;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.45; -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--celeste); outline-offset: 2px; }
+
+.app { display: grid; grid-template-columns: 360px minmax(0, 1fr); height: 100%; }
+.ctrl { overflow-y: auto; background: var(--tiza); border-right: 1px solid var(--line); padding: 22px 20px 28px; display: grid; gap: 22px; align-content: start; }
+.vista { position: relative; min-height: 0; display: grid; place-items: start center; padding: 18px; overflow: hidden; }
+
+h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6rem; line-height: 1.05; letter-spacing: -0.02em; color: var(--azul); }
+.bajada { margin: 6px 0 0; color: var(--ink-2); font-size: 0.9rem; }
+.grupo { display: grid; gap: 10px; }
+.rotulo { margin: 0; font-size: 0.72rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; height: 32px; padding: 0 14px; border: 0; border-radius: 999px; background: rgba(0, 61, 165, 0.1); color: var(--azul); cursor: pointer; font-size: 14px; line-height: 1; }
+@media (hover: hover) and (pointer: fine) { .chip:hover { background: rgba(0, 61, 165, 0.18); } }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--tiza); }
+
+/* Un control por variable: muestra de color, opacidad y el valor que se carga en el Master. */
+.var { display: grid; gap: 6px; padding: 12px; border-radius: 14px; background: #fff; border: 1px solid var(--line); }
+.var__cab { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.var__nombre { font-weight: 500; font-size: 14px; }
+.var__token { font-family: var(--f-mono); font-size: 11px; color: var(--ink-3); }
+.var__fila { display: grid; grid-template-columns: 32px minmax(0, 1fr) 46px; align-items: center; gap: 10px; }
+.var input[type="color"] { width: 32px; height: 32px; padding: 0; border: 1px solid var(--line); border-radius: 8px; background: none; cursor: pointer; }
+.var input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px; }
+.var input[type="color"]::-webkit-color-swatch { border: 0; border-radius: 6px; }
+.var input[type="range"] { width: 100%; accent-color: var(--azul); }
+.var__num { font-family: var(--f-mono); font-size: 12px; text-align: right; font-variant-numeric: tabular-nums; }
+.var__valor { font-family: var(--f-mono); font-size: 11px; color: var(--ink-2); }
+.var.cambiado { border-color: var(--celeste); }
+
+.acciones { display: flex; gap: 8px; flex-wrap: wrap; }
+.boton { height: 38px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--azul); color: var(--tiza); cursor: pointer; font-size: 14px; line-height: 1; }
+.boton--sec { background: rgba(0, 61, 165, 0.1); color: var(--azul); }
+.salida { margin: 0; padding: 12px; border-radius: 12px; background: var(--ink); color: var(--tiza); font-family: var(--f-mono); font-size: 11.5px; line-height: 1.6; white-space: pre-wrap; }
+.nota { margin: 0; color: var(--ink-3); font-size: 12.5px; }
+
+.marco { width: 100%; height: 100%; border-radius: 20px; overflow: hidden; background: var(--bg); border: 1px solid var(--line); transition: width 260ms ease; }
+.marco.celu { width: 390px; }
+.marco iframe { display: block; width: 100%; height: 100%; border: 0; }
+
+@media (max-width: 860px) {
+  .app { grid-template-columns: 1fr; grid-template-rows: auto 70vh; height: auto; }
+  .ctrl { border-right: 0; border-bottom: 1px solid var(--line); }
+  .marco.celu { width: min(390px, 100%); }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="ctrl">
+    <div>
+      <h1>Barra transparente</h1>
+      <p class="bajada">Los valores que hoy arman la barra sobre la cabecera. Se ajustan en vivo sobre la página real y salen listos para el Master.</p>
+    </div>
+
+    <div class="grupo">
+      <p class="rotulo">Página</p>
+      <div class="chips" id="paginas">
+        <button class="chip" type="button" data-url="../hojas-de-seguridad/" aria-pressed="true">Hojas · amarillo</button>
+        <button class="chip" type="button" data-url="../biblioteca/" aria-pressed="false">Biblioteca · azul</button>
+        <button class="chip" type="button" data-url="../novedades/" aria-pressed="false">Novedades · foto</button>
+      </div>
+    </div>
+
+    <div class="grupo">
+      <p class="rotulo">Ancho</p>
+      <div class="chips" id="anchos">
+        <button class="chip" type="button" data-ancho="" aria-pressed="true">Escritorio</button>
+        <button class="chip" type="button" data-ancho="celu" aria-pressed="false">Celular</button>
+      </div>
+    </div>
+
+    <div class="grupo" id="vars">
+      <p class="rotulo">Variables · Web/Sobre foto</p>
+    </div>
+
+    <div class="grupo">
+      <p class="rotulo">Desenfoque · valor fijo en base.css</p>
+      <div class="var" id="blurVar">
+        <div class="var__cab"><span class="var__nombre">Desenfoque del vidrio</span><span class="var__token">backdrop-filter</span></div>
+        <div class="var__fila" style="grid-template-columns: minmax(0, 1fr) 46px;">
+          <input type="range" id="blur" min="0" max="40" step="1" aria-label="Desenfoque en píxeles">
+          <span class="var__num" id="blurNum"></span>
+        </div>
+        <span class="var__valor">Menú, lupa y cruz del buscador</span>
+      </div>
+    </div>
+
+    <div class="acciones">
+      <button class="boton" type="button" id="copiar">Copiar valores</button>
+      <button class="boton boton--sec" type="button" id="reset">Volver a los de hoy</button>
+    </div>
+    <pre class="salida" id="salida"></pre>
+    <p class="nota">El logo, la lupa y el menú del celular usan Tiza, el blanco de la marca: no son de la barra y no se tocan acá.</p>
+  </aside>
+
+  <section class="vista">
+    <div class="marco" id="marco"><iframe id="frame" src="../hojas-de-seguridad/" title="Página de Profertil con la barra de navegación"></iframe></div>
+  </section>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  // Los valores de hoy (componentes/tokens.css, exportado del Master) y el desenfoque de base.css.
+  var HOY = {
+    "foto-fondo": { nombre: "Fondo", figma: "Web/Sobre foto/Fondo", uso: "Cápsula del menú", hex: "#FFFEEF", a: 14 },
+    "foto-boton": { nombre: "Botón", figma: "Web/Sobre foto/Botón", uso: "Círculo de la lupa y la cruz", hex: "#FFFEEF", a: 16 },
+    "foto-borde": { nombre: "Borde", figma: "Web/Sobre foto/Borde", uso: "Filo del menú, la lupa y la cruz", hex: "#FFFEEF", a: 22 },
+    "foto-texto": { nombre: "Texto", figma: "Web/Sobre foto/Texto", uso: "Ítems del menú", hex: "#FFFEEF", a: 90 }
+  };
+  var BLUR_HOY = 14;
+  var CLAVE = "pf-barra-tweak";
+  var estado = {};
+
+  function rgba(v) {
+    var h = v.hex.replace("#", ""), r = parseInt(h.slice(0, 2), 16), g = parseInt(h.slice(2, 4), 16), b = parseInt(h.slice(4, 6), 16);
+    return "rgba(" + r + ", " + g + ", " + b + ", " + +(v.a / 100).toFixed(2) + ")";
+  }
+  function inicial() {
+    var e = { blur: BLUR_HOY };
+    Object.keys(HOY).forEach(function (k) { e[k] = { hex: HOY[k].hex, a: HOY[k].a }; });
+    return e;
+  }
+  try { estado = JSON.parse(localStorage.getItem(CLAVE)) || inicial(); } catch (err) { estado = inicial(); }
+
+  // Arma un control por variable.
+  var cont = $("vars"), refs = {};
+  Object.keys(HOY).forEach(function (k) {
+    var d = HOY[k], el = document.createElement("div");
+    el.className = "var";
+    el.innerHTML = '<div class="var__cab"><span class="var__nombre">' + d.nombre + '</span><span class="var__token">--' + k + '</span></div>' +
+      '<div class="var__fila"><input type="color" aria-label="Color de ' + d.nombre + '"><input type="range" min="0" max="100" step="1" aria-label="Opacidad de ' + d.nombre + '"><span class="var__num"></span></div>' +
+      '<span class="var__valor"></span>';
+    cont.appendChild(el);
+    var color = el.querySelector('input[type="color"]'), rango = el.querySelector('input[type="range"]');
+    refs[k] = { el: el, color: color, rango: rango, num: el.querySelector(".var__num"), valor: el.querySelector(".var__valor") };
+    color.addEventListener("input", function () { estado[k].hex = color.value.toUpperCase(); pintar(); });
+    rango.addEventListener("input", function () { estado[k].a = +rango.value; pintar(); });
+  });
+  $("blur").addEventListener("input", function () { estado.blur = +$("blur").value; pintar(); });
+
+  function aplicar() {
+    var doc; try { doc = $("frame").contentDocument; } catch (err) { return; }
+    if (!doc || !doc.documentElement) return;
+    Object.keys(HOY).forEach(function (k) { doc.documentElement.style.setProperty("--" + k, rgba(estado[k])); });
+    var st = doc.getElementById("pf-tweak-barra");
+    if (!st) { st = doc.createElement("style"); st.id = "pf-tweak-barra"; (doc.head || doc.documentElement).appendChild(st); }
+    var f = "blur(" + estado.blur + "px)";
+    st.textContent = ".pf-barra__menu, .pf-barra__busca, .pf-barra__cerrar { backdrop-filter: " + f + "; -webkit-backdrop-filter: " + f + "; }";
+  }
+
+  function pintar() {
+    var lineas = [];
+    Object.keys(HOY).forEach(function (k) {
+      var r = refs[k], v = estado[k], d = HOY[k];
+      r.color.value = v.hex; r.rango.value = v.a; r.num.textContent = v.a + "%";
+      r.valor.textContent = d.uso + " · " + rgba(v);
+      r.el.classList.toggle("cambiado", v.hex !== d.hex || v.a !== d.a);
+      lineas.push(d.figma + "  " + v.hex + " " + v.a + "%");
+    });
+    $("blur").value = estado.blur; $("blurNum").textContent = estado.blur + "px";
+    $("blurVar").classList.toggle("cambiado", estado.blur !== BLUR_HOY);
+    lineas.push("", "base.css · blur(" + estado.blur + "px)");
+    $("salida").textContent = lineas.join("\n");
+    try { localStorage.setItem(CLAVE, JSON.stringify(estado)); } catch (err) {}
+    aplicar();
+  }
+
+  $("frame").addEventListener("load", aplicar);
+  $("reset").addEventListener("click", function () { estado = inicial(); pintar(); });
+  $("copiar").addEventListener("click", function () {
+    var t = $("salida").textContent, b = $("copiar");
+    (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () {
+      b.textContent = "Copiado"; setTimeout(function () { b.textContent = "Copiar valores"; }, 1400);
+    }, function () {});
+  });
+
+  function grupoChips(id, alElegir) {
+    $(id).addEventListener("click", function (e) {
+      var b = e.target.closest(".chip"); if (!b) return;
+      $(id).querySelectorAll(".chip").forEach(function (c) { c.setAttribute("aria-pressed", c === b ? "true" : "false"); });
+      alElegir(b);
+    });
+  }
+  grupoChips("paginas", function (b) { $("frame").src = b.dataset.url; });
+  grupoChips("anchos", function (b) { $("marco").classList.toggle("celu", b.dataset.ancho === "celu"); });
+
+  pintar();
+})();
+</script>
+</body>
+</html>
