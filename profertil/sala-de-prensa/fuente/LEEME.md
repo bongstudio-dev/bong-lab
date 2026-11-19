@@ -32,10 +32,9 @@ Gacetilla), hoja de borde a borde, buscador en la lupa, filtros en el dock y anc
 - **Contacto de prensa** dentro de la tarjeta de la cabecera, siempre a la vista (a la derecha en escritorio ancho).
 - **Pestañas** con el Selector de `base.css`, fijas debajo de la barra al bajar. La fila no tiene fondo: queda solo la
   cápsula, con su tono hecho opaco para que se lea sobre fotos y miniaturas. En escritorio el selector de vistas de la
-  pestaña va en la misma fila fija, a la derecha y con el mismo alto. En el celular arriba queda fija solo la fila de
-  pestañas: el selector va dentro del panel de filtros, en una fila "Vista" arriba de los grupos (donde llega el pulgar y
-  junto a lo demás que cambia la lista), y el contador con los chips queda en la página, sin fijar. El JS mueve el selector
-  según el ancho (`ubicarHerr`). Al cambiar de pestaña el indicador viaja y lo
+  pestaña va en la misma fila fija, a la derecha y con el mismo alto, en escritorio y en el celular. Las pestañas no
+  llevan número (el total ya está en el contador). En el celular la cápsula de pestañas mide lo suyo, así no cambia de
+  ancho entre pestañas, y el selector siempre tiene tres opciones (en Fotos, chicas son 3 columnas). Al cambiar de pestaña el indicador viaja y lo
   de abajo (resultado y panel) se funde afuera, cambia sin verse (también el salto al principio de la lista) y se funde
   adentro. Cada una con su ancla: `#gacetillas`, `#fotos`, `#logos`. Filtros y búsqueda en la dirección:
   `#gacetillas&tipo=aviso&anio=2023&q=planta`, `#fotos&galeria=urea`. Alias para redirigir las direcciones viejas:
@@ -50,7 +49,7 @@ Gacetilla), hoja de borde a borde, buscador en la lupa, filtros en el dock y anc
   de Formas de la Biblioteca.
 - **Fotos**: masonry por filas (cada foto a la columna más corta, por su proporción) con visor propio
   (flechas, Esc, deslizar, descarga del original). Filtro Galería. Selector de tamaño como el de Novedades (chicas,
-  medianas, grandes: 6/4/3 columnas en escritorio, 2/1 en el celular, sin chicas; se recuerda en `prensa-fotos-vista`).
+  medianas, grandes: 6/4/3 columnas en escritorio, 3/2/1 en el celular; se recuerda en `prensa-fotos-vista`).
   Al cambiar, las fotos viajan a su lugar nuevo.
 - **Logos**: una tarjeta por versión con su vista previa y las descargas en SVG, PNG y PDF. Sin filtros ni selector
   (el dock no aparece).

@@ -114,12 +114,14 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 .pf-pest .pf-herramientas { align-items: stretch; }
 .pf-pest .pf-selector--iconos button { padding-inline: 13px; }
 .pf-pest .pf-selector { pointer-events: auto; background: linear-gradient(var(--line), var(--line)), var(--pf-papel, #fff); } /* el mismo tono, opaco: fija, pasa sobre fotos y miniaturas */
-.pf-pest .pf-pestanas button { gap: 7px; padding-inline: 16px; font-size: var(--texto-cuerpo); }
-.pf-pest .pf-pestanas button .pf-pastilla__n { font-size: 12px; }
+.pf-pest .pf-pestanas button { padding-inline: 16px; font-size: var(--texto-cuerpo); }
 .pf-selector__ind { box-shadow: none; }
 @media (max-width: 640px) {
-  .pf-pest .pf-pestanas { display: flex; flex: 1; }
-  .pf-pest .pf-pestanas button { flex: 1 1 0; padding-inline: 8px; font-size: var(--texto-chico); }
+  /* Pestañas y selector en la misma fila: la cápsula de pestañas mide lo suyo (no cambia de ancho entre pestañas) y el
+     selector va a la derecha, siempre con tres opciones. */
+  .pf-pest { gap: 8px; }
+  .pf-pest .pf-pestanas button { padding-inline: 12px; font-size: var(--texto-chico); }
+  .pf-pest .pf-selector--iconos button { padding-inline: 9px; }
 }
 .pf-panel[hidden] { display: none; }
 @keyframes pf-entra { from { opacity: 0; } } /* solo aparece: sin desplazamiento, como en la Biblioteca */
@@ -156,14 +158,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
   .pf-activos::-webkit-scrollbar { display: none; }
   .pf-activos > * { flex: none; }
   .pf-activos__limpiar { flex: none; white-space: nowrap; }
-  .pf-densidad [data-vista="chico"] { display: none; }
 }
-/* Fila "Vista" del panel: el rótulo como el de los grupos y el Selector a todo el ancho (pieza selector--ancho de base.css). */
-.pf-f-vista { display: grid; gap: 8px; padding: 6px 2px 14px; border-bottom: 1px solid var(--line); }
-.pf-f-vista:not(:has(.pf-selector:not([hidden]))) { display: none; }
-.pf-f-vista .pf-f-label { font-size: 0.8rem; color: var(--ink); }
-.pf-f-vista .pf-herramientas, .pf-f-vista .pf-selector:not([hidden]) { display: flex; width: 100%; }
-.pf-f-vista .pf-selector button { flex: 1 1 0; padding-block: 8px; }
 }
 
 /* --- Gacetillas: la fila de documento de base.css. La fecha va completa (día, mes y año), así que su columna es más ancha. */
@@ -461,17 +456,9 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
   <div class="pf-pest" id="pf-pest">
     <div class="pf-selector pf-pestanas" role="tablist" aria-label="Material de prensa">
       <span class="pf-selector__ind" aria-hidden="true"></span>
-      <button type="button" role="tab" id="pf-t-gacetillas" data-tab="gacetillas" aria-controls="gacetillas" aria-pressed="true" aria-selected="true">Gacetillas<b class="pf-pastilla__n"></b></button>
-      <button type="button" role="tab" id="pf-t-fotos" data-tab="fotos" aria-controls="fotos" aria-pressed="false" aria-selected="false">Fotos<b class="pf-pastilla__n"></b></button>
-      <button type="button" role="tab" id="pf-t-logos" data-tab="logos" aria-controls="logos" aria-pressed="false" aria-selected="false">Logos<b class="pf-pastilla__n"></b></button>
-    </div>
-  </div>
-
-  <div class="pf-cambia" id="pf-cambia">
-  <div class="pf-result-row">
-    <div class="pf-result-main">
-      <p class="pf-result-text" id="pf-resultText" aria-live="polite"></p>
-      <div class="pf-activos" id="pf-activos"></div>
+      <button type="button" role="tab" id="pf-t-gacetillas" data-tab="gacetillas" aria-controls="gacetillas" aria-pressed="true" aria-selected="true">Gacetillas</button>
+      <button type="button" role="tab" id="pf-t-fotos" data-tab="fotos" aria-controls="fotos" aria-pressed="false" aria-selected="false">Fotos</button>
+      <button type="button" role="tab" id="pf-t-logos" data-tab="logos" aria-controls="logos" aria-pressed="false" aria-selected="false">Logos</button>
     </div>
     <div class="pf-herramientas pf-cambia" id="pf-herr">
       <div class="pf-selector pf-selector--iconos pf-vista" data-para="gacetillas" role="group" aria-label="Cómo se ven las gacetillas">
@@ -486,6 +473,14 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
         <button type="button" data-vista="medio" aria-pressed="true" aria-label="Fotos medianas" title="Medianas"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0" width="6.5" height="6.5" rx="2.1"/><rect x="8.5" y="0" width="6.5" height="6.5" rx="2.1"/><rect x="0" y="8.5" width="6.5" height="6.5" rx="2.1"/><rect x="8.5" y="8.5" width="6.5" height="6.5" rx="2.1"/></svg></button>
         <button type="button" data-vista="grande" aria-pressed="false" aria-label="Fotos grandes" title="Grandes"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0" width="15" height="15" rx="4.8"/></svg></button>
       </div>
+    </div>
+  </div>
+
+  <div class="pf-cambia" id="pf-cambia">
+  <div class="pf-result-row">
+    <div class="pf-result-main">
+      <p class="pf-result-text" id="pf-resultText" aria-live="polite"></p>
+      <div class="pf-activos" id="pf-activos"></div>
     </div>
   </div>
 
@@ -513,7 +508,6 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 
 <section class="pf-filters" id="pf-filters" aria-label="Filtros">
   <div class="pf-f-body" id="pf-fBody"><div class="pf-f-in">
-    <div class="pf-f-vista" id="pf-fVista"><span class="pf-f-label">Vista</span></div>
     <div class="pf-f-grupos" id="pf-fGrupos"></div>
     <button class="pf-f-clear" id="pf-fClear" type="button" hidden>Limpiar filtros</button>
   </div></div>
@@ -636,7 +630,6 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
   Object.keys(TABS).forEach(function (t) {
     TABS[t].sel = {};
     TABS[t].grupos.forEach(function (g) { TABS[t].sel[g.id] = {}; });
-    $("pf-t-" + t).querySelector(".pf-pastilla__n").textContent = TABS[t].items.length;
   });
 
   /* --- Estado y filtro (la regla de la Biblioteca: dentro de un grupo suman, entre grupos se cruzan) --------- */
@@ -720,10 +713,10 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
       '<a class="pf-doc__d pf-fo__d" href="' + esc(x.f.u) + '" download target="_blank" rel="noopener" aria-label="Descargar la foto original">' + BAJAR + "</a>" +
       (conGal ? '<span class="pf-fo__g">' + esc(x.g.nombre) + "</span>" : "") + "</li>";
   }
-  // Columnas según el ancho y el tamaño elegido, como las tarjetas de Novedades. En el celular no hay "chicas".
+  // Columnas según el ancho y el tamaño elegido, como las tarjetas de Novedades.
   function columnasFotos() {
     var w = $("pf-lista").clientWidth;
-    if (w < 700) return tamFotos === "grande" ? 1 : 2;
+    if (w < 700) return { chico: 3, medio: 2, grande: 1 }[tamFotos];
     if (w < 1000) return { chico: 4, medio: 3, grande: 2 }[tamFotos];
     return { chico: 6, medio: 4, grande: 3 }[tamFotos];
   }
@@ -954,16 +947,6 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
     marcarVistas(true);
     cambiarVista($("pf-fotos"), function () { repartirFotos(); listas(); }, true);
   });
-  // Dónde van los selectores de vista: en escritorio, en la fila fija de las pestañas; en el celular, en el panel de filtros.
-  function ubicarHerr() {
-    var herr = $("pf-herr"), dest = esMobile.matches ? $("pf-fVista") : $("pf-pest");
-    if (herr.parentNode !== dest) dest.appendChild(herr);
-    marcarVistas(false);
-  }
-  esMobile.addEventListener("change", ubicarHerr);
-  ubicarHerr();
-  // En el celular no hay fotos chicas: si quedó elegida, se ven medianas.
-  if (esMobile.matches && tamFotos === "chico") tamFotos = "medio";
 
   /* Toda la fila de gacetilla es el enlace al visor (como en la Biblioteca). */
   $("pf-docs").addEventListener("click", function (e) {
@@ -1143,7 +1126,6 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
     gr.classList.remove("pf-quieto");
     abrirGrupo(abierto);
     resumen();
-    if (si) marcarVistas(false);   // en el celular el selector vive en el panel: recién abierto tiene ancho
     var dur = parseFloat(getComputedStyle(document.documentElement).getPropertyValue(si ? "--f-abrir" : "--f-cerrar")) || 420;
     tListo = setTimeout(terminar, dur + 60);
   }
@@ -1211,7 +1193,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
     if (!corriendo) { corriendo = true; requestAnimationFrame(anim); }
   }
   window.addEventListener("scroll", function () { despertar(200); }, { passive: true });
-  window.addEventListener("resize", function () { despertar(700); moverInd(pest, false); ubicarHerr(); });
+  window.addEventListener("resize", function () { despertar(700); moverInd(pest, false); marcarVistas(false); });
   $("pf-filters").addEventListener("click", function () { despertar(900); });
   $("pf-filters").addEventListener("transitionend", function () { despertar(120); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { despertar(300); moverInd(pest, false); marcarVistas(false); });
