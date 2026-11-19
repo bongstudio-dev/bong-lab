@@ -79,7 +79,7 @@
 .pf-n-in .pf-etiqueta { --s: var(--etq-m); margin-top: 14px; }
 .pf-n-in .pf-etiqueta__rotulo { outline: 1px solid var(--line); outline-offset: -1px; }
 .pf-n-ante { margin: 0 0 -6px; font: 500 var(--texto-destacado)/1.3 var(--f-display); color: var(--ink-2); max-width: 60ch; }
-.pf-n-in h1 { margin: 0; font: 600 clamp(36px, 4.4vw, 60px)/1.02 var(--f-display); letter-spacing: -0.035em; color: var(--azul); text-wrap: balance; overflow-wrap: break-word; }
+.pf-n-in h1 { margin: 0; font: 600 clamp(36px, 4.4vw, 60px)/1.02 var(--f-display); letter-spacing: -0.035em; color: var(--pf-titulo, var(--azul)); text-wrap: balance; overflow-wrap: break-word; }
 .pf-n-in h1.pf-largo { font-size: clamp(30px, 3.4vw, 44px); line-height: 1.06; }
 
 .pf-n-bajada { margin: 0; max-width: 60ch; font-size: var(--texto-destacado); line-height: 1.5; color: var(--ink-2); }
@@ -770,6 +770,9 @@ body.pf-foco #pf-nota { border-radius: 0; margin-inline: 0; }
     h += "<h1" + (n.t.length > 80 ? ' class="pf-largo"' : "") + ">" + esc(n.t) + "</h1>";
     if (d.b) h += '<p class="pf-n-bajada">' + esc(d.b) + "</p>";
     $("pf-cabIn").innerHTML = h;
+    // El título toma el color del texto de la etiqueta (el del tipo de nota), así acompaña al campo de la cabecera.
+    var e = $("pf-cabIn").querySelector(".pf-etiqueta"), tx = e && e.style.getPropertyValue("--tx").trim();
+    $("pf-cabIn").style.setProperty("--pf-titulo", tx || "var(--azul)");
     document.title = n.t + " · Novedades Profertil";
   }
 

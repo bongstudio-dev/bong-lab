@@ -168,15 +168,6 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
       <div class="triadas" id="triadas"></div>
     </div>
 
-    <div class="grupo" id="grupoTitulo">
-      <p class="rotulo">Título de la cabecera</p>
-      <div class="chips" id="titulos">
-        <button class="chip" type="button" data-titulo="azul" aria-pressed="true">Azul</button>
-        <button class="chip" type="button" data-titulo="campo" aria-pressed="false">Fondo del campo</button>
-        <button class="chip" type="button" data-titulo="etiqueta" aria-pressed="false">Texto de la etiqueta</button>
-      </div>
-    </div>
-
     <div class="grupo">
       <p class="rotulo">Ancho</p>
       <div class="chips" id="anchos">
@@ -284,16 +275,7 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
     if (!st) { st = doc.createElement("style"); st.id = "pf-tweak-barra"; (doc.head || doc.documentElement).appendChild(st); }
     var f = "blur(" + estado.blur + "px)";
     st.textContent = ".pf-barra__menu, .pf-barra__busca, .pf-barra__cerrar { backdrop-filter: " + f + "; -webkit-backdrop-filter: " + f + "; }" +
-      (estado.modo === "blanca" ? BLANCA : "") +
-      // Título del color del fondo del campo (campo.js deja --pf-campo-fondo en :root); Biblioteca, Hojas y Nota.
-      (estado.titulo === "campo" ? "#pf-cab h1 { color: var(--pf-campo-fondo, var(--azul)); }" : "") +
-      (estado.titulo === "etiqueta" ? "#pf-cab h1 { color: " + colorEtiqueta(doc) + "; }" : "");
-  }
-  // El texto de la etiqueta de la cabecera (--tx, el color del tipo de nota). Las listas no tienen etiqueta: fondo del campo.
-  function colorEtiqueta(doc) {
-    var e = doc.querySelector("#pf-cab .pf-etiqueta");
-    var tx = e && e.style.getPropertyValue("--tx");
-    return tx ? tx.trim() : "var(--pf-campo-fondo, var(--azul))";
+      (estado.modo === "blanca" ? BLANCA : "");
   }
   // Sólida blanca: la barra sigue transparente; lo que hoy es vidrio (menú, lupa, cruz y menú del celular) pasa al color de fondo de la página
   // (--bg), sólido, con el texto y los íconos en azul. La página actual del menú, pastilla azul con el texto en ese mismo color. El logo no cambia.
@@ -320,8 +302,7 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
     if (estado.modo === "blanca") lineas = ["Sobre la cabecera · piezas sólidas", "Menú, lupa y cruz · fondo de la página (--bg), sin desenfoque", "Texto e íconos · Marca/Azul", "Página actual · pastilla azul, texto en el fondo de la página", "Barra y logo · sin cambios"];
     document.querySelector(".app").dataset.modo = estado.modo || "vidrio";
     $("modos").querySelectorAll(".chip").forEach(function (c) { c.setAttribute("aria-pressed", c.dataset.modo === (estado.modo || "vidrio") ? "true" : "false"); });
-    lineas.push("", "Campo · " + tri.nombre, "Título · " + ({ campo: "fondo del campo", etiqueta: "texto de la etiqueta (en las listas, fondo del campo)" }[estado.titulo] || "Marca/Azul"));
-    $("titulos").querySelectorAll(".chip").forEach(function (c) { c.setAttribute("aria-pressed", c.dataset.titulo === (estado.titulo || "azul") ? "true" : "false"); });
+    lineas.push("", "Campo · " + tri.nombre');
     $("salida").textContent = lineas.join("\n");
     try { localStorage.setItem(CLAVE, JSON.stringify(estado)); } catch (err) {}
     aplicar();
@@ -363,7 +344,6 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
   function elegirPagina(b) { $("grupoTriada").classList.toggle("apagado", !/hojas|nota/.test(b.dataset.url)); $("frame").src = urlPagina(); }
   grupoChips("paginas", elegirPagina, "#paginas .chip, #notas .chip");
   grupoChips("notas", elegirPagina, "#paginas .chip, #notas .chip");
-  grupoChips("titulos", function (b) { estado.titulo = b.dataset.titulo; pintar(); });
   grupoChips("modos", function (b) { estado.modo = b.dataset.modo; pintar(); });
   grupoChips("anchos", function (b) { $("marco").classList.toggle("celu", b.dataset.ancho === "celu"); });
 

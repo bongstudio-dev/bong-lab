@@ -68,7 +68,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 .pf-campo-cab { position: relative; z-index: 1; min-height: var(--pf-campo-alto, 70svh); padding: calc(var(--pf-barra-h, 64px) + 12px) 12px 88px; }
 .pf-bh { display: grid; gap: 16px; justify-items: start; width: min(100%, 760px); margin-inline: auto;
   background: var(--pf-papel, #fff); border-radius: var(--radio-tarjeta, 24px); padding: 22px 20px 26px; }
-.pf-bh h1 { margin: 0; font: 600 2.1rem/1.02 var(--f-display); letter-spacing: -0.035em; color: var(--azul); text-wrap: balance; }
+.pf-bh h1 { margin: 0; font: 600 2.1rem/1.02 var(--f-display); letter-spacing: -0.035em; color: var(--pf-campo-fondo, var(--azul)); /* el color del fondo del campo de la cabecera (campo.js lo deja en :root) */ text-wrap: balance; }
 .pf-bh p { margin: 0; max-width: 60ch; font-size: var(--texto-cuerpo); line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
 .pf-campo-seguir { position: absolute; left: 50%; bottom: 24px; translate: -50% 0; width: 44px; height: 44px; border-radius: 50%;
   background: var(--pf-papel, #fff); color: var(--ink, #111); display: grid; place-items: center; transition: opacity 300ms ease; }
