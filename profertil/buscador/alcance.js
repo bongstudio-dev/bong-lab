@@ -13,7 +13,14 @@
    cierra el buscador de la barra él mismo y, mientras se escribe, muestra en el panel una vista previa de la
    sección (o de todo el sitio con el interruptor). Enter o "Ver los N" llevan a la lista con la búsqueda hecha.
    <script src="../../buscador/alcance.js" data-seccion="notas" data-nombre="Novedades" data-modo="previa" defer></script>
-   data-en es cómo se nombra la sección dentro de una frase, si lleva artículo ("la Biblioteca"). */
+   data-en es cómo se nombra la sección dentro de una frase, si lleva artículo ("la Biblioteca").
+
+   El buscador sugiere primero la sección de la página en la que uno está. En una plantilla que sirve a varias secciones (el
+   visor de documentos abre documentos de la Biblioteca, gacetillas de la Sala de prensa y hojas de seguridad) la página dice
+   cuál es la suya antes de que cargue este script:
+   window.PF_ALCANCE = { seccion: "prensa", nombre: "Prensa", en: "la Sala de prensa" };
+   Sin sección (seccion: "") el buscador busca en todo el sitio y no muestra el interruptor: es lo que corresponde a las páginas
+   que no pertenecen a ninguna lista. */
 (function () {
   "use strict";
   var yo = document.currentScript;
@@ -51,6 +58,13 @@
   }
 
   function iniciar() {
+    var pag = window.PF_ALCANCE;
+    if (pag) {
+      if ("seccion" in pag) SECCION = pag.seccion || "";
+      if (pag.nombre) NOMBRE = pag.nombre;
+      EN = pag.en || pag.nombre || EN;
+    }
+    var SOLO_SITIO = !SECCION;
     var caja = $("pf-busca"), input = $("pf-q"), nav = $("pf-nav"), lupa = $("pf-goSearch"), cerrar = $("pf-qClose"), vacio = $("pf-empty");
     if (!caja || !input || !cerrar) return;
     var amplio = false, indice = null, cargando = null, fallo = false, abiertos = {}, t;
@@ -215,7 +229,7 @@
     }
 
     function restringir(enfocar) {
-      if (!amplio) return;
+      if (!amplio || SOLO_SITIO) return;
       amplio = false;
       abiertos = {};
       swPintar();
@@ -358,6 +372,8 @@
     });
     if (caja.classList.contains("pf-abierto")) cargar();
     vacioActual();
+    // Página sin sección: todo el sitio, sin interruptor (y al cerrar el buscador no vuelve a una sección que no hay).
+    if (SOLO_SITIO) { sw.hidden = true; amplio = true; caja.classList.add("pf-alc--amplio"); input.placeholder = "Buscá en todo el sitio"; return; }
     if (p.en === "sitio") {
       if (!caja.classList.contains("pf-abierto") && lupa) lupa.click();
       if (p.q) input.value = p.q;

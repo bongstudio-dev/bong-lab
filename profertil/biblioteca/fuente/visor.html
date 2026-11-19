@@ -236,14 +236,21 @@ body.pf-foco .pf-v-doc { grid-column: 1; grid-row: 1; margin-top: 0; padding-bot
   // (fuera de esta maqueta): el visor los abre igual, sin el link de vuelta a una lista.
   // Cada documento vuelve a su lista: la Biblioteca o Hojas de seguridad. Inversores todavía no tiene la suya en la maqueta.
   var LISTAS = {
-    biblioteca: { href: "../", nombre: "Biblioteca", titulo: "Biblioteca Virtual Profertil", todos: "Ver toda la Biblioteca" },
-    msds: { href: "../../hojas-de-seguridad/", nombre: "Hojas de seguridad", titulo: "Hojas de seguridad Profertil", todos: "Ver todas las hojas", mas: "Más hojas de seguridad" },
-    gacetilla: { href: "../../sala-de-prensa/#gacetillas", nombre: "Sala de prensa", titulo: "Sala de prensa Profertil", todos: "Ver todas las gacetillas", mas: "Más gacetillas" },
-    aviso: { href: "../../sala-de-prensa/#gacetillas", nombre: "Sala de prensa", titulo: "Sala de prensa Profertil", todos: "Ver todas las gacetillas", mas: "Más avisos a la comunidad" }
+    biblioteca: { href: "../", nombre: "Biblioteca", titulo: "Biblioteca Virtual Profertil", todos: "Ver toda la Biblioteca",
+      alcance: { seccion: "documentos", nombre: "Biblioteca", en: "la Biblioteca" } },
+    msds: { href: "../../hojas-de-seguridad/", nombre: "Hojas de seguridad", titulo: "Hojas de seguridad Profertil", todos: "Ver todas las hojas", mas: "Más hojas de seguridad",
+      alcance: { seccion: "hojas", nombre: "Hojas", en: "las hojas de seguridad" } },
+    gacetilla: { href: "../../sala-de-prensa/#gacetillas", nombre: "Sala de prensa", titulo: "Sala de prensa Profertil", todos: "Ver todas las gacetillas", mas: "Más gacetillas",
+      alcance: { seccion: "prensa", nombre: "Prensa", en: "la Sala de prensa" } },
+    aviso: { href: "../../sala-de-prensa/#gacetillas", nombre: "Sala de prensa", titulo: "Sala de prensa Profertil", todos: "Ver todas las gacetillas", mas: "Más avisos a la comunidad",
+      alcance: { seccion: "prensa", nombre: "Prensa", en: "la Sala de prensa" } }
   };
   var enBiblioteca = !/^(msds|inversores|gacetilla|aviso)$/.test(d.c);
   var suLista = enBiblioteca ? LISTAS.biblioteca : LISTAS[d.c] || null;
   document.title = d.t + " · " + (suLista ? suLista.titulo : "Profertil");
+  // El buscador de la barra sugiere primero la sección del documento abierto (../../buscador/alcance.js lo lee al iniciar).
+  // Sin lista propia (inversores), busca en todo el sitio.
+  window.PF_ALCANCE = suLista ? suLista.alcance : { seccion: "" };
 
   /* --- Cabecera y datos -------------------------------------------------------------- */
   $("pf-cabIn").innerHTML =
