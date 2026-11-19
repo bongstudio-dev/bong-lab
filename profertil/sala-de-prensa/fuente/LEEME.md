@@ -43,7 +43,10 @@ Gacetilla), hoja de borde a borde, buscador en la lupa, filtros en el dock y anc
   como scroll del usuario (antes el dock se achicaba y agrandaba con cada cambio de vista). El cambio de vista toma de
   referencia la primera fila visible debajo de la fila fija. Al cambiar de pestaña el indicador viaja y lo
   de abajo (resultado y panel) se funde afuera, cambia sin verse (también el salto al principio de la lista) y entra
-  fundiéndose con un ascenso de 12 px (la curva base `--ease`, como el dock). Cada una con su ancla: `#gacetillas`, `#fotos`, `#logos`. Filtros y búsqueda en la dirección:
+  fundiéndose con un ascenso de 12 px (la curva base `--ease`, como el dock). El selector de vistas de la fila fija, entre
+  Gacetillas y Fotos, no desaparece: la cápsula y su pastilla quedan como esqueleto, los íconos se funden y cambian y la
+  pastilla viaja a la opción elegida de la otra pestaña (clase `pf-muda`). Hacia o desde Logos, que no tiene selector, se
+  funde entero. Cada una con su ancla: `#gacetillas`, `#fotos`, `#logos`. Filtros y búsqueda en la dirección:
   `#gacetillas&tipo=aviso&anio=2023&q=planta`, `#fotos&galeria=urea`. Alias para redirigir las direcciones viejas:
   `#videos` (abre Fotos), `#documentos`, `#_fotos`, `#_documentos`, `#_videos`, `#_gacetillas-de-prensa`.
 - **Dock con pocos grupos**: si la pestaña tiene dos grupos de filtros o menos (hoy todas), la barra no lleva una pastilla

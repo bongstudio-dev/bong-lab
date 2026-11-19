@@ -134,12 +134,18 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 .pf-panel[hidden] { display: none; }
 @keyframes pf-entra { from { opacity: 0; } } /* solo aparece: sin desplazamiento, como en la Biblioteca */
 /* Cambio de pestaña: lo de abajo de las pestañas (resultado y panel) se funde afuera, cambia mientras no se ve y entra fundiéndose
-   con un leve ascenso (la curva base, como el dock). El selector de vistas de la fila fija solo se funde.
+   con un leve ascenso (la curva base, como el dock).
    Las filas y fotos de la pestaña nueva no suman su propia entrada (pf-quieta): entra el panel entero, una sola vez. */
 .pf-cambia { transition: opacity 300ms ease, transform 460ms var(--ease); }
 /* Afuera solo se funde; el desplazamiento se pone de golpe ya oculto, así la pestaña nueva sube 12 px mientras aparece. */
 .pf-cambia.pf-oculto { opacity: 0; transform: translateY(12px); transition: opacity 140ms ease, transform 0s linear 130ms; }
-#pf-herr.pf-oculto { transform: none; }
+/* Selector de vistas al cambiar de pestaña. Entre Gacetillas y Fotos la cápsula y su pastilla quedan como esqueleto: solo los
+   íconos se funden y cambian, y la pastilla viaja a la opción elegida de la otra pestaña. Hacia o desde Logos (sin selector)
+   se funde entero. */
+#pf-herr { transition: opacity 300ms ease; }
+#pf-herr.pf-oculto { opacity: 0; transition-duration: 140ms; }
+#pf-herr .pf-selector svg { transition: opacity 260ms ease; }
+#pf-herr.pf-muda .pf-selector svg { opacity: 0; transition-duration: 120ms; }
 @media (prefers-reduced-motion: reduce) { .pf-cambia, .pf-cambia.pf-oculto { transform: none; } }
 .pf-doc.pf-quieta, .pf-fo.pf-quieta { animation: none; }
 
@@ -472,7 +478,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
       <button type="button" role="tab" id="pf-t-fotos" data-tab="fotos" aria-controls="fotos" aria-pressed="false" aria-selected="false">Fotos</button>
       <button type="button" role="tab" id="pf-t-logos" data-tab="logos" aria-controls="logos" aria-pressed="false" aria-selected="false">Logos</button>
     </div>
-    <div class="pf-herramientas pf-cambia" id="pf-herr">
+    <div class="pf-herramientas" id="pf-herr">
       <div class="pf-selector pf-selector--iconos pf-vista" data-para="gacetillas" role="group" aria-label="Cómo se ven las gacetillas">
         <span class="pf-selector__ind" aria-hidden="true"></span>
         <button type="button" data-vista="compacta" aria-pressed="false" aria-label="Lista compacta" title="Compacta"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0.5" width="15" height="2" rx="1"/><rect x="0" y="4.5" width="15" height="2" rx="1"/><rect x="0" y="8.5" width="15" height="2" rx="1"/><rect x="0" y="12.5" width="15" height="2" rx="1"/></svg></button>
@@ -918,9 +924,11 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
   }
   /* Cambio de pestaña: el indicador viaja enseguida; lo de abajo se funde afuera (140 ms; el cambio espera 170), cambia sin verse (también el salto al
      principio de la lista, si se estaba más abajo) y entra fundiéndose y subiendo 12 px (300 y 460 ms). Un clic nuevo en el medio toma el último pedido. */
-  var cambia = $("pf-cambia"), tCambio = 0;
+  var cambia = $("pf-cambia"), herr = $("pf-herr"), tCambio = 0;
+  function selDe(t) { return herr.querySelector('.pf-selector[data-para="' + t + '"]'); }
   function irA(t, animar) {
     if (!TABS[t]) return;
+    var viejo = herr.querySelector(".pf-selector:not([hidden])"), muda = !!(viejo && selDe(t));
     mostrarPest(true);
     if ($("pf-filters").classList.contains("pf-abierto")) abrirFiltros(false);
     tab = t;
@@ -928,14 +936,21 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
     moverInd(pest, animar);
     function cambiar() {
       Object.keys(TABS).forEach(function (k) { $(k).hidden = k !== tab; });
+      var oi = viejo && viejo.querySelector(".pf-selector__ind"), w = oi && oi.style.width, tr = oi && oi.style.transform;
       marcarVistas(false);
+      var nuevo = selDe(tab);
+      if (muda && nuevo && nuevo !== viejo && animar && !quieto.matches) {   // la pastilla sale de donde estaba la de la otra pestaña
+        var ni = nuevo.querySelector(".pf-selector__ind");
+        ni.classList.add("pf-quieto"); ni.style.width = w; ni.style.transform = tr; void ni.offsetWidth; ni.classList.remove("pf-quieto");
+        moverInd(nuevo, true);
+      }
       armarFiltros(); abrirFiltros(false);
       sinEntrada = animar; aplicar(); sinEntrada = false;
-      cambia.classList.remove("pf-oculto"); $("pf-herr").classList.remove("pf-oculto");
+      cambia.classList.remove("pf-oculto"); herr.classList.remove("pf-oculto", "pf-muda");
     }
     clearTimeout(tCambio);
     if (!animar || quieto.matches) { cambiar(); return; }
-    cambia.classList.add("pf-oculto"); $("pf-herr").classList.add("pf-oculto");
+    cambia.classList.add("pf-oculto"); herr.classList.add(muda ? "pf-muda" : "pf-oculto");
     $("pf-filters").classList.add("pf-fuera");   // el dock se va y vuelve (o no, en Logos) con la pestaña nueva
     tCambio = setTimeout(cambiar, 170);
   }
