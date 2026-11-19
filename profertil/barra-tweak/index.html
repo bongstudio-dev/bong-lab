@@ -117,7 +117,7 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
 .triada__txt { display: grid; gap: 1px; min-width: 0; }
 .triada__nombre { font-size: 14px; font-weight: 500; line-height: 1.2; }
 .triada__tipo { font-size: 12px; color: var(--ink-3); line-height: 1.3; }
-#grupoTriada.apagado { opacity: .4; pointer-events: none; }
+#grupoTriada.apagado, #grupoBajar.apagado { opacity: .4; pointer-events: none; }
 /* Con la barra sólida blanca, el vidrio no se usa: sus controles quedan apagados. */
 .app[data-modo="blanca"] .vidrio { opacity: .4; pointer-events: none; }
 
@@ -166,6 +166,15 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
     <div class="grupo" id="grupoTriada">
       <p class="rotulo">Tríada del campo · Hojas y Nota</p>
       <div class="triadas" id="triadas"></div>
+    </div>
+
+    <div class="grupo apagado" id="grupoBajar">
+      <p class="rotulo">Al bajar por la cabecera · Nota</p>
+      <div class="chips" id="bajar">
+        <button class="chip" type="button" data-bajar="" aria-pressed="true">Como hoy</button>
+        <button class="chip" type="button" data-bajar="a" aria-pressed="false">A · azul enseguida</button>
+        <button class="chip" type="button" data-bajar="b" aria-pressed="false">B · menú y lupa en azul</button>
+      </div>
     </div>
 
     <div class="grupo" id="grupoTitulo">
@@ -321,6 +330,7 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
     document.querySelector(".app").dataset.modo = estado.modo || "vidrio";
     $("modos").querySelectorAll(".chip").forEach(function (c) { c.setAttribute("aria-pressed", c.dataset.modo === (estado.modo || "vidrio") ? "true" : "false"); });
     lineas.push("", "Campo · " + tri.nombre, "Título · " + ({ campo: "fondo del campo", etiqueta: "texto de la etiqueta (en las listas, fondo del campo)" }[estado.titulo] || "Marca/Azul"));
+    $("bajar").querySelectorAll(".chip").forEach(function (c) { c.setAttribute("aria-pressed", c.dataset.bajar === (estado.bajar || "") ? "true" : "false"); });
     $("titulos").querySelectorAll(".chip").forEach(function (c) { c.setAttribute("aria-pressed", c.dataset.titulo === (estado.titulo || "azul") ? "true" : "false"); });
     $("salida").textContent = lineas.join("\n");
     try { localStorage.setItem(CLAVE, JSON.stringify(estado)); } catch (err) {}
@@ -332,7 +342,10 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
     var b = document.querySelector('#paginas [aria-pressed="true"], #notas [aria-pressed="true"]'), u = b.dataset.url;
     if (u.indexOf("hojas") === -1 && u.indexOf("nota") === -1) return u;
     var t = TRIADAS.filter(function (x) { return x.id === estado.triada; })[0];
-    return t && t.id !== "hoy" ? u + (u.indexOf("?") === -1 ? "?" : "&") + "campo=" + t.c.join("-") : u;
+    if (t && t.id !== "hoy") u += (u.indexOf("?") === -1 ? "?" : "&") + "campo=" + t.c.join("-");
+    // Cómo se comporta la barra al bajar por la cabecera (la Nota toma ?barra=a o ?barra=b solo para comparar).
+    if (estado.bajar && u.indexOf("nota") !== -1) u += (u.indexOf("?") === -1 ? "?" : "&") + "barra=" + estado.bajar;
+    return u;
   }
   TRIADAS.forEach(function (t) {
     var b = document.createElement("button");
@@ -359,9 +372,10 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
       alElegir(b);
     });
   }
-  function elegirPagina(b) { $("grupoTriada").classList.toggle("apagado", !/hojas|nota/.test(b.dataset.url)); $("frame").src = urlPagina(); }
+  function elegirPagina(b) { $("grupoTriada").classList.toggle("apagado", !/hojas|nota/.test(b.dataset.url)); $("grupoBajar").classList.toggle("apagado", !/nota/.test(b.dataset.url)); $("frame").src = urlPagina(); }
   grupoChips("paginas", elegirPagina, "#paginas .chip, #notas .chip");
   grupoChips("notas", elegirPagina, "#paginas .chip, #notas .chip");
+  grupoChips("bajar", function (b) { estado.bajar = b.dataset.bajar; pintar(); $("frame").src = urlPagina(); });
   grupoChips("titulos", function (b) { estado.titulo = b.dataset.titulo; pintar(); });
   grupoChips("modos", function (b) { estado.modo = b.dataset.modo; pintar(); });
   grupoChips("anchos", function (b) { $("marco").classList.toggle("celu", b.dataset.ancho === "celu"); });
