@@ -1268,15 +1268,27 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
   function mostrarPest(si) { $("pf-pest").classList.toggle("pf-escondida", !si); }   // se llama también antes de esta línea (saltar, irA)
   function pestFija() { return $("pf-lista").getBoundingClientRect().top < parseFloat(getComputedStyle(pestEl).top) - 2; }
   pestEl.addEventListener("focusin", function () { mostrarPest(true); });
+  /* En el iPhone la barra del navegador se agranda o achica mientras se scrollea: cambia el alto de la ventana y scrollY salta unos
+     píxeles para el otro lado. Eso, y el rebote elástico en los bordes, no es el usuario cambiando de dirección: la fila fija se
+     escondía y volvía (tironeaba). La posición se acota al rango real, un cambio de alto de la ventana no cuenta como movimiento,
+     y la dirección solo cambia cuando el recorrido en un mismo sentido suma DIR_UMBRAL px. */
+  var DIR_UMBRAL = 24, acumDir = 0;
+  function yReal() { return Math.min(Math.max(window.scrollY, 0), Math.max(0, document.documentElement.scrollHeight - window.innerHeight)); }
+  function sinDir(ms) { hastaSinDir = Math.max(hastaSinDir, performance.now() + ms); acumDir = 0; }
+  window.addEventListener("resize", function () { sinDir(250); }, { passive: true });
+  if (window.visualViewport) window.visualViewport.addEventListener("resize", function () { sinDir(250); }, { passive: true });
   window.addEventListener("scroll", function () {
-    var y = window.scrollY;
-    if (performance.now() < hastaSinDir) { yAntes = y; return; }
-    var dy = y - yAntes;
-    if (Math.abs(dy) < 8) return;
+    var y = yReal();
+    if (performance.now() < hastaSinDir) { yAntes = y; acumDir = 0; return; }
+    var paso = y - yAntes;
     yAntes = y;
+    if (!paso) return;
+    if ((paso > 0) !== (acumDir > 0)) acumDir = 0;   // cambió el sentido: se cuenta de nuevo
+    acumDir += paso;
+    if (Math.abs(acumDir) < DIR_UMBRAL) return;
     var f = $("pf-filters"), abiertos = f.classList.contains("pf-abierto");
     var alFinal = y + window.innerHeight >= document.documentElement.scrollHeight - 4;
-    var baja = dy > 0 && !alFinal;
+    var baja = acumDir > 0 && !alFinal;
     if (!esMobile.matches || abiertos) f.classList.remove("pf-chica"); else f.classList.toggle("pf-chica", baja && y > 40);
     mostrarPest(!(baja && pestFija() && !abiertos && !$("pf-busca").classList.contains("pf-abierto")));
   }, { passive: true });
