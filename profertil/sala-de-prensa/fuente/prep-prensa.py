@@ -163,8 +163,8 @@ def contacto():
     # Tildes que faltan en el sitio actual.
     for p in personas:
         p['cargo'] = p['cargo'].replace('Lider', 'Líder').replace('Comunicacion ', 'Comunicación ')
-        # Foto de la persona: las del sitio actual vienen con el verde aplicado sobre la imagen; se pasaron a blanco y negro
-        # (luminancia, contraste estirado), recortadas a la cara, 144 px. Viven en fotos/contacto/<usuario del mail>.webp.
+        # Foto de la persona: la misma del sitio actual pero en color (allá viene con el verde aplicado sobre la imagen),
+        # recortada a la cara, 144 px. Vive en fotos/contacto/<usuario del mail>.webp.
         f = 'fotos/contacto/%s.webp' % p['mail'].split('@')[0]
         if os.path.exists(os.path.join(RAIZ, f)): p['foto'] = f
     bienvenida = next(x for t, h, x in toks if t == 'p' and x.startswith('Te damos'))
