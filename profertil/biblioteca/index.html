@@ -485,7 +485,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
   var $ = function (id) { return document.getElementById(id); };
   /* Cabecera con campo (campo.js): el color y la Forma del badge de la sección, como en la Nota. */
   var CAMPO = PAG.campo || { color: "azul", forma: "lupa", tema: ["lupa", "suelo", "capas"] };
-  window.PF_CAMPO = { formas: A.formas, color: CAMPO.color, forma: CAMPO.forma, tema: CAMPO.tema, cab: "pf-cab", main: "pf-hoja", columna: "pf-lista" };
+  window.PF_CAMPO = { formas: A.formas, color: CAMPO.color, paleta: CAMPO.paleta, forma: CAMPO.forma, tema: CAMPO.tema, cab: "pf-cab", main: "pf-hoja", columna: "pf-lista" };
 
   /* Barra transparente sobre la cabecera: toma el azul cuando termina el campo, como en Novedades. */
   var barraSolida = function () { $("pf-top").classList.toggle("pf-barra--solida", window.scrollY > $("pf-cab").offsetHeight - 80); };
@@ -1292,7 +1292,8 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
   };
   var pedida = Q.get("p");
   // ?p=azul|verde|amarillo|naranja fuerza otro color (solo para probar).
-  var paleta = PALETAS[PALETAS[pedida] ? pedida : (PALETAS[P.color] ? P.color : "azul")];
+  // Una página puede pasar su propia combinación en P.paleta ({ fondo, figura, acento }); ?p= la sigue pisando para probar.
+  var paleta = PALETAS[pedida] || P.paleta || PALETAS[PALETAS[P.color] ? P.color : "azul"];
 
   // --- Formas: las del tema pesan más; el resto aparece de vez en cuando.
   var TODAS = Object.keys(P.formas);

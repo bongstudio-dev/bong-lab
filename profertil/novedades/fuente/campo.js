@@ -30,7 +30,8 @@
   };
   var pedida = Q.get("p");
   // ?p=azul|verde|amarillo|naranja fuerza otro color (solo para probar).
-  var paleta = PALETAS[PALETAS[pedida] ? pedida : (PALETAS[P.color] ? P.color : "azul")];
+  // Una página puede pasar su propia combinación en P.paleta ({ fondo, figura, acento }); ?p= la sigue pisando para probar.
+  var paleta = PALETAS[pedida] || P.paleta || PALETAS[PALETAS[P.color] ? P.color : "azul"];
 
   // --- Formas: las del tema pesan más; el resto aparece de vez en cuando.
   var TODAS = Object.keys(P.formas);

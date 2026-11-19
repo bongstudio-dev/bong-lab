@@ -341,7 +341,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
   var $ = function (id) { return document.getElementById(id); };
   /* Cabecera con campo (campo.js): el color y la Forma del badge de la sección, como en la Nota. */
   var CAMPO = PAG.campo || { color: "azul", forma: "lupa", tema: ["lupa", "suelo", "capas"] };
-  window.PF_CAMPO = { formas: A.formas, color: CAMPO.color, forma: CAMPO.forma, tema: CAMPO.tema, cab: "pf-cab", main: "pf-hoja", columna: "pf-lista" };
+  window.PF_CAMPO = { formas: A.formas, color: CAMPO.color, paleta: CAMPO.paleta, forma: CAMPO.forma, tema: CAMPO.tema, cab: "pf-cab", main: "pf-hoja", columna: "pf-lista" };
 
   /* Barra transparente sobre la cabecera: toma el azul cuando termina el campo, como en Novedades. */
   var barraSolida = function () { $("pf-top").classList.toggle("pf-barra--solida", window.scrollY > $("pf-cab").offsetHeight - 80); };
