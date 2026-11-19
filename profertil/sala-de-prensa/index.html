@@ -140,7 +140,11 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 
 /* --- Pestañas: el Selector de base.css, fijo arriba de la hoja al bajar (debajo de la barra azul). La fila no tiene fondo: queda
    solo la cápsula, con el suyo. La fila deja pasar los clics a lo que tiene debajo; la cápsula los toma. */
-.pf-pest { position: sticky; top: calc(var(--pf-barra-h, 76px) - 1px); z-index: 20; padding-block: 10px; pointer-events: none; }
+/* Fija como el dock y la barra (position: fixed), no sticky: en el celular, cuando la barra del navegador se achica o se agranda,
+   lo sticky se recalcula contra el scroll y quedaba un píxel desfasado de la barra azul (temblaba); lo fixed va pegado a la pantalla.
+   En su lugar queda un hueco del mismo alto (.pf-pest-lugar) y el JS pasa la fila a fija cuando el hueco llega a la barra (fijarPest). */
+.pf-pest { position: relative; z-index: 20; padding-block: 10px; pointer-events: none; }
+.pf-pest.pf-fija { position: fixed; top: calc(var(--pf-barra-h, 76px) - 1px); }
 /* Escritorio: los selectores de vista van en la misma fila fija, a la derecha de las pestañas y con su mismo alto (el JS los
    mueve acá; en el celular quedan en la línea del contador, porque al lado de las pestañas no entran). */
 .pf-pest { display: flex; align-items: stretch; justify-content: space-between; gap: 12px; }
@@ -1287,7 +1291,29 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
   /* Dirección del scroll del usuario: al bajar el dock se achica (celular) y la fila fija se esconde; al subir vuelven. */
   var yAntes = window.scrollY, pestEl = $("pf-pest");
   function mostrarPest(si) { $("pf-pest").classList.toggle("pf-escondida", !si); }   // se llama también antes de esta línea (saltar, irA)
-  function pestFija() { return $("pf-lista").getBoundingClientRect().top < parseFloat(getComputedStyle(pestEl).top) - 2; }
+  // Dónde queda la fila fija: debajo de la barra azul (el mismo cálculo que el CSS de .pf-fija).
+  function topFijo() { var v = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--pf-barra-h")); return (isNaN(v) ? 76 : v) - 1; }
+  function pestFija() { return $("pf-lista").getBoundingClientRect().top < topFijo() - 2; }
+  /* La fila pasa a fixed cuando su hueco llega a la barra, y vuelve a su lugar cuando el hueco baja. El hueco guarda el alto (la página
+     no se mueve) y le da a la fila su izquierda y su ancho. */
+  var lugar = document.createElement("div");
+  lugar.className = "pf-pest-lugar";
+  pestEl.parentNode.insertBefore(lugar, pestEl);
+  lugar.appendChild(pestEl);
+  function fijarPest() {
+    var r = lugar.getBoundingClientRect(), fija = r.top <= topFijo();
+    if (fija) {
+      lugar.style.height = pestEl.offsetHeight + "px";
+      pestEl.style.left = r.left + "px"; pestEl.style.width = r.width + "px";
+    }
+    if (fija === pestEl.classList.contains("pf-fija")) return;
+    pestEl.classList.toggle("pf-fija", fija);
+    if (!fija) { lugar.style.height = ""; pestEl.style.left = pestEl.style.width = ""; mostrarPest(true); }
+  }
+  window.addEventListener("scroll", fijarPest, { passive: true });
+  window.addEventListener("resize", fijarPest);
+  if (window.ResizeObserver) new ResizeObserver(function () { if (pestEl.classList.contains("pf-fija")) lugar.style.height = pestEl.offsetHeight + "px"; fijarPest(); }).observe(pestEl);
+  fijarPest();
   pestEl.addEventListener("focusin", function () { mostrarPest(true); });
   /* En el iPhone la barra del navegador se agranda o achica mientras se scrollea: cambia el alto de la ventana y scrollY salta unos
      píxeles para el otro lado. Eso, y el rebote elástico en los bordes, no es el usuario cambiando de dirección: la fila fija se
