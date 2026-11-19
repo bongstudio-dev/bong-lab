@@ -294,6 +294,9 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 }
 .pf-pocos .pf-f-gr__cab { cursor: default; min-height: 40px; padding-bottom: 2px; }
 .pf-pocos .pf-f-gr__cab svg, .pf-pocos .pf-f-gr__res { display: none; }
+/* Sin acordeón, el cuerpo no necesita la grilla 0fr/1fr: Safari en iPhone medía esa fila con las pastillas en otro
+   reparto y dejaba aire debajo. Como bloque, mide lo que ocupan. */
+.pf-pocos .pf-f-gr__cuerpo { display: block; visibility: visible; }
 @media (max-width: 640px) {
   .pf-f-gr__cab { min-height: 52px; }
   .pf-f-gr .pf-pastilla, .pf-f-gr .pf-chip { --h: 34px; }
