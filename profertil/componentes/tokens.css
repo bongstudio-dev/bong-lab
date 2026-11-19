@@ -37,6 +37,7 @@
   --f-acordeon: 260ms;  /* Web/Movimiento/Filtros acordeón */
   --f-chica: 280ms;  /* Web/Movimiento/Compacto */
   --t-buscador: 420ms;  /* Web/Movimiento/Buscador */
+  --t-barra: 520ms;  /* Web/Movimiento/Barra */
   --t-vista: 420ms;  /* Web/Movimiento/Vista */
   --carrusel-dura: 7000ms;  /* Web/Movimiento/Carrusel duración */
   --carrusel-pase: 700ms;  /* Web/Movimiento/Carrusel pase */

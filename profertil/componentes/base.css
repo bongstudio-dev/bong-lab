@@ -130,7 +130,7 @@ a.pf-etiqueta { text-decoration: none; }
    separación = 58 para la lupa). Si el menú es tan ancho que centrado pisaría uno de los dos, ese costado queda
    en su mínimo y el menú se corre hacia donde haya lugar: nunca se superpone. */
 .pf-barra { position: fixed; inset: 0 0 auto; z-index: 50; padding-top: env(safe-area-inset-top, 0px); }
-.pf-barra::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: var(--barra); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); transform: translateY(-100%); transition: transform 520ms var(--ease), box-shadow 520ms ease; }
+.pf-barra::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: var(--barra); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); transform: translateY(-100%); transition: transform var(--t-barra) var(--ease), box-shadow var(--t-barra) ease; }
 .pf-barra--solida::before { transform: none; box-shadow: 0 10px 30px -18px rgba(0, 20, 60, .7); }
 @media (prefers-reduced-motion: reduce) {
   .pf-barra::before { transform: none; opacity: 0; transition: opacity 200ms ease; }
@@ -392,7 +392,7 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 .pf-barra--solida::before { box-shadow: none; }
 .pf-barra__menu > a { text-decoration: none; }
 .pf-barra__busca { text-decoration: none; }
-.pf-progreso { position: absolute; inset: 0; display: flex; align-items: flex-end; pointer-events: none; transform: translateY(calc(4px - 100%)); transition: transform 520ms var(--ease); }
+.pf-progreso { position: absolute; inset: 0; display: flex; align-items: flex-end; pointer-events: none; transform: translateY(calc(4px - 100%)); transition: transform var(--t-barra) var(--ease); }
 .pf-barra--solida .pf-progreso { transform: none; }
 .pf-progreso i { display: block; width: 100%; height: 4px; background: var(--amarillo); transform: scaleX(var(--p, 0)); transform-origin: left; }
 @media (prefers-reduced-motion: reduce) { .pf-progreso { transition: none; } }
