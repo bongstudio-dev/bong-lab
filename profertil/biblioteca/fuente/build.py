@@ -26,6 +26,10 @@ def js(x):
 BIB = json.load(open('docs.json', encoding='utf-8'))['docs']
 MSDS = json.load(open('docs-msds.json', encoding='utf-8'))['docs']
 OTROS = MSDS + json.load(open('docs-inversores.json', encoding='utf-8'))['docs']
+# Gacetillas de la Sala de prensa (../../sala-de-prensa/fuente/prep-prensa.py): su lista es la Sala de prensa; el visor las abre como a los demás.
+PRENSA = [{'id': g['id'], 't': g['t'], 'c': g['tipo'], 'y': g['y'], 'f': g['f'], 'u': g['u'], **({'l': g['l']} if g.get('l') else {})}
+          for g in json.load(open(os.path.join(AQUI, '..', '..', 'sala-de-prensa', 'fuente', 'prensa.json'), encoding='utf-8'))['gacetillas']]
+OTROS = OTROS + PRENSA
 # Hojas de seguridad: el nombre del producto, sin "MSDS" (la página ya lo dice) y con las siglas entre paréntesis en mayúscula.
 for d in MSDS:
     t = re.sub(r'\s*\bMSDS\b\s*', ' ', d['t']).strip()

@@ -51,6 +51,16 @@ def hojas():
     return sorted(out, key=lambda x: x[0].lower())
 
 
+# --- Gacetillas de la Sala de prensa (sala-de-prensa/fuente/prensa.json): abren en el visor de la Biblioteca ---
+def gacetillas():
+    MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
+    out = []
+    for d in sorted(leer('sala-de-prensa/fuente/prensa.json')['gacetillas'], key=lambda d: (d['f'], d.get('dia', 0)), reverse=True):
+        tipo = 'Aviso a la comunidad' if d['tipo'] == 'aviso' else 'Gacetilla'
+        out.append([d['t'], 'biblioteca/ver/?d=' + d['id'], tipo + ' · ' + MESES[d['m'] - 1] + ' ' + d['y']])
+    return out
+
+
 # --- Notas de Novedades (novedades/fuente/notas.json), de la más reciente a la más vieja ---
 TIPOS = {'institucional': 'Institucional', 'comercial': 'Comercial', 'somos': 'Somos Profertil', 'tecnico': 'Artículo técnico',
          'aviso': 'Aviso a la comunidad', 'financiera': 'Gacetilla financiera'}
@@ -74,7 +84,7 @@ def notas():
 
 # --- Páginas: los nodos de tipo "pagina" del mapa de arquitectura v0 ---
 # Las que ya tienen maqueta llevan a ella; el resto, a su dirección del sitio actual.
-EN_MAQUETA = {'Novedades': 'novedades/'}
+EN_MAQUETA = {'Novedades': 'novedades/', 'Sala de prensa': 'sala-de-prensa/'}
 RAICES_SIN_RUTA = {'Navegación principal'}   # el menú principal no se nombra como ruta
 
 
@@ -102,6 +112,7 @@ def paginas():
 GRUPOS = [
     ('documentos', 'Biblioteca', 'documento', 'documentos', 'los', 'biblioteca/#q=', documentos),
     ('hojas', 'Hojas de seguridad', 'hoja', 'hojas', 'las', 'hojas-de-seguridad/#q=', hojas),
+    ('prensa', 'Gacetillas', 'gacetilla', 'gacetillas', 'las', 'sala-de-prensa/#gacetillas&q=', gacetillas),
     ('notas', 'Notas', 'nota', 'notas', 'las', 'novedades/#q=', notas),
     ('paginas', 'Páginas', 'página', 'páginas', 'las', '', paginas),
 ]

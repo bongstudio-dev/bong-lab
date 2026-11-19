@@ -173,7 +173,10 @@ def bajar_todos(nombres):
     with ThreadPoolExecutor(2) as ex:
         fallos = [(u, r) for u, r in ex.map(uno, faltan) if r != 'ok']
     # Copias que ya no corresponden a ningún documento.
-    sobran = set(os.listdir(CARPETA)) - set(nombres.values())
+    # Las gacetillas de la Sala de prensa también guardan su copia acá (las baja su prep-prensa.py): no se tocan.
+    prensa = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'sala-de-prensa', 'fuente', 'prensa.json')
+    de_prensa = {g['l'] for g in json.load(open(prensa, encoding='utf-8'))['gacetillas'] if g.get('l')} if os.path.exists(prensa) else set()
+    sobran = set(os.listdir(CARPETA)) - set(nombres.values()) - de_prensa
     for n in sobran:
         os.remove(os.path.join(CARPETA, n))
     if sobran:
