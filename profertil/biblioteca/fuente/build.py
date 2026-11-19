@@ -118,8 +118,9 @@ hacer_lista(os.path.join(AQUI, '..', 'index.html'), docs, grupos,
 # Hojas de seguridad: 22 documentos, uno por producto. Sin filtros (cultivo, zona y nutriente no aplican) ni orden por año
 # (no tienen); el visor y los PDF son los de la Biblioteca. La fila es el ícono, el producto y la descarga.
 HOJAS_PAG = js({'base': '../biblioteca/', 'todo': 'Todas las hojas de seguridad', 'uno': 'hoja', 'varios': 'hojas',
-                'campo': {'color': 'amarillo', 'forma': 'casco', 'tema': ['casco', 'escudo']}})
+                'campo': {'color': 'amarillo', 'forma': 'casco', 'tema': ['casco', 'escudo']}, 'barra': 'transparente'})
 HOJAS_TEXTOS = [
+    ('<header class="pf-barra pf-barra--solida" id="pf-top">', '<header class="pf-barra" id="pf-top">'),
     ('<title>Biblioteca Virtual Profertil</title>', '<title>Hojas de seguridad Profertil</title>'),
     ('<meta name="description" content="Maqueta de la Biblioteca Virtual de profertil.com.ar sobre el concepto web del manual de marca: los boletines y ensayos reales del sitio actual, con buscador, filtros por cultivo, zona, año y nutriente, y visor de PDF.">',
      '<meta name="description" content="Maqueta de Hojas de seguridad de profertil.com.ar sobre el concepto web del manual de marca: las fichas de datos de seguridad reales de cada producto, con buscador y visor de PDF.">'),
