@@ -30,17 +30,26 @@ Una sola página con la lógica de la Biblioteca y Novedades: cabecera con campo
 Gacetilla), hoja de borde a borde, buscador en la lupa, filtros en el dock y ancla.
 
 - **Contacto de prensa** dentro de la tarjeta de la cabecera, siempre a la vista (a la derecha en escritorio ancho).
-- **Pestañas** con el Selector de `base.css`, fijas debajo de la barra al bajar. Cada una con su ancla: `#gacetillas`,
-  `#fotos`, `#logos`. Filtros y búsqueda en la dirección: `#gacetillas&tipo=aviso&anio=2023&q=planta`, `#fotos&galeria=urea`.
-  Alias para redirigir las direcciones viejas: `#videos` (abre Fotos y baja a Videos), `#documentos`, `#_fotos`,
-  `#_documentos`, `#_videos`, `#_gacetillas-de-prensa`.
+- **Pestañas** con el Selector de `base.css`, fijas debajo de la barra al bajar. La fila no tiene fondo: queda solo la
+  cápsula, con su tono hecho opaco para que se lea sobre fotos y miniaturas. Al cambiar de pestaña el indicador viaja y lo
+  de abajo (resultado y panel) se funde afuera, cambia sin verse (también el salto al principio de la lista) y se funde
+  adentro. Cada una con su ancla: `#gacetillas`, `#fotos`, `#logos`. Filtros y búsqueda en la dirección:
+  `#gacetillas&tipo=aviso&anio=2023&q=planta`, `#fotos&galeria=urea`. Alias para redirigir las direcciones viejas:
+  `#videos` (abre Fotos), `#documentos`, `#_fotos`, `#_documentos`, `#_videos`, `#_gacetillas-de-prensa`.
+- **Dock con pocos grupos**: si la pestaña tiene dos grupos de filtros o menos (hoy todas), la barra no lleva una pastilla
+  por grupo, queda solo el botón Filtros (el del celular, con el contador) y el panel muestra todos los grupos abiertos,
+  sin acordeón. Con tres o más vuelve el dock de la Biblioteca tal cual.
 - **Gacetillas**: la fila de documento de `base.css` con la fecha completa. Abren en el visor de la Biblioteca
   (`../biblioteca/ver/?d=prensa-...`), que vuelve a la Sala de prensa. Filtros Tipo (Gacetilla o Aviso a la comunidad,
-  las mismas etiquetas que esos tipos en Novedades) y Año.
-- **Fotos y videos**: masonry por filas (cada foto a la columna más corta, por su proporción) con visor propio
-  (flechas, Esc, deslizar, descarga del original). Filtro Galería. Al final, Videos: como no hay video de YouTube vigente,
-  el primer MP4 se ve en la página; los dos MP4 se descargan y el canal se abre afuera.
-- **Logos**: una tarjeta por versión con su vista previa y las descargas en SVG, PNG y PDF. Sin filtros (el dock no aparece).
+  las mismas etiquetas que esos tipos en Novedades) y Año. Selector de vistas de la Biblioteca (compacta, lista,
+  miniaturas; se recuerda en `prensa-vista`): en miniaturas va la foto de la gacetilla si tiene (8 de 47) y si no el arte
+  de Formas de la Biblioteca.
+- **Fotos**: masonry por filas (cada foto a la columna más corta, por su proporción) con visor propio
+  (flechas, Esc, deslizar, descarga del original). Filtro Galería. Selector de tamaño como el de Novedades (chicas,
+  medianas, grandes: 6/4/3 columnas en escritorio, 2/1 en el celular, sin chicas; se recuerda en `prensa-fotos-vista`).
+  Al cambiar, las fotos viajan a su lugar nuevo.
+- **Logos**: una tarjeta por versión con su vista previa y las descargas en SVG, PNG y PDF. Sin filtros ni selector
+  (el dock no aparece).
 
 ## Datos (`prep-prensa.py` → `prensa.json`)
 
@@ -52,13 +61,16 @@ Lee el HTML guardado del relevamiento (`~/Documents/Desarrollo/relevamiento-prof
 - **Tipo:** Aviso a la comunidad si el PDF se titula "Información para la comunidad" o "Novedades de planta"; si no, Gacetilla.
 - **PDF:** se guardan con las copias de la Biblioteca (`../../biblioteca/pdf/`), con su mismo criterio de nombre.
   `prep-docs.py` de la Biblioteca no los borra (los lee de `prensa.json`).
+- **Foto de la gacetilla:** las 8 que traen foto se copian en `../fotos/gacetillas/<id>.webp` (720 px) y quedan en
+  `fm`; el build no publica la dirección original.
 - **Fotos:** el original de cada miniatura de las 6 galerías, sin repetidos (59). En `../fotos/<galería>/NN.webp`
   (2000 px) y `NN-mini.webp` (720 px). La descarga apunta al original del sitio.
 - **Logos:** copia local en `../logos/`.
 
 ## Pendiente
 
-- Confirmar con Profertil el teléfono de prensa y si el video institucional de YouTube se vuelve a subir.
+- Confirmar con Profertil el teléfono de prensa. Videos salió de la página (el de YouTube ya no existe y los MP4 son
+  institucionales viejos); si vuelve, se suma como pestaña o sección.
 - Qué carga el CMS por gacetilla (título, fecha, tipo, foto): hoy el sitio solo tiene mes y PDF.
 - Algunas galerías repiten la misma foto en distintos formatos (Planta Ingeniero White 1 en JPG, JPEG y PNG); se quitaron
   solo los repetidos exactos de dirección.

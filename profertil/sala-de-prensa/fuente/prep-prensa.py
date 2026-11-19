@@ -5,10 +5,10 @@
 
 Qué toma (todo de las páginas /sala-de-prensa/ en español):
 - Gacetillas: las de 2021 y 2023 (la de 2022 está vacía). Cada una es un mes, un PDF y a veces una foto.
-  El PDF se guarda con las copias de la Biblioteca (../../biblioteca/pdf/) para que las abra su visor.
+  El PDF se guarda con las copias de la Biblioteca (../../biblioteca/pdf/) para que las abra su visor; la foto, si tiene,
+  en ../fotos/gacetillas/ (720 px) para la vista de miniaturas.
 - Fotos: las 6 galerías (4 enlazadas desde Fotos y 2 que no lo están), con la foto original de cada miniatura.
 - Logos: las variantes de la pestaña Documentos, en PDF, PNG y SVG.
-- Videos: el video de YouTube, los MP4 para descargar y el canal.
 - Contacto de prensa.
 """
 import gzip, hashlib, json, os, re, subprocess, sys, tempfile, unicodedata
@@ -145,29 +145,6 @@ def logos():
     return [g for g in grupos if g['variantes']]
 
 
-def videos():
-    out = {'youtube': [], 'descargas': [], 'canal': None}
-    for t, h, x in tokens('sala-de-prensa/videos'):
-        if t == 'iframe' and 'youtube.com/embed/' in h:
-            out['youtube'].append(re.search(r'embed/([\w-]+)', h).group(1))
-        elif t == 'a' and h.lower().endswith('.mp4'):
-            out['descargas'].append(h)
-        elif t == 'a' and 'youtube.com/user' in h:
-            out['canal'] = h
-    # Los videos de YouTube que ya no existen (el oEmbed da 404) quedan aparte: la página no los muestra.
-    vivos = []
-    for v in out['youtube']:
-        r = subprocess.run(['curl', '-s', '-o', '/dev/null', '-w', '%{http_code}', 'https://www.youtube.com/oembed?format=json&url=https://www.youtube.com/watch?v=' + v],
-                           capture_output=True, text=True).stdout
-        (vivos if r == '200' else out.setdefault('youtube_caidos', [])).append(v)
-    out['youtube'] = vivos
-    # Nombre de cada MP4: el del archivo, legible (el sitio actual solo dice "Descarga").
-    NOMBRES = {'Profertil-Institucional2021-ENSALADA-1080p-16.2.23.mp4': 'Video institucional 2021',
-               'Profertil-TLNRRHH-1080p-12-11-21.mp4': 'Video TLN RRHH'}
-    out['descargas'] = [{'u': u, 'nombre': NOMBRES.get(u.rsplit('/', 1)[-1], u.rsplit('/', 1)[-1])} for u in out['descargas']]
-    return out
-
-
 def contacto():
     toks = tokens('sala-de-prensa/profertil')
     personas, tel, mail = [], None, None
@@ -258,11 +235,18 @@ def medidas(ruta):
 
 def main():
     bajar = '--bajar' in sys.argv
-    datos = {'gacetillas': gacetillas(), 'galerias': galerias(), 'logos': logos(), 'videos': videos(), 'contacto': contacto()}
+    datos = {'gacetillas': gacetillas(), 'galerias': galerias(), 'logos': logos(), 'contacto': contacto()}
     if bajar:
         for d in datos['gacetillas']:
             dest = os.path.join(PDF_DIR, d['l'])
             if not os.path.exists(dest): curl(d['u'], dest)
+            # La foto que acompaña a algunas gacetillas: copia chica para la vista de miniaturas.
+            mini = os.path.join(RAIZ, 'fotos', 'gacetillas', d['id'] + '.webp')
+            if d['foto'] and not os.path.exists(mini):
+                os.makedirs(os.path.dirname(mini), exist_ok=True)
+                with tempfile.TemporaryDirectory() as td:
+                    t = os.path.join(td, 'f' + os.path.splitext(urlparse(d['foto']).path)[1])
+                    if curl(d['foto'], t): webp(t, mini, 720, 78)
         for g in datos['galerias']:
             carpeta = os.path.join(RAIZ, 'fotos', g['id']); os.makedirs(carpeta, exist_ok=True)
             for i, u in enumerate(g['fotos'], 1):
@@ -285,6 +269,7 @@ def main():
             txt = subprocess.run(['pdftotext', '-l', '1', '-layout', os.path.join(PDF_DIR, d['l']), '-'], capture_output=True, text=True).stdout
             d['texto'] = ' '.join(txt.split())[:600]
         titular(d)
+        if os.path.exists(os.path.join(RAIZ, 'fotos', 'gacetillas', d['id'] + '.webp')): d['fm'] = 'fotos/gacetillas/' + d['id'] + '.webp'
     for g in datos['galerias']:
         g['f'] = []
         for i, u in enumerate(g['fotos'], 1):
@@ -298,7 +283,7 @@ def main():
                              for ext, u in v['archivos'].items()}
     json.dump(datos, open(os.path.join(AQUI, 'prensa.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     print('gacetillas', len(datos['gacetillas']), '· fotos', sum(len(g['f']) for g in datos['galerias']),
-          '· logos', sum(len(g['variantes']) for g in datos['logos']), '· videos', len(datos['videos']['youtube']), '+', len(datos['videos']['descargas']))
+          '· logos', sum(len(g['variantes']) for g in datos['logos']), '· con foto', sum(1 for d in datos['gacetillas'] if d.get('fm')))
 
 
 main()

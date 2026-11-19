@@ -1,5 +1,5 @@
 <title>Sala de prensa Profertil</title>
-<meta name="description" content="Maqueta de la Sala de prensa de profertil.com.ar sobre el concepto web del manual de marca: las gacetillas, fotos, videos y logos reales del sitio actual, en una sola página con pestañas, filtros y el contacto de prensa.">
+<meta name="description" content="Maqueta de la Sala de prensa de profertil.com.ar sobre el concepto web del manual de marca: las gacetillas, fotos y logos reales del sitio actual, en una sola página con pestañas, filtros y el contacto de prensa.">
 <meta name="theme-color" content="#003DA5">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,8 +11,9 @@
 <style>
 /* Sala de prensa Profertil: una sola página con tres pestañas (Gacetillas, Fotos y Logos) y el contacto de prensa a la vista.
    La lógica es la de la Biblioteca y Novedades: cabecera con campo, hoja de borde a borde, buscador en la lupa, filtros en el
-   dock y ancla. Las gacetillas son filas de documento que abren en el visor de la Biblioteca; las fotos, una grilla con visor
-   propio; los logos, tarjetas con sus descargas. Cada pestaña tiene su ancla (#gacetillas, #fotos, #logos). */
+   dock y ancla. Las gacetillas son filas de documento que abren en el visor de la Biblioteca, con sus tres vistas; las fotos,
+   una grilla con visor propio y tres tamaños; los logos, tarjetas con sus descargas. Cada pestaña tiene su ancla
+   (#gacetillas, #fotos, #logos). */
 
 html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 
@@ -57,8 +58,10 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
   .pf-contacto { grid-column: 2; grid-row: 1 / span 2; padding: 2px 0 0 28px; border-top: 0; border-left: 1px solid var(--line); }
 }
 
-/* --- Pestañas: el Selector de base.css, fijo arriba de la hoja al bajar (debajo de la barra azul). */
-.pf-pest { position: sticky; top: calc(var(--pf-barra-h, 76px) - 1px); z-index: 20; padding-block: 10px; background: var(--pf-papel, #fff); }
+/* --- Pestañas: el Selector de base.css, fijo arriba de la hoja al bajar (debajo de la barra azul). La fila no tiene fondo: queda
+   solo la cápsula, con el suyo. La fila deja pasar los clics a lo que tiene debajo; la cápsula los toma. */
+.pf-pest { position: sticky; top: calc(var(--pf-barra-h, 76px) - 1px); z-index: 20; padding-block: 10px; pointer-events: none; }
+.pf-pest .pf-selector { pointer-events: auto; background: linear-gradient(var(--line), var(--line)), var(--pf-papel, #fff); } /* el mismo tono, opaco: fija, pasa sobre fotos y miniaturas */
 .pf-pest .pf-selector button { gap: 7px; padding-inline: 16px; font-size: var(--texto-cuerpo); }
 .pf-pest .pf-selector button .pf-pastilla__n { font-size: 12px; }
 .pf-selector__ind { box-shadow: none; }
@@ -67,8 +70,12 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
   .pf-pest .pf-selector button { flex: 1 1 0; padding-inline: 8px; font-size: var(--texto-chico); }
 }
 .pf-panel[hidden] { display: none; }
-.pf-panel { animation: pf-entra 320ms var(--ease) backwards; }
-@keyframes pf-entra { from { opacity: 0; } }
+@keyframes pf-entra { from { opacity: 0; } } /* solo aparece: sin desplazamiento, como en la Biblioteca */
+/* Cambio de pestaña: lo de abajo de las pestañas (resultado y panel) se funde afuera, cambia mientras no se ve y se funde adentro.
+   Las filas y fotos de la pestaña nueva no suman su propia entrada (pf-quieta): entra el panel entero, una sola vez. */
+.pf-cambia { transition: opacity 260ms var(--ease); }
+.pf-cambia.pf-oculto { opacity: 0; transition-duration: 140ms; transition-timing-function: ease; }
+.pf-doc.pf-quieta, .pf-fo.pf-quieta { animation: none; }
 
 /* --- Resultado y filtros activos (como la Biblioteca) */
 .pf-result-row { margin-top: 0; }
@@ -78,9 +85,20 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 .pf-activos .pf-chip svg { width: 9px; height: 9px; opacity: .7; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
 @media (hover: hover) and (pointer: fine) { .pf-activos .pf-chip:hover { background: color-mix(in srgb, var(--azul) 26%, #fff); } }
 .pf-activos__limpiar { align-self: center; border: 0; background: transparent; cursor: pointer; padding: 4px 6px; color: var(--azul); font-size: var(--texto-chico); text-decoration: underline; text-underline-offset: 3px; }
+/* Selectores de vista: el de la Biblioteca en Gacetillas (compacta, lista, miniaturas) y el de Novedades en Fotos (chicas, medianas,
+   grandes). Cada uno aparece solo en su pestaña; en Logos no hay. */
+.pf-herramientas { display: flex; align-items: center; gap: 10px; }
+.pf-herramientas:not(:has(.pf-selector:not([hidden]))) { display: none; }
+.pf-herramientas .pf-selector[hidden] { display: none; }
+.pf-herramientas .pf-selector button { position: relative; }
+.pf-herramientas .pf-selector button::after { content: ""; position: absolute; inset: -9px 0; }
 @media (max-width: 640px) {
-  .pf-result-row { padding-block: 14px 12px; }
-  .pf-result-main { flex-wrap: nowrap; margin-right: -16px; width: calc(100% + 16px); }
+  /* Un solo selector: va en la misma línea que el contador y los chips (que se deslizan hasta él). */
+  .pf-result-row { padding-block: 14px 12px; gap: 12px; flex-wrap: nowrap; }
+  .pf-herramientas { flex: none; }
+  .pf-densidad [data-vista="chico"] { display: none; }
+  .pf-result-main { flex: 1; flex-wrap: nowrap; margin-right: -16px; width: calc(100% + 16px); }
+  .pf-result-row:has(.pf-herramientas .pf-selector:not([hidden])) .pf-result-main { margin-right: 0; width: auto; }
   .pf-result-text { flex: none; white-space: nowrap; }
   .pf-activos { flex-wrap: nowrap; flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none; padding-right: 16px; }
   .pf-activos::-webkit-scrollbar { display: none; }
@@ -93,6 +111,44 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 .pf-doc__d::after, .pf-f-toggle::after { content: ""; position: absolute; inset: -8px; border-radius: 999px; }
 .pf-doc__d:active { scale: .94; }
 @media (max-width: 640px) { .pf-doc { grid-template-columns: minmax(0, 1fr) 36px; } }
+
+/* Vistas: compacta, lista (la de siempre) y miniaturas, las de la Biblioteca. Al cambiar, cada fila se desliza a su lugar nuevo. */
+.pf-doc__arte { display: none; }
+.pf-docs[data-vista="compacta"] .pf-doc { grid-template-columns: 22px minmax(0, 1fr) 96px 30px; column-gap: 14px; padding: 7px 0; }
+.pf-docs[data-vista="compacta"] .pf-etiqueta__rotulo { display: none; }
+.pf-docs[data-vista="compacta"] .pf-doc__t { font-size: 1rem; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pf-docs[data-vista="compacta"] .pf-doc__d { width: 28px; height: 28px; }
+.pf-docs[data-vista="compacta"] .pf-doc__d svg { width: 14px; height: 14px; }
+/* Miniaturas: la foto de la gacetilla si la tiene; si no, el arte de Formas de la Biblioteca. */
+.pf-docs[data-vista="mini"] { display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); align-content: start; gap: 30px 18px; border-top: 0; padding-top: 4px; }
+.pf-docs[data-vista="mini"] .pf-doc { display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; align-items: start; row-gap: 10px; padding: 0; border: 0; transition: translate 320ms var(--ease); }
+.pf-docs[data-vista="mini"] .pf-doc__arte { display: block; grid-row: 1; aspect-ratio: 1; border-radius: var(--radio-media); overflow: hidden; line-height: 0; background: var(--line); }
+.pf-docs[data-vista="mini"] .pf-doc__arte svg, .pf-docs[data-vista="mini"] .pf-doc__arte img { width: 100%; height: 100%; }
+.pf-docs[data-vista="mini"] .pf-doc__arte img { object-fit: cover; }
+.pf-docs[data-vista="mini"] .pf-doc .pf-etiqueta { position: absolute; top: 10px; left: 10px; z-index: 1; max-width: calc(100% - 56px); pointer-events: none; }
+.pf-docs[data-vista="mini"] .pf-etiqueta__rotulo { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.pf-docs[data-vista="mini"] .pf-doc__t { grid-row: 2; padding: 0 2px; font-size: 1.04rem; line-height: 1.18; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.pf-docs[data-vista="mini"] .pf-doc__t a::after { inset: 0 0 -8px 0; }
+.pf-docs[data-vista="mini"] .pf-doc__y { grid-row: 3; padding: 0 2px; text-align: left; margin-top: -4px; }
+.pf-docs[data-vista="mini"] .pf-doc__d { position: absolute; top: 10px; right: 10px; z-index: 2; width: 30px; height: 30px; background: var(--color-blanco); border-color: transparent; }
+@media (hover: hover) and (pointer: fine) {
+  .pf-docs[data-vista="mini"] .pf-doc:hover { translate: 0 -5px; }
+  .pf-docs[data-vista="mini"] .pf-doc__d:hover { background: var(--azul); border-color: var(--azul); color: var(--tiza); }
+}
+.pf-docs[data-vista="mini"] .pf-doc:active { translate: 0 -2px; }
+@media (max-width: 640px) {
+  .pf-docs[data-vista="compacta"] .pf-doc { grid-template-columns: 22px minmax(0, 1fr) 30px; padding: 9px 0; row-gap: 0; }
+  .pf-docs[data-vista="compacta"] .pf-doc .pf-etiqueta, .pf-docs[data-vista="compacta"] .pf-doc__t { grid-row: 1; }
+  .pf-docs[data-vista="compacta"] .pf-doc .pf-etiqueta { grid-column: 1; }
+  .pf-docs[data-vista="compacta"] .pf-doc__t { grid-column: 2; font-size: .98rem; }
+  .pf-docs[data-vista="compacta"] .pf-doc__y { display: none; }
+  .pf-docs[data-vista="compacta"] .pf-doc__d { grid-column: 3; grid-row: 1; align-self: center; }
+  .pf-docs[data-vista="mini"] { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 12px; }
+  .pf-docs[data-vista="mini"] .pf-doc .pf-etiqueta { grid-column: auto; grid-row: auto; }
+  .pf-docs[data-vista="mini"] .pf-doc__t { grid-column: 1; grid-row: 2; font-size: .98rem; }
+  .pf-docs[data-vista="mini"] .pf-doc__y { grid-column: 1; grid-row: 3; }
+  .pf-docs[data-vista="mini"] .pf-doc__d { grid-column: auto; grid-row: auto; }
+}
 
 /* --- Fotos: grilla en columnas (cada foto con su proporción). La foto es el botón que abre el visor; la descarga queda encima. */
 /* Masonry por filas, como Novedades: cada foto va a la columna más corta (las alturas salen de la proporción de cada foto,
@@ -111,24 +167,6 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
   .pf-fo:hover .pf-fo__d, .pf-fo__d:focus-visible { opacity: 1; }
 }
 @media (max-width: 640px) { .pf-fotos { gap: 10px; } .pf-fotos__col { gap: 16px; } .pf-fo__d { width: 30px; height: 30px; top: 7px; right: 7px; } }
-
-/* Videos: al final de Fotos. El video de YouTube se carga recién al tocarlo (portada con el botón de play). */
-.pf-videos { display: grid; gap: 18px; margin-top: 56px; padding-top: 28px; border-top: 1px solid var(--line); }
-.pf-videos h2 { margin: 0; font: 600 var(--texto-subtitulo)/1.1 var(--f-display); color: var(--azul); letter-spacing: -0.02em; }
-.pf-videos > p { margin: 0; max-width: 62ch; color: var(--ink-2); }
-.pf-videos__in { display: grid; gap: 18px; }
-@media (min-width: 900px) { .pf-videos__in { grid-template-columns: minmax(0, 1.6fr) minmax(240px, 1fr); align-items: start; } }
-.pf-yt { position: relative; aspect-ratio: 16 / 9; border-radius: var(--radio-media); overflow: hidden; background: var(--ink); }
-.pf-yt button { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; background: none; cursor: pointer; }
-.pf-yt img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.pf-yt__play { position: absolute; left: 50%; top: 50%; translate: -50% -50%; width: 68px; height: 68px; border-radius: 50%; background: var(--tiza); display: grid; place-items: center; transition: scale 260ms var(--ease); }
-.pf-yt__play svg { width: 22px; height: 22px; fill: var(--azul); margin-left: 4px; }
-@media (hover: hover) and (pointer: fine) { .pf-yt button:hover .pf-yt__play { scale: 1.08; } }
-.pf-yt iframe, .pf-yt video { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-.pf-bajadas { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
-.pf-bajadas .pf-boton { width: 100%; justify-content: space-between; height: auto; min-height: 48px; padding-block: 12px; text-align: left; }
-.pf-bajadas .pf-boton span { display: grid; gap: 3px; }
-.pf-bajadas .pf-boton small { font: 400 var(--texto-mini)/1.2 var(--f-body); color: var(--ink-3); }
 
 /* --- Logos: una tarjeta por variante, con la vista previa y las tres descargas. El blanco va sobre azul. */
 .pf-logos { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 18px; }
@@ -199,6 +237,19 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 .pf-f-n { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: .5px 4px 0; border-radius: 999px; background: var(--verde); color: #fff; font: 400 11px/12px var(--f-body); }
 .pf-f-main .pf-pastilla { gap: 6px; }
 .pf-f-main .pf-pastilla[aria-expanded="true"] { background: var(--line); }
+/* Pocos grupos (dos o menos): la barra no lleva una pastilla por grupo, queda solo el botón Filtros (como en el celular), y el panel
+   muestra todos los grupos abiertos, sin acordeón. */
+.pf-filters.pf-pocos .pf-f-main { display: none; }
+.pf-filters.pf-pocos .pf-f-bar { justify-content: center; }
+@media (min-width: 641px) {
+  /* El botón Filtros del celular (base.css), con su texto y el contador al lado. */
+  .pf-filters.pf-pocos .pf-f-bar { padding: 4px; }
+  .pf-filters.pf-pocos .pf-f-toggle { width: auto; height: 46px; padding: 0 22px 0 26px; color: var(--ink); font-family: var(--f-display); font-size: 1.04rem; }
+  .pf-filters.pf-pocos .pf-f-txt { display: inline; }
+  .pf-filters.pf-pocos .pf-f-count { position: static; order: 2; }
+}
+.pf-pocos .pf-f-gr__cab { cursor: default; min-height: 40px; padding-bottom: 2px; }
+.pf-pocos .pf-f-gr__cab svg, .pf-pocos .pf-f-gr__res { display: none; }
 @media (max-width: 640px) {
   .pf-f-gr__cab { min-height: 52px; }
   .pf-f-gr .pf-pastilla, .pf-f-gr .pf-chip { --h: 34px; }
@@ -235,7 +286,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 
 <header class="pf-bh" id="pf-cab">
   <h1>Sala de prensa</h1>
-  <p>Muchas gracias por ayudarnos a difundir nuestro propósito de cuidar el suelo para generar alimentos sanos y nutritivos. Acá encontrás gacetillas, fotos, videos y logos para tu trabajo periodístico.</p>
+  <p>Muchas gracias por ayudarnos a difundir nuestro propósito de cuidar el suelo para generar alimentos sanos y nutritivos. Acá encontrás gacetillas, fotos y logos para tu trabajo periodístico.</p>
   <section class="pf-contacto" aria-labelledby="pf-contacto-t">
     <h2 id="pf-contacto-t">Contacto de prensa</h2>
     <ul class="pf-personas" id="pf-personas"></ul>
@@ -249,29 +300,39 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
     <div class="pf-selector pf-pestanas" role="tablist" aria-label="Material de prensa">
       <span class="pf-selector__ind" aria-hidden="true"></span>
       <button type="button" role="tab" id="pf-t-gacetillas" data-tab="gacetillas" aria-controls="gacetillas" aria-pressed="true" aria-selected="true">Gacetillas<b class="pf-pastilla__n"></b></button>
-      <button type="button" role="tab" id="pf-t-fotos" data-tab="fotos" aria-controls="fotos" aria-pressed="false" aria-selected="false">Fotos y videos<b class="pf-pastilla__n"></b></button>
+      <button type="button" role="tab" id="pf-t-fotos" data-tab="fotos" aria-controls="fotos" aria-pressed="false" aria-selected="false">Fotos<b class="pf-pastilla__n"></b></button>
       <button type="button" role="tab" id="pf-t-logos" data-tab="logos" aria-controls="logos" aria-pressed="false" aria-selected="false">Logos<b class="pf-pastilla__n"></b></button>
     </div>
   </div>
 
+  <div class="pf-cambia" id="pf-cambia">
   <div class="pf-result-row">
     <div class="pf-result-main">
       <p class="pf-result-text" id="pf-resultText" aria-live="polite"></p>
       <div class="pf-activos" id="pf-activos"></div>
     </div>
+    <div class="pf-herramientas">
+      <div class="pf-selector pf-selector--iconos pf-vista" data-para="gacetillas" role="group" aria-label="Cómo se ven las gacetillas">
+        <span class="pf-selector__ind" aria-hidden="true"></span>
+        <button type="button" data-vista="compacta" aria-pressed="false" aria-label="Lista compacta" title="Compacta"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0.5" width="15" height="2" rx="1"/><rect x="0" y="4.5" width="15" height="2" rx="1"/><rect x="0" y="8.5" width="15" height="2" rx="1"/><rect x="0" y="12.5" width="15" height="2" rx="1"/></svg></button>
+        <button type="button" data-vista="lista" aria-pressed="true" aria-label="Lista" title="Lista"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0" width="4" height="4" rx="1.3"/><rect x="6" y="1" width="9" height="2" rx="1"/><rect x="0" y="5.5" width="4" height="4" rx="1.3"/><rect x="6" y="6.5" width="9" height="2" rx="1"/><rect x="0" y="11" width="4" height="4" rx="1.3"/><rect x="6" y="12" width="9" height="2" rx="1"/></svg></button>
+        <button type="button" data-vista="mini" aria-pressed="false" aria-label="Miniaturas" title="Miniaturas"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0" width="6.5" height="6.5" rx="2.1"/><rect x="8.5" y="0" width="6.5" height="6.5" rx="2.1"/><rect x="0" y="8.5" width="6.5" height="6.5" rx="2.1"/><rect x="8.5" y="8.5" width="6.5" height="6.5" rx="2.1"/></svg></button>
+      </div>
+      <div class="pf-selector pf-selector--iconos pf-densidad" data-para="fotos" role="group" aria-label="Tamaño de las fotos" hidden>
+        <span class="pf-selector__ind" aria-hidden="true"></span>
+        <button type="button" data-vista="chico" aria-pressed="false" aria-label="Fotos chicas" title="Chicas"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0" width="4" height="4" rx="1.3"/><rect x="5.5" y="0" width="4" height="4" rx="1.3"/><rect x="11" y="0" width="4" height="4" rx="1.3"/><rect x="0" y="5.5" width="4" height="4" rx="1.3"/><rect x="5.5" y="5.5" width="4" height="4" rx="1.3"/><rect x="11" y="5.5" width="4" height="4" rx="1.3"/><rect x="0" y="11" width="4" height="4" rx="1.3"/><rect x="5.5" y="11" width="4" height="4" rx="1.3"/><rect x="11" y="11" width="4" height="4" rx="1.3"/></svg></button>
+        <button type="button" data-vista="medio" aria-pressed="true" aria-label="Fotos medianas" title="Medianas"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0" width="6.5" height="6.5" rx="2.1"/><rect x="8.5" y="0" width="6.5" height="6.5" rx="2.1"/><rect x="0" y="8.5" width="6.5" height="6.5" rx="2.1"/><rect x="8.5" y="8.5" width="6.5" height="6.5" rx="2.1"/></svg></button>
+        <button type="button" data-vista="grande" aria-pressed="false" aria-label="Fotos grandes" title="Grandes"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0" width="15" height="15" rx="4.8"/></svg></button>
+      </div>
+    </div>
   </div>
 
   <section class="pf-panel" id="gacetillas" role="tabpanel" aria-labelledby="pf-t-gacetillas">
-    <ul class="pf-docs" id="pf-docs"></ul>
+    <ul class="pf-docs" id="pf-docs" data-vista="lista"></ul>
   </section>
 
   <section class="pf-panel" id="fotos" role="tabpanel" aria-labelledby="pf-t-fotos" hidden>
     <div class="pf-fotos" id="pf-fotos"></div>
-    <section class="pf-videos" id="videos" aria-labelledby="pf-videos-t">
-      <h2 id="pf-videos-t">Videos</h2>
-      <p>Imágenes de video para ilustrar tus notas. En nuestro canal de YouTube hay mucho más material; si necesitás alguno de esos videos, escribinos.</p>
-      <div class="pf-videos__in" id="pf-videos"></div>
-    </section>
   </section>
 
   <section class="pf-panel" id="logos" role="tabpanel" aria-labelledby="pf-t-logos" hidden>
@@ -283,6 +344,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
     <svg viewBox="0 0 555 662" aria-hidden="true"><use href="#pf-simbolo"/></svg>
     <p id="pf-emptyText"></p>
     <button class="pf-boton pf-boton--verde" id="pf-emptyReset" type="button">Ver todo</button>
+  </div>
   </div>
 </main>
 </div>
@@ -320,7 +382,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
   "use strict";
 
   /* Datos reales de la Sala de prensa del sitio actual (prep-prensa.py → prensa.json):
-     gacetillas (título y fecha del PDF, tipo, copia en ../biblioteca/pdf/), galerías de fotos, logos, videos y contacto. */
+     gacetillas (título y fecha del PDF, tipo, copia en ../biblioteca/pdf/ y foto si tiene), galerías de fotos, logos y contacto. */
   var P = /*__PRENSA__*/{};
   var A = /*__ASSETS__*/{};
   var $ = function (id) { return document.getElementById(id); };
@@ -417,6 +479,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
   /* --- Estado y filtro (la regla de la Biblioteca: dentro de un grupo suman, entre grupos se cruzan) --------- */
   var tab = "gacetillas", q = "", lista = [];
   var esMobile = window.matchMedia("(max-width: 640px)");
+  var quieto = matchMedia("(prefers-reduced-motion: reduce)");
   function T() { return TABS[tab]; }
   function activos(o) { return Object.keys(o).filter(function (k) { return o[k]; }); }
   function pasa(x, salvo) {
@@ -431,24 +494,76 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
     return true;
   }
 
+  /* --- Arte de miniatura: el de la Biblioteca (las Formas del sistema sobre un par de color distinto al de la etiqueta, figura sobre
+     fondo). Es determinista: cada gacetilla siempre tiene el mismo. Las que traen foto usan la foto. */
+  function rnd32(a) {
+    return function () {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  var FORMAS_CAT = { gacetilla: ["escudo", "industria", "urea"], aviso: ["casco", "circulos", "sol"] };
+  var PARES = { azul: ["#003DA5", "#4086FF"], verde: ["#2D8035", "#5EB53A"], amarillo: ["#EABA2C", "#E57F19"], naranja: ["#E57F19", "#8A4818"] };
+  var PARES_CONTRA = { gacetilla: ["verde", "amarillo", "naranja"], aviso: ["azul", "verde"] };
+  function usar(f, x, y, w, h, rot, color) {
+    var cx = x + w / 2, cy = y + h / 2;
+    return '<g transform="rotate(' + rot + " " + cx + " " + cy + ')"><use href="#pf-forma-' + f + '" x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="' + color + '"/></g>';
+  }
+  function arte(x) {
+    var d = x.d;
+    if (d.fm) return '<img src="' + esc(d.fm) + '" alt="" loading="lazy" decoding="async">';
+    var W = 240, H = 240, r = rnd32(x.k * 7919 + 13);
+    var op = PARES_CONTRA[d.c], par = PARES[op[x.k % op.length]];
+    var inv = r() < 0.3, fig = inv ? par[1] : par[0], fondo = inv ? par[0] : par[1];
+    var fs = FORMAS_CAT[d.c], f1 = fs[Math.floor(r() * fs.length)], f2 = fs[Math.floor(r() * fs.length)];
+    var s = '<svg viewBox="0 0 ' + W + " " + H + '" aria-hidden="true"><rect width="' + W + '" height="' + H + '" fill="' + fondo + '"/>';
+    var modo = r(), rots = [0, 90, 180, 270];
+    if (modo < 0.45) {
+      var t = W * (1.05 + r() * 0.35);
+      s += usar(f1, W - t * (0.62 + r() * 0.2), H - t * (0.66 + r() * 0.2), t, t, rots[Math.floor(r() * 4)], fig);
+    } else if (modo < 0.75) {
+      var m = W / 2 * 0.92;
+      s += usar(f1, W / 2 - m - 4, (H - m) / 2, m, m, rots[Math.floor(r() * 4)], fig);
+      s += usar(f2, W / 2 + 4, (H - m) / 2, m, m, rots[Math.floor(r() * 4)], fig);
+    } else {
+      var cw = W / 2, lado = cw * 0.82;
+      for (var yy = 0; yy < 2; yy++) for (var xx = 0; xx < 2; xx++) s += usar((xx + yy) % 2 ? f2 : f1, xx * cw + (cw - lado) / 2, yy * cw + (cw - lado) / 2, lado, lado, rots[(xx + yy * 3) % 4], fig);
+    }
+    return s + "</svg>";
+  }
+
   /* --- Pintar ------------------------------------------------------------------ */
+  // Vistas de las gacetillas (las de la Biblioteca) y tamaño de las fotos (el de Novedades); cada una se recuerda en este navegador.
+  function leerVista(clave, ok, def) { var v = def; try { v = localStorage.getItem(clave) || def; } catch (e) {} return ok.indexOf(v) === -1 ? def : v; }
+  var vista = leerVista("prensa-vista", ["compacta", "lista", "mini"], "lista");
+  var tamFotos = leerVista("prensa-fotos-vista", ["chico", "medio", "grande"], "medio");
+  var sinEntrada = false;   // al cambiar de vista o de pestaña las filas nacen sin su entrada
   function filaGacetilla(x) {
     var d = x.d, qq = plano(q.trim());
     var bajar = d.l ? 'href="../biblioteca/pdf/' + encodeURIComponent(d.l) + '" download' : 'href="' + esc(d.u) + '" target="_blank" rel="noopener"';
-    return '<li class="pf-doc" data-k="' + x.k + '">' + etq(d.c) +
-      '<h2 class="pf-doc__t"><a href="../biblioteca/ver/?d=' + encodeURIComponent(d.id) + '">' + resaltar(x.t, qq) + "</a></h2>" +
+    return '<li class="pf-doc' + (sinEntrada ? " pf-quieta" : "") + '" data-k="' + x.k + '">' + (vista === "mini" ? '<div class="pf-doc__arte">' + arte(x) + "</div>" : "") +
+      etq(d.c).replace('class="pf-etiqueta"', 'class="pf-etiqueta" title="' + CATS[d.c].nombre + '"') +
+      '<h2 class="pf-doc__t"' + (vista === "compacta" ? ' title="' + esc(x.t) + '"' : "") + '><a href="../biblioteca/ver/?d=' + encodeURIComponent(d.id) + '">' + resaltar(x.t, qq) + "</a></h2>" +
       '<span class="pf-doc__y"><time datetime="' + d.f + (d.dia ? "-" + ("0" + d.dia).slice(-2) : "") + '" title="' + x.fecha + '">' + x.corta + "</time></span>" +
       '<a class="pf-doc__d" ' + bajar + ' aria-label="Descargar PDF: ' + esc(x.t) + '">' + BAJAR + "</a></li>";
   }
   function fotoSrc(x, grande) { return "fotos/" + x.g.id + "/" + x.f.n + (grande ? "" : "-mini") + ".webp"; }
   function tileFoto(x, j) {
     var conGal = !activos(T().sel.galeria).length || activos(T().sel.galeria).length > 1;
-    return '<li class="pf-fo" data-k="' + x.k + '"><button class="pf-fo__b" type="button" data-j="' + j + '" aria-label="Ver ' + esc(x.g.nombre) + ", foto " + x.i + " de " + x.de + '">' +
-      '<img src="' + fotoSrc(x) + '" width="' + x.f.mi[0] + '" height="' + x.f.mi[1] + '" loading="lazy" decoding="async" alt="' + esc(x.g.nombre) + ", foto " + x.i + '"></button>' +
+    return '<li class="pf-fo' + (sinEntrada ? " pf-quieta" : "") + '" data-k="' + x.k + '"><button class="pf-fo__b" type="button" data-j="' + j + '" aria-label="Ver ' + esc(x.g.nombre) + ", foto " + x.i + " de " + x.de + '">' +
+      '<img' + (sinEntrada ? ' class="pf-lista"' : "") + ' src="' + fotoSrc(x, $("pf-lista").clientWidth / nCols > 380) + '" width="' + x.f.mi[0] + '" height="' + x.f.mi[1] + '" loading="lazy" decoding="async" alt="' + esc(x.g.nombre) + ", foto " + x.i + '"></button>' +
       '<a class="pf-doc__d pf-fo__d" href="' + esc(x.f.u) + '" download target="_blank" rel="noopener" aria-label="Descargar la foto original">' + BAJAR + "</a>" +
       (conGal ? '<span class="pf-fo__g">' + esc(x.g.nombre) + "</span>" : "") + "</li>";
   }
-  function columnasFotos() { var w = $("pf-lista").clientWidth; return w >= 1000 ? 4 : w >= 700 ? 3 : 2; }
+  // Columnas según el ancho y el tamaño elegido, como las tarjetas de Novedades. En el celular no hay "chicas".
+  function columnasFotos() {
+    var w = $("pf-lista").clientWidth;
+    if (w < 700) return tamFotos === "grande" ? 1 : 2;
+    if (w < 1000) return { chico: 4, medio: 3, grande: 2 }[tamFotos];
+    return { chico: 6, medio: 4, grande: 3 }[tamFotos];
+  }
   var nCols = 0;
   function repartirFotos() {
     nCols = columnasFotos();
@@ -479,7 +594,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
   function pintar() {
     var t = T();
     lista = t.items.filter(function (x) { return pasa(x); });
-    if (tab === "gacetillas") $("pf-docs").innerHTML = lista.map(filaGacetilla).join("");
+    if (tab === "gacetillas") { $("pf-docs").dataset.vista = vista; $("pf-docs").innerHTML = lista.map(filaGacetilla).join(""); }
     if (tab === "fotos") {
       repartirFotos(); listas();
     }
@@ -496,16 +611,20 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
     return '<button type="button" class="' + cls + '"' + st + ' data-f="op" data-g="' + g.id + '" data-v="' + o.id + '" aria-pressed="false">' +
       esc(o.nombre) + '<b class="' + (g.chip ? "pf-chip__n" : "pf-pastilla__n") + '"></b></button>';
   }
+  // Con dos grupos o menos la barra queda solo con el botón Filtros y el panel los muestra todos abiertos (sin acordeón).
+  function pocos() { return T().grupos.length <= 2; }
   function armarFiltros() {
     var gs = T().grupos;
     $("pf-filters").classList.toggle("pf-fuera", !gs.length);
-    $("pf-fMain").innerHTML = gs.map(function (g) {
+    $("pf-filters").classList.toggle("pf-pocos", pocos());
+    $("pf-fMain").innerHTML = pocos() ? "" : gs.map(function (g) {
       return '<button type="button" class="pf-pastilla pf-pastilla--todas" data-abrir="' + g.id + '" aria-expanded="false" aria-controls="pf-fBody">' + g.nombre + '<b class="pf-f-n" hidden></b></button>';
     }).join("");
     $("pf-fGrupos").innerHTML = gs.map(function (g) {
+      var cab = '<span class="pf-f-label">' + g.nombre + '</span><b class="pf-f-n" hidden></b><span class="pf-f-gr__res"></span>';
       return '<section class="pf-f-gr" data-grupo="' + g.id + '">' +
-        '<button type="button" class="pf-f-gr__cab" data-grupo="' + g.id + '" aria-expanded="false" aria-controls="pf-fg-' + g.id + '">' +
-        '<span class="pf-f-label">' + g.nombre + '</span><b class="pf-f-n" hidden></b><span class="pf-f-gr__res"></span>' + CHEVRON + "</button>" +
+        (pocos() ? '<div class="pf-f-gr__cab" data-grupo="' + g.id + '">' + cab + "</div>" :
+        '<button type="button" class="pf-f-gr__cab" data-grupo="' + g.id + '" aria-expanded="false" aria-controls="pf-fg-' + g.id + '">' + cab + CHEVRON + "</button>") +
         '<div class="pf-f-gr__activos"></div>' +
         '<div class="pf-f-gr__cuerpo" id="pf-fg-' + g.id + '" role="group" aria-label="' + g.nombre + '"><div><div class="pf-f-gr__in"><div class="pf-f-row">' +
         g.opciones.map(function (o) { return opcion(g, o); }).join("") + "</div></div></div></div></section>";
@@ -541,7 +660,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
     if (!qq && !nf) txt = t.todo + " · <b>" + lista.length + "</b>";
     $("pf-resultText").innerHTML = txt;
     $("pf-qCount").textContent = lista.length;
-    var nsub = esMobile.matches ? nf : 0;
+    var nsub = esMobile.matches || pocos() ? nf : 0;
     $("pf-fCount").hidden = nsub === 0; $("pf-fCount").textContent = nsub;
     $("pf-fTxt").textContent = esMobile.matches && $("pf-filters").classList.contains("pf-abierto") ? "Ver " + lista.length + " " + (lista.length === 1 ? t.uno : t.varios) : "Filtros";
     $("pf-fClear").hidden = nf === 0;
@@ -594,15 +713,35 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
     if (!animar) { void ind.offsetWidth; ind.classList.remove("pf-quieto"); }
   }
   var pest = document.querySelector(".pf-pestanas");
+  function marcarVistas(animar) {
+    document.querySelectorAll(".pf-herramientas .pf-selector").forEach(function (sel) {
+      sel.hidden = sel.dataset.para !== tab;
+      var v = sel.classList.contains("pf-vista") ? vista : tamFotos;
+      sel.querySelectorAll("[data-vista]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.vista === v)); });
+      if (!sel.hidden) moverInd(sel, animar);
+    });
+  }
+  /* Cambio de pestaña: el indicador viaja enseguida; lo de abajo se funde afuera (140 ms), cambia sin verse (también el salto al
+     principio de la lista, si se estaba más abajo) y se funde adentro (260 ms). Un clic nuevo en el medio toma el último pedido. */
+  var cambia = $("pf-cambia"), tCambio = 0;
   function irA(t, animar) {
     if (!TABS[t]) return;
     if ($("pf-filters").classList.contains("pf-abierto")) abrirFiltros(false);
     tab = t;
     pest.querySelectorAll("[data-tab]").forEach(function (b) { var si = b.dataset.tab === t; b.setAttribute("aria-pressed", String(si)); b.setAttribute("aria-selected", String(si)); b.tabIndex = si ? 0 : -1; });
     moverInd(pest, animar);
-    Object.keys(TABS).forEach(function (k) { $(k).hidden = k !== t; });
-    armarFiltros(); abrirFiltros(false);
-    aplicar();
+    function cambiar() {
+      Object.keys(TABS).forEach(function (k) { $(k).hidden = k !== tab; });
+      marcarVistas(false);
+      armarFiltros(); abrirFiltros(false);
+      sinEntrada = animar; aplicar(); sinEntrada = false;
+      cambia.classList.remove("pf-oculto");
+    }
+    clearTimeout(tCambio);
+    if (!animar || quieto.matches) { cambiar(); return; }
+    cambia.classList.add("pf-oculto");
+    $("pf-filters").classList.add("pf-fuera");   // el dock se va y vuelve (o no, en Logos) con la pestaña nueva
+    tCambio = setTimeout(cambiar, 150);
   }
   pest.addEventListener("click", function (e) { var b = e.target.closest("[data-tab]"); if (b && b.dataset.tab !== tab) irA(b.dataset.tab, true); });
   pest.addEventListener("keydown", function (e) {
@@ -611,6 +750,49 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
     i = (i + ks.length) % ks.length; irA(ks[i], true); $("pf-t-" + ks[i]).focus();
   });
 
+  /* Cambiar de vista (la lógica de la Biblioteca): cada fila o foto visible se arma en su lugar nuevo y viaja desde donde estaba. Las que
+     no se veían aparecen directo. Si el principio de la lista está a la vista, la página no se mueve; si ya se bajó, la primera visible
+     queda en su lugar. */
+  function cambiarVista(cont, rehacer, escala) {
+    var tope = $("pf-top").offsetHeight + 8, alto = window.innerHeight, ref = null, antes = {};
+    cont.querySelectorAll("[data-k]").forEach(function (el) {
+      var r = el.getBoundingClientRect();
+      if (r.bottom > tope && r.top < alto) { antes[el.dataset.k] = r; if (!ref) ref = { k: el.dataset.k, top: r.top }; }
+    });
+    if (cont.getBoundingClientRect().top >= tope) ref = null;
+    var y = window.scrollY;
+    cont.style.minHeight = cont.offsetHeight + "px";
+    sinEntrada = true; rehacer(); sinEntrada = false;
+    cont.style.minHeight = "";
+    var el = ref && cont.querySelector('[data-k="' + ref.k + '"]');
+    if (el) window.scrollTo({ top: Math.max(0, window.scrollY + el.getBoundingClientRect().top - ref.top), behavior: "instant" });
+    else if (window.scrollY !== y) window.scrollTo({ top: y, behavior: "instant" });
+    if (!cont.animate || quieto.matches) return;
+    cont.querySelectorAll("[data-k]").forEach(function (n) {
+      var o = antes[n.dataset.k]; if (!o) return;
+      var r = n.getBoundingClientRect(), dx = o.left - r.left, dy = o.top - r.top, s = escala && r.width ? o.width / r.width : 1;
+      if (!dx && !dy && s === 1) return;
+      n.animate([{ transform: "translate(" + dx + "px," + dy + "px) scale(" + s + ")", transformOrigin: "0 0" }, { transform: "none", transformOrigin: "0 0" }],
+        { duration: 380, easing: "cubic-bezier(.2,.8,.2,1)" });
+    });
+  }
+  document.querySelector(".pf-vista").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-vista]"); if (!b || b.dataset.vista === vista) return;
+    vista = b.dataset.vista;
+    try { localStorage.setItem("prensa-vista", vista); } catch (err) {}
+    marcarVistas(true);
+    cambiarVista($("pf-docs"), pintar, false);
+  });
+  document.querySelector(".pf-densidad").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-vista]"); if (!b || b.dataset.vista === tamFotos) return;
+    tamFotos = b.dataset.vista;
+    try { localStorage.setItem("prensa-fotos-vista", tamFotos); } catch (err) {}
+    marcarVistas(true);
+    cambiarVista($("pf-fotos"), function () { repartirFotos(); listas(); }, true);
+  });
+  // En el celular no hay fotos chicas: si quedó elegida, se ven medianas.
+  if (esMobile.matches && tamFotos === "chico") tamFotos = "medio";
+
   /* Toda la fila de gacetilla es el enlace al visor (como en la Biblioteca). */
   $("pf-docs").addEventListener("click", function (e) {
     if (e.defaultPrevented || e.target.closest("a, button")) return;
@@ -618,25 +800,6 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
     if (!a) return;
     if (e.metaKey || e.ctrlKey || e.shiftKey) window.open(a.href, "_blank", "noopener"); else a.click();
   });
-
-  /* --- Videos ------------------------------------------------------------------ */
-  (function () {
-    var V = P.videos, h = "";
-    V.youtube.forEach(function (id) {
-      h += '<div class="pf-yt"><button type="button" data-yt="' + id + '" aria-label="Reproducir el video"><img src="https://i.ytimg.com/vi/' + id + '/hqdefault.jpg" alt="" loading="lazy">' +
-        '<span class="pf-yt__play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z"/></svg></span></button></div>';
-    });
-    // Sin video de YouTube vigente, el primero de los MP4 se ve en la página (se carga recién al darle play).
-    if (!V.youtube.length && V.descargas.length) h += '<div class="pf-yt"><video controls preload="metadata" playsinline src="' + esc(V.descargas[0].u) + '#t=1"></video></div>';
-    h += '<ul class="pf-bajadas">' + V.descargas.map(function (d) {
-      return '<li><a class="pf-boton" href="' + esc(d.u) + '" download target="_blank" rel="noopener"><span>' + esc(d.nombre) + "<small>MP4 · 1080p</small></span>" + BAJAR + "</a></li>";
-    }).join("") + (V.canal ? '<li><a class="pf-boton" href="' + esc(V.canal) + '" target="_blank" rel="noopener"><span>Canal de YouTube<small>@profertilagro</small></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>' : "") + "</ul>";
-    $("pf-videos").innerHTML = h;
-    $("pf-videos").addEventListener("click", function (e) {
-      var b = e.target.closest("[data-yt]"); if (!b) return;
-      b.parentNode.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + b.dataset.yt + '?autoplay=1&rel=0" title="Video de Profertil" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>';
-    });
-  })();
 
   /* --- Visor de fotos: recorre las fotos de la lista filtrada ------------------------------------- */
   var vf = $("pf-vf"), vfI = -1;
@@ -718,9 +881,9 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
   function abrirGrupo(g) {
     abierto = g;
     document.querySelectorAll(".pf-f-gr").forEach(function (el) {
-      var si = el.dataset.grupo === g;
+      var si = pocos() || el.dataset.grupo === g;
       el.classList.toggle("pf-abierto", si);
-      el.querySelector(".pf-f-gr__cab").setAttribute("aria-expanded", String(si));
+      if (!pocos()) el.querySelector(".pf-f-gr__cab").setAttribute("aria-expanded", String(si));
     });
     document.querySelectorAll("#pf-fMain [data-abrir]").forEach(function (b) {
       b.setAttribute("aria-expanded", String(b.dataset.abrir === g && $("pf-filters").classList.contains("pf-abierto")));
@@ -772,7 +935,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
       if (!yaAbierto) { abrirGrupo(ab.dataset.abrir); abrirFiltros(true); } else cambiarGrupo(ab.dataset.abrir);
       return;
     }
-    var cab = e.target.closest(".pf-f-gr__cab");
+    var cab = e.target.closest("button.pf-f-gr__cab");
     if (cab) { cambiarGrupo(abierto === cab.dataset.grupo ? null : cab.dataset.grupo); return; }
     var b = e.target.closest("[data-f]"); if (!b) return;
     if (b.getAttribute("aria-disabled") === "true") return;
@@ -843,7 +1006,6 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 
   /* --- Ancla (la de la Biblioteca): baja una pantalla o vuelve al principio de la pestaña ------------- */
   var ancla = $("pf-ancla"), cuerpo = ancla.firstElementChild, flecha = cuerpo.firstElementChild;
-  var quieto = matchMedia("(prefers-reduced-motion: reduce)");
   var raiz = getComputedStyle(document.documentElement);
   function tk(n) { return parseFloat(raiz.getPropertyValue("--" + n)); }
   var GAP = tk("ancla-gap"), APRETAR = tk("ancla-apretar"), BAJAR_P = tk("ancla-bajar"), CAMBIO = tk("ancla-cambio");
@@ -876,10 +1038,10 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
     if (!corriendo) { corriendo = true; requestAnimationFrame(anim); }
   }
   window.addEventListener("scroll", function () { despertar(200); }, { passive: true });
-  window.addEventListener("resize", function () { despertar(700); moverInd(pest, false); });
+  window.addEventListener("resize", function () { despertar(700); moverInd(pest, false); marcarVistas(false); });
   $("pf-filters").addEventListener("click", function () { despertar(900); });
   $("pf-filters").addEventListener("transitionend", function () { despertar(120); });
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { despertar(300); moverInd(pest, false); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { despertar(300); moverInd(pest, false); marcarVistas(false); });
   ancla.addEventListener("pointerdown", function () { M.q.t = APRETAR; despertar(); });
   function soltarAncla() { M.q.t = 1; despertar(); }
   ancla.addEventListener("pointerup", soltarAncla);
@@ -893,8 +1055,8 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
   });
 
   /* --- Dirección: #gacetillas | #fotos | #logos, con filtros y búsqueda (&anio=2023&tipo=aviso&galeria=urea&q=…).
-     También #videos (abre Fotos y baja a los videos), #documentos (la pestaña vieja de logos) y #buscar. */
-  var pedido = location.hash.slice(1).split("&"), primero = pedido[0], conBusca = primero === "buscar", aVideos = primero === "videos";
+     También las direcciones viejas: #videos (abre Fotos), #documentos (la pestaña vieja de logos) y #buscar. */
+  var pedido = location.hash.slice(1).split("&"), primero = pedido[0], conBusca = primero === "buscar";
   var ALIAS = { videos: "fotos", documentos: "logos", "_fotos": "fotos", "_documentos": "logos", "_videos": "fotos", "_gacetillas-de-prensa": "gacetillas" };
   var inicial = TABS[primero] ? primero : ALIAS[primero] || "gacetillas";
   tab = inicial;
@@ -913,11 +1075,8 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
   if (location.hash && !conBusca) aUrl();
   if (conBusca) abrirBusca(true);
   // Con una pestaña en la dirección se baja hasta ella cuando la página terminó de armarse (el campo cambia el alto de la cabecera).
-  function bajarAPestana() {
-    if (aVideos) $("videos").scrollIntoView({ block: "start" });
-    else window.scrollTo({ top: inicioLista(), behavior: "instant" });
-  }
-  if (aVideos || /^#(gacetillas|fotos|logos|documentos|_)/.test(location.hash)) {
+  function bajarAPestana() { window.scrollTo({ top: inicioLista(), behavior: "instant" }); }
+  if (/^#(gacetillas|fotos|videos|logos|documentos|_)/.test(location.hash)) {
     if (document.readyState === "complete") requestAnimationFrame(bajarAPestana); else window.addEventListener("load", function () { requestAnimationFrame(bajarAPestana); }, { once: true });
   }
   despertar(900);

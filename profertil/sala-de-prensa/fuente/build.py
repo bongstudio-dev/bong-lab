@@ -34,7 +34,7 @@ aj = json.loads(leer(BIB, 'assets.json')); aj.pop('iconos', None)
 # Datos: lo que usa la página (sin el texto de los PDF, que solo sirvió para sacar títulos y fechas).
 P = json.load(open('prensa.json', encoding='utf-8'))
 for g in P['gacetillas']:
-    g.pop('texto', None); g.pop('archivo', None)
+    g.pop('texto', None); g.pop('archivo', None); g.pop('foto', None)   # la foto va desde la copia local (fm)
 
 # --- Transición entre páginas: la misma de la Biblioteca y Novedades ---
 TR_CSS = leer(BIB, 'transicion.css'); TR_CAB = leer(BIB, 'transicion-cabeza.js'); TR_JS = leer(BIB, 'transicion.js')
@@ -67,7 +67,7 @@ doc = doc[:i] + '<script>\n' + leer(NOV, 'campo.js') + '</script>\n' + doc[i:]
 base = leer(AQUI, '..', '..', 'carrusel-fotos', 'index.html')
 f = base[base.index('<!-- firma:bong'):base.index('-->', base.index('<!-- firma:bong')) + 3]
 f = re.sub(r'      PROFERTIL · CARRUSEL DE FOTOS\n      [^\n]*\n',
-           '      PROFERTIL · SALA DE PRENSA\n      Maqueta de la Sala de prensa: gacetillas, fotos, videos y logos reales del sitio actual.\n', f)
+           '      PROFERTIL · SALA DE PRENSA\n      Maqueta de la Sala de prensa: gacetillas, fotos y logos reales del sitio actual.\n', f)
 f = re.sub(r'      Prototipo del componente[^\n]*\n', '      Prototipo de la Sala de prensa para la web de Profertil.\n', f)
 doc = doc.replace('<!DOCTYPE html>\n', '<!DOCTYPE html>\n' + f + '\n', 1)
 
