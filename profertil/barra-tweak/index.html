@@ -106,6 +106,18 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
 .var__num { font-family: var(--f-mono); font-size: 12px; text-align: right; font-variant-numeric: tabular-nums; }
 .var__valor { font-family: var(--f-mono); font-size: 11px; color: var(--ink-2); }
 .var.cambiado { border-color: var(--celeste); }
+/* Tríadas del campo: tres puntos (fondo, figura, acento) y el nombre de la combinación. */
+.triadas { display: grid; gap: 6px; }
+.triada { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 10px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 12px; background: #fff; cursor: pointer; text-align: left; }
+@media (hover: hover) and (pointer: fine) { .triada:hover { border-color: rgba(0, 61, 165, 0.35); } }
+.triada[aria-pressed="true"] { border-color: var(--azul); outline: 1px solid var(--azul); outline-offset: -2px; }
+.triada__puntos { display: flex; }
+.triada__puntos i { width: 20px; height: 20px; border-radius: 999px; border: 2px solid #fff; margin-left: -6px; }
+.triada__puntos i:first-child { margin-left: 0; width: 26px; height: 26px; margin-top: -3px; margin-bottom: -3px; }
+.triada__txt { display: grid; gap: 1px; min-width: 0; }
+.triada__nombre { font-size: 14px; font-weight: 500; line-height: 1.2; }
+.triada__tipo { font-size: 12px; color: var(--ink-3); line-height: 1.3; }
+#grupoTriada.apagado { opacity: .4; pointer-events: none; }
 /* Con la barra sólida blanca, el vidrio no se usa: sus controles quedan apagados. */
 .app[data-modo="blanca"] .vidrio { opacity: .4; pointer-events: none; }
 
@@ -137,10 +149,15 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
     <div class="grupo">
       <p class="rotulo">Página</p>
       <div class="chips" id="paginas">
-        <button class="chip" type="button" data-url="../hojas-de-seguridad/" aria-pressed="true">Hojas · amarillo</button>
+        <button class="chip" type="button" data-url="../hojas-de-seguridad/" aria-pressed="true">Hojas de seguridad</button>
         <button class="chip" type="button" data-url="../biblioteca/" aria-pressed="false">Biblioteca · azul</button>
         <button class="chip" type="button" data-url="../novedades/" aria-pressed="false">Novedades · foto</button>
       </div>
+    </div>
+
+    <div class="grupo" id="grupoTriada">
+      <p class="rotulo">Tríada del campo · Hojas</p>
+      <div class="triadas" id="triadas"></div>
     </div>
 
     <div class="grupo">
@@ -201,6 +218,17 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
   };
   var BLUR_HOY = 14;
   var CLAVE = "pf-barra-tweak";
+  // Tríadas para el campo de Hojas: combinaciones del Master con fondo de color que no sea azul (ni el amarillo
+  // o el naranja ya probados). Orden: fondo, figura (las Formas), acento (sin acento, el cursor no cambia nada).
+  var C = { azul: "003DA5", celeste: "4086FF", verde: "2D8035", verdeClaro: "5EB53A", amarillo: "EABA2C", naranja: "E57F19", terra: "8A4818", verdeOscuro: "154B1A" };
+  var TRIADAS = [
+    { id: "hoy", nombre: "Amarillo, Naranja y Verde", tipo: "Terciaria · la de hoy", c: [C.amarillo, C.naranja, C.verde] },
+    { id: "v-a-t", nombre: "Verde, Amarillo y Terra", tipo: "Terciaria · cascos amarillos", c: [C.verde, C.amarillo, C.terra] },
+    { id: "v-vc-a", nombre: "Verde, Verde Claro y Amarillo", tipo: "Terciaria", c: [C.verde, C.verdeClaro, C.amarillo] },
+    { id: "v-vc", nombre: "Verde con Verde Claro", tipo: "Secundaria · sin acento", c: [C.verde, C.verdeClaro] },
+    { id: "t-n", nombre: "Terra con Naranja", tipo: "Secundaria · sin acento", c: [C.terra, C.naranja] },
+    { id: "vo-a-vc", nombre: "Verde Oscuro, Amarillo y Verde Claro", tipo: "Fuera del Master · Verde Oscuro es un observado", c: [C.verdeOscuro, C.amarillo, C.verdeClaro] }
+  ];
   var estado = {};
 
   function rgba(v) {
@@ -260,16 +288,35 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
     $("blur").value = estado.blur; $("blurNum").textContent = estado.blur + "px";
     $("blurVar").classList.toggle("cambiado", estado.blur !== BLUR_HOY);
     lineas.push("", "base.css · blur(" + estado.blur + "px)");
+    var tri = TRIADAS.filter(function (x) { return x.id === (estado.triada || "hoy"); })[0];
+    document.querySelectorAll(".triada").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.id === tri.id ? "true" : "false"); });
     if (estado.modo === "blanca") lineas = ["Sobre la cabecera · piezas sólidas", "Menú, lupa y cruz · fondo de la página (--bg), sin desenfoque", "Texto e íconos · Marca/Azul", "Página actual · pastilla azul, texto en el fondo de la página", "Barra y logo · sin cambios"];
     document.querySelector(".app").dataset.modo = estado.modo || "vidrio";
     $("modos").querySelectorAll(".chip").forEach(function (c) { c.setAttribute("aria-pressed", c.dataset.modo === (estado.modo || "vidrio") ? "true" : "false"); });
+    lineas.push("", "Campo de Hojas · " + tri.nombre);
     $("salida").textContent = lineas.join("\n");
     try { localStorage.setItem(CLAVE, JSON.stringify(estado)); } catch (err) {}
     aplicar();
   }
 
+  // Tríadas: cada una recarga Hojas con ?campo=fondo-figura-acento (campo.js la toma solo para probar).
+  function urlPagina() {
+    var b = $("paginas").querySelector('[aria-pressed="true"]'), u = b.dataset.url;
+    if (u.indexOf("hojas") === -1) return u;
+    var t = TRIADAS.filter(function (x) { return x.id === estado.triada; })[0];
+    return t && t.id !== "hoy" ? u + "?campo=" + t.c.join("-") : u;
+  }
+  TRIADAS.forEach(function (t) {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "triada"; b.dataset.id = t.id;
+    b.innerHTML = '<span class="triada__puntos">' + t.c.map(function (h) { return '<i style="background:#' + h + '"></i>'; }).join("") + '</span>' +
+      '<span class="triada__txt"><span class="triada__nombre">' + t.nombre + '</span><span class="triada__tipo">' + t.tipo + '</span></span>';
+    b.addEventListener("click", function () { estado.triada = t.id; pintar(); $("frame").src = urlPagina(); });
+    $("triadas").appendChild(b);
+  });
+
   $("frame").addEventListener("load", aplicar);
-  $("reset").addEventListener("click", function () { estado = inicial(); pintar(); });
+  $("reset").addEventListener("click", function () { var antes = estado.triada; estado = inicial(); pintar(); if (antes && antes !== "hoy") $("frame").src = urlPagina(); });
   $("copiar").addEventListener("click", function () {
     var t = $("salida").textContent, b = $("copiar");
     (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () {
@@ -284,11 +331,12 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
       alElegir(b);
     });
   }
-  grupoChips("paginas", function (b) { $("frame").src = b.dataset.url; });
+  grupoChips("paginas", function (b) { $("grupoTriada").classList.toggle("apagado", b.dataset.url.indexOf("hojas") === -1); $("frame").src = urlPagina(); });
   grupoChips("modos", function (b) { estado.modo = b.dataset.modo; pintar(); });
   grupoChips("anchos", function (b) { $("marco").classList.toggle("celu", b.dataset.ancho === "celu"); });
 
   pintar();
+  if (estado.triada && estado.triada !== "hoy") $("frame").src = urlPagina();
 })();
 </script>
 </body>

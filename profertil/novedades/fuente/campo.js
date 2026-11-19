@@ -31,6 +31,9 @@
   var pedida = Q.get("p");
   // ?p=azul|verde|amarillo|naranja fuerza otro color (solo para probar).
   var paleta = PALETAS[PALETAS[pedida] ? pedida : (PALETAS[P.color] ? P.color : "azul")];
+  // ?campo=fondo-figura-acento (hex sin #, el acento puede faltar) prueba otra combinación (lo usa el tweak de la barra).
+  var probada = (Q.get("campo") || "").split("-").filter(function (h) { return /^[0-9a-f]{6}$/i.test(h); });
+  if (probada.length >= 2) paleta = { fondo: "#" + probada[0], figura: "#" + probada[1], acento: probada[2] ? "#" + probada[2] : null };
 
   // --- Formas: las del tema pesan más; el resto aparece de vez en cuando.
   var TODAS = Object.keys(P.formas);
