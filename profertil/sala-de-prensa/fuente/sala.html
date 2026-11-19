@@ -326,7 +326,8 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
   var $ = function (id) { return document.getElementById(id); };
   window.PF_CAMPO = { formas: A.formas, color: "azul", forma: "escudo", tema: ["escudo", "circulos", "urea"], cab: "pf-cab", main: "pf-hoja", columna: "pf-lista" };
 
-  var barraSolida = function () { $("pf-top").classList.toggle("pf-barra--solida", window.scrollY > $("pf-cab").offsetHeight - 80); };
+  // Barra transparente al cargar; toma el azul apenas se baja, cuando la caja de la cabecera llega a la barra.
+  var barraSolida = function () { var t = $("pf-top"); t.classList.toggle("pf-barra--solida", window.scrollY > 0 && $("pf-cab").getBoundingClientRect().top <= t.offsetHeight); };
   window.addEventListener("scroll", barraSolida, { passive: true });
   window.addEventListener("resize", barraSolida);
   barraSolida();

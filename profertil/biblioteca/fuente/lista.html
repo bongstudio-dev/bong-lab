@@ -344,7 +344,8 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
   window.PF_CAMPO = { formas: A.formas, color: CAMPO.color, forma: CAMPO.forma, tema: CAMPO.tema, cab: "pf-cab", main: "pf-hoja", columna: "pf-lista" };
 
   /* Barra transparente sobre la cabecera: toma el azul cuando termina el campo, como en Novedades. */
-  var barraSolida = function () { $("pf-top").classList.toggle("pf-barra--solida", window.scrollY > $("pf-cab").offsetHeight - 80); };
+  // Barra transparente al cargar; toma el azul apenas se baja, cuando la caja de la cabecera llega a la barra.
+  var barraSolida = function () { var t = $("pf-top"); t.classList.toggle("pf-barra--solida", window.scrollY > 0 && $("pf-cab").getBoundingClientRect().top <= t.offsetHeight); };
   window.addEventListener("scroll", barraSolida, { passive: true });
   window.addEventListener("resize", barraSolida);
   barraSolida();

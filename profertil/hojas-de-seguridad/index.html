@@ -52,7 +52,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=DM+Mono&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../componentes/tokens.css?v=bd64c4ee">
-<link rel="stylesheet" href="../componentes/base.css?v=01945231">
+<link rel="stylesheet" href="../componentes/base.css?v=01cc9be1">
 <link rel="stylesheet" href="../buscador/alcance.css?v=4835451c">
 <script src="../buscador/alcance.js?v=314d064a" data-seccion="hojas" data-nombre="Hojas" data-en="las hojas de seguridad" defer></script>
 <style>
@@ -501,7 +501,8 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
   window.PF_CAMPO = { formas: A.formas, color: CAMPO.color, forma: CAMPO.forma, tema: CAMPO.tema, cab: "pf-cab", main: "pf-hoja", columna: "pf-lista" };
 
   /* Barra transparente sobre la cabecera: toma el azul cuando termina el campo, como en Novedades. */
-  var barraSolida = function () { $("pf-top").classList.toggle("pf-barra--solida", window.scrollY > $("pf-cab").offsetHeight - 80); };
+  // Barra transparente al cargar; toma el azul apenas se baja, cuando la caja de la cabecera llega a la barra.
+  var barraSolida = function () { var t = $("pf-top"); t.classList.toggle("pf-barra--solida", window.scrollY > 0 && $("pf-cab").getBoundingClientRect().top <= t.offsetHeight); };
   window.addEventListener("scroll", barraSolida, { passive: true });
   window.addEventListener("resize", barraSolida);
   barraSolida();

@@ -119,7 +119,9 @@ a.pf-etiqueta { text-decoration: none; }
 
 /* @pieza barra
    Web/Barra navegación: logo, menú en cápsula de vidrio y buscador en la lupa.
-   Transparente sobre el header de foto o color; .pf-barra--solida toma el azul (al bajar, o siempre).
+   Transparente sobre el header de foto o color; .pf-barra--solida toma el azul (al bajar, o siempre). El azul no
+   aparece de golpe: es una franja detrás del logo, el menú y la lupa que baja deslizándose desde arriba (y vuelve a
+   subir al volver arriba). Si la página carga con la barra ya sólida, el azul está desde el principio.
    Markup: header.pf-barra > .pf-barra__in > nav.pf-barra__nav > logo, menú, menú mobile, buscador y su cerrar.
    El menú va centrado en la página, no en el espacio que queda entre el logo y la lupa: como esos dos costados
    no miden lo mismo, centrarlo entre ellos lo corre hacia un lado y deja de alinear con la columna de texto.
@@ -127,8 +129,13 @@ a.pf-etiqueta { text-decoration: none; }
    a la derecha la reserva de la lupa, que va en absoluto. Cada costado tiene un mínimo (el logo, y 44 + 14 de
    separación = 58 para la lupa). Si el menú es tan ancho que centrado pisaría uno de los dos, ese costado queda
    en su mínimo y el menú se corre hacia donde haya lugar: nunca se superpone. */
-.pf-barra { position: fixed; inset: 0 0 auto; z-index: 50; padding-top: env(safe-area-inset-top, 0px); transition: background 260ms ease, box-shadow 260ms ease; }
-.pf-barra--solida { background: var(--barra); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 10px 30px -18px rgba(0, 20, 60, .7); }
+.pf-barra { position: fixed; inset: 0 0 auto; z-index: 50; padding-top: env(safe-area-inset-top, 0px); }
+.pf-barra::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: var(--barra); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); transform: translateY(-100%); transition: transform 520ms var(--ease), box-shadow 520ms ease; }
+.pf-barra--solida::before { transform: none; box-shadow: 0 10px 30px -18px rgba(0, 20, 60, .7); }
+@media (prefers-reduced-motion: reduce) {
+  .pf-barra::before { transform: none; opacity: 0; transition: opacity 200ms ease; }
+  .pf-barra--solida::before { opacity: 1; }
+}
 .pf-barra__in { width: min(100% - 32px, 1320px); margin-inline: auto; }
 .pf-barra__nav { position: relative; display: grid; grid-template-columns: minmax(max-content, 1fr) auto minmax(44px, 1fr); align-items: center; column-gap: 14px; height: 76px; transition: height 260ms var(--ease); }
 .pf-barra__logo { grid-column: 1; justify-self: start; display: block; color: var(--tiza); fill: currentColor; line-height: 0; }
@@ -379,13 +386,16 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 
 /* @pieza lectura
    Lectura: lo común a las páginas de lectura (Nota y visor de la Biblioteca). Barra sólida sin sombra con la
-   línea amarilla de progreso abajo (el JS pone --p de 0 a 1), brillo del esqueleto de carga, aviso que sube
+   línea amarilla de progreso abajo (el JS pone --p de 0 a 1). La línea viaja pegada al borde de abajo del azul:
+   mientras la barra es transparente queda arriba de todo y baja con él. Brillo del esqueleto de carga, aviso que sube
    desde abajo y aire antes del pie. */
-.pf-barra--solida { box-shadow: none; }
+.pf-barra--solida::before { box-shadow: none; }
 .pf-barra__menu > a { text-decoration: none; }
 .pf-barra__busca { text-decoration: none; }
-.pf-progreso { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; }
-.pf-progreso i { display: block; height: 100%; background: var(--amarillo); transform: scaleX(var(--p, 0)); transform-origin: left; }
+.pf-progreso { position: absolute; inset: 0; display: flex; align-items: flex-end; pointer-events: none; transform: translateY(calc(4px - 100%)); transition: transform 520ms var(--ease); }
+.pf-barra--solida .pf-progreso { transform: none; }
+.pf-progreso i { display: block; width: 100%; height: 4px; background: var(--amarillo); transform: scaleX(var(--p, 0)); transform-origin: left; }
+@media (prefers-reduced-motion: reduce) { .pf-progreso { transition: none; } }
 @keyframes pf-brillo { from { background-position: 125% 0; } to { background-position: -25% 0; } }
 @media (prefers-reduced-motion: reduce) {
   .pf-esqueleto { animation: none !important; }
