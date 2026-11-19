@@ -99,28 +99,24 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 .pf-herramientas .pf-selector[hidden] { display: none; }
 .pf-herramientas .pf-selector button { position: relative; }
 .pf-herramientas .pf-selector button::after { content: ""; position: absolute; inset: -9px 0; }
-/* Celular: el contador, los chips y el selector de vistas van en una pastilla fija debajo de las pestañas, del mismo ancho y
-   tono. Al bajar se esconde por detrás de las pestañas; al subir vuelve (como el dock de filtros, que se achica al bajar).
-   Para que no se sienta apretada: el selector va sin su cápsula (solo el indicador), los chips se deslizan con un fundido en el
-   borde y "Limpiar todo" queda en el panel de filtros (cada chip ya tiene su ×). */
+/* Celular: el selector de vistas va dentro del panel de filtros (fila "Vista", arriba de los grupos), donde llega el pulgar y
+   junto a lo demás que cambia la lista. Arriba queda fija solo la fila de pestañas; el contador y los chips van en la página. */
 @media (max-width: 640px) {
-  .pf-result-row { position: sticky; top: calc(var(--pf-barra-h, 76px) - 1px + 10px + var(--pf-pest-h, 39px) + 6px); z-index: 19;
-    margin: 4px 0 14px; padding: 0 0 0 16px; gap: 10px; flex-wrap: nowrap; min-height: var(--pf-pest-h, 39px); border-radius: 999px;
-    background: linear-gradient(var(--line), var(--line)), var(--pf-papel, #fff);
-    transition: transform 380ms var(--ease), opacity 240ms ease; }
-  .pf-result-row:not(:has(.pf-herramientas .pf-selector:not([hidden]))) { padding-right: 16px; }
-  .pf-result-row.pf-escondida { transform: translateY(calc(-100% - 10px)); opacity: 0; pointer-events: none; }
-  .pf-herramientas { flex: none; align-self: stretch; }
-  .pf-result-row .pf-selector--iconos { background: transparent; }
-  .pf-result-row .pf-selector--iconos button { padding-inline: 10px; }
-  .pf-densidad [data-vista="chico"] { display: none; }
-  .pf-result-main { flex: 1; flex-wrap: nowrap; gap: 10px; min-height: 0; }
-  .pf-result-text { flex: none; white-space: nowrap; font-size: var(--texto-chico); }
-  .pf-activos { flex-wrap: nowrap; flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none; padding-right: 14px;
-    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 14px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 14px), transparent); }
+  .pf-result-row { padding-block: 14px 12px; gap: 12px; flex-wrap: nowrap; }
+  .pf-result-main { flex: 1; flex-wrap: nowrap; margin-right: -16px; width: calc(100% + 16px); }
+  .pf-result-text { flex: none; white-space: nowrap; }
+  .pf-activos { flex-wrap: nowrap; flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none; padding-right: 16px; }
   .pf-activos::-webkit-scrollbar { display: none; }
   .pf-activos > * { flex: none; }
-  .pf-activos__limpiar { display: none; }
+  .pf-activos__limpiar { flex: none; white-space: nowrap; }
+  .pf-densidad [data-vista="chico"] { display: none; }
+}
+/* Fila "Vista" del panel: el rótulo como el de los grupos y el Selector a todo el ancho (pieza selector--ancho de base.css). */
+.pf-f-vista { display: grid; gap: 8px; padding: 6px 2px 14px; border-bottom: 1px solid var(--line); }
+.pf-f-vista:not(:has(.pf-selector:not([hidden]))) { display: none; }
+.pf-f-vista .pf-f-label { font-size: 0.8rem; color: var(--ink); }
+.pf-f-vista .pf-herramientas, .pf-f-vista .pf-selector:not([hidden]) { display: flex; width: 100%; }
+.pf-f-vista .pf-selector button { flex: 1 1 0; padding-block: 8px; }
 }
 
 /* --- Gacetillas: la fila de documento de base.css. La fecha va completa (día, mes y año), así que su columna es más ancha. */
@@ -373,6 +369,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 
 <section class="pf-filters" id="pf-filters" aria-label="Filtros">
   <div class="pf-f-body" id="pf-fBody"><div class="pf-f-in">
+    <div class="pf-f-vista" id="pf-fVista"><span class="pf-f-label">Vista</span></div>
     <div class="pf-f-grupos" id="pf-fGrupos"></div>
     <button class="pf-f-clear" id="pf-fClear" type="button" hidden>Limpiar filtros</button>
   </div></div>
@@ -598,7 +595,8 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
     });
     $("pf-fotos").innerHTML = cols.map(function (h) { return '<ul class="pf-fotos__col">' + h + "</ul>"; }).join("");
   }
-  window.addEventListener("resize", function () { if (tab === "fotos" && columnasFotos() !== nCols) { repartirFotos(); listas(); } });
+  // Solo con el panel de Fotos a la vista: durante el fundido de pestaña la lista todavía puede ser la de otra.
+  window.addEventListener("resize", function () { if (!$("fotos").hidden && lista[0] && lista[0].f && columnasFotos() !== nCols) { repartirFotos(); listas(); } });
   function listas() {
     $("pf-fotos").querySelectorAll("img").forEach(function (im) {
       if (im.complete) im.classList.add("pf-lista"); else im.addEventListener("load", function () { im.classList.add("pf-lista"); }, { once: true });
@@ -812,29 +810,14 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
     marcarVistas(true);
     cambiarVista($("pf-fotos"), function () { repartirFotos(); listas(); }, true);
   });
-  // Dónde van los selectores de vista: en escritorio, en la fila fija de las pestañas; en el celular, en la línea del contador.
+  // Dónde van los selectores de vista: en escritorio, en la fila fija de las pestañas; en el celular, en el panel de filtros.
   function ubicarHerr() {
-    var herr = $("pf-herr"), dest = esMobile.matches ? document.querySelector(".pf-result-row") : $("pf-pest");
+    var herr = $("pf-herr"), dest = esMobile.matches ? $("pf-fVista") : $("pf-pest");
     if (herr.parentNode !== dest) dest.appendChild(herr);
     marcarVistas(false);
   }
   esMobile.addEventListener("change", ubicarHerr);
   ubicarHerr();
-  /* Celular: la pastilla del resultado se esconde al bajar y vuelve al subir, solo cuando ya está fija (en su lugar se ve siempre).
-     Su tope sale del alto real de la cápsula de las pestañas (--pf-pest-h). */
-  function altoPest() { document.documentElement.style.setProperty("--pf-pest-h", pest.offsetHeight + "px"); }
-  altoPest(); window.addEventListener("resize", altoPest);
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(altoPest);
-  var fila = document.querySelector(".pf-result-row"), yFila = window.scrollY;
-  window.addEventListener("scroll", function () {
-    var y = window.scrollY, dy = y - yFila;
-    if (!esMobile.matches) { fila.classList.remove("pf-escondida"); yFila = y; return; }
-    if (Math.abs(dy) < 8) return;
-    yFila = y;
-    var tope = parseFloat(getComputedStyle(fila).top) || 0;
-    var fija = cambia.getBoundingClientRect().top < tope - 6;
-    fila.classList.toggle("pf-escondida", dy > 0 && fija && !filtrosAbiertos());
-  }, { passive: true });
   // En el celular no hay fotos chicas: si quedó elegida, se ven medianas.
   if (esMobile.matches && tamFotos === "chico") tamFotos = "medio";
 
@@ -849,7 +832,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
   /* --- Visor de fotos: recorre las fotos de la lista filtrada ------------------------------------- */
   var vf = $("pf-vf"), vfI = -1;
   function verFoto(j) {
-    if (!lista.length) return;
+    if (!lista.length || !lista[0].f) return;   // un toque durante el cambio de pestaña
     vfI = (j + lista.length) % lista.length;
     var x = lista[vfI], img = $("pf-vfImg");
     if (!img) { img = document.createElement("img"); img.id = "pf-vfImg"; $("pf-vfEsc").prepend(img); }
@@ -1016,6 +999,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
     gr.classList.remove("pf-quieto");
     abrirGrupo(abierto);
     resumen();
+    if (si) marcarVistas(false);   // en el celular el selector vive en el panel: recién abierto tiene ancho
     var dur = parseFloat(getComputedStyle(document.documentElement).getPropertyValue(si ? "--f-abrir" : "--f-cerrar")) || 420;
     tListo = setTimeout(terminar, dur + 60);
   }
