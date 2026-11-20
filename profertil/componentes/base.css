@@ -197,7 +197,9 @@ a.pf-etiqueta { text-decoration: none; }
    Tacto: sin el destello gris de Safari, sin la demora del doble toque y sin seleccionar el texto de los
    botones al dejar apretado. Los :hover van siempre dentro de (hover: hover) and (pointer: fine). */
 :root {
-  color-scheme: light;
+  /* Solo claro: sin esto, Chrome y Samsung Internet en Android oscurecen la página por su cuenta
+     cuando el teléfono está en modo oscuro e invierten los colores del sistema. */
+  color-scheme: only light;
   --shadow: var(--sombra-tarjeta);
   --f-mono: "DM Mono", ui-monospace, Menlo, monospace;
 }
