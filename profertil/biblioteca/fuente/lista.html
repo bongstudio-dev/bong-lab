@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="../componentes/tokens.css">
 <link rel="stylesheet" href="../componentes/base.css">
 <link rel="stylesheet" href="../buscador/alcance.css">
+<script src="../componentes/barra-vista.js"></script>
 <script src="../buscador/alcance.js" data-seccion="documentos" data-nombre="Biblioteca" data-en="la Biblioteca" defer></script>
 <style>
 /* Biblioteca Virtual Profertil: los documentos técnicos del sitio actual (boletines, ensayos, informes de campaña).
@@ -44,19 +45,11 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
   .pf-herramientas.pf-atada.pf-escondida .pf-selector { pointer-events: none; }
   @media (prefers-reduced-motion: reduce) { .pf-herramientas.pf-atada { transition: opacity 200ms ease; } .pf-herramientas.pf-atada.pf-escondida { translate: none; } }
 }
-/* Celular: la barra de vista va con su caja y vuelve al subir (barraQueVuelve en el JS). Nada de lo anterior corre acá: en el iPhone,
-   mientras la barra del navegador cambia de alto, la página recibe la posición del scroll cada ~100 ms, y una fila que se ubica según
-   el scroll (fixed atada o fijada por JS) se queda atrás y salta. Acá la mueve el navegador: en su lugar es contenido, pegada es
-   sticky y suelta es relative con desplazamiento. Para que el sticky tenga recorrido, el JS la saca de .pf-result-row (que es baja)
-   y la pone al principio de la lista; .pf-vuelve-marca (alto 0) marca su lugar. */
+/* Celular: la barra de vista es la pieza compartida (barra-vista en base.css y barra-vista.js); nada de lo anterior corre acá.
+   Para que el sticky tenga recorrido, el JS la saca de .pf-result-row (que es baja) y la pone al principio de la lista. */
 @media (max-width: 640px) {
-  .pf-vuelve-marca { height: 0; }
   .pf-vuelve-marca + .pf-herramientas { margin-top: 26px; }   /* lo que sumaban el margen y el padding de .pf-result-row */
   .pf-herramientas + .pf-result-row { margin-top: 0; padding-top: 12px; }
-  .pf-herramientas.pf-vuelve--fija { position: sticky; top: var(--vuelve-pega, calc(var(--pf-barra-h, 76px) + 9px)); }
-  .pf-herramientas.pf-vuelve--suelta { top: var(--vuelve-top, 0px); }
-  .pf-herramientas.pf-vuelve--fija, .pf-herramientas.pf-vuelve--suelta { pointer-events: none; }
-  .pf-herramientas.pf-vuelve--fija .pf-selector, .pf-herramientas.pf-vuelve--suelta .pf-selector { pointer-events: auto; }
 }
 
 /* --- Panel de filtros: barra fija full rounded con los cuatro
@@ -923,51 +916,6 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
     if (e.key === "/" && document.activeElement !== $("pf-q") && !/^(input|textarea)$/i.test(document.activeElement.tagName)) { e.preventDefault(); abrirBusca(true); }
   });
 
-  /* --- Barra de vista en el celular: va con su caja y vuelve al subir --------------------------------- */
-  // (La misma función en Biblioteca, Hojas de seguridad, Novedades y Sala de prensa.)
-  // - Bajando, la fila va con su caja como cualquier contenido y la tapa la barra azul: no se esconde con animación.
-  // - Subiendo, si su lugar ya quedó tapado, entra desde atrás de la barra (380 ms con la curva --ease y fundido de 260 ms) y queda
-  //   sticky debajo. Si su lugar todavía se ve, no se toca: baja sola con la caja.
-  // - Si se vuelve a bajar con la fila pegada, se suelta donde está (relative con desplazamiento) y se va con el scroll.
-  // - Arriba de todo, el sticky se suelta solo en su lugar.
-  // fila: la barra. marca: un div de alto 0 justo antes, que dice dónde está su lugar. topFila(): dónde queda pegada.
-  // barraAbajo(): el borde de abajo de la barra azul.
-  function barraQueVuelve(fila, marca, topFila, barraAbajo) {
-    var estado = "lugar", entrada = null, fundido = null;   // lugar | fija | suelta
-    function limpiar() {
-      if (entrada) { entrada.cancel(); entrada = null; }
-      if (fundido) { fundido.cancel(); fundido = null; }
-      fila.classList.remove("pf-vuelve--fija", "pf-vuelve--suelta"); fila.style.removeProperty("--vuelve-top");
-      estado = "lugar";
-    }
-    function fijar(animar) {
-      var r = fila.getBoundingClientRect(), t = topFila(), b = barraAbajo(), h = fila.offsetHeight, oculta = r.bottom <= b;
-      var desde = oculta ? b - t - h - 9 : r.top - t;   // tapada: arranca entera detrás de la barra; a la vista: desde donde está
-      limpiar(); fila.style.setProperty("--vuelve-pega", t + "px"); fila.classList.add("pf-vuelve--fija"); estado = "fija";
-      if (!animar || !fila.animate || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-      entrada = fila.animate([{ transform: "translateY(" + desde + "px)" }, { transform: "none" }], { duration: 380, easing: "cubic-bezier(.22, 1, .36, 1)" });
-      if (oculta) fundido = fila.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 260, easing: "ease" });
-    }
-    function soltar() {
-      var r = fila.getBoundingClientRect().top, s = marca.getBoundingClientRect().top;
-      limpiar(); fila.style.setProperty("--vuelve-top", (r - s) + "px"); fila.classList.add("pf-vuelve--suelta"); estado = "suelta";
-    }
-    return {
-      fija: function () { return estado === "fija"; },
-      // Lo llama el listener de dirección del scroll (umbral de 8 px) con el sentido del gesto.
-      mover: function (dy) {
-        var s = marca.getBoundingClientRect().top;
-        if (s >= topFila()) { if (estado !== "lugar") limpiar(); return; }
-        if (dy > 0) { if (estado === "fija") soltar(); return; }
-        if (estado === "fija") return;
-        if (s + fila.offsetHeight > barraAbajo()) return;
-        fijar(true);
-      },
-      // Saltos de scroll que hace la página (filtrar, cambiar de vista): la fila queda a la vista, sin animar.
-      saltar: function () { if (marca.getBoundingClientRect().top >= topFila()) limpiar(); else if (estado !== "fija") fijar(false); },
-      apagar: limpiar
-    };
-  }
 
   /* --- Selectores fijos (la lógica de la Sala de prensa) --------------------------------------------- */
   // La fila pasa a fixed cuando llega a la barra y vuelve a su lugar cuando baja. El hueco guarda su tamaño (la página no se mueve) y le
@@ -1011,11 +959,12 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
     herrLugar.style.width = r.width + "px"; herrLugar.style.height = r.height + "px"; herrLugar.classList.add("pf-activo");
     herr.style.left = r.left + "px"; herr.style.width = r.width + "px"; herr.classList.add("pf-fija");
   }
-  /* Celular: la barra de vista va con su caja y vuelve al subir (ver el CSS de .pf-vuelve--fija). Lo de arriba (atar, fijarHerr) queda
+  /* Celular: la barra de vista va con su caja y vuelve al subir (PFBarraVista, en componentes/barra-vista.js). Lo de arriba (atar, fijarHerr) queda
      solo para escritorio. Al cruzar los 640 px (girar el teléfono, achicar la ventana) se pasa de un modo al otro. */
   var enCel = false, vuelveMarca = document.createElement("div"), filaResultado = document.querySelector(".pf-result-row");
   vuelveMarca.className = "pf-vuelve-marca";
-  var vuelve = barraQueVuelve(herr, vuelveMarca, topFijo, function () { return topFijo() - 9; });
+  var vuelve = PFBarraVista.queVuelve(herr, vuelveMarca, topFijo);
+  PFBarraVista.alPixel($("pf-hoja"), document.querySelector(".pf-campo-cab"));
   function modoHerr() {
     enCel = esMobile.matches;
     if (enCel) {

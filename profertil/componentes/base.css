@@ -244,6 +244,19 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 .pf-empty svg { width: 64px; height: 76px; }
 .pf-empty p { margin: 0; max-width: 42ch; color: var(--ink-2); font-size: 1.05rem; }
 
+/* @pieza barra-vista
+   Barra de vista en el celular: la fila de selectores (vista, orden, pestañas) va con su caja y vuelve al subir. El JS es
+   barra-vista.js (PFBarraVista.queVuelve), que le pone .pf-vuelve y cambia entre estos estados; nada la mueve por código:
+   en su lugar es contenido, pegada es sticky y suelta es relative con desplazamiento. .pf-vuelve-marca (alto 0, justo antes)
+   marca su lugar. La caja que la contiene empieza en un píxel entero (.pf-al-pixel, PFBarraVista.alPixel): con medio píxel,
+   en el iPhone la fila pegada y la barra azul redondean distinto mientras se scrollea y la fila tiembla. */
+.pf-vuelve-marca { height: 0; }
+.pf-vuelve.pf-vuelve--fija { position: sticky; top: var(--vuelve-pega, 85px); }
+.pf-vuelve.pf-vuelve--suelta { position: relative; top: var(--vuelve-top, 0px); }
+.pf-vuelve.pf-vuelve--fija, .pf-vuelve.pf-vuelve--suelta { pointer-events: none; }
+.pf-vuelve.pf-vuelve--fija .pf-selector, .pf-vuelve.pf-vuelve--suelta .pf-selector { pointer-events: auto; }
+.pf-al-pixel { margin-top: var(--pf-ajuste, 0px); }
+
 /* @pieza filtros
    Filtros: el dock fijo abajo (barra con las pastillas, panel en acordeón que se despliega hacia arriba,
    contador) y el ancla azul a su derecha. Cada página define lo suyo: la caja .pf-filters (ancho, fondo,
