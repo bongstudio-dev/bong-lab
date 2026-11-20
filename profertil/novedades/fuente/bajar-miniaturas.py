@@ -8,7 +8,7 @@ tarjeta usa para reservar el lugar. Sin `mi`, la tarjeta usa el arte.
 Se puede correr las veces que haga falta: solo baja lo que falta.
 
     python3 profertil/novedades/fuente/bajar-miniaturas.py
-    python3 profertil/novedades/fuente/build.py
+    npm run build      # rearma el sitio con las fotos nuevas
 """
 import json, os, struct, subprocess, sys, tempfile, urllib.parse
 from concurrent.futures import ThreadPoolExecutor

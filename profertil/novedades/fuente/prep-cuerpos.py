@@ -325,9 +325,10 @@ def bajar_destacadas(notas, cuantas=5):
     import subprocess, tempfile
     carpeta = os.path.join(AQUI, '..', 'fotos', 'notas')
     os.makedirs(carpeta, exist_ok=True)
-    # Las del header: las rutas de DESTACADAS en template.html o, si esta
-    # vacia, las mas recientes (igual que la pagina).
-    tpl = open(os.path.join(AQUI, 'template.html'), encoding='utf-8').read()
+    # Las del header: las rutas de DESTACADAS en el script de Novedades
+    # (src/paginas/novedades/novedades.js) o, si esta vacia, las mas recientes
+    # (igual que la pagina).
+    tpl = open(os.path.join(AQUI, '..', '..', '..', 'src', 'paginas', 'novedades', 'novedades.js'), encoding='utf-8').read()
     m = re.search(r'var DESTACADAS = \[(.*?)\];', tpl, re.S)
     rutas = re.findall(r'"([^"]+)"', m.group(1)) if m else []
     por_ruta = {n['u']: n for n in notas}

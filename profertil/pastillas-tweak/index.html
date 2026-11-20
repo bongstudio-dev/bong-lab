@@ -54,7 +54,7 @@
 <link rel="stylesheet" href="../componentes/base.css">
 <style>
 /* Lo propio de las páginas de listas (Biblioteca, Hojas de seguridad, Sala de prensa): pastilla y chip con número.
-   Va igual que en biblioteca/fuente/lista.html y sala-de-prensa/fuente/sala.html, para medir lo publicado. */
+   Va igual que en src/paginas/biblioteca/lista.css y src/paginas/sala-de-prensa/sala.css, para medir lo publicado. */
 .pf-f-gr .pf-pastilla, .pf-f-gr .pf-chip { gap: 7px; }
 .pf-pastilla__n { font: 400 round(0.86em, 1px)/1 var(--f-body); font-variant-numeric: tabular-nums; opacity: .72; }
 .pf-pastilla:has(> .pf-pastilla__n) { align-items: baseline; padding-top: calc((var(--h) - var(--fs)) / 2); }
@@ -166,7 +166,7 @@ pre { margin: 0; padding: 14px; background: var(--ink); color: var(--tiza); bord
 <script>
 (function () {
   var FLECHA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
-  var BASE = "componentes/base.css", LISTAS = "biblioteca/fuente/lista.html y sala-de-prensa/fuente/sala.html";
+  var BASE = "componentes/base.css", LISTAS = "src/paginas/biblioteca/lista.css y src/paginas/sala-de-prensa/sala.css";
   function px(el, p) { return parseFloat(getComputedStyle(el)[p]) || 0; }
   function r1(x) { return Math.round(x * 10) / 10; }
   function dec(x) { return String(+(x / 100).toFixed(4)).replace(/^0\./, "."); }

@@ -13,7 +13,7 @@
   var NOTAS = /*__NOTAS__*/[];
   var A = /*__ASSETS__*/{};
 
-  /* @comun: este bloque (hasta @fin-comun) lo usa también la página de Nota; build.py lo copia. */
+  /* @comun: este bloque (hasta @fin-comun) lo usa también la página de Nota: está en comun.js y Astro lo suma a las dos. */
 /*__COMUN__*/  /* @fin-comun */
 
   /* --- Estado ------------------------------------------------------------- */
@@ -470,7 +470,7 @@
   var quieto = matchMedia("(prefers-reduced-motion: reduce)");
   // Resortes: masa 1, rigidez k, amortiguacion c. c = 2*raiz(k) no rebota.
   // Los valores son tokens del Figma Master (06 · Web, Web/Resorte/* y
-  // Web/Proporción/*): build.py los pone en :root y aca se leen.
+  // Web/Proporción/*): tokens.css los pone en :root y aca se leen.
   var raiz = getComputedStyle(document.documentElement);
   function tk(n) { return parseFloat(raiz.getPropertyValue("--" + n)); }
   var GAP = tk("ancla-gap"), APRETAR = tk("ancla-apretar"), BAJAR = tk("ancla-bajar"), CAMBIO = tk("ancla-cambio");

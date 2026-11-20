@@ -9,7 +9,7 @@
   var DOCS = /*__DOCS__*/[];
   var GRUPOS = /*__GRUPOS__*/[];
   var A = /*__ASSETS__*/{};
-  /* La misma plantilla arma otras listas de documentos (build.py): Hojas de seguridad pasa acá dónde están el visor y los PDF,
+  /* La misma plantilla arma otras listas de documentos (src/componentes/Lista.astro): Hojas de seguridad pasa acá dónde están el visor y los PDF,
      cómo se nombran sus documentos y el campo de su cabecera. Vacío, es la Biblioteca. */
   var PAG = /*__PAG__*/{};
   var BASE = PAG.base || "";
