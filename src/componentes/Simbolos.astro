@@ -1,0 +1,9 @@
+---
+// Los símbolos SVG de la página (logos oficiales y lo que sume cada página) para usar con <use href="#...">.
+// Los scripts de las páginas suman acá las Formas del sistema (id pf-defs).
+import { LOGOS } from "../lib/sistema.mjs";
+---
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="pf-defs">
+  <Fragment set:html={LOGOS} />
+  <slot />
+</defs></svg>

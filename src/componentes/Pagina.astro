@@ -1,0 +1,47 @@
+---
+// Layout de las páginas del sitio: firma de Bong, <head> común, la transición entre páginas (Persiana con logo animado)
+// y el pie. Cada página pone en el slot "head" su título, descripción, hojas de estilo y scripts del head, y en el
+// slot principal su contenido (con <Pie /> donde va el pie y su script al final).
+//
+// Orden del <head>: lo de la página, su CSS junto al de la transición, el script de la transición (antes de pintar:
+// si se llega con la persiana, deja el paño tapando), el CSS de la cabecera con campo si lo lleva y el del pie.
+import { firma } from "../lib/firma.mjs";
+import { transicion, CAMPO, PIE } from "../lib/sistema.mjs";
+interface Props {
+  firma: { nombre: string; que: string; contexto: string };
+  transicion: "novedades" | "biblioteca";
+  css: string;
+  campo?: "css+js" | "js";        // cabecera con campo de Formas (novedades/fuente/campo, hoy en src/compartido/campo)
+}
+const { css, campo } = Astro.props;
+const tr = transicion(Astro.props.transicion);
+const PIE_VISTO = `
+  // Con el pie a la vista, el dock de filtros y el ancla se retiran (la regla está en base.css).
+  (function () {
+    var pie = document.querySelector(".pf-pie");
+    if (pie && "IntersectionObserver" in window) new IntersectionObserver(function (en) {
+      document.documentElement.classList.toggle("pf-en-pie", en[0].isIntersecting);
+    }, { rootMargin: "0px 0px -40px 0px" }).observe(pie);
+  })();
+`;
+---
+<!DOCTYPE html>
+<Fragment set:html={firma(Astro.props.firma)} />
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<slot name="head" />
+<style is:inline set:html={css + "\n" + tr.css}></style>
+<script is:inline set:html={"\n" + tr.cabeza}></script>
+{campo === "css+js" && <style is:inline set:html={"\n" + CAMPO.css}></style>}
+<style id="pf-pie-css" is:inline set:html={PIE.css}></style>
+</head>
+<body>
+<Fragment set:html={tr.velo} />
+<slot />
+<script is:inline set:html={"\n" + tr.js}></script>
+{campo && <script is:inline set:html={"\n" + CAMPO.js}></script>}
+<script is:inline set:html={PIE_VISTO}></script>
+</body>
+</html>

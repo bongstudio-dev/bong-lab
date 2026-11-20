@@ -1,0 +1,21 @@
+---
+// Dock de filtros: la pieza "filtros" de componentes/base.css (barra de abajo con los grupos y el panel que se abre).
+// El contenido del panel va en el slot; lo arma el script de cada página.
+interface Props {
+  clase?: string;                                  // clase extra de la sección (Novedades arranca fuera de vista)
+  principal?: { id: string; etiqueta: string };    // la fila de pastillas de la barra
+  toggle?: string;                                 // etiqueta del botón de filtros
+  txtId?: boolean;                                 // el texto del botón lo cambia el script (celular: "Ver 24 documentos")
+}
+const { clase, principal = { id: "pf-fMain", etiqueta: "Filtros" }, toggle = "Filtros", txtId = true } = Astro.props;
+---
+<section class:list={["pf-filters", clase]} id="pf-filters" aria-label="Filtros">
+  <div class="pf-f-body" id="pf-fBody"><div class="pf-f-in">
+    <slot />
+    <button class="pf-f-clear" id="pf-fClear" type="button" hidden>Limpiar filtros</button>
+  </div></div>
+  <div class="pf-f-bar">
+    <div class="pf-f-main" id={principal.id} role="group" aria-label={principal.etiqueta}></div>
+    <button class="pf-f-toggle" id="pf-fToggle" type="button" aria-expanded="false" aria-controls="pf-fBody" aria-label={toggle}><span class="pf-f-txt" id={txtId ? "pf-fTxt" : undefined}>Filtros</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg><span class="pf-f-count" id="pf-fCount" hidden>0</span></button>
+  </div>
+</section>
