@@ -265,6 +265,21 @@
    y el indicador; si no, la página entera se corre junto con ellas. */
 :root.pf-vt-vista::view-transition-old(root) { display: none; }
 :root.pf-vt-vista::view-transition-new(root) { animation: none; }
+/* Las tarjetas que viajan se pintan en una capa por encima de toda la página: con la página bajada, pasaban por arriba de lo que
+   está fijo en pantalla. Durante el cambio de vista eso fijo también viaja como capa propia (no se mueve, solo se apila) y cada
+   capa toma la altura que tiene en la página, así queda siempre arriba de las tarjetas. */
+:root.pf-vt-vista #pf-top { view-transition-name: pf-vt-barra; }
+:root.pf-vt-vista .pf-herramientas { view-transition-name: pf-vt-herr; }
+:root.pf-vt-vista .pf-filters { view-transition-name: pf-vt-filtros; }
+:root.pf-vt-vista .pf-ancla { view-transition-name: pf-vt-ancla; }
+:root.pf-vt-vista .pf-tr-panel { view-transition-name: pf-vt-panel; }
+::view-transition-group(pf-vt-herr) { z-index: 20; }
+::view-transition-group(pf-ind-vista), ::view-transition-group(pf-vista-chico),
+::view-transition-group(pf-vista-medio), ::view-transition-group(pf-vista-grande) { z-index: 21; }
+::view-transition-group(pf-vt-filtros) { z-index: 40; }
+::view-transition-group(pf-vt-ancla) { z-index: 41; }
+::view-transition-group(pf-vt-barra) { z-index: 50; }
+::view-transition-group(pf-vt-panel) { z-index: 80; }
 
 /* --- Grilla --------------------------------------------------------------- */
 .pf-grid { display: flex; gap: 16px; align-items: flex-start; padding-bottom: 170px; }
