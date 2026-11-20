@@ -179,9 +179,11 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
 .pf-campo-seguir svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .pf-campo-bajo .pf-campo-seguir { opacity: 0; }
 /* La hoja con la lista es opaca y tapa el campo; de borde a borde, con la columna adentro. */
-/* overflow-x: clip: al cambiar de vista las filas se deslizan desde su lugar viejo (una tarjeta de la columna derecha arranca corrida a
-   la derecha) y, sin recorte, la página se ensanchaba un instante: Safari en iPhone la alejaba entera para que entre. */
-.pf-hoja { position: relative; z-index: 2; min-height: 100svh; padding-top: 8px; background: var(--pf-papel, #fff); overflow-x: clip;
+/* La hoja no recorta: en el iPhone, la barra de vista pegada dentro de una caja que recorta con esquinas redondeadas sube y baja un
+   píxel mientras se scrollea. El recorte va en la lista (.pf-docs): al cambiar de vista las filas se deslizan desde su lugar viejo (una
+   tarjeta de la columna derecha arranca corrida a la derecha) y, sin recorte, la página se ensanchaba un instante y Safari en iPhone
+   la alejaba entera para que entre. */
+.pf-hoja { position: relative; z-index: 2; min-height: 100svh; padding-top: 8px; background: var(--pf-papel, #fff);
   border-radius: var(--radio-tarjeta, 24px) var(--radio-tarjeta, 24px) 0 0; }
 @media (min-width: 720px) {
   .pf-campo-cab { padding: calc(var(--pf-barra-h, 64px) + 24px) 24px 96px; }
@@ -193,6 +195,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
 .pf-result-row { margin-top: 8px; }
 
 /* --- Filas: una por documento, separadas por una línea (sin cajas ni sombras). */
+.pf-docs { overflow-x: clip; }
 .pf-docs:not(:empty) { min-height: 60vh; }
 /* La fila de base.css (pieza "documento") más el cursor y la entrada al aparecer. */
 .pf-doc { cursor: pointer; animation: pf-entra 380ms var(--ease) backwards; }

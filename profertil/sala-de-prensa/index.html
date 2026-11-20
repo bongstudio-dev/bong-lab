@@ -76,7 +76,9 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
   background: var(--pf-papel, #fff); color: var(--ink, #111); display: grid; place-items: center; transition: opacity 300ms ease; }
 .pf-campo-seguir svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .pf-campo-bajo .pf-campo-seguir { opacity: 0; }
-.pf-hoja { position: relative; z-index: 2; min-height: 100svh; padding-top: 8px; background: var(--pf-papel, #fff); overflow-x: clip;
+/* La hoja no recorta: en el iPhone, la barra pegada dentro de una caja que recorta con esquinas redondeadas sube y baja un píxel
+   mientras se scrollea. El recorte va en cada panel (.pf-panel), para que lo que se desliza al cambiar de vista no ensanche la página. */
+.pf-hoja { position: relative; z-index: 2; min-height: 100svh; padding-top: 8px; background: var(--pf-papel, #fff);
   border-radius: var(--radio-tarjeta, 24px) var(--radio-tarjeta, 24px) 0 0; } /* empieza en píxel entero: PFBarraVista.alPixel */
 
 /* Contacto de prensa: dentro de la tarjeta, separado por un filete. Las personas y, abajo, el mail y el teléfono del área. */
@@ -184,6 +186,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
   .pf-pest .pf-pestanas button { padding-inline: 12px; font-size: var(--texto-chico); }
   .pf-pest .pf-selector--iconos button { padding-inline: 9px; }
 }
+.pf-panel { overflow-x: clip; }
 .pf-panel[hidden] { display: none; }
 @keyframes pf-entra { from { opacity: 0; } } /* solo aparece: sin desplazamiento, como en la Biblioteca */
 /* Cambio de pestaña: lo de abajo de las pestañas (resultado y panel) se funde afuera, cambia mientras no se ve y entra fundiéndose
