@@ -1,0 +1,8 @@
+---
+// Dirección vieja de las notas, nota/?n=<nota>: lleva a novedades/<nota>/ (con el # de la página, si lo hay).
+// Sin parámetro, o con uno que no existe, a la más reciente (como hacía la página de antes).
+import Redireccion from "../../../../componentes/Redireccion.astro";
+import { NOTAS } from "../../../../lib/datos.mjs";
+const ultima = NOTAS[NOTAS.length - 1].ar;
+---
+<Redireccion titulo="Nota · Novedades Profertil" parametro="n" ids={NOTAS.map((n) => n.ar)} sinParametro={ultima} desconocido={ultima} lista="../" />

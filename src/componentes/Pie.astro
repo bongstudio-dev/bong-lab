@@ -1,0 +1,24 @@
+---
+// Pie del sitio, el mismo en todas las páginas: el componente "Pie de página" de la librería (c/pie.js), Institucional
+// sobre azul con la línea ética. Se arma en el build; su CSS va al final del <head> y el aviso de "pie a la vista"
+// (que retira el dock y el ancla) al final del <body>, los dos desde el layout (Pagina.astro).
+// Enlaces que ya tienen página en la maqueta van a ella; el resto queda como texto, con la misma clase.
+import { PIE } from "../lib/sistema.mjs";
+const ENLACES: Record<string, string> = {
+  "Noticias": "novedades/",
+  "Sala de prensa": "sala-de-prensa/",
+  "Biblioteca virtual": "biblioteca/",
+  "Fichas y hojas de seguridad": "hojas-de-seguridad/",
+};
+const aca = Astro.url.pathname;
+const html = PIE.html.replace(/<a\b([^>]*)>([\s\S]*?)<\/a>/g, (_, attrs: string, adentro: string) => {
+  const r = ENLACES[adentro.replace(/<[^>]*>/g, "").trim()];
+  if (!r) {
+    const c = /\bclass="([^"]*)"/.exec(attrs);
+    return `<span${c ? ` class="${c[1]}"` : ""}>${adentro}</span>`;
+  }
+  const href = import.meta.env.BASE_URL.replace(/\/?$/, "/") + "profertil/" + r;
+  return `<a${attrs.replace(/\bhref="[^"]*"/, `href="${href}"`)}${aca === href ? ' aria-current="page"' : ""}>${adentro}</a>`;
+});
+---
+<Fragment set:html={html} />

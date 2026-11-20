@@ -155,11 +155,11 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
       </div>
       <p class="rotulo">Notas reales, una por tipo</p>
       <div class="chips" id="notas">
-        <button class="chip" type="button" data-url="../novedades/nota/?n=profertil-recibio-a-su-visitante-numero-60-000" aria-pressed="false">Institucional</button>
-        <button class="chip" type="button" data-url="../novedades/nota/?n=profertil-realizo-su-segunda-emision-de-obligaciones-negociables" aria-pressed="false">Financiera</button>
-        <button class="chip" type="button" data-url="../novedades/nota/?n=nuevo-boletin-tecnico-del-departamento-de-id" aria-pressed="false">Técnico</button>
-        <button class="chip" type="button" data-url="../novedades/nota/?n=parada-de-planta-programada-2025" aria-pressed="false">Aviso</button>
-        <button class="chip" type="button" data-url="../novedades/nota/?n=profertil-excelencia-tecnico-2025" aria-pressed="false">Comercial</button>
+        <button class="chip" type="button" data-url="../novedades/profertil-recibio-a-su-visitante-numero-60-000/" aria-pressed="false">Institucional</button>
+        <button class="chip" type="button" data-url="../novedades/profertil-realizo-su-segunda-emision-de-obligaciones-negociables/" aria-pressed="false">Financiera</button>
+        <button class="chip" type="button" data-url="../novedades/nuevo-boletin-tecnico-del-departamento-de-id/" aria-pressed="false">Técnico</button>
+        <button class="chip" type="button" data-url="../novedades/parada-de-planta-programada-2025/" aria-pressed="false">Aviso</button>
+        <button class="chip" type="button" data-url="../novedades/profertil-excelencia-tecnico-2025/" aria-pressed="false">Comercial</button>
       </div>
     </div>
 
@@ -302,7 +302,7 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
     if (estado.modo === "blanca") lineas = ["Sobre la cabecera · piezas sólidas", "Menú, lupa y cruz · fondo de la página (--bg), sin desenfoque", "Texto e íconos · Marca/Azul", "Página actual · pastilla azul, texto en el fondo de la página", "Barra y logo · sin cambios"];
     document.querySelector(".app").dataset.modo = estado.modo || "vidrio";
     $("modos").querySelectorAll(".chip").forEach(function (c) { c.setAttribute("aria-pressed", c.dataset.modo === (estado.modo || "vidrio") ? "true" : "false"); });
-    lineas.push("", "Campo · " + tri.nombre');
+    lineas.push("", "Campo · " + tri.nombre);
     $("salida").textContent = lineas.join("\n");
     try { localStorage.setItem(CLAVE, JSON.stringify(estado)); } catch (err) {}
     aplicar();
@@ -311,7 +311,7 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
   // Tríadas: cada una recarga Hojas con ?campo=fondo-figura-acento (campo.js la toma solo para probar).
   function urlPagina() {
     var b = document.querySelector('#paginas [aria-pressed="true"], #notas [aria-pressed="true"]'), u = b.dataset.url;
-    if (u.indexOf("hojas") === -1 && u.indexOf("nota") === -1) return u;
+    if (u.indexOf("hojas") === -1 && !b.closest("#notas")) return u;
     var t = TRIADAS.filter(function (x) { return x.id === estado.triada; })[0];
     if (t && t.id !== "hoy") u += (u.indexOf("?") === -1 ? "?" : "&") + "campo=" + t.c.join("-");
     return u;
@@ -341,7 +341,7 @@ h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 1.6r
       alElegir(b);
     });
   }
-  function elegirPagina(b) { $("grupoTriada").classList.toggle("apagado", !/hojas|nota/.test(b.dataset.url)); $("frame").src = urlPagina(); }
+  function elegirPagina(b) { $("grupoTriada").classList.toggle("apagado", !(/hojas/.test(b.dataset.url) || b.closest("#notas"))); $("frame").src = urlPagina(); }
   grupoChips("paginas", elegirPagina, "#paginas .chip, #notas .chip");
   grupoChips("notas", elegirPagina, "#paginas .chip, #notas .chip");
   grupoChips("modos", function (b) { estado.modo = b.dataset.modo; pintar(); });

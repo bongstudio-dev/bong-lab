@@ -1,15 +1,18 @@
 # Documentos · fuente
 
-`../index.html` (lista) y `../ver/index.html` (visor) se generan desde esta carpeta. No editarlos a mano:
-tocar `lista.html`, `visor.html` o los datos y regenerar.
+La Biblioteca (`../`), Hojas de seguridad y la página de cada documento (`../<id>/`) se arman con Astro: ver
+`src/LEEME.md` en la raíz del repo. La lista sale de `src/componentes/Lista.astro` (la misma para la Biblioteca y Hojas
+de seguridad) con `src/paginas/biblioteca/lista.css` y `lista.js`; la página de documento, de
+`src/pages/profertil/biblioteca/[doc].astro` con `visor.css` y `visor.js`; lo que comparten las dos está en `comun.js`.
+Acá quedan los datos y los scripts que los preparan. Después de tocar algo:
 
 ```bash
-python3 profertil/biblioteca/fuente/build.py
+npm run build
 ```
 
 ## Qué hay
 
-- `lista.html`: la Biblioteca Virtual, una sola página con filtros. Misma lógica que Novedades (barra, buscador en la
+- La lista: la Biblioteca Virtual, una sola página con filtros. Misma lógica que Novedades (barra, buscador en la
   lupa, filtros en el dock, ancla, transición entre páginas) con un encabezado chico y filas en vez de tarjetas:
   sección, título, año y descarga.
   Toda la fila es el enlace al visor; el botón de descarga queda por encima.
@@ -18,35 +21,37 @@ python3 profertil/biblioteca/fuente/build.py
   Los filtros activos (cultivo, zona, año, nutriente y búsqueda) aparecen como chips que se sacan de a uno.
   Ver "Filtros" abajo.
 - Buscador: con el chip **En: Documentos** filtra la lista; sin el chip busca en todo el sitio. Es el componente
-  compartido de `../../buscador/` (ver su `LEEME.md`), que se carga en el head de `lista.html`.
-- `visor.html`: la página de un documento, `ver/?d=<id>`, para los 668 (Biblioteca, hojas de seguridad e
-  inversores). En los de la Biblioteca, el link de vuelta va a la lista; en los otros no hay link de vuelta porque su
+  compartido de `../../buscador/` (ver su `LEEME.md`), que se carga en el head de cada página (`src/componentes/Cabeza.astro`).
+- La página de un documento, `<id>/`, para los 715 (Biblioteca, hojas de seguridad, inversores y gacetillas de la
+  Sala de prensa), con el título ya puesto. La dirección de antes, `ver/?d=<id>`, lleva a la nueva conservando el `#`
+  (sin parámetro, al primero; con uno que no existe, a la lista). La lista de todos los documentos (para las
+  relacionadas) va en `../datos-docs.js`, que comparten todas las páginas de documento. En los de la Biblioteca, el link de vuelta va a la lista; en los otros no hay link de vuelta porque su
   página no está en esta maqueta. Título arriba a la izquierda y tres columnas: índice de
   páginas (el punto azul viaja con el resorte de la librería), el PDF con scroll continuo y los datos (descarga,
   cantidad de páginas, modo lectura, copiar el link). Cierra con documentos de la misma categoría y el pie.
   Las páginas se dibujan con pdf.js al ancho de la columna, solo las cercanas a la pantalla; cada una reserva su
   lugar con la proporción de su PDF y muestra el brillo de carga hasta que se dibuja.
-- **Hojas de seguridad** (`../../hojas-de-seguridad/index.html`): la misma `lista.html` con otros datos y textos (lo arma
-  `build.py`, ver `hacer_lista`). 22 documentos de `docs-msds.json`, uno por producto: sin filtros, sin ancla y sin orden por
+- **Hojas de seguridad** (`../../hojas-de-seguridad/index.html`): la misma lista con otros datos y textos
+  (`src/pages/profertil/hojas-de-seguridad/index.astro`). 22 documentos de `docs-msds.json`, uno por producto: sin filtros, sin ancla y sin orden por
   año; la fila es ícono, producto y descarga. El nombre se muestra sin "MSDS" y con las siglas entre paréntesis en
   mayúscula (lo mismo en el visor y en el buscador). Los enlaces van al visor y a los PDF de la Biblioteca; el visor
   vuelve a esta lista. `window.PF_CAMPO` amarillo con la Forma casco, la de su badge.
-  En `lista.html`, `PAG` (vacío en la Biblioteca) trae la base del visor, cómo se nombran los documentos y el campo.
+  En `lista.js`, `PAG` (vacío en la Biblioteca) trae la base del visor, cómo se nombran los documentos y el campo.
 - `docs.json`: los 627 documentos de la Biblioteca (secciones cereales, oleaginosas, pasturas, industriales y
   biblioteca). `docs-msds.json` (22 hojas de seguridad) y `docs-inversores.json` (19 informes) son de otras páginas
   del sitio nuevo: no van en la lista, pero el visor los abre igual. Las hojas de seguridad tienen su lista (arriba). Los tres los arma `prep-docs.py` desde el crawl.
 - `etiquetas.json`: las etiquetas de la Biblioteca Virtual del sitio actual por documento. Lo arma `prep-etiquetas.py`.
 - `../vendor/`: pdf.js (Apache 2.0), versión legacy para que ande también en Safari viejos.
 - `../pdf/`: copia de todos los PDF (ver "Los PDF" abajo).
-- `transicion*.{css,js}`, `logo-blanco.svg`, `simbolo-color.svg`, `assets.json`: los mismos de Novedades. El
-  `build.py` toma el logo animado de la transición del componente de la librería.
+- La transición entre páginas (`src/compartido/transicion/biblioteca/`), los logos y las Formas (`src/compartido/`)
+  son los mismos de Novedades. El logo animado de la transición se toma del componente de la librería al armar.
 
 ## Datos
 
 ```bash
 python3 profertil/biblioteca/fuente/prep-docs.py        # docs.json, docs-msds.json, docs-inversores.json
 python3 profertil/biblioteca/fuente/prep-etiquetas.py   # etiquetas.json (lee la Biblioteca Virtual del sitio actual)
-python3 profertil/biblioteca/fuente/build.py            # ../index.html y ../ver/index.html
+npm run build                                           # las páginas
 ```
 
 Un documento es una página en español de las secciones de biblioteca (`/cereales/`, `/oleaginosas/`,

@@ -1,0 +1,138 @@
+
+/* ==========================================================================
+   Visor de documentos Profertil: la página de un documento (boletín, ensayo, hoja de seguridad, informe).
+   Misma estructura que la Nota: título arriba a la izquierda y, abajo, tres columnas: el índice de páginas,
+   el PDF (todas las páginas una debajo de otra, con scroll continuo) y los datos. Cierra con documentos
+   de la misma categoría y el pie.
+   Los datos son una copia fija del sitio actual (docs.json); el PDF se dibuja con pdf.js.
+   ========================================================================== */
+/* Sin sombras: las páginas se separan del fondo por el color y una línea. */
+html { scroll-padding-top: 96px; }
+
+
+/* --- Grilla de tres columnas: índice de páginas, documento y datos. Fila 1 el título, fila 2 el resto. */
+.pf-v-grilla { width: min(100% - 32px, 1280px); margin-inline: auto; display: grid; grid-template-columns: 190px minmax(0, 780px) 190px; justify-content: center; gap: 0 56px; padding-top: calc(140px + env(safe-area-inset-top, 0px)); }
+
+/* --- Cabecera: sin caja. La etiqueta completa (forma, rótulo y año) va junto al título. */
+.pf-v-cab { grid-column: 2 / -1; grid-row: 1; }
+.pf-v-in { display: grid; gap: 18px; justify-items: start; max-width: 900px; }
+.pf-v-volver { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; color: var(--ink-2); font-size: var(--texto-chico); text-decoration: none; transition: color 200ms ease; }
+@media (hover: hover) and (pointer: fine) { .pf-v-volver:hover { color: var(--azul); } }
+.pf-v-in .pf-etiqueta { --s: var(--etq-m); margin-top: 14px; }
+.pf-v-in .pf-etiqueta__rotulo { outline: 1px solid var(--line); outline-offset: -1px; }
+.pf-v-in h1 { margin: 0; font: 600 clamp(32px, 3.8vw, 52px)/1.04 var(--f-display); letter-spacing: -0.03em; color: var(--azul); text-wrap: balance; overflow-wrap: break-word; }
+.pf-v-in h1.pf-largo { font-size: clamp(28px, 3vw, 40px); line-height: 1.08; }
+
+/* --- Documento: las páginas una debajo de otra, con el ancho de la columna. Cada una reserva su lugar con la proporción del PDF y muestra un brillo que pasa mientras se dibuja. */
+.pf-v-doc { grid-column: 2; grid-row: 2; margin-top: 56px; min-width: 0; display: grid; gap: 16px; align-content: start; }
+.pf-v-pag { position: relative; width: 100%; aspect-ratio: var(--r, 0.7071); overflow: hidden; border-radius: 6px; background: var(--color-blanco); outline: 1px solid var(--line); outline-offset: -1px; scroll-margin-top: 96px; }
+.pf-v-pag canvas { display: block; width: 100%; height: 100%; opacity: 0; transition: opacity 400ms ease; }
+.pf-v-pag.pf-lista canvas { opacity: 1; }
+.pf-v-pag.pf-esqueleto { background: linear-gradient(100deg, transparent 35%, color-mix(in srgb, var(--color-blanco) 70%, transparent) 50%, transparent 65%) var(--card); background-size: 250% 100%; animation: pf-brillo 1.5s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .pf-v-pag canvas, .pf-v-cuenta, .pf-aviso { transition: none; } }
+.pf-v-num { position: absolute; z-index: 2; right: 10px; bottom: 8px; padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--ink) 62%, transparent); color: var(--tiza); font-size: var(--texto-mini); font-variant-numeric: tabular-nums; opacity: 0; transition: opacity 200ms ease; pointer-events: none; }
+@media (hover: hover) and (pointer: fine) { .pf-v-pag:hover .pf-v-num { opacity: 1; } }
+
+/* Capa de texto: el texto del PDF, invisible, encima del dibujo. Permite seleccionar y copiar, y que la búsqueda del
+   navegador (Cmd+F) encuentre palabras dentro del documento. Las posiciones son relativas a la página y el tamaño de
+   letra sale de --total-scale-factor (ancho en pantalla / ancho del PDF), así acompaña el zoom sin rehacerse.
+   Reglas de pdf.js (web/pdf_viewer.css), reducidas a lo que usa este visor. */
+.pf-v-pag .textLayer { position: absolute; inset: 0; width: 100% !important; height: 100% !important; overflow: clip; line-height: 1; text-align: initial; text-size-adjust: none; -webkit-text-size-adjust: none; forced-color-adjust: none; transform-origin: 0 0; z-index: 1; }
+.pf-v-pag .textLayer :is(span, br) { position: absolute; color: transparent; white-space: pre; cursor: text; transform-origin: 0% 0%; }
+.pf-v-pag .textLayer span.markedContent { top: 0; height: 0; }
+.pf-v-pag .textLayer ::selection { background: color-mix(in srgb, var(--azul) 28%, transparent); color: transparent; }
+.pf-v-pag .textLayer br::selection { background: transparent; }
+
+/* --- Zoom: las páginas crecen desde el ancho de la columna. El documento se come los márgenes (hasta 16 px del borde)
+   y, si no entra, se desplaza de costado. En pantallas anchas el índice y los datos se ocultan mientras dura. */
+body.pf-zoom .pf-v-doc { --w: min(var(--pw), 100vw - 32px); width: var(--w); margin-inline: min(0px, (100% - var(--w)) / 2); grid-template-columns: var(--pw); overflow-x: auto; overscroll-behavior-x: contain; }
+@media (min-width: 1101px) { body.pf-zoom :is(.pf-v-indice, .pf-v-datos) { visibility: hidden; } }
+
+/* Cuando el PDF no está en la maqueta o no se pudo leer: un aviso en el lugar del documento. */
+.pf-v-aviso { display: grid; justify-items: start; gap: 14px; padding: 28px; border-radius: var(--radio-tarjeta); background: var(--card); }
+.pf-v-aviso p { margin: 0; max-width: 52ch; font-size: var(--texto-destacado); line-height: 1.5; color: var(--ink-2); }
+.pf-v-aviso strong { color: var(--azul); font-weight: 600; }
+
+/* --- Datos, a la derecha: sin rótulos. Páginas y modo lectura pegados y en azul, descarga y compartir. */
+.pf-v-datos { grid-column: 3; grid-row: 2; align-self: start; position: sticky; top: 112px; margin: 56px 0 0; display: grid; justify-items: start; gap: 14px; font-size: var(--texto-chico); }
+.pf-v-par { display: flex; gap: 4px; }
+.pf-v-pags { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px 0 9px; border-radius: 999px; background: var(--azul); color: var(--tiza); font-size: var(--texto-mini); font-variant-numeric: tabular-nums; }
+.pf-v-pags svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.pf-v-foco, .pf-v-copiar { display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border-radius: 999px; cursor: pointer; transition: color 200ms ease, border-color 200ms ease, background 200ms ease; }
+.pf-v-foco { border: 0; background: var(--azul); color: var(--tiza); }
+.pf-v-foco svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.pf-v-copiar { border: 1px solid var(--line); background: transparent; color: var(--ink-2); }
+.pf-v-copiar svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+@media (hover: hover) and (pointer: fine) { .pf-v-foco:hover { background: var(--ink); } .pf-v-copiar:hover { color: var(--azul); border-color: var(--azul); } }
+.pf-v-bajar { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+.pf-doc__d::after { content: ""; position: absolute; inset: -8px; border-radius: 999px; }
+/* Pastilla de abajo: aparece al entrar al documento. Dice en qué página se está (donde no hay índice: pantallas
+   medianas, celular, modo lectura y zoom) y, con mouse, lleva el zoom: alejar, nivel (vuelve al ancho) y acercar.
+   En pantallas táctiles el zoom es el de dos dedos y la página se vuelve a dibujar nítida al soltar. */
+.pf-v-cuenta { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 50; translate: -50% 12px; display: flex; align-items: center; gap: 2px; padding: 4px; border-radius: 999px; background: color-mix(in srgb, var(--ink) 86%, transparent); color: var(--tiza); font-size: var(--texto-chico); font-variant-numeric: tabular-nums; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 240ms ease, translate 320ms var(--ease), visibility 0s 320ms; }
+.pf-v-cuenta.pf-on { opacity: 1; visibility: visible; translate: -50% 0; pointer-events: auto; transition-delay: 0s; }
+.pf-v-cuenta__n { padding: 0 10px; line-height: 30px; pointer-events: none; }
+.pf-v-cuenta__sep { width: 1px; height: 16px; margin-inline: 2px; background: color-mix(in srgb, var(--tiza) 28%, transparent); }
+.pf-v-zoom { display: flex; align-items: center; gap: 2px; }
+.pf-v-zoom button { display: grid; place-items: center; min-width: 30px; height: 30px; padding: 0; border: 0; border-radius: 999px; background: transparent; color: inherit; font: inherit; font-size: var(--texto-mini); cursor: pointer; transition: background 160ms ease, opacity 160ms ease; }
+.pf-v-zoom button svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.pf-v-zoom .pf-v-zoom__nivel { min-width: 48px; }
+.pf-v-zoom button:disabled { opacity: .38; cursor: default; }
+.pf-v-zoom button:focus-visible { outline: 2px solid var(--tiza); outline-offset: -2px; }
+@media (hover: hover) and (pointer: fine) { .pf-v-zoom button:not(:disabled):hover { background: color-mix(in srgb, var(--tiza) 14%, transparent); } }
+@media (hover: none), (pointer: coarse) { .pf-v-zoom, .pf-v-cuenta__sep { display: none; } .pf-v-cuenta { padding: 3px 4px; } }
+.pf-v-cuenta.pf-una :is(.pf-v-cuenta__n, .pf-v-cuenta__sep) { display: none; }
+/* Con el índice a la vista, el número de página sobra: queda solo el zoom. */
+@media (min-width: 1101px) { body:not(.pf-foco):not(.pf-zoom) :is(.pf-v-cuenta__n, .pf-v-cuenta__sep) { display: none; } }
+.pf-v-bajar svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* --- Índice de páginas, a la izquierda: fijo al bajar. El punto azul viaja con un resorte (el de la librería) hasta la página que se está leyendo. */
+.pf-v-indice { grid-column: 1; grid-row: 2; align-self: start; position: sticky; top: 112px; margin-top: 56px; max-height: calc(100vh - 150px); overflow-y: auto; scrollbar-width: none; font-size: var(--texto-chico); }
+.pf-v-indice::-webkit-scrollbar { display: none; }
+.pf-v-indice ol { position: relative; margin: 0; padding: 0 0 0 18px; list-style: none; display: grid; gap: 8px; }
+.pf-v-indice a { display: block; color: var(--ink-2); line-height: 1.35; text-decoration: none; font-variant-numeric: tabular-nums; transition: color 200ms ease, translate var(--punto-dura, 320ms) var(--punto-curva, var(--ease)); }
+.pf-v-indice a.pf-on { color: var(--azul); translate: 4px 0; }
+@media (hover: hover) and (pointer: fine) { .pf-v-indice a:hover { color: var(--azul); translate: 4px 0; } }
+.pf-v-indice__punto { position: absolute; left: 0; top: 0; width: 7px; height: 7px; border-radius: 999px; background: var(--azul); translate: 0 var(--y, 0px); transition: translate var(--punto-dura, 420ms) var(--punto-curva, var(--ease)); }
+@media (prefers-reduced-motion: reduce) { .pf-v-indice a, .pf-v-indice__punto { transition: none; } }
+
+/* --- Modo lectura: queda el documento, con más ancho. Se sale con el mismo botón, el de arriba a la derecha o Esc. */
+body.pf-foco :is(.pf-barra, .pf-v-indice, .pf-v-datos, .pf-v-cab, .pf-v-sigue, .pf-pie) { display: none; }
+body.pf-foco .pf-v-grilla { grid-template-columns: minmax(0, 860px); padding-top: 40px; }
+body.pf-foco .pf-v-doc { grid-column: 1; grid-row: 1; margin-top: 0; padding-bottom: 120px; }
+.pf-v-salir { position: fixed; top: calc(20px + env(safe-area-inset-top, 0px)); right: 20px; z-index: 60; display: inline-flex; align-items: center; gap: 10px; height: 38px; padding: 0 8px 0 16px; border: 1px solid var(--line); border-radius: 999px; background: var(--bg); color: var(--ink-2); font-size: var(--texto-chico); cursor: pointer; }
+.pf-v-salir kbd { padding: 3px 7px; border-radius: 999px; background: var(--card); font: inherit; font-size: var(--texto-mini); color: var(--ink-2); }
+@media (hover: hover) and (pointer: fine) { .pf-v-salir:hover { color: var(--azul); border-color: var(--azul); } }
+@media (hover: none) { .pf-v-salir kbd { display: none; } }
+
+/* --- Más documentos: filas, las mismas de la lista. */
+.pf-v-sigue { margin-top: 128px; }
+.pf-v-sigue__cab { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 20px; margin-bottom: 20px; }
+.pf-v-sigue__cab h2 { margin: 0; font: 600 var(--texto-subtitulo)/1.1 var(--f-display); letter-spacing: -0.02em; color: var(--azul); }
+.pf-v-sigue__cab a { display: inline-flex; align-items: center; gap: 6px; color: var(--azul); font-size: var(--texto-chico); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, var(--celeste) 60%, transparent); }
+
+
+/* --- Pantallas medianas y celular: una columna; el índice se va y los datos pasan arriba del documento. */
+@media (max-width: 1100px) {
+  .pf-v-grilla { grid-template-columns: minmax(0, 780px); }
+  .pf-v-cab, .pf-v-datos, .pf-v-doc { grid-column: 1; }
+  .pf-v-datos { grid-row: 2; position: static; margin: 28px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .pf-v-doc { grid-row: 3; margin-top: 28px; }
+  .pf-v-indice { display: none; }
+  /* Sin cursor fino, los controles redondos suben a 40 px (el alto del botón de descarga). */
+  .pf-v-foco, .pf-v-copiar { width: 40px; height: 40px; }
+  .pf-v-pags { height: 40px; padding: 0 14px 0 11px; }
+}
+@media (max-width: 640px) {
+  .pf-v-grilla { padding-top: calc(108px + env(safe-area-inset-top, 0px)); }
+  .pf-v-in { gap: 14px; }
+  .pf-v-in .pf-etiqueta { margin-top: 10px; }
+  /* Descarga, páginas, modo lectura y link en una sola línea. */
+  .pf-v-datos { flex-wrap: nowrap; gap: 6px; }
+  .pf-v-pdf { display: none; }
+  .pf-v-datos .pf-boton { padding-inline: 14px; }
+  .pf-v-in h1 { font-size: 2rem; }
+  .pf-v-in h1.pf-largo { font-size: 1.65rem; }
+  .pf-v-sigue { margin-top: 80px; }
+  .pf-v-aviso { padding: 20px; }
+}

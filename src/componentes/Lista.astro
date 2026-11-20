@@ -1,0 +1,85 @@
+---
+// Plantilla de lista de documentos: la Biblioteca Virtual y Hojas de seguridad (la misma página con otros datos y textos).
+// Filas con el título, la etiqueta de la categoría, el año y la descarga; cada fila lleva a la página del documento
+// (biblioteca/<id>/). Tres vistas (compacta, lista y miniaturas), filtros en el dock, ancla y cabecera con campo de Formas.
+// El comportamiento está en src/paginas/biblioteca/lista.js (con el bloque común de comun.js) y el estilo en lista.css.
+import Pagina from "./Pagina.astro";
+import Cabeza from "./Cabeza.astro";
+import Simbolos from "./Simbolos.astro";
+import Barra from "./Barra.astro";
+import Dock from "./Dock.astro";
+import Ancla from "./Ancla.astro";
+import Pie from "./Pie.astro";
+import { armar, assets, js } from "../lib/sistema.mjs";
+import CSS from "../paginas/biblioteca/lista.css?raw";
+import JS from "../paginas/biblioteca/lista.js?raw";
+import COMUN from "../paginas/biblioteca/comun.js?raw";
+
+interface Props {
+  titulo: string; descripcion: string; firma: { nombre: string; que: string; contexto: string };
+  alcance: { seccion: string; nombre: string; en: string };
+  saltar: string; busca: { etiqueta: string; placeholder: string };
+  h1: string; bajada: string; vaciar: string;
+  docs: unknown[]; grupos: unknown[]; pag?: Record<string, unknown>; css?: string;
+}
+const p = Astro.props;
+const script = armar(JS, {
+  "/*__COMUN__*/": COMUN, "/*__DOCS__*/[]": js(p.docs), "/*__GRUPOS__*/[]": js(p.grupos),
+  "/*__ASSETS__*/{}": js(assets()), "/*__PAG__*/{}": p.pag ? js(p.pag) : "{}",
+});
+---
+<Pagina firma={p.firma} transicion="biblioteca" css={CSS + (p.css || "")} campo="js">
+<Cabeza slot="head" titulo={p.titulo} descripcion={p.descripcion} raiz="../" temaColor mono barraVista alcance={p.alcance} />
+
+<Simbolos badge />
+
+<a class="pf-saltar" href="#pf-lista">{p.saltar}</a>
+
+<Barra busca={p.busca} cuenta />
+
+<header class="pf-bh" id="pf-cab">
+  <h1>{p.h1}</h1>
+  <p>{p.bajada}</p>
+</header>
+
+<div class="pf-hoja" id="pf-hoja">
+
+<main class="pf-col" id="pf-lista" tabindex="-1">
+  <div class="pf-result-row">
+    <div class="pf-result-main">
+      <p class="pf-result-text" id="pf-resultText" aria-live="polite"></p>
+      <div class="pf-activos" id="pf-activos"></div>
+    </div>
+    <div class="pf-herramientas">
+      <div class="pf-selector pf-orden" role="group" aria-label="Orden">
+        <span class="pf-selector__ind" aria-hidden="true"></span>
+        <button type="button" id="pf-sortAz" aria-pressed="true">A a Z</button>
+        <button type="button" id="pf-sortAnio" aria-pressed="false">Por año</button>
+      </div>
+      <div class="pf-selector pf-selector--iconos pf-vista" role="group" aria-label="Cómo se ven los documentos">
+        <span class="pf-selector__ind" aria-hidden="true"></span>
+        <button type="button" data-vista="compacta" aria-pressed="false" aria-label="Lista compacta" title="Compacta"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0.5" width="15" height="2" rx="1"/><rect x="0" y="4.5" width="15" height="2" rx="1"/><rect x="0" y="8.5" width="15" height="2" rx="1"/><rect x="0" y="12.5" width="15" height="2" rx="1"/></svg></button>
+        <button type="button" data-vista="lista" aria-pressed="true" aria-label="Lista" title="Lista"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0" width="4" height="4" rx="1.3"/><rect x="6" y="1" width="9" height="2" rx="1"/><rect x="0" y="5.5" width="4" height="4" rx="1.3"/><rect x="6" y="6.5" width="9" height="2" rx="1"/><rect x="0" y="11" width="4" height="4" rx="1.3"/><rect x="6" y="12" width="9" height="2" rx="1"/></svg></button>
+        <button type="button" data-vista="mini" aria-pressed="false" aria-label="Miniaturas" title="Miniaturas"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0" width="6.5" height="6.5" rx="2.1"/><rect x="8.5" y="0" width="6.5" height="6.5" rx="2.1"/><rect x="0" y="8.5" width="6.5" height="6.5" rx="2.1"/><rect x="8.5" y="8.5" width="6.5" height="6.5" rx="2.1"/></svg></button>
+      </div>
+    </div>
+  </div>
+  <ul class="pf-docs" id="pf-docs" data-vista="lista"></ul>
+  <div class="pf-empty" id="pf-empty" hidden>
+    <svg viewBox="0 0 555 662" aria-hidden="true"><use href="#pf-simbolo"/></svg>
+    <p id="pf-emptyText"></p>
+    <button class="pf-boton pf-boton--verde" id="pf-emptyReset" type="button">{p.vaciar}</button>
+  </div>
+  <div class="pf-sentinel" id="pf-sentinel"></div>
+</main>
+<Pie />
+</div>
+
+<Dock>
+    <div class="pf-f-grupos" id="pf-fGrupos"></div>
+</Dock>
+
+<Ancla />
+
+<script is:inline set:html={"\n" + script}></script>
+</Pagina>

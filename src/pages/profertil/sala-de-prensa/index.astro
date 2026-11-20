@@ -1,0 +1,119 @@
+---
+// Sala de prensa: una sola página con pestañas (Gacetillas, Fotos, Logos), el contacto de prensa en la cabecera con
+// campo, filtros en el dock y ancla. Las gacetillas abren en la página de cada documento de la Biblioteca
+// (biblioteca/<id>/). El comportamiento está en src/paginas/sala-de-prensa/sala.js y el estilo en sala.css.
+import Pagina from "../../../componentes/Pagina.astro";
+import Cabeza from "../../../componentes/Cabeza.astro";
+import Simbolos from "../../../componentes/Simbolos.astro";
+import Barra from "../../../componentes/Barra.astro";
+import Dock from "../../../componentes/Dock.astro";
+import Ancla from "../../../componentes/Ancla.astro";
+import Pie from "../../../componentes/Pie.astro";
+import { armar, assets, js } from "../../../lib/sistema.mjs";
+import { PRENSA } from "../../../lib/datos.mjs";
+import CSS from "../../../paginas/sala-de-prensa/sala.css?raw";
+import JS from "../../../paginas/sala-de-prensa/sala.js?raw";
+const script = armar(JS, { "/*__PRENSA__*/{}": js(PRENSA), "/*__ASSETS__*/{}": js(assets()) });
+---
+<Pagina firma={{ nombre: "PROFERTIL · SALA DE PRENSA", que: "Maqueta de la Sala de prensa: gacetillas, fotos y logos reales del sitio actual.", contexto: "Prototipo de la Sala de prensa para la web de Profertil." }} transicion="biblioteca" css={CSS} campo="js">
+<Cabeza slot="head" titulo="Sala de prensa Profertil" descripcion="Maqueta de la Sala de prensa de profertil.com.ar sobre el concepto web del manual de marca: las gacetillas, fotos y logos reales del sitio actual, en una sola página con pestañas, filtros y el contacto de prensa." raiz="../" temaColor mono barraVista alcance={{ seccion: "prensa", nombre: "Prensa", en: "la Sala de prensa" }} />
+
+<Simbolos badge />
+
+<a class="pf-saltar" href="#pf-lista">Ir a la Sala de prensa</a>
+
+<Barra busca={{ etiqueta: "Buscar en la Sala de prensa", placeholder: "Buscá: planta, premios, urea…" }} cuenta />
+
+<header class="pf-bh" id="pf-cab">
+  <h1>Sala de prensa</h1>
+  <p>Muchas gracias por ayudarnos a difundir nuestro propósito de cuidar el suelo para generar alimentos sanos y nutritivos. Acá encontrás gacetillas, fotos y logos para tu trabajo periodístico.</p>
+  <section class="pf-contacto" aria-labelledby="pf-contacto-t">
+    <h2 id="pf-contacto-t"><button type="button" class="pf-ct-cab" id="pf-ct-cab" aria-expanded="false" aria-controls="pf-ct-det">
+      <span class="pf-ct-caras" id="pf-ct-caras" aria-hidden="true"></span>
+      <span class="pf-ct-tit">Contacto de prensa<span class="pf-ct-nombres" id="pf-ct-nombres"></span></span>
+      <span class="pf-ct-flecha" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></span>
+    </button></h2>
+    <div class="pf-ct-det" id="pf-ct-det" hidden><ul class="pf-personas" id="pf-personas"></ul></div>
+    <div class="pf-area" id="pf-area"></div>
+  </section>
+</header>
+
+<div class="pf-hoja" id="pf-hoja">
+<main class="pf-col" id="pf-lista" tabindex="-1">
+  <div class="pf-pest" id="pf-pest">
+    <div class="pf-selector pf-pestanas" role="tablist" aria-label="Material de prensa">
+      <span class="pf-selector__ind" aria-hidden="true"></span>
+      <button type="button" role="tab" id="pf-t-gacetillas" data-tab="gacetillas" aria-controls="gacetillas" aria-pressed="true" aria-selected="true">Gacetillas</button>
+      <button type="button" role="tab" id="pf-t-fotos" data-tab="fotos" aria-controls="fotos" aria-pressed="false" aria-selected="false">Fotos</button>
+      <button type="button" role="tab" id="pf-t-logos" data-tab="logos" aria-controls="logos" aria-pressed="false" aria-selected="false">Logos</button>
+    </div>
+    <div class="pf-herramientas" id="pf-herr">
+      <div class="pf-selector pf-selector--iconos pf-vista" data-para="gacetillas" role="group" aria-label="Cómo se ven las gacetillas">
+        <span class="pf-selector__ind" aria-hidden="true"></span>
+        <button type="button" data-vista="compacta" aria-pressed="false" aria-label="Lista compacta" title="Compacta"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0.5" width="15" height="2" rx="1"/><rect x="0" y="4.5" width="15" height="2" rx="1"/><rect x="0" y="8.5" width="15" height="2" rx="1"/><rect x="0" y="12.5" width="15" height="2" rx="1"/></svg></button>
+        <button type="button" data-vista="lista" aria-pressed="true" aria-label="Lista" title="Lista"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0" width="4" height="4" rx="1.3"/><rect x="6" y="1" width="9" height="2" rx="1"/><rect x="0" y="5.5" width="4" height="4" rx="1.3"/><rect x="6" y="6.5" width="9" height="2" rx="1"/><rect x="0" y="11" width="4" height="4" rx="1.3"/><rect x="6" y="12" width="9" height="2" rx="1"/></svg></button>
+        <button type="button" data-vista="mini" aria-pressed="false" aria-label="Miniaturas" title="Miniaturas"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0" width="6.5" height="6.5" rx="2.1"/><rect x="8.5" y="0" width="6.5" height="6.5" rx="2.1"/><rect x="0" y="8.5" width="6.5" height="6.5" rx="2.1"/><rect x="8.5" y="8.5" width="6.5" height="6.5" rx="2.1"/></svg></button>
+      </div>
+      <div class="pf-selector pf-selector--iconos pf-densidad" data-para="fotos" role="group" aria-label="Tamaño de las fotos" hidden>
+        <span class="pf-selector__ind" aria-hidden="true"></span>
+        <button type="button" data-vista="chico" aria-pressed="false" aria-label="Fotos chicas" title="Chicas"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0" width="4" height="4" rx="1.3"/><rect x="5.5" y="0" width="4" height="4" rx="1.3"/><rect x="11" y="0" width="4" height="4" rx="1.3"/><rect x="0" y="5.5" width="4" height="4" rx="1.3"/><rect x="5.5" y="5.5" width="4" height="4" rx="1.3"/><rect x="11" y="5.5" width="4" height="4" rx="1.3"/><rect x="0" y="11" width="4" height="4" rx="1.3"/><rect x="5.5" y="11" width="4" height="4" rx="1.3"/><rect x="11" y="11" width="4" height="4" rx="1.3"/></svg></button>
+        <button type="button" data-vista="medio" aria-pressed="true" aria-label="Fotos medianas" title="Medianas"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0" width="6.5" height="6.5" rx="2.1"/><rect x="8.5" y="0" width="6.5" height="6.5" rx="2.1"/><rect x="0" y="8.5" width="6.5" height="6.5" rx="2.1"/><rect x="8.5" y="8.5" width="6.5" height="6.5" rx="2.1"/></svg></button>
+        <button type="button" data-vista="grande" aria-pressed="false" aria-label="Fotos grandes" title="Grandes"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0" width="15" height="15" rx="4.8"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="pf-cambia" id="pf-cambia">
+  <div class="pf-result-row">
+    <div class="pf-result-main">
+      <p class="pf-result-text" id="pf-resultText" aria-live="polite"></p>
+      <div class="pf-activos" id="pf-activos"></div>
+    </div>
+  </div>
+
+  <section class="pf-panel" id="gacetillas" role="tabpanel" aria-labelledby="pf-t-gacetillas">
+    <ul class="pf-docs" id="pf-docs" data-vista="lista"></ul>
+  </section>
+
+  <section class="pf-panel" id="fotos" role="tabpanel" aria-labelledby="pf-t-fotos" hidden>
+    <div class="pf-fotos" id="pf-fotos"></div>
+  </section>
+
+  <section class="pf-panel" id="logos" role="tabpanel" aria-labelledby="pf-t-logos" hidden>
+    <ul class="pf-logos" id="pf-logos"></ul>
+    <p class="pf-logos-pie">Cada versión en SVG y PDF (vectoriales, para impresión y pantalla) y en PNG. Para otros usos de la marca, escribinos a <a href="mailto:prensa@profertil.com.ar">prensa@profertil.com.ar</a>.</p>
+  </section>
+
+  <div class="pf-empty" id="pf-empty" hidden>
+    <svg viewBox="0 0 555 662" aria-hidden="true"><use href="#pf-simbolo"/></svg>
+    <p id="pf-emptyText"></p>
+    <button class="pf-boton pf-boton--verde" id="pf-emptyReset" type="button">Ver todo</button>
+  </div>
+  </div>
+</main>
+<Pie />
+</div>
+
+<Dock>
+    <div class="pf-f-grupos" id="pf-fGrupos"></div>
+</Dock>
+
+<Ancla />
+
+<dialog class="pf-vf" id="pf-vf" aria-label="Foto">
+  <div class="pf-vf__cab">
+    <p class="pf-vf__t" id="pf-vfT"></p>
+    <div class="pf-vf__acc">
+      <a class="pf-boton-icono" id="pf-vfBajar" href="#" download target="_blank" rel="noopener" aria-label="Descargar la foto original" title="Descargar la foto original"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v13M6 13l6 6 6-6"/></svg></a>
+      <button class="pf-boton-icono" id="pf-vfCerrar" type="button" aria-label="Cerrar" title="Cerrar (Esc)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+  </div>
+  <div class="pf-vf__esc" id="pf-vfEsc">
+    <button class="pf-boton-icono pf-vf__ant" id="pf-vfAnt" type="button" aria-label="Foto anterior"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+    <button class="pf-boton-icono pf-vf__sig" id="pf-vfSig" type="button" aria-label="Foto siguiente"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+  </div>
+  <p class="pf-vf__pie">Fotos de libre uso para notas sobre Profertil.</p>
+</dialog>
+
+<script is:inline set:html={"\n" + script}></script>
+</Pagina>

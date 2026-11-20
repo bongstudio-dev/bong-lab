@@ -1,0 +1,379 @@
+
+/* ==========================================================================
+   Novedades Profertil: maqueta del archivo de notas.
+   Layout: barra fija con logo, menu y la lupa que se expande en buscador;
+   carrusel a pantalla completa con las cinco notas destacadas; grilla
+   masonry de tarjetas y panel de filtros flotante (categoria y año).
+   Paleta, pares de color, formas e iconos son los oficiales del manual de
+   marca y de las herramientas del sistema. Un solo tema, a proposito: el
+   manual define la web sobre tiza y no tiene version oscura.
+   ========================================================================== */
+
+
+/* Sin el destello gris de Safari al tocar (el resto del tacto está en la pieza "pagina" de base.css). */
+@media (hover: none) {
+  .pf-card:active { transform: scale(0.985); transition-duration: 120ms; }
+  .pf-d-flecha:active { background: var(--tiza); color: var(--azul); }
+  .pf-d-cta:active { background: #fff; }
+}
+
+/* --- Destacadas: carrusel a pantalla completa ---------------------------
+   Las cinco notas mas recientes (o las de DESTACADAS, si se cargan), una por
+   pantalla, como en el archivo de waabi.pf-ai/insights y como las stories: la
+   barra de la nota se llena y al terminar entra la siguiente deslizandose de
+   costado. Tocar a la derecha pasa, a la izquierda vuelve, mantener apretado
+   pausa y en touch la placa sigue al dedo. Se frena tambien con el foco del
+   teclado, fuera de vista o con la nota abierta.
+   Cada placa es la foto de la nota recortada como una hoja (dos esquinas
+   opuestas redondeadas) entre dos Flores del sistema enormes, una detras y
+   otra delante: el mismo lenguaje que las piezas de redes (Figma Master,
+   Header de noticias · con foto). Parallax al hacer scroll y al pasar de
+   placa: ver "Profundidad" abajo. */
+.pf-dest {
+  position: relative; overflow: hidden;
+  height: 100vh; height: 100svh; min-height: 540px;
+  background: var(--azul); color: var(--tiza);
+  touch-action: pan-y;
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+}
+/* La posicion de cada placa la maneja el JS (translateX); aca solo cual se ve. */
+.pf-d-slide { position: absolute; inset: 0; visibility: hidden; transform: translateX(100%); will-change: transform; }
+.pf-d-slide.pf-vis { visibility: visible; }
+.pf-d-slide.pf-on { z-index: 1; }
+.pf-d-slide { overflow: hidden; background: var(--fondo); }
+.pf-d-art { position: absolute; inset: 0; }
+/* Escena: la caja de la foto. Las flores se ubican en unidades de su ancho
+   (cqw), asi los arcos cruzan las mismas esquinas en cualquier pantalla. Sin
+   deriva ni reaccion al mouse: las capas solo se mueven con el scroll y el pase.
+   Composicion: Figma Master, "Destacadas con foto" Desktop normal (1440 x 900),
+   Desktop ancho (2011 x 900) y Mobile (375 x 812), ajustada a ojo:
+   armonica, no simetrica. La Flor de adelante compensa el peso de la foto y
+   de la Flor de atras. Hasta 1440 la foto es media pantalla y sangra por la
+   derecha; de 1440 a 2011 los valores pasan de una composicion a la otra con
+   --t (0 a 571 px) y desde 2011 quedan fijos: la foto deja de crecer y entra
+   en pantalla, la Flor de atras baja y la de adelante crece hacia la izquierda.
+   Los coeficientes de --t son la diferencia entre los dos frames (en px, con la
+   foto de 720) dividida 571.
+   Zona segura del texto: la columna va del margen del contenido (--m) hasta la
+   foto menos 48 px (--g) y nunca es menor a 560 px (--col; en pantallas chicas,
+   media pantalla). Si no entra, cede la foto: primero se corre a la derecha y
+   sangra mas (hasta 12vw afuera) y despues se achica. El titulo se escala con
+   esa columna (ver .pf-d-in h2). */
+.pf-dest {
+  --t: clamp(0px, 100vw - 1440px, 571px);
+  --m: max(16px, (100vw - 1320px) / 2);
+  --g: 48px;
+  --col: min(560px, 50vw);
+  --f-ini: calc(var(--m) + var(--col) + var(--g));
+  --f-der0: calc(-2.8vw + var(--t) * 0.6);
+  --f-ancho0: min(50vw, 80svh);
+  --f-der: max(-12vw, min(var(--f-der0), 100vw - var(--f-ini) - var(--f-ancho0)));
+  --f-ancho: min(var(--f-ancho0), 100vw - var(--f-der) - var(--f-ini));
+}
+.pf-d-esc { position: absolute; z-index: 1; top: 15.5%; bottom: 15.5%; right: var(--f-der); width: var(--f-ancho); container-type: size; }
+.pf-d-capa { position: absolute; display: block; height: auto; }
+.pf-d-capa svg { display: block; width: 100%; height: auto; }
+/* Profundidad, en dos niveles y sin JS en cada cuadro:
+   - Scroll: la capa (.pf-d-capa) sube con la pagina a su velocidad mediante una
+     animacion atada al scroll (animation-timeline), que el navegador mueve en el
+     mismo paso que la pagina. Asi no tironea en Safari (el parallax con JS
+     llegaba un cuadro tarde). Donde no hay soporte (Safari < 26) queda quieta.
+     --v es cuanto se queda atras por cada px de scroll: positivo va mas lento
+     (lejos), negativo mas rapido (cerca).
+   - Pase de placa: adentro, .pf-d-desliz acompana el deslizamiento con su propia
+     velocidad: --sx es donde esta la placa (-1 a 1, lo escribe el JS al pasar)
+     y --k cuanto se separa de ella. --tr es la misma transicion que la placa. */
+.pf-d-desliz { display: block; transform: translate3d(calc(var(--sx, 0) * var(--k)), 0, 0); transition: var(--tr, none); }
+@supports (animation-timeline: scroll()) {
+  .pf-d-capa { animation: pf-d-prof linear both; animation-timeline: scroll(root block); animation-range: 0px 1000px; }
+  @keyframes pf-d-prof { to { transform: translate3d(0, calc(var(--v) * 1000px), 0); } }
+}
+.pf-d-atras { --v: 0.45; --k: -48vw; width: 236cqw; left: calc(36.1cqw + var(--t) * 0.1475); top: calc(-179.2cqw + var(--t) * 1.1955); color: var(--atras); }
+.pf-d-frente { --v: -0.25; --k: 38vw; z-index: 2; width: calc(180.6cqw + var(--t) * 0.2862); left: calc(-157.1cqw - var(--t) * 0.2875); top: calc(100cqh - 22.8cqw - var(--t) * 0.1122); color: var(--frente); }
+.pf-d-foto { --v: 0.2; --k: -16vw; z-index: 1; inset: 0; }
+.pf-d-foto .pf-d-desliz, .pf-d-recorte { position: absolute; inset: 0; }
+.pf-d-recorte { overflow: hidden; border-radius: 0 37cqw 0 37cqw; background: rgba(255, 254, 239, 0.12); }
+.pf-d-foto img { display: block; width: 100%; height: 100%; object-fit: cover; transform: scale(1.1); transition: transform 9s linear, opacity 600ms ease; }
+.pf-d-foto img.pf-carga { opacity: 0; }
+.pf-d-slide.pf-on .pf-d-foto img { transform: scale(1.02); }
+/* El bloque de texto va centrado con la foto (Figma: 216 a 672 en 900 de alto). */
+.pf-d-txt { position: absolute; z-index: 3; left: 0; right: 0; top: 50%; transform: translateY(calc(-50% - 6px)); }
+.pf-d-in { display: grid; gap: 22px; justify-items: start; max-width: min(720px, 100vw - var(--f-der) - var(--f-ancho) - var(--g) - var(--m)); container-type: inline-size; }
+.pf-d-kick { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; font-size: 0.95rem; color: rgba(255, 254, 239, 0.88); }
+.pf-d-kick .pf-etiqueta { --s: var(--etq-l); }
+.pf-d-in h2 {
+  margin: 0;
+  font-family: var(--f-display); font-weight: 600;
+  /* Entre 64 y 88: el 13.5% de la columna (unos 15 caracteres por linea) y,
+     en pantallas bajas, lo que deja el alto para 5 lineas entre la barra y los
+     indicadores. Los titulos de mas de 80 caracteres (el 10% de las notas) van
+     a 64 (.pf-largo). Una palabra sin cortes (p. ej. "compartida.pf-Profertil") se
+     parte antes que pisar la foto. */
+  font-size: clamp(64px, min(13.5cqi, (100svh - 330px) / 4.7), 88px); line-height: 0.94; letter-spacing: -0.04em;
+  text-wrap: balance; overflow-wrap: break-word;
+}
+.pf-d-in h2.pf-largo { font-size: 64px; }
+.pf-d-bajada { margin: 0; max-width: 56ch; font-size: clamp(1rem, 1.4vw, 1.12rem); line-height: 1.5; color: rgba(255, 254, 239, 0.9); }
+.pf-d-cta {
+  display: inline-flex; align-items: center; gap: 10px;
+  height: var(--btn-l); padding: 0 22px 0 24px;
+  border: 0; border-radius: 999px; cursor: pointer;
+  background: var(--tiza); color: var(--azul);
+  font-family: var(--f-body); font-size: round(calc(var(--btn-l) * .274), 1px); font-weight: 500;
+  line-height: 1; text-box: trim-both cap alphabetic; /* igual que el botón sobre color de base.css */
+  transition: background 200ms ease, color 200ms ease;
+}
+@media (hover: hover) and (pointer: fine) { .pf-d-cta:hover { background: #fff; } }
+.pf-d-cta svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 260ms var(--ease); }
+@media (hover: hover) and (pointer: fine) { .pf-d-cta:hover svg { transform: translateX(3px); } }
+
+/* Indicadores: una barra por nota, como en las stories: las anteriores
+   llenas y la actual llenandose (las mueve el JS). Sin texto: el titulo ya
+   esta en la placa. */
+.pf-d-nav { position: absolute; z-index: 2; left: 0; right: 0; bottom: calc(26px + env(safe-area-inset-bottom, 0px)); }
+.pf-d-nav .pf-wrap { display: flex; align-items: center; gap: 28px; }
+.pf-d-segs { flex: 1; min-width: 0; display: grid; grid-template-columns: repeat(var(--n, 5), minmax(0, 1fr)); gap: 16px; }
+.pf-d-seg { display: grid; padding: 14px 0; border: 0; background: transparent; cursor: pointer; text-align: left; color: rgba(255, 254, 239, 0.56); transition: color 240ms ease; }
+.pf-d-seg.pf-on { color: var(--tiza); }
+@media (hover: hover) and (pointer: fine) { .pf-d-seg:hover { color: var(--tiza); } }
+.pf-d-bar { display: block; height: 2px; border-radius: 2px; background: rgba(255, 254, 239, 0.26); overflow: hidden; }
+.pf-d-bar i { display: block; height: 100%; background: var(--tiza); transform: scaleX(0); transform-origin: left; }
+.pf-d-flechas { flex: none; display: flex; gap: 8px; }
+.pf-d-flecha {
+  width: 46px; height: 46px; border-radius: 999px; cursor: pointer;
+  border: 1px solid rgba(255, 254, 239, 0.3); background: rgba(255, 254, 239, 0.08); color: var(--tiza);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  display: grid; place-items: center; transition: background 200ms ease, color 200ms ease;
+}
+@media (hover: hover) and (pointer: fine) { .pf-d-flecha:hover { background: var(--tiza); color: var(--azul); } }
+.pf-d-flecha svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* --- Resultado ------------------------------------------------------------ */
+.pf-herramientas { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.pf-herramientas .pf-vista { margin-left: auto; } /* la vista siempre contra el borde derecho */
+/* Selectores fijos al bajar (la lógica de la Sala de prensa): cuando la fila de selectores llega a la barra azul pasa a position: fixed,
+   no sticky (en el celular lo sticky tiembla un píxel contra la barra cuando la del navegador se achica o se agranda). En su lugar
+   queda un hueco del mismo tamaño (.pf-herr-lugar, lo arma el JS). Al bajar se va por detrás de la barra; al subir vuelve. La fila deja
+   pasar los clics y los selectores los toman; los selectores con su tono opaco, para leerse sobre las tarjetas. */
+.pf-herr-lugar { display: none; flex: none; }
+.pf-herr-lugar.pf-activo { display: block; }
+.pf-herramientas { position: relative; z-index: 20; transition: transform 380ms var(--ease), opacity 260ms ease; will-change: transform; }
+.pf-herramientas .pf-selector { background: linear-gradient(var(--line), var(--line)), var(--pf-papel, var(--bg)); } /* acá no hay --pf-papel: el fondo de la página */
+.pf-herramientas.pf-fija { position: fixed; top: calc(var(--pf-barra-h, 76px) + 9px); pointer-events: none; }
+.pf-herramientas.pf-fija .pf-selector { pointer-events: auto; }
+.pf-herramientas.pf-escondida { transform: translateY(calc(-100% - 18px)); opacity: 0; }
+.pf-herramientas.pf-escondida .pf-selector { pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .pf-herramientas { transition: opacity 200ms ease; } .pf-herramientas.pf-escondida { transform: none; } }
+/* Donde se puede, la fila va siempre fixed y la mueve el navegador atado al scroll: baja con la página hasta la barra y ahí queda (el JS
+   solo mide --herr-desde, --herr-hasta y --herr-recorrido). Así no depende de que el JS llegue a tiempo y no se pasa de largo aunque la
+   página esté ocupada (el carrusel). Para esconderla se usa translate, que se suma a la animación. */
+@keyframes pf-herr-baja { from { transform: translateY(var(--herr-desde, 0px)); } to { transform: translateY(var(--herr-hasta, 0px)); } }
+@supports (animation-timeline: scroll()) {
+  .pf-herramientas.pf-atada { position: fixed; top: 0; pointer-events: none; animation: pf-herr-baja linear both; animation-timeline: scroll(root block);
+    animation-range: 0px var(--herr-recorrido, 0px); transition: translate 380ms var(--ease), opacity 260ms ease; }
+  .pf-herramientas.pf-atada .pf-selector { pointer-events: auto; }
+  .pf-herramientas.pf-atada.pf-escondida { translate: 0 calc(-100% - 18px); }
+  .pf-herramientas.pf-atada.pf-escondida .pf-selector { pointer-events: none; }
+  @media (prefers-reduced-motion: reduce) { .pf-herramientas.pf-atada { transition: opacity 200ms ease; } .pf-herramientas.pf-atada.pf-escondida { translate: none; } }
+}
+/* Celular: la barra de vista es la pieza compartida (barra-vista en base.css y barra-vista.js); nada de lo anterior corre acá.
+   El JS la pone entre el contador y la grilla. */
+@media (max-width: 640px) {
+  .pf-vuelve-marca + .pf-herramientas { margin-top: 22px; }   /* el padding de arriba de .pf-result-row */
+  .pf-herramientas + .pf-result-row { padding-block: 12px; }
+}
+/* El Selector es la pieza "selector" de base.css. Al cambiar de vista el indicador lo mueve la View
+   Transition, junto con las tarjetas; al cambiar el orden, su transición. */
+.pf-selector.pf-vista .pf-selector__ind { view-transition-name: pf-ind-vista; }
+/* Los botones tambien viajan como capa propia: si no, quedan en la foto de la
+   pagina, que la View Transition pinta debajo del indicador, y el icono
+   elegido se tapa mientras el indicador se mueve. */
+.pf-selector.pf-vista [data-vista="chico"] { view-transition-name: pf-vista-chico; }
+.pf-selector.pf-vista [data-vista="medio"] { view-transition-name: pf-vista-medio; }
+.pf-selector.pf-vista [data-vista="grande"] { view-transition-name: pf-vista-grande; }
+
+/* --- Vista: tres tamaños de tarjeta (chico, medio, grande), un ícono cada
+   uno, con el mismo estilo que el orden. El cambio se anima con View
+   Transitions donde hay. En mobile no hay "chico". */
+@media (max-width: 640px) { .pf-selector.pf-vista [data-vista="chico"] { display: none; } }
+::view-transition-group(*) { animation-duration: var(--t-vista); animation-timing-function: var(--curva-vista); }
+/* La transición entre páginas mueve la foto de toda la página (root). En el cambio de
+   vista esa foto no tiene nada que animar: se cambia de golpe y solo viajan las tarjetas
+   y el indicador; si no, la página entera se corre junto con ellas. */
+:root.pf-vt-vista::view-transition-old(root) { display: none; }
+:root.pf-vt-vista::view-transition-new(root) { animation: none; }
+/* Las tarjetas que viajan se pintan en una capa por encima de toda la página: con la página bajada, pasaban por arriba de lo que
+   está fijo en pantalla. Durante el cambio de vista eso fijo también viaja como capa propia (no se mueve, solo se apila) y cada
+   capa toma la altura que tiene en la página, así queda siempre arriba de las tarjetas. */
+:root.pf-vt-vista #pf-top { view-transition-name: pf-vt-barra; }
+:root.pf-vt-vista .pf-herramientas { view-transition-name: pf-vt-herr; }
+:root.pf-vt-vista .pf-filters { view-transition-name: pf-vt-filtros; }
+:root.pf-vt-vista .pf-ancla { view-transition-name: pf-vt-ancla; }
+:root.pf-vt-vista .pf-tr-panel { view-transition-name: pf-vt-panel; }
+::view-transition-group(pf-vt-herr) { z-index: 20; }
+::view-transition-group(pf-ind-vista), ::view-transition-group(pf-vista-chico),
+::view-transition-group(pf-vista-medio), ::view-transition-group(pf-vista-grande) { z-index: 21; }
+::view-transition-group(pf-vt-filtros) { z-index: 40; }
+::view-transition-group(pf-vt-ancla) { z-index: 41; }
+::view-transition-group(pf-vt-barra) { z-index: 50; }
+::view-transition-group(pf-vt-panel) { z-index: 80; }
+
+/* --- Grilla --------------------------------------------------------------- */
+.pf-grid { display: flex; gap: 16px; align-items: flex-start; padding-bottom: 170px; }
+.pf-gcol { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+.pf-gcol.pf-medidor { position: absolute; left: 0; top: 0; visibility: hidden; pointer-events: none; }
+
+a.pf-card, a.pf-d-cta { text-decoration: none; }
+.pf-card {
+  position: relative; display: grid; text-align: left;
+  border: 0; padding: 0; cursor: pointer;
+  background: var(--card);
+  border-radius: 26px;
+  box-shadow: var(--shadow);
+  transition: transform 320ms var(--ease), box-shadow 320ms var(--ease);
+  animation: pf-entra 420ms var(--ease) backwards;
+}
+@media (hover: hover) and (pointer: fine) { .pf-card:hover { transform: translateY(-3px); box-shadow: 0 1px 2px rgba(10, 30, 74, 0.06), 0 18px 34px -16px rgba(10, 30, 74, 0.34); } }
+@keyframes pf-entra { from { transform: translateY(8px); } to { transform: none; } }
+
+.pf-media { position: relative; margin: 8px 8px 0; border-radius: 19px; overflow: hidden; line-height: 0; max-width: 100%; }
+.pf-media > svg { display: block; width: 100%; height: auto; }
+/* Foto de la nota (copia local en fotos/mini). Reserva su lugar con la
+   proporcion de la foto, acotada entre 3:4 y 16:9, y entra con un fundido. */
+.pf-media > img { display: block; width: 100%; height: auto; object-fit: cover; background: var(--card); opacity: 0; transition: opacity 500ms ease; }
+.pf-media > img.pf-lista { opacity: 1; }
+.pf-media .pf-etiqueta { position: absolute; top: 10px; left: 10px; }
+.pf-play { position: absolute; top: 10px; right: 10px; width: 36px; height: 36px; border-radius: 999px; background: rgba(255, 254, 239, 0.94); display: grid; place-items: center; }
+.pf-play svg { width: 12px; height: 12px; fill: var(--azul); margin-left: 2px; }
+
+.pf-lead { padding: 18px 18px 2px; display: grid; gap: 14px; justify-items: start; }
+.pf-lead h3 {
+  margin: 0;
+  font-family: var(--f-display); font-weight: 600;
+  font-size: 1.36rem; line-height: 1.06; letter-spacing: -0.025em;
+  color: var(--azul);
+  text-wrap: balance;
+}
+.pf-meta { padding: 12px 18px 18px; display: grid; gap: 8px; min-width: 0; }
+.pf-when { margin: 0; font-size: 0.84rem; color: var(--ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pf-when b { font-weight: 500; color: var(--ink-2); }
+.pf-ttl {
+  margin: 0;
+  font-family: var(--f-display); font-weight: 500;
+  font-size: 1.1rem; line-height: 1.2; letter-spacing: -0.015em;
+  color: var(--azul);
+  display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+}
+.pf-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 4px; }
+.pf-more { font-size: 0.86rem; color: var(--ink-3); padding-left: 2px; }
+
+/* --- Etiqueta: la pieza "etiqueta" de base.css. Acá, solo cómo se acomoda en tarjetas y en el detalle. */
+.pf-media .pf-etiqueta .pf-etiqueta__rotulo { box-shadow: none; }
+/* La etiqueta nunca se sale de la tarjeta: la tarjeta es contenedor y, si es
+   angosta, la etiqueta pasa al nombre corto y suelta el año. Si aun asi no
+   entra, el rotulo se corta con puntos suspensivos. */
+a.pf-card, a.pf-d-cta { text-decoration: none; }
+.pf-card { container-type: inline-size; }
+.pf-card .pf-etiqueta { max-width: 100%; }
+.pf-card .pf-media .pf-etiqueta { max-width: calc(100% - 20px); }
+.pf-card .pf-etiqueta .pf-etiqueta__rotulo { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.pf-card .pf-etiqueta .pf-etiqueta__rotulo > span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Tarjetas anchas (vista con pocas columnas): la tipografia crece. */
+@container (min-width: 420px) {
+  .pf-lead { padding: 26px 26px 4px; gap: 18px; }
+  .pf-lead h3 { font-size: 2.1rem; line-height: 1.02; }
+  .pf-meta { padding: 14px 18px 22px; }
+  .pf-ttl { font-size: 1.55rem; line-height: 1.12; -webkit-line-clamp: 3; }
+  .pf-when { font-size: 0.92rem; }
+  .pf-etiqueta { --s: var(--etq-l); }
+  .pf-media .pf-etiqueta { top: 14px; left: 14px; }
+}
+@container (max-width: 250px) {
+  .pf-etiqueta .pf-etiqueta__completo { display: none; }
+  .pf-etiqueta .pf-etiqueta__corto { display: inline; }
+  .pf-etiqueta .pf-etiqueta__dato { display: none; }
+}
+
+/* --- Panel de filtros: barra fija full rounded con "Todas" y las tres
+   categorias con mas notas; arriba se despliega el panel con las demas y el
+   año. En mobile la barra se reduce a un boton "Filtros" y el panel trae
+   todas las categorias. Abre y cierra animando el alto del panel (medido en
+   JS: animar 0fr a 1fr en un contenedor de alto automatico falla en Chrome)
+   y, en mobile, el ancho. */
+/* Mientras el carrusel ocupa la pantalla el dock baja y no tapa los
+   indicadores; vuelve cuando aparecen las tarjetas. */
+.pf-filters.pf-fuera { transform: translateY(calc(100% + 40px)); opacity: 0; pointer-events: none; }
+
+/* --- Vacio ---------------------------------------------------------------- */
+
+@media (max-width: 640px) {
+  /* Vista y orden tienen que entrar en una línea (en 375 sobran pocos px). */
+  .pf-herramientas { width: 100%; justify-content: space-between; flex-wrap: nowrap; }
+  /* Mobile: como la historia. Texto arriba y la foto abajo, a todo el ancho. */
+  .pf-d-slide { display: flex; flex-direction: column; padding: 96px 0 calc(74px + env(safe-area-inset-bottom, 0px)); }
+  .pf-d-txt { position: relative; top: auto; transform: none; order: 1; }
+  .pf-d-art { position: relative; inset: auto; order: 2; flex: 1; min-height: 0; }
+  .pf-d-esc { top: 34px; bottom: 0; right: -10px; left: -10px; width: auto; }
+  .pf-d-atras { width: 228cqw; left: 54cqw; top: -162cqw; }
+  .pf-d-frente { width: 192cqw; left: -63cqw; top: calc(100cqh - 37.5cqw); }
+  .pf-d-in { gap: 16px; max-width: none; }
+  .pf-d-in h2, .pf-d-in h2.pf-largo { font-size: 2.3rem; }
+  .pf-d-kick { font-size: 0.86rem; gap: 10px; }
+  .pf-d-kick .pf-etiqueta { --s: var(--etq-m); }
+  .pf-d-cta { height: var(--btn-m); font-size: round(calc(var(--btn-m) * .274), 1px); }
+  .pf-d-nav { bottom: calc(22px + env(safe-area-inset-bottom, 0px)); }
+  .pf-d-segs { gap: 6px; }
+  .pf-d-flechas { display: none; }
+  .pf-grid, .pf-gcol { gap: 10px; }
+  a.pf-card, a.pf-d-cta { text-decoration: none; }
+.pf-card { border-radius: 20px; }
+  .pf-media { margin: 6px 6px 0; border-radius: 15px; }
+  .pf-media .pf-etiqueta { top: 7px; left: 7px; --s: var(--etq-s); }
+  .pf-play { width: 28px; height: 28px; top: 7px; right: 7px; }
+  .pf-lead { padding: 13px 12px 2px; gap: 10px; }
+  .pf-lead h3 { font-size: 1.08rem; }
+  .pf-lead .pf-etiqueta { --s: var(--etq-s); }
+  .pf-meta { padding: 9px 12px 13px; gap: 6px; }
+  .pf-when { font-size: 0.76rem; }
+  .pf-ttl { font-size: 0.96rem; }
+  /* Mobile: la barra es solo el boton "Filtros"; el panel trae categorias y año. */
+  /* Cerrado y abierto ocupan la columna del contenido (.pf-wrap deja 16 px por
+     lado): el ancho no se anima. El tweak puede probar un cerrado mas angosto
+     con --f-ancho-cerrado. */
+  /* Bajando, la pastilla se compacta como la barra de direcciones de Safari:
+     angosta, mas baja, con el texto y la flecha mas chicos y pegada al borde.
+     Subiendo (o al llegar al final) vuelve. Abierta nunca esta chica. El ancho
+     del cerrado y el abierto es el mismo, asi que esta transicion solo corre
+     al compactar y al volver. */
+}
+/* --- Ancla: la accion principal, afuera del dock -------------------------
+   Un circulo azul con la flecha, pegado a la derecha del dock pero separado
+   de el. Es lo unico saturado de la barra. Baja o
+   vuelve al principio de la lista; la mueve el JS (ver "Ancla" abajo).
+   --a es el alto del dock cerrado: en desktop 30 de pastilla + 2 x 3 de
+   f-main + 2 x 5 de f-bar + 2 de borde + 1 del borde del f-body = 49. La
+   separacion y los resortes son tokens del Figma (--ancla-*, ver "Ancla" en
+   el JS). */
+/* Abajo se ancla con el mismo bottom que el dock (y la misma transicion al
+   compactarse): asi Safari, al mostrar o esconder su barra, mueve los dos
+   juntos. Si la altura la pusiera el JS desde arriba, la bola llegaria un
+   cuadro tarde y saltaria. En mobile la x y el alto tambien salen del CSS,
+   con la transicion del dock: su borde derecho es lineal en su ancho, asi
+   que los dos se mueven juntos cuadro a cuadro. En desktop la x la pone el JS
+   (--ancla-x: ahi el dock no se compacta). El JS solo pone la escala. */
+@media (max-width: 640px) {
+  /* Mobile: --a es 57, toggle 46 + 2 x 4 de f-bar + 2 de borde + 1 del
+     f-body. El dock (ancho w) va centrado entre 0 y 100% - --a - gap: su borde
+     derecho es (100% - --a - gap + w) / 2 y la bola arranca un gap despues.
+     Con w = 100% - 32 - gap - --a da 100% - 16 - --a. Compacto, w es 104
+     (128 con contador) y el alto 41: toggle 30 + 2 x 4 de f-bar + 2 de
+     borde + 1 del borde del f-body. */
+}
+
+/* ?solo=dock: solo la barra de arriba y el dock de filtros, sin carrusel ni
+   tarjetas. Lo usa el tweak de la animacion. */
+.pf-solo-dock .pf-dest, .pf-solo-dock main { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pf-d-desliz { transform: none; }
+}

@@ -1,0 +1,36 @@
+---
+// Hojas de seguridad: 22 documentos, uno por producto, con la plantilla de la Biblioteca. Sin filtros (cultivo, zona y
+// nutriente no aplican) ni orden por año (no tienen); la página del documento y los PDF son los de la Biblioteca.
+// La fila es el ícono, el producto y la descarga.
+import Lista from "../../../componentes/Lista.astro";
+import { MSDS } from "../../../lib/datos.mjs";
+const CSS = `
+/* Hojas de seguridad: sin filtros, ancla ni orden por año. La fila es el ícono, el producto y la descarga: el rótulo de la
+   etiqueta y el año sobran (todas son hojas de seguridad y ninguna tiene año). */
+.pf-filters, .pf-ancla, .pf-orden { display: none; }
+.pf-docs[data-vista="lista"] .pf-doc { grid-template-columns: 34px minmax(0, 1fr) 36px; }
+.pf-docs[data-vista="lista"] .pf-etiqueta__rotulo, .pf-docs[data-vista="lista"] .pf-doc__y { display: none; }
+@media (max-width: 640px) {
+  .pf-docs[data-vista="lista"] .pf-doc { grid-template-columns: 30px minmax(0, 1fr) 36px; row-gap: 0; }
+  .pf-docs[data-vista="lista"] .pf-doc .pf-etiqueta, .pf-docs[data-vista="lista"] .pf-doc__t, .pf-docs[data-vista="lista"] .pf-doc__d { grid-row: 1; }
+  .pf-docs[data-vista="lista"] .pf-doc .pf-etiqueta { grid-column: 1; }
+  .pf-docs[data-vista="lista"] .pf-doc__t { grid-column: 2; }
+  .pf-docs[data-vista="lista"] .pf-doc__d { grid-column: 3; align-self: center; }
+}
+`;
+---
+<Lista
+  titulo="Hojas de seguridad Profertil"
+  descripcion="Maqueta de Hojas de seguridad de profertil.com.ar sobre el concepto web del manual de marca: las fichas de datos de seguridad reales de cada producto, con buscador y visor de PDF."
+  firma={{ nombre: "PROFERTIL · HOJAS DE SEGURIDAD", que: "Maqueta de Hojas de seguridad: las fichas reales de cada producto del sitio actual.", contexto: "Prototipo de la página de Hojas de seguridad para la web de Profertil." }}
+  alcance={{ seccion: "hojas", nombre: "Hojas", en: "las hojas de seguridad" }}
+  saltar="Ir a las hojas de seguridad"
+  busca={{ etiqueta: "Buscar un producto", placeholder: "Buscá un producto: urea, UAN…" }}
+  h1="Hojas de seguridad"
+  bajada="La ficha de datos de seguridad de cada producto de Profertil, para transportarlo, almacenarlo y usarlo de forma segura y saber cómo actuar ante una emergencia."
+  vaciar="Ver todas las hojas"
+  docs={MSDS}
+  grupos={[]}
+  pag={{ base: "../biblioteca/", todo: "Todas las hojas de seguridad", uno: "hoja", varios: "hojas", campo: { color: "verde", forma: "casco", tema: ["casco", "escudo"] } }}
+  css={CSS}
+/>

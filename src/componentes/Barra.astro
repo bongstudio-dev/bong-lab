@@ -1,0 +1,39 @@
+---
+// Barra del sitio: logo, menú, buscador en la lupa y cerrar. La pieza "barra" de componentes/base.css.
+// El buscador con alcance (profertil/buscador/alcance.js) se engancha a sus ids: pf-busca, pf-q, pf-nav, pf-goSearch, pf-qClose.
+interface Props {
+  solida?: boolean;                               // fondo azul desde arriba (páginas sin cabecera de color)
+  logo?: { href: string; etiqueta: string };      // a dónde lleva el logo (por defecto, al sitio actual)
+  actual?: string;                                // el ítem del menú de la sección donde se está
+  actualEnlace?: string;                          // en las páginas internas de una sección, ese ítem vuelve a su lista
+  busca: { etiqueta: string; placeholder: string; simple?: boolean };
+  cuenta?: boolean;                               // contador de resultados dentro del campo
+  progreso?: boolean;                             // franja de avance de lectura bajo la barra
+}
+const { solida = false, logo, actual, actualEnlace, busca, cuenta = false, progreso = false } = Astro.props;
+const ITEMS = ["Home", "Empresa", "Sostenibilidad", "Productos y Servicios", "Novedades", "Compliance"];
+// Páginas internas (con logo propio): el menú se lee y la lupa no se anuncia dos veces.
+const interna = Boolean(logo);
+---
+<header class:list={["pf-barra", { "pf-barra--solida": solida }]} id="pf-top">
+  <div class="pf-barra__in">
+    <nav class="pf-barra__nav" id="pf-nav" aria-label="Sitio">
+      <a class="pf-barra__logo" href={logo ? logo.href : "https://www.profertil.com.ar/"} aria-label={logo ? logo.etiqueta : "Profertil"}>
+        <svg viewBox="0 0 1458 1021" aria-hidden="true"><use href="#pf-logo-blanco"/></svg>
+      </a>
+      <div class="pf-barra__menu" aria-hidden={interna ? undefined : "true"}>
+        {ITEMS.map((t) => t === actual ? (actualEnlace ? <a href={actualEnlace} aria-current="page">{t}</a> : <span aria-current="page">{t}</span>) : <span>{t}</span>)}
+      </div>
+      <span class="pf-barra__menu-mobile" aria-hidden="true"><i><b></b><b></b><b></b><b></b></i>Menú</span>
+      <div class="pf-barra__busca" id="pf-busca" role="search">
+        <button class="pf-barra__lupa" id="pf-goSearch" type="button" aria-label={busca.etiqueta} aria-expanded="false" aria-controls="pf-q"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden={interna ? "true" : undefined}><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></button>
+        {busca.simple
+          ? <input id="pf-q" type="search" autocomplete="off" placeholder={busca.placeholder} aria-label={busca.etiqueta} tabindex="-1">
+          : <input id="pf-q" name="q" type="search" autocomplete="off" spellcheck="false" enterkeyhint="search" placeholder={busca.placeholder} aria-label={busca.etiqueta} tabindex="-1">}
+{cuenta && <span class="pf-barra__cuenta" id="pf-qCount">0</span>}
+      </div>
+      <button class="pf-barra__cerrar" id="pf-qClose" type="button" aria-label="Cerrar buscador" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </nav>
+  </div>
+{progreso && <div class="pf-progreso" aria-hidden="true"><i id="pf-progreso"></i></div>}
+</header>

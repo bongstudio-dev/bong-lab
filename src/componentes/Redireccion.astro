@@ -1,0 +1,28 @@
+---
+// Página que lleva de una dirección vieja con parámetro (?d=, ?n=) a la nueva de cada documento o nota, conservando
+// el resto de la consulta (por ejemplo ?p=verde para probar el campo) y el #. `ids` son las direcciones que existen; `sinParametro` es a dónde ir sin parámetro y `desconocido` si el
+// parámetro no es ninguna (null: a la lista).
+interface Props { titulo: string; parametro: string; ids: string[]; sinParametro: string; desconocido: string | null; lista: string }
+const { titulo, parametro, ids, sinParametro, desconocido, lista } = Astro.props;
+const codigo = `
+(function () {
+  var ids = ${JSON.stringify(ids).replace(/<\//g, "<\\/")};
+  var s = new URLSearchParams(location.search), q = s.get(${JSON.stringify(parametro)});
+  s.delete(${JSON.stringify(parametro)});
+  var a = q === null ? ${JSON.stringify(sinParametro)} : ids.indexOf(q) >= 0 ? q : ${JSON.stringify(desconocido)};
+  location.replace(a === null ? ${JSON.stringify(lista)} : "../" + encodeURIComponent(a) + "/" + (s.toString() ? "?" + s : "") + location.hash);
+})();
+`;
+---
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>{titulo}</title>
+<meta name="robots" content="noindex">
+<script is:inline set:html={codigo}></script>
+</head>
+<body>
+<p><a href={lista}>{titulo}</a></p>
+</body>
+</html>

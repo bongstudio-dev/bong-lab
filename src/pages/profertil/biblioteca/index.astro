@@ -1,0 +1,18 @@
+---
+// Biblioteca Virtual: los 627 documentos de la Biblioteca con sus etiquetas del sitio actual.
+import Lista from "../../../componentes/Lista.astro";
+import { BIB, GRUPOS } from "../../../lib/datos.mjs";
+---
+<Lista
+  titulo="Biblioteca Virtual Profertil"
+  descripcion="Maqueta de la Biblioteca Virtual de profertil.com.ar sobre el concepto web del manual de marca: los boletines y ensayos reales del sitio actual, con buscador, filtros por cultivo, zona, año y nutriente, y visor de PDF."
+  firma={{ nombre: "PROFERTIL · BIBLIOTECA VIRTUAL", que: "Maqueta de la Biblioteca Virtual: los PDF reales del sitio actual, con sus etiquetas.", contexto: "Prototipo de la Biblioteca Virtual para la web de Profertil." }}
+  alcance={{ seccion: "documentos", nombre: "Biblioteca", en: "la Biblioteca" }}
+  saltar="Ir a la Biblioteca"
+  busca={{ etiqueta: "Buscar en la Biblioteca", placeholder: "Buscá: soja, boletín, urea…" }}
+  h1="Biblioteca Virtual"
+  bajada="Accedé a investigaciones sobre nutrición de cultivos, eficiencia de nutrientes y cuidado del suelo, agua y aire, elaboradas por Investigación y Desarrollo de Profertil, instituciones técnicas y especialistas de trayectoria."
+  vaciar="Ver toda la Biblioteca"
+  docs={BIB}
+  grupos={GRUPOS}
+/>

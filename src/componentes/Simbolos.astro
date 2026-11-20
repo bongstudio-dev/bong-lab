@@ -1,0 +1,12 @@
+---
+// Los símbolos SVG de la página (logos oficiales y lo que sume cada página) para usar con <use href="#...">.
+// Los scripts de las páginas suman acá las Formas del sistema (id pf-defs).
+import { LOGOS } from "../lib/sistema.mjs";
+const BADGE = '<symbol id="pf-badge-bg" viewBox="0 0 100 100"><path d="M32 0H68C76.4869 0 84.6263 3.37142 90.6274 9.37258C96.6286 15.3737 100 23.5131 100 32V68C100 76.4869 96.6286 84.6263 90.6274 90.6274C84.6263 96.6286 76.4869 100 68 100H32C23.5131 100 15.3737 96.6286 9.37258 90.6274C3.37142 84.6263 0 76.4869 0 68V32C0 23.5131 3.37142 15.3737 9.37258 9.37258C15.3737 3.37142 23.5131 0 32 0Z"/></symbol>';
+interface Props { badge?: boolean }   // fondo del badge de las etiquetas: el squircle del componente (radio 32%)
+---
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="pf-defs">
+  <Fragment set:html={LOGOS} />
+  {Astro.props.badge && <Fragment set:html={BADGE} />}
+  <slot />
+</defs></svg>
