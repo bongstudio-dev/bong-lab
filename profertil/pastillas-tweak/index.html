@@ -53,10 +53,10 @@
 <link rel="stylesheet" href="../componentes/tokens.css">
 <link rel="stylesheet" href="../componentes/base.css">
 <style>
-/* Las dos reglas de la pastilla con número, tal como están en la Biblioteca (lista.html).
+/* Las dos reglas de la pastilla con número, tal como están en Biblioteca, Hojas de seguridad y Sala de prensa.
    Los controles las pisan con las variables --tw-* de abajo. */
 .pf-pastilla__n { font: 400 round(0.86em, 1px)/1 var(--f-body); font-variant-numeric: tabular-nums; opacity: .72; }
-.pf-pastilla:has(> .pf-pastilla__n) { align-items: baseline; padding-top: calc((var(--h) - var(--fs)) / 2 - 1px); }
+.pf-pastilla:has(> .pf-pastilla__n) { align-items: baseline; padding-top: calc((var(--h) - var(--fs)) / 2); }
 
 .tw .pf-pastilla { --h: var(--tw-h); --fs: var(--tw-fs); gap: var(--tw-gap); }
 .tw .pf-pastilla__n { font-size: var(--tw-n); opacity: var(--tw-op); position: relative; top: calc(var(--tw-subn) * -1); }
@@ -149,8 +149,8 @@ pre { margin: 0; padding: 14px; background: var(--ink); color: var(--tiza); bord
 
 <script>
 (function () {
-  // Valores publicados: alto 30, nombre 14 (47% del alto, a par), número 12 (86%), nombre sube 1, número 0, separación 7.
-  var DEF = { h: 30, fs: 14, n: 12, sub: 1, subn: 0, gap: 7, op: 72, z: 4 };
+  // Valores publicados: alto 30, nombre 14 (47% del alto, a par), número 12 (86%), aire parejo arriba (sin subir), separación 7.
+  var DEF = { h: 30, fs: 14, n: 12, sub: 0, subn: 0, gap: 7, op: 72, z: 4 };
   var CTL = [
     ["h", "Alto de la pastilla", 22, 44, 1, "px"],
     ["fs", "Cuerpo del nombre", 10, 22, 1, "px"],
@@ -162,7 +162,7 @@ pre { margin: 0; padding: 14px; background: var(--ink); color: var(--tiza); bord
     ["z", "Zoom de la lupa", 1, 12, 1, "x"]
   ];
   var CHIPS = [["Colza-Canola", 6, "verde"], ["Trigo", 24, "verde"], ["Soja", 118, "verde"], ["Maíz", 9, "verde"], ["Buenos Aires", 52, "azul"], ["Nitrógeno", 7, "azul"]];
-  var KEY = "pf-pastillas-tweak";
+  var KEY = "pf-pastillas-tweak-2";
   var v = Object.assign({}, DEF);
   try { Object.assign(v, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch (e) {}
 
@@ -214,10 +214,10 @@ pre { margin: 0; padding: 14px; background: var(--ink); color: var(--tiza); bord
   function css() {
     var pad = (v.h - v.fs) / 2 - v.sub;
     var t = "/* base.css · @pieza pastilla */\n.pf-pastilla { --h: " + v.h + "px; --fs: " + v.fs + "px; }\n\n" +
-      "/* biblioteca/fuente/lista.html */\n.pf-f-gr .pf-pastilla, .pf-f-gr .pf-chip { gap: " + v.gap + "px; }\n" +
+      "/* biblioteca/fuente/lista.html y sala-de-prensa/fuente/sala.html */\n.pf-f-gr .pf-pastilla, .pf-f-gr .pf-chip { gap: " + v.gap + "px; }\n" +
       ".pf-pastilla__n { font: 400 " + v.n + "px/1 var(--f-body); font-variant-numeric: tabular-nums; opacity: " + (v.op / 100) + ";" +
       (v.subn ? " position: relative; top: " + (-v.subn) + "px;" : "") + " }\n" +
-      ".pf-pastilla:has(> .pf-pastilla__n) { align-items: baseline; padding-top: calc((var(--h) - var(--fs)) / 2 - " + v.sub + "px); }" +
+      ".pf-pastilla:has(> .pf-pastilla__n) { align-items: baseline; padding-top: calc((var(--h) - var(--fs)) / 2" + (v.sub ? " - " + v.sub + "px" : "") + "); }" +
       "\n/* padding-top resultante: " + f1(pad) + "px" + (pad % 1 ? " (medio píxel: alto y cuerpo con distinta paridad)" : "") + " */";
     document.getElementById("css").textContent = t;
   }
