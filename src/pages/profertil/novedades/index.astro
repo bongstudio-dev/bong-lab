@@ -1,0 +1,78 @@
+---
+// Novedades: el archivo de las 471 notas. Carrusel a pantalla completa con cinco destacadas, grilla masonry de tarjetas
+// (cada una lleva a la página de su nota, novedades/<nota>/), filtros por categoría y año en el dock, ancla y buscador.
+// El comportamiento está en src/paginas/novedades/novedades.js (con el bloque común de comun.js, que también usa la
+// página de nota) y el estilo en novedades.css. ?solo=dock muestra solo el dock (lo usa novedades-tweak).
+import Pagina from "../../../componentes/Pagina.astro";
+import Cabeza from "../../../componentes/Cabeza.astro";
+import Simbolos from "../../../componentes/Simbolos.astro";
+import Barra from "../../../componentes/Barra.astro";
+import Dock from "../../../componentes/Dock.astro";
+import Ancla from "../../../componentes/Ancla.astro";
+import Pie from "../../../componentes/Pie.astro";
+import { armar, assets, js } from "../../../lib/sistema.mjs";
+import { NOTAS } from "../../../lib/datos.mjs";
+import CSS from "../../../paginas/novedades/novedades.css?raw";
+import JS from "../../../paginas/novedades/novedades.js?raw";
+import COMUN from "../../../paginas/novedades/comun.js?raw";
+const script = armar(JS, { "/*__COMUN__*/": COMUN, "/*__NOTAS__*/[]": js(NOTAS), "/*__ASSETS__*/{}": js(assets()) });
+const SOLO_DOCK = 'if (/[?&]solo=dock\\b/.test(location.search)) document.documentElement.classList.add("pf-solo-dock");';
+---
+<Pagina firma={{ nombre: "PROFERTIL · NOVEDADES", que: "Maqueta del archivo de notas: las notas reales del sitio actual.", contexto: "Prototipo de la sección Novedades para la web de Profertil." }} transicion="novedades" css={CSS}>
+<Cabeza slot="head" titulo="Novedades Profertil" descripcion="Maqueta del archivo de notas de profertil.com.ar sobre el concepto web del manual de marca: las 471 notas reales del sitio actual, con buscador y filtros." raiz="../" mono barraVista alcance={{ seccion: "notas", nombre: "Novedades" }} />
+
+<Simbolos badge />
+
+<script is:inline set:html={SOLO_DOCK}></script>
+<Barra actual="Novedades" busca={{ etiqueta: "Buscar notas", placeholder: "Buscá: trigo, becas…", simple: true }} cuenta />
+
+<section class="pf-dest" id="pf-dest" aria-roledescription="carrusel" aria-label="Notas destacadas">
+  <div id="pf-dSlides"></div>
+  <div class="pf-d-nav">
+    <div class="pf-wrap">
+      <div class="pf-d-segs" id="pf-dSegs"></div>
+      <div class="pf-d-flechas">
+        <button class="pf-d-flecha" id="pf-dPrev" type="button" aria-label="Destacada anterior"><svg viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg></button>
+        <button class="pf-d-flecha" id="pf-dNext" type="button" aria-label="Destacada siguiente"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<main class="pf-wrap">
+  <div class="pf-result-row">
+    <p class="pf-result-text" id="pf-resultText" aria-live="polite"></p>
+    <div class="pf-herramientas">
+      <div class="pf-selector pf-orden" role="group" aria-label="Orden">
+        <span class="pf-selector__ind" aria-hidden="true"></span>
+        <button type="button" id="pf-sortNew" aria-pressed="true">Más recientes</button>
+        <button type="button" id="pf-sortOld" aria-pressed="false">Más antiguas</button>
+      </div>
+      <div class="pf-selector pf-selector--iconos pf-vista" role="group" aria-label="Tamaño de las tarjetas">
+        <span class="pf-selector__ind" aria-hidden="true"></span>
+        <button type="button" data-vista="chico" aria-pressed="false" aria-label="Tarjetas chicas" title="Chicas"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0" width="4" height="4" rx="1.3"/><rect x="5.5" y="0" width="4" height="4" rx="1.3"/><rect x="11" y="0" width="4" height="4" rx="1.3"/><rect x="0" y="5.5" width="4" height="4" rx="1.3"/><rect x="5.5" y="5.5" width="4" height="4" rx="1.3"/><rect x="11" y="5.5" width="4" height="4" rx="1.3"/><rect x="0" y="11" width="4" height="4" rx="1.3"/><rect x="5.5" y="11" width="4" height="4" rx="1.3"/><rect x="11" y="11" width="4" height="4" rx="1.3"/></svg></button>
+        <button type="button" data-vista="medio" aria-pressed="true" aria-label="Tarjetas medianas" title="Medianas"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0" width="6.5" height="6.5" rx="2.1"/><rect x="8.5" y="0" width="6.5" height="6.5" rx="2.1"/><rect x="0" y="8.5" width="6.5" height="6.5" rx="2.1"/><rect x="8.5" y="8.5" width="6.5" height="6.5" rx="2.1"/></svg></button>
+        <button type="button" data-vista="grande" aria-pressed="false" aria-label="Tarjetas grandes" title="Grandes"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0" width="15" height="15" rx="4.8"/></svg></button>
+      </div>
+    </div>
+  </div>
+  <div class="pf-grid" id="pf-grid"></div>
+  <div class="pf-empty" id="pf-empty" hidden>
+    <svg viewBox="0 0 555 662" aria-hidden="true"><use href="#pf-simbolo"/></svg>
+    <p id="pf-emptyText"></p>
+    <button class="pf-boton pf-boton--verde" id="pf-emptyReset" type="button">Ver todas las notas</button>
+  </div>
+  <div class="pf-sentinel" id="pf-sentinel"></div>
+</main>
+
+<Pie />
+
+<Dock clase="pf-fuera" principal={{ id: "pf-fTipos", etiqueta: "Tipo de nota" }} toggle="Más filtros" txtId={false}>
+    <div class="pf-f-group pf-f-cats"><p class="pf-f-label" id="pf-fCatsLabel">Categoría</p><div class="pf-f-row" id="pf-fTiposTodas"></div></div>
+    <div class="pf-f-group"><p class="pf-f-label">Año</p><div class="pf-f-row" id="pf-fAnios"></div></div>
+</Dock>
+
+<Ancla />
+
+<script is:inline set:html={"\n" + script}></script>
+</Pagina>

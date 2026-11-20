@@ -1,0 +1,71 @@
+---
+// Página de una nota: novedades/<nota>/, una por cada una de las 471. Cabecera en una tarjeta sobre el campo de Formas
+// del color de su tipo, foto, índice de secciones, datos, el texto (lo lee al abrir de ../notas/<nota>.json) y tres
+// relacionadas. Llega con el título y los datos para compartir ya puestos.
+// El comportamiento está en src/paginas/novedades/nota.js (con el bloque común de comun.js) y el estilo en nota.css;
+// la lista de todas las notas (para las relacionadas) la comparten todas estas páginas en ../datos-notas.js.
+import Pagina from "../../../componentes/Pagina.astro";
+import Cabeza from "../../../componentes/Cabeza.astro";
+import Simbolos from "../../../componentes/Simbolos.astro";
+import Barra from "../../../componentes/Barra.astro";
+import Pie from "../../../componentes/Pie.astro";
+import { armar, assets, js } from "../../../lib/sistema.mjs";
+import { NOTAS } from "../../../lib/datos.mjs";
+import CSS from "../../../paginas/novedades/nota.css?raw";
+import JS from "../../../paginas/novedades/nota.js?raw";
+import COMUN from "../../../paginas/novedades/comun.js?raw";
+
+export function getStaticPaths() {
+  return NOTAS.map((n) => ({ params: { nota: n.ar }, props: { n } }));
+}
+const { n } = Astro.props;
+const script = armar(JS, { "/*__COMUN__*/": COMUN, "/*__ASSETS__*/{}": js(assets({ iconos: true })), '/*__NOTA__*/""': js(n.ar) });
+// Para compartir: título, bajada y foto de la nota (la copia local si la hay).
+const aqui = new URL(Astro.url.pathname, Astro.site).href;
+const foto = n.mi ? new URL("../fotos/mini/" + encodeURIComponent(n.ar) + ".webp", aqui).href : n.imgL ? new URL("../" + n.imgL, aqui).href : n.img || "";
+const descripcion = n.b || "Plantilla de nota de profertil.com.ar sobre el concepto web del manual de marca, con el texto, las fotos y las etiquetas reales de cada nota del sitio actual.";
+---
+<Pagina firma={{ nombre: "PROFERTIL · NOTA", que: "Plantilla de nota de Novedades, con las notas reales del sitio actual y la cabecera sobre un campo de Formas.", contexto: "Prototipo de la página de nota para la web de Profertil." }} transicion="novedades" css={CSS} campo="css+js">
+<Cabeza slot="head" titulo={n.t + " · Novedades Profertil"} descripcion={descripcion} raiz="../../" alcance={{ seccion: "notas", nombre: "Novedades", previa: true }}>
+<link rel="canonical" href={aqui}>
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Profertil">
+<meta property="og:title" content={n.t}>
+{n.b && <meta property="og:description" content={n.b}>}
+<meta property="og:url" content={aqui}>
+{foto && <meta property="og:image" content={foto}>}
+<meta name="twitter:card" content={foto ? "summary_large_image" : "summary"}>
+</Cabeza>
+
+<Simbolos badge />
+
+<Barra logo={{ href: "../", etiqueta: "Profertil, ir a Novedades" }} actual="Novedades" actualEnlace="../" busca={{ etiqueta: "Buscar en Novedades", placeholder: "Buscá: trigo, becas…" }} progreso />
+
+<main id="pf-nota" aria-busy="true">
+  <div class="pf-n-grilla" id="pf-grilla">
+    <header class="pf-n-cab" id="pf-cab"><div class="pf-n-in" id="pf-cabIn"></div></header>
+    <nav class="pf-n-indice" id="pf-indice" aria-label="En esta nota" hidden></nav>
+    <figure class="pf-n-foto" id="pf-foto" hidden><div class="pf-n-foto__hoja" id="pf-fotoHoja"></div></figure>
+    <div class="pf-n-datos" id="pf-datos"></div>
+    <article class="pf-n-texto" id="pf-texto"></article>
+  </div>
+  <section class="pf-n-sigue pf-n-col" aria-label="Notas relacionadas">
+    <div class="pf-n-rel__cab"><h2>Notas relacionadas</h2></div>
+    <div class="pf-n-rel__marco">
+      <div class="pf-n-rel__fila" id="pf-rel"></div>
+      <button class="pf-n-rel__flecha pf-n-rel__flecha--ant" id="pf-relAnt" type="button" aria-label="Notas anteriores" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 12H7M11 8l-4 4 4 4"/></svg></button>
+      <button class="pf-n-rel__flecha pf-n-rel__flecha--sig" id="pf-relSig" type="button" aria-label="Más notas" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12h10M13 8l4 4-4 4"/></svg></button>
+    </div>
+  </section>
+</main>
+
+<Pie />
+
+
+<button class="pf-n-salir" id="pf-focoSalir" type="button" hidden>Salir del modo lectura <kbd>Esc</kbd></button>
+
+<div class="pf-aviso" id="pf-aviso" role="status" aria-live="polite"></div>
+
+<script is:inline src="../datos-notas.js"></script>
+<script is:inline set:html={"\n" + script}></script>
+</Pagina>
