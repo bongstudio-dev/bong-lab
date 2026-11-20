@@ -22,15 +22,15 @@
       #############     #############
       #############        #######
 
-      PROFERTIL · TWEAK DE PASTILLAS
-      Ajuste de a un píxel de la línea de base del nombre y el número en las pastillas de filtro.
+      PROFERTIL · TWEAK DE PIEZAS
+      Ajuste óptico de a un píxel de las piezas con texto: pastillas, chips, botones, etiquetas y selector.
 
       Hola. Si estás leyendo esto, te gusta ver cómo están hechas las cosas.
       A nosotros también.
 
       Diseño y desarrollo: Bong Studio
       Estudio de branding. Córdoba, Argentina. Desde 2019.
-      Herramienta para ajustar los valores de las pastillas de filtro de la web de Profertil.
+      Herramienta para validar y ajustar el centrado de las piezas de la web de Profertil.
 
       CRÉDITOS
       María Lopez / Brand Designer
@@ -45,77 +45,98 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tweak de pastillas</title>
-<meta name="description" content="Ajuste en vivo, de a un píxel, de la línea de base del nombre y el número en las pastillas de filtro de Profertil.">
+<title>Tweak de piezas</title>
+<meta name="description" content="Ajuste óptico de a un píxel de todas las piezas con texto del sistema web de Profertil: pastillas, chips, botones, etiquetas y selector, con lupa, guías y lectura del aire arriba y abajo.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=DM+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=DM+Mono&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../componentes/tokens.css">
 <link rel="stylesheet" href="../componentes/base.css">
 <style>
-/* Las dos reglas de la pastilla con número, tal como están en Biblioteca, Hojas de seguridad y Sala de prensa.
-   Los controles las pisan con las variables --tw-* de abajo. */
+/* Lo propio de las páginas de listas (Biblioteca, Hojas de seguridad, Sala de prensa): pastilla y chip con número.
+   Va igual que en biblioteca/fuente/lista.html y sala-de-prensa/fuente/sala.html, para medir lo publicado. */
+.pf-f-gr .pf-pastilla, .pf-f-gr .pf-chip { gap: 7px; }
 .pf-pastilla__n { font: 400 round(0.86em, 1px)/1 var(--f-body); font-variant-numeric: tabular-nums; opacity: .72; }
 .pf-pastilla:has(> .pf-pastilla__n) { align-items: baseline; padding-top: calc((var(--h) - var(--fs)) / 2); }
 
-.tw .pf-pastilla { --h: var(--tw-h); --fs: var(--tw-fs); gap: var(--tw-gap); }
-.tw .pf-pastilla__n { font-size: var(--tw-n); opacity: var(--tw-op); position: relative; top: calc(var(--tw-subn) * -1); }
-.tw .pf-pastilla:has(> .pf-pastilla__n) { padding-top: calc((var(--h) - var(--fs)) / 2 - var(--tw-sub)); }
-
 html { background: var(--bg); color: var(--ink); }
 body { margin: 0; font: 400 14px/1.4 var(--f-body); }
-.app { display: grid; grid-template-columns: 300px minmax(0, 1fr); min-height: 100vh; }
+.app { display: grid; grid-template-columns: 260px minmax(0, 1fr); min-height: 100vh; }
 .panel { padding: 20px; border-right: 1px solid var(--line); display: grid; align-content: start; gap: 14px; position: sticky; top: 0; height: 100vh; overflow: auto; box-sizing: border-box; }
-.panel h1 { margin: 0 0 4px; font: 600 20px/1.1 var(--f-display, "Familjen Grotesk"), sans-serif; }
+.panel h1 { margin: 0 0 4px; font: 600 20px/1.1 var(--f-display); }
 .panel p { margin: 0; color: var(--ink-2); font-size: 12px; }
+.indice { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.indice a { display: flex; justify-content: space-between; gap: 8px; padding: 6px 8px; border-radius: 8px; color: var(--ink); text-decoration: none; font-size: 13px; }
+.indice a:hover { background: var(--line); }
+.indice em { font-style: normal; font-family: "DM Mono", monospace; font-size: 11px; }
 .ctl { display: grid; gap: 4px; }
-.ctl__top { display: flex; justify-content: space-between; align-items: baseline; font-size: 12px; }
-.ctl__top span:last-child { font-family: "DM Mono", monospace; display: flex; gap: 4px; align-items: center; }
+.ctl__top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 12px; }
+.ctl__top > span:last-child { font-family: "DM Mono", monospace; display: flex; gap: 4px; align-items: center; white-space: nowrap; }
 .ctl__top button { width: 20px; height: 20px; border: 0; border-radius: 6px; background: var(--line); color: var(--ink); font: 500 13px/1 var(--f-body); cursor: pointer; padding: 0; }
-.ctl input[type=range] { width: 100%; accent-color: var(--azul); }
+.ctl__top b.mod { color: var(--azul); }
+.ctl input[type=range] { width: 100%; accent-color: var(--azul); margin: 0; }
 .ctl small { color: var(--ink-3); font-size: 11px; }
-.sep { height: 1px; background: var(--line); margin: 4px 0; }
+.sep { height: 1px; background: var(--line); margin: 2px 0; }
 .checks { display: grid; gap: 6px; font-size: 12px; }
 .checks label { display: flex; gap: 8px; align-items: center; cursor: pointer; }
 .acc { display: flex; gap: 8px; flex-wrap: wrap; }
 .acc button { height: 32px; padding: 0 14px; border: 0; border-radius: 999px; background: var(--ink); color: var(--tiza); font: 500 13px/1 var(--f-body); cursor: pointer; }
 .acc button.sec { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
-.main { padding: 28px; display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: 28px; min-width: 0; }
-.bloque h2 { margin: 0 0 10px; font: 500 12px/1 var(--f-body); color: var(--ink-3); text-transform: none; }
-.fila { display: flex; flex-wrap: wrap; gap: 6px; }
-.lupa { position: relative; overflow: auto; background: var(--tiza); border-radius: 12px; padding: 0; }
+.main { padding: 28px; display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: 40px; min-width: 0; }
+.main h2 { margin: 0; font: 600 22px/1.1 var(--f-display); }
+.cab { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.cab span { font: 400 11px/1.3 "DM Mono", monospace; color: var(--ink-3); }
+.pieza { scroll-margin-top: 20px; display: grid; gap: 14px; }
+.pieza > p { margin: -6px 0 0; color: var(--ink-2); font-size: 12px; max-width: 70ch; }
+.cols { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 20px; align-items: start; }
+.ctls { display: grid; gap: 12px; padding: 14px; border-radius: 12px; background: color-mix(in srgb, var(--tiza) 60%, transparent); }
+.ctls .acc button { height: 28px; font-size: 12px; }
+.muestras { display: grid; gap: 10px; }
+.fila { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.fila--color { padding: 14px; border-radius: 12px; background: var(--azul); }
+.lupa { position: relative; overflow: auto; background: var(--tiza); border-radius: 12px; }
+.lupa--color { background: var(--azul); }
 .lupa__in { position: relative; zoom: var(--z); padding: 6px; width: max-content; }
 .lupa__in .fila { flex-wrap: nowrap; }
+.lupa__in .fila--color { padding: 6px; border-radius: 0; background: transparent; }
 .lupa__grid { position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(to right, rgba(10,30,74,.10) 1px, transparent 1px), linear-gradient(to bottom, rgba(10,30,74,.10) 1px, transparent 1px); background-size: calc(var(--z) * 1px) calc(var(--z) * 1px); }
+.lupa--color .lupa__grid { background-image: linear-gradient(to right, rgba(255,255,255,.12) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,.12) 1px, transparent 1px); }
+.sin-grid .lupa__grid { display: none; }
 .guia { position: absolute; height: 0; pointer-events: none; border-top: 1px solid; }
 .guia--centro { border-top-style: dashed; border-color: rgba(255, 0, 90, .9); }
 .guia--base { border-color: #00C2FF; }
 .guia--cap { border-color: #FFB800; }
 .guia--n { border-color: #7CFF6B; }
-.lectura { width: 100%; border-collapse: collapse; font: 400 12px/1.3 "DM Mono", monospace; }
-.lectura th, .lectura td { text-align: left; padding: 6px 10px 6px 0; border-bottom: 1px solid var(--line); }
-.tabla-w { overflow-x: auto; }
-.lectura th { font-family: var(--f-body); font-weight: 500; color: var(--ink-3); }
-.ok { color: var(--verde); } .mal { color: #C0392B; }
-.ley { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11px; color: var(--ink-2); margin-top: 8px; }
+.ley { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11px; color: var(--ink-2); }
 .ley i { display: inline-block; width: 14px; border-top: 2px solid; vertical-align: middle; margin-right: 5px; }
+.tabla-w { overflow-x: auto; }
+.lectura { width: 100%; border-collapse: collapse; font: 400 12px/1.3 "DM Mono", monospace; }
+.lectura th, .lectura td { text-align: left; padding: 6px 10px 6px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+.lectura th { font-family: var(--f-body); font-weight: 500; color: var(--ink-3); }
+.lectura td:first-child { font-family: var(--f-body); }
+.lectura a { color: inherit; }
+.ok { color: var(--verde); } .mal { color: #C0392B; }
 pre { margin: 0; padding: 14px; background: var(--ink); color: var(--tiza); border-radius: 10px; font: 400 12px/1.5 "DM Mono", monospace; white-space: pre-wrap; }
+.pre-vacio { color: var(--ink-3); font-size: 12px; margin: 0; }
+@media (max-width: 1100px) { .cols { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 760px) { .app { grid-template-columns: minmax(0, 1fr); } .panel { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); } .main { padding: 16px; } }
 </style>
+<style id="ov"></style>
 </head>
 <body>
-<div class="app tw" id="app">
+<div class="app" id="app">
   <aside class="panel">
     <div>
-      <h1>Pastillas</h1>
-      <p>Línea de base del nombre y del número, de a un píxel. Flechas del teclado sobre un control para mover de a uno.</p>
+      <h1>Tweak de piezas</h1>
+      <p>Ajuste óptico de a un píxel de todas las piezas con texto. Primero se mira cómo quedan, después se toca. Flechas del teclado sobre un control para mover de a uno.</p>
     </div>
-    <div id="ctls"></div>
+    <ul class="indice" id="indice"></ul>
     <div class="sep"></div>
+    <div class="ctl" id="ctlZoom"></div>
     <div class="checks">
       <label><input type="checkbox" id="cGuias" checked> Guías en la lupa</label>
       <label><input type="checkbox" id="cGrid" checked> Cuadrícula de píxel</label>
-      <label><input type="checkbox" id="cElegida"> Ver elegidas (tinta)</label>
+      <label><input type="checkbox" id="cElegida"> Ver elegidas</label>
     </div>
     <div class="acc">
       <button id="bCopiar">Copiar CSS</button>
@@ -123,158 +144,296 @@ pre { margin: 0; padding: 14px; background: var(--ink); color: var(--tiza); bord
     </div>
   </aside>
 
-  <main class="main">
-    <section class="bloque">
-      <h2>Tamaño real</h2>
-      <div class="fila" id="real"></div>
+  <main class="main" id="main">
+    <section class="pieza" id="resumen">
+      <div class="cab"><h2>Vista conjunta</h2><span>px a tamaño real · diferencia = aire arriba - aire abajo de la mayúscula</span></div>
+      <div class="tabla-w"><table class="lectura"><thead><tr><th>Pieza</th><th>Muestra</th><th>Caja</th><th>Aire arriba</th><th>Aire abajo</th><th>Diferencia</th><th>Número</th></tr></thead><tbody id="tResumen"></tbody></table></div>
+      <div class="ley"><span><i style="border-color:rgba(255,0,90,.9);border-top-style:dashed"></i>centro de la caja</span><span><i style="border-color:#FFB800"></i>alto de mayúscula</span><span><i style="border-color:#00C2FF"></i>línea de base</span><span><i style="border-color:#7CFF6B"></i>base y alto del número</span></div>
     </section>
-
-    <section class="bloque">
-      <h2>Lupa</h2>
-      <div class="lupa" id="lupa"><div class="lupa__in" id="lupaIn"><div class="fila" id="ampli"></div></div><div class="lupa__grid" id="grid"></div></div>
-      <div class="ley"><span><i style="border-color:rgba(255,0,90,.9);border-top-style:dashed"></i>centro de la pastilla</span><span><i style="border-color:#FFB800"></i>alto de mayúscula del nombre</span><span><i style="border-color:#00C2FF"></i>base del nombre</span><span><i style="border-color:#7CFF6B"></i>base y alto del número</span></div>
-    </section>
-
-    <section class="bloque">
-      <h2>Lectura (px, en tamaño real)</h2>
-      <div class="tabla-w"><table class="lectura"><thead><tr><th>Pastilla</th><th>Aire arriba</th><th>Aire abajo</th><th>Diferencia</th><th>Base nombre vs número</th><th>Número arriba / abajo</th></tr></thead><tbody id="tabla"></tbody></table></div>
-    </section>
-
-    <section class="bloque">
-      <h2>CSS resultante</h2>
-      <pre id="css"></pre>
+    <div id="piezas" style="display:grid;gap:56px"></div>
+    <section class="pieza" id="css-total">
+      <div class="cab"><h2>CSS resultante</h2><span>solo lo que cambió, con el archivo donde va</span></div>
+      <pre id="cssTotal"></pre>
     </section>
   </main>
 </div>
 
+<script>window.Libreria = { lista: [], sumar: function () {} };</script>
+<script src="../componentes/formas.js"></script>
+<script src="../componentes/c/sistema.js"></script>
 <script>
 (function () {
-  // Valores publicados: alto 30, nombre 14 (47% del alto, a par), número 12 (86%), aire parejo arriba (sin subir), separación 7.
-  var DEF = { h: 30, fs: 14, n: 12, sub: 0, subn: 0, gap: 7, op: 72, z: 4 };
-  var CTL = [
-    ["h", "Alto de la pastilla", 22, 44, 1, "px"],
-    ["fs", "Cuerpo del nombre", 10, 22, 1, "px"],
-    ["n", "Cuerpo del número", 8, 20, 1, "px"],
-    ["sub", "Subir el nombre", -6, 6, 1, "px", "Negativo baja. Mueve nombre y número juntos (alinean por base)."],
-    ["subn", "Subir solo el número", -6, 6, 1, "px", "Corre el número respecto de la base del nombre."],
-    ["gap", "Separación nombre / número", 0, 16, 1, "px"],
-    ["op", "Opacidad del número", 20, 100, 1, "%"],
-    ["z", "Zoom de la lupa", 1, 12, 1, "x"]
+  var FLECHA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+  var BASE = "componentes/base.css", LISTAS = "biblioteca/fuente/lista.html y sala-de-prensa/fuente/sala.html";
+  function px(el, p) { return parseFloat(getComputedStyle(el)[p]) || 0; }
+  function r1(x) { return Math.round(x * 10) / 10; }
+  function dec(x) { return String(+(x / 100).toFixed(4)).replace(/^0\./, "."); }
+  // Subir el texto en una caja de alto fijo centrada: el doble de aire abajo lo sube N; arriba lo baja.
+  function sube(n) { return n > 0 ? "padding-bottom: " + (2 * n) + "px;" : "padding-top: " + (-2 * n) + "px;"; }
+  function pas(n, c, pc, num, sel) { return '<button type="button" class="pf-pastilla" aria-pressed="' + !!sel + '"' + (pc ? ' style="--pc:var(--' + pc + ')"' : "") + ' data-m="' + n + '">' + c + (num != null ? '<b class="pf-pastilla__n">' + num + '</b>' : "") + '</button>'; }
+
+  /* Cada pieza: muestras (cada caja medible lleva data-m con su nombre), controles, de dónde sale lo publicado y qué CSS
+     escribe cuando un valor cambia. El valor publicado se lee de la página ya dibujada, no se copia a mano. */
+  var PIEZAS = [
+    {
+      id: "pastilla", nombre: "Pastilla filtro", archivo: BASE + " · @pieza pastilla",
+      nota: "Sin número se centra en la caja; con número alinea por línea de base y el aire de arriba es parejo.",
+      html: '<div class="fila pf-f-gr">' + pas("Sin número", "Institucional") + pas("Sin número (verde)", "Trigo", "verde") + pas("Elegida", "Comercial", null, null, true) + '</div>' +
+            '<div class="fila pf-f-gr">' + pas("Con número", "Colza-Canola", "verde", 6) + pas("Con número (3 cifras)", "Soja", "verde", 118) + pas("Con número (azul)", "Buenos Aires", null, 52) + '</div>',
+      caja: ".pf-pastilla",
+      ctl: [["h", "Alto", 22, 44, 1, "px"], ["fs", "Cuerpo del nombre", 10, 22, 1, "px"], ["sube", "Subir texto (sin número)", -6, 6, 1, "px"], ["suben", "Subir nombre y número", -6, 6, 1, "px", "Con número: corre los dos juntos sobre la línea de base."], ["n", "Cuerpo del número", 8, 20, 1, "px"], ["subn", "Subir solo el número", -6, 6, 1, "px"], ["gap", "Separación nombre / número", 0, 16, 1, "px"]],
+      leer: function (r) { var a = r.querySelector('[data-m="Sin número"]'), b = r.querySelector('[data-m="Con número"]'); return { h: px(a, "height"), fs: px(a, "fontSize"), sube: 0, suben: 0, n: px(b.querySelector("b"), "fontSize"), subn: 0, gap: px(b, "columnGap") }; },
+      css: function (v, d, c) {
+        var o = [];
+        if (c.h || c.fs) o.push([BASE, ".pf-pastilla { " + (c.h ? "--h: " + v.h + "px; " : "") + (c.fs ? "--fs: " + v.fs + "px; " : "") + "}"]);
+        if (c.sube) o.push([BASE, ".pf-pastilla:not(:has(> .pf-pastilla__n)) { " + sube(v.sube) + " }"]);
+        if (c.suben) o.push([LISTAS, ".pf-pastilla:has(> .pf-pastilla__n) { align-items: baseline; padding-top: calc((var(--h) - var(--fs)) / 2 - " + v.suben + "px); }"]);
+        if (c.n || c.subn) o.push([LISTAS, ".pf-pastilla__n { " + (c.n ? "font-size: " + v.n + "px; " : "") + (c.subn ? "position: relative; top: " + (-v.subn) + "px; " : "") + "}"]);
+        if (c.gap) o.push([LISTAS, ".pf-f-gr .pf-pastilla { gap: " + v.gap + "px; }"]);
+        return o;
+      }
+    },
+    {
+      id: "chip", nombre: "Chip año", archivo: BASE + " · @pieza chip",
+      nota: "Se centra en la caja; el contador va en el mismo cuerpo, más liviano.",
+      html: '<div class="fila pf-f-gr"><button type="button" class="pf-chip" aria-pressed="false" data-m="Sin número">2024</button><button type="button" class="pf-chip" aria-pressed="false" data-m="Con número">2026<b class="pf-chip__n">12</b></button><button type="button" class="pf-chip" aria-pressed="true" data-m="Elegido">2021<b class="pf-chip__n">40</b></button></div>',
+      caja: ".pf-chip",
+      ctl: [["h", "Alto", 22, 44, 1, "px"], ["fs", "Cuerpo", 10, 22, 1, "px"], ["sube", "Subir texto", -6, 6, 1, "px"], ["subn", "Subir solo el número", -6, 6, 1, "px"], ["gap", "Separación año / número", 0, 16, 1, "px"]],
+      leer: function (r) { var a = r.querySelector('[data-m="Con número"]'); return { h: px(a, "height"), fs: px(a, "fontSize"), sube: 0, subn: 0, gap: px(a, "columnGap") }; },
+      css: function (v, d, c) {
+        var o = [];
+        if (c.h || c.fs || c.sube) o.push([BASE, ".pf-chip { " + (c.h ? "--h: " + v.h + "px; " : "") + (c.fs ? "font-size: " + v.fs + "px; " : "") + (c.sube ? sube(v.sube) + " " : "") + "}"]);
+        if (c.subn) o.push([BASE, ".pf-chip__n { position: relative; top: " + (-v.subn) + "px; }"]);
+        if (c.gap) o.push([LISTAS, ".pf-f-gr .pf-chip { gap: " + v.gap + "px; }"]);
+        return o;
+      }
+    },
+    {
+      id: "boton", nombre: "Botón", archivo: BASE + " · @pieza boton",
+      nota: "Alto 40. Recorta la caja del texto a la mayúscula (text-box), así el centrado es el de la mayúscula y no el de la tipografía.",
+      html: '<div class="fila"><button type="button" class="pf-boton" data-m="Base">Limpiar filtros</button><button type="button" class="pf-boton pf-boton--principal" data-m="Principal">Ver resultados</button><button type="button" class="pf-boton pf-boton--alerta" data-m="Alerta">Borrar todo</button><a class="pf-boton pf-boton--verde" href="#" data-m="Verde con flecha">Ver la nota original' + FLECHA + '</a></div>',
+      caja: ".pf-boton",
+      ctl: [["h", "Alto", 28, 56, 1, "px"], ["fs", "Cuerpo", 10, 22, 1, "px"], ["sube", "Subir texto", -6, 6, 1, "px"]],
+      leer: function (r) { var a = r.querySelector('[data-m="Base"]'); return { h: px(a, "height"), fs: px(a, "fontSize"), sube: 0 }; },
+      css: function (v, d, c) {
+        if (!(c.h || c.fs || c.sube)) return [];
+        return [[BASE, ".pf-boton:not(.pf-boton--chico) { " + (c.h ? "height: " + v.h + "px; " : "") + (c.fs ? "font-size: " + v.fs + "px; " : "") + (c.sube ? sube(v.sube) + " " : "") + "}"]];
+      }
+    },
+    {
+      id: "boton-chico", nombre: "Botón chico", archivo: BASE + " · @pieza boton (pf-boton--chico)",
+      nota: "Alto 32, para acciones dentro de un aviso.",
+      html: '<div class="fila"><button type="button" class="pf-boton pf-boton--chico" data-m="Base">Deshacer</button><button type="button" class="pf-boton pf-boton--chico pf-boton--principal" data-m="Principal">Aceptar</button></div>',
+      caja: ".pf-boton",
+      ctl: [["h", "Alto", 24, 44, 1, "px"], ["fs", "Cuerpo", 10, 20, 1, "px"], ["sube", "Subir texto", -6, 6, 1, "px"]],
+      leer: function (r) { var a = r.querySelector('[data-m="Base"]'); return { h: px(a, "height"), fs: px(a, "fontSize"), sube: 0 }; },
+      css: function (v, d, c) {
+        if (!(c.h || c.fs || c.sube)) return [];
+        return [[BASE, ".pf-boton--chico { " + (c.h ? "height: " + v.h + "px; " : "") + (c.fs ? "font-size: " + v.fs + "px; " : "") + (c.sube ? sube(v.sube) + " " : "") + "}"]];
+      }
+    },
+    {
+      id: "boton-color", nombre: "Botón sobre color", archivo: BASE + " · @pieza boton-color", fondo: true,
+      nota: "L 48 en desktop y M 44 en mobile. Familjen al 33,3% del alto, recortado a la mayúscula.",
+      html: '<div class="fila fila--color"><a class="pf-boton-color" href="#" data-m="L 48">Leer la nota' + FLECHA + '</a><a class="pf-boton-color" href="#" style="--alto: var(--btn-m)" data-m="M 44">Leer la nota' + FLECHA + '</a></div>',
+      caja: ".pf-boton-color",
+      ctl: [["pc", "Cuerpo (% del alto)", 25, 45, .1, "%"], ["sube", "Subir texto", -6, 6, 1, "px"]],
+      leer: function (r) { var a = r.querySelector('[data-m="L 48"]'); return { pc: r1(px(a, "fontSize") / px(a, "height") * 100), sube: 0 }; },
+      css: function (v, d, c) {
+        if (!(c.pc || c.sube)) return [];
+        return [[BASE, ".pf-boton-color { " + (c.pc ? "font-size: calc(var(--alto, var(--btn-l)) * " + dec(v.pc) + "); " : "") + (c.sube ? sube(v.sube) + " " : "") + "}"]];
+      }
+    },
+    {
+      id: "etiqueta", nombre: "Etiqueta", archivo: BASE + " · @pieza etiqueta",
+      nota: "S 22, M 27 y L 32. Familjen al 48% del alto, rótulo y dato recortados a la mayúscula.",
+      html: function () {
+        var S = window.SIS;
+        function e(t, id, dato, nom) { return S.etiqueta(id, dato).replace('class="pf-etiqueta"', 'class="pf-etiqueta" data-t="' + t + '"').replace('class="pf-etiqueta__rotulo"', 'class="pf-etiqueta__rotulo" data-m="' + nom + ' · rótulo"').replace('class="pf-etiqueta__dato"', 'class="pf-etiqueta__dato" data-m="' + nom + ' · dato"'); }
+        return '<div class="fila">' + e("s", "institucional", 24, "S") + e("m", "tecnico", 118, "M") + e("l", "aviso", 6, "L") + '</div>';
+      },
+      css0: '.pf-etiqueta[data-t="s"] { --s: var(--etq-s); } .pf-etiqueta[data-t="m"] { --s: var(--etq-m); } .pf-etiqueta[data-t="l"] { --s: var(--etq-l); }',
+      caja: "[data-m]",
+      ctl: [["pc", "Cuerpo (% del alto)", 36, 60, .5, "%"], ["sube", "Subir rótulo", -4, 4, 1, "px"], ["subd", "Subir dato", -4, 4, 1, "px"]],
+      leer: function (r) { var a = r.querySelector('[data-t="l"]'); return { pc: r1(px(a, "fontSize") / px(a, "height") * 100), sube: 0, subd: 0 }; },
+      css: function (v, d, c) {
+        var o = [];
+        if (c.pc) o.push([BASE, ".pf-etiqueta { font-size: calc(var(--s) * " + dec(v.pc) + "); }"]);
+        if (c.sube) o.push([BASE, ".pf-etiqueta__rotulo { " + sube(v.sube) + " }"]);
+        if (c.subd) o.push([BASE, ".pf-etiqueta__dato { " + sube(v.subd) + " }"]);
+        return o;
+      }
+    },
+    {
+      id: "selector", nombre: "Selector", archivo: BASE + " · @pieza selector",
+      nota: "El alto lo da el texto: interlínea 1,5 más 6 de aire arriba y abajo. La caja medida es la opción (lo que cubre el indicador).",
+      html: '<div class="fila"><div class="pf-selector" role="group" aria-label="Orden"><span class="pf-selector__ind" aria-hidden="true"></span><button type="button" aria-pressed="true" data-m="Elegida">Más recientes</button><button type="button" aria-pressed="false" data-m="Sin elegir">Más antiguas</button></div></div>',
+      caja: "[data-m]",
+      ctl: [["fs", "Cuerpo", 10, 20, 1, "px"], ["pad", "Aire arriba y abajo", 2, 12, 1, "px"], ["sube", "Subir texto", -4, 4, 1, "px"]],
+      leer: function (r) { var a = r.querySelector('[data-m="Elegida"]'); return { fs: px(a, "fontSize"), pad: px(a, "paddingTop"), sube: 0 }; },
+      css: function (v, d, c) {
+        if (!(c.fs || c.pad || c.sube)) return [];
+        return [[BASE, ".pf-selector button { " + (c.fs ? "font-size: " + v.fs + "px; " : "") + ((c.pad || c.sube) ? "padding-top: " + (v.pad - v.sube) + "px; padding-bottom: " + (v.pad + v.sube) + "px; " : "") + "}"]];
+      },
+      despues: function (raiz) {
+        // Ubica el indicador sobre la opción elegida (lo mismo que hace el JS del sitio).
+        raiz.querySelectorAll(".pf-selector").forEach(function (sel) {
+          var ind = sel.querySelector(".pf-selector__ind"), b = sel.querySelector('button[aria-pressed="true"]');
+          ind.classList.add("pf-quieto"); ind.style.width = b.offsetWidth + "px"; ind.style.transform = "translateX(" + b.offsetLeft + "px)";
+        });
+      }
+    }
   ];
-  var CHIPS = [["Colza-Canola", 6, "verde"], ["Trigo", 24, "verde"], ["Soja", 118, "verde"], ["Maíz", 9, "verde"], ["Buenos Aires", 52, "azul"], ["Nitrógeno", 7, "azul"]];
-  var KEY = "pf-pastillas-tweak-2";
-  var v = Object.assign({}, DEF);
-  try { Object.assign(v, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch (e) {}
 
-  var app = document.getElementById("app"), ctls = document.getElementById("ctls"), inputs = {};
-  CTL.forEach(function (c) {
+  var KEY = "pf-tweak-piezas-1", Z = 4, DEF = {}, V = {};
+  var guardado = {}; try { guardado = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) {}
+  var ov = document.getElementById("ov"), css0 = PIEZAS.map(function (p) { return p.css0 || ""; }).join("\n");
+  ov.textContent = css0;
+
+  function control(cont, k, nombre, min, max, paso, unidad, desc, leer, poner, esMod) {
     var d = document.createElement("div"); d.className = "ctl";
-    d.innerHTML = '<div class="ctl__top"><span>' + c[1] + '</span><span><button data-d="-1" aria-label="menos">−</button><b id="o-' + c[0] + '"></b><button data-d="1" aria-label="más">+</button></span></div>' +
-      '<input type="range" min="' + c[2] + '" max="' + c[3] + '" step="' + c[4] + '" id="i-' + c[0] + '">' + (c[6] ? "<small>" + c[6] + "</small>" : "");
-    ctls.appendChild(d);
-    var inp = d.querySelector("input"); inputs[c[0]] = inp; inp.value = v[c[0]];
-    inp.addEventListener("input", function () { v[c[0]] = +inp.value; aplicar(); });
-    d.querySelectorAll("button").forEach(function (b) {
-      b.addEventListener("click", function () { var x = Math.max(c[2], Math.min(c[3], v[c[0]] + +b.dataset.d)); v[c[0]] = x; inp.value = x; aplicar(); });
-    });
+    d.innerHTML = '<div class="ctl__top"><span>' + nombre + '</span><span><button data-d="-1" aria-label="menos">−</button><b></b><button data-d="1" aria-label="más">+</button></span></div>' +
+      '<input type="range" min="' + min + '" max="' + max + '" step="' + paso + '" aria-label="' + nombre + '">' + (desc ? "<small>" + desc + "</small>" : "");
+    cont.appendChild(d);
+    var inp = d.querySelector("input"), out = d.querySelector("b");
+    function pinta() { var x = leer(); inp.value = x; out.textContent = (Math.round(x * 10) / 10) + unidad; out.className = esMod && esMod() ? "mod" : ""; }
+    inp.addEventListener("input", function () { poner(+inp.value); });
+    d.querySelectorAll("button").forEach(function (b) { b.addEventListener("click", function () { poner(Math.max(min, Math.min(max, r1(leer() + b.dataset.d * paso)))); }); });
+    return pinta;
+  }
+
+  // --- Armado de las secciones ---
+  var piezasEl = document.getElementById("piezas"), indice = document.getElementById("indice"), pintores = [];
+  PIEZAS.forEach(function (p) {
+    var html = typeof p.html === "function" ? p.html() : p.html;
+    var s = document.createElement("section"); s.className = "pieza"; s.id = "p-" + p.id;
+    s.innerHTML = '<div class="cab"><h2>' + p.nombre + '</h2><span>' + p.archivo + '</span></div><p>' + p.nota + '</p>' +
+      '<div class="cols"><div class="muestras"><div class="tw-real">' + html + '</div>' +
+      '<div class="lupa' + (p.fondo ? " lupa--color" : "") + '"><div class="lupa__in"><div class="tw-ampli">' + html + '</div></div><div class="lupa__grid"></div></div>' +
+      '<div class="tabla-w"><table class="lectura"><thead><tr><th>Muestra</th><th>Caja</th><th>Arriba</th><th>Abajo</th><th>Diferencia</th><th>Número</th></tr></thead><tbody></tbody></table></div></div>' +
+      '<div class="ctls"><div class="tw-ctl" style="display:grid;gap:12px"></div><div class="acc"><button class="sec" data-r>Volver a lo publicado</button></div><pre class="tw-css" hidden></pre></div></div>';
+    piezasEl.appendChild(s);
+    p.el = s; p.real = s.querySelector(".tw-real"); p.ampli = s.querySelector(".tw-ampli"); p.lupaIn = s.querySelector(".lupa__in"); p.tbody = s.querySelector("tbody");
+    var li = document.createElement("li"); li.innerHTML = '<a href="#p-' + p.id + '"><span>' + p.nombre + '</span><em></em></a>'; indice.appendChild(li); p.idx = li.querySelector("em");
+    s.querySelector("[data-r]").addEventListener("click", function () { V[p.id] = Object.assign({}, DEF[p.id]); todo(); });
   });
 
-  function pastilla(ch) {
-    var b = document.createElement("button");
-    b.type = "button"; b.className = "pf-pastilla"; b.setAttribute("aria-pressed", "false");
-    if (ch[2] === "verde") b.style.setProperty("--pc", "var(--verde)");
-    b.appendChild(document.createTextNode(ch[0]));
-    var n = document.createElement("b"); n.className = "pf-pastilla__n"; n.textContent = ch[1]; b.appendChild(n);
-    b.addEventListener("click", function () { b.setAttribute("aria-pressed", b.getAttribute("aria-pressed") === "true" ? "false" : "true"); medir(); });
-    return b;
-  }
-  var real = document.getElementById("real"), ampli = document.getElementById("ampli");
-  CHIPS.forEach(function (ch) { real.appendChild(pastilla(ch)); ampli.appendChild(pastilla(ch)); });
-
-  // Alto de mayúscula y de cifra medidos con el contorno real del glifo.
+  // --- Medición ---
   var cv = document.createElement("canvas").getContext("2d");
-  function asc(txt, px) { cv.font = "400 " + px + "px 'DM Sans'"; return cv.measureText(txt).actualBoundingBoxAscent; }
-  function f1(x) { return (Math.round(x * 10) / 10).toFixed(1).replace(".0", ""); }
-
-  function aplicar() {
-    CTL.forEach(function (c) { document.getElementById("o-" + c[0]).textContent = v[c[0]] + c[5]; });
-    app.style.setProperty("--tw-h", v.h + "px");
-    app.style.setProperty("--tw-fs", v.fs + "px");
-    app.style.setProperty("--tw-n", v.n + "px");
-    app.style.setProperty("--tw-sub", v.sub + "px");
-    app.style.setProperty("--tw-subn", v.subn + "px");
-    app.style.setProperty("--tw-gap", v.gap + "px");
-    app.style.setProperty("--tw-op", v.op / 100);
-    app.style.setProperty("--z", v.z);
-    try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) {}
-    css();
-    requestAnimationFrame(medir);
+  function fuente(el) { var c = getComputedStyle(el); return c.fontStyle + " " + c.fontWeight + " " + c.fontSize + " " + c.fontFamily; }
+  // Línea de base de un texto: arriba de su caja de glifos + el ascendente de la fuente (como lo redondea el navegador).
+  function textos(caja) {
+    var w = document.createTreeWalker(caja, NodeFilter.SHOW_TEXT), t, out = [];
+    while ((t = w.nextNode())) {
+      if (!t.nodeValue.trim()) continue;
+      var r = document.createRange(); r.selectNodeContents(t); var rc = r.getClientRects()[0]; if (!rc) continue;
+      cv.font = fuente(t.parentElement);
+      var m = cv.measureText("H"), a = m.fontBoundingBoxAscent, ds = m.fontBoundingBoxDescent;
+      var asc = Math.abs(rc.height - (Math.round(a) + Math.round(ds))) < .6 ? Math.round(a) : a;
+      var cifra = /^[\d\s.,]+$/.test(t.nodeValue.trim());
+      var cap = cv.measureText(cifra ? "0123456789" : "H").actualBoundingBoxAscent;
+      out.push({ base: rc.top + asc, cap: cap, izq: rc.left, ancho: rc.width, cifra: cifra, sec: t.parentElement !== caja && t.parentElement.tagName === "B" });
+    }
+    return out;
   }
+  function f1(x) { return (Math.round(x * 10) / 10).toFixed(1).replace(".0", "").replace(/^-0$/, "0"); }
+  function difTxt(d) { var ok = Math.abs(d) < .5; return '<td class="' + (ok ? "ok" : "mal") + '">' + (d > 0 ? "+" : "") + f1(d) + (ok ? " centrado" : d > 0 ? " bajo" : " alto") + "</td>"; }
 
-  function css() {
-    var pad = (v.h - v.fs) / 2 - v.sub;
-    var t = "/* base.css · @pieza pastilla */\n.pf-pastilla { --h: " + v.h + "px; --fs: " + v.fs + "px; }\n\n" +
-      "/* biblioteca/fuente/lista.html y sala-de-prensa/fuente/sala.html */\n.pf-f-gr .pf-pastilla, .pf-f-gr .pf-chip { gap: " + v.gap + "px; }\n" +
-      ".pf-pastilla__n { font: 400 " + v.n + "px/1 var(--f-body); font-variant-numeric: tabular-nums; opacity: " + (v.op / 100) + ";" +
-      (v.subn ? " position: relative; top: " + (-v.subn) + "px;" : "") + " }\n" +
-      ".pf-pastilla:has(> .pf-pastilla__n) { align-items: baseline; padding-top: calc((var(--h) - var(--fs)) / 2" + (v.sub ? " - " + v.sub + "px" : "") + "); }" +
-      "\n/* padding-top resultante: " + f1(pad) + "px" + (pad % 1 ? " (medio píxel: alto y cuerpo con distinta paridad)" : "") + " */";
-    document.getElementById("css").textContent = t;
-  }
-
-  // Sonda: un elemento sin tamaño apoyado en la línea de base, para leer dónde cae.
-  function base(el) {
-    var s = document.createElement("span");
-    s.style.cssText = "display:inline-block;width:0;height:0;vertical-align:baseline";
-    el.appendChild(s); var y = s.getBoundingClientRect().top; s.remove(); return y;
-  }
-
-  function medir() {
-    document.querySelectorAll(".guia").forEach(function (g) { g.remove(); });
-    var tb = document.getElementById("tabla"); tb.innerHTML = "";
-    var capN = asc("H", v.fs), capD = asc("0123456789", v.n);
-    var lupaIn = document.getElementById("lupaIn"), lr = lupaIn.getBoundingClientRect(), z = v.z;
-    var guias = document.getElementById("cGuias").checked;
-    Array.prototype.forEach.call(real.children, function (p, i) {
-      var r = p.getBoundingClientRect(), num = p.querySelector(".pf-pastilla__n");
-      // Base del nombre: la sonda como hijo directo se alinea con la base de la fila (la del nombre).
-      var s = document.createElement("span"); s.style.cssText = "display:inline-block;width:0;height:0;align-self:baseline;margin:0";
-      p.insertBefore(s, num); var bN = s.getBoundingClientRect().top; s.remove();
-      var bD = base(num);
-      var arriba = bN - capN - r.top, abajo = r.bottom - bN, dif = arriba - abajo;
-      var nArr = bD - capD - r.top, nAbj = r.bottom - bD;
-      var tr = document.createElement("tr");
-      tr.innerHTML = "<td>" + CHIPS[i][0] + " " + CHIPS[i][1] + "</td><td>" + f1(arriba) + "</td><td>" + f1(abajo) + "</td>" +
-        '<td class="' + (Math.abs(dif) < .5 ? "ok" : "mal") + '">' + (dif > 0 ? "+" : "") + f1(dif) + (Math.abs(dif) < .5 ? " centrado" : dif > 0 ? " (texto bajo)" : " (texto alto)") + "</td>" +
-        '<td class="' + (Math.abs(bN - bD) < .5 ? "ok" : "mal") + '">' + (Math.abs(bN - bD) < .5 ? "misma base" : "número " + f1(Math.abs(bN - bD)) + (bD < bN ? " arriba" : " abajo")) + "</td>" +
-        "<td>" + f1(nArr) + " / " + f1(nAbj) + "</td>";
-      tb.appendChild(tr);
+  var guias = true, filasRes = [];
+  function medir(p) {
+    p.lupaIn.querySelectorAll(".guia").forEach(function (g) { g.remove(); });
+    p.tbody.innerHTML = "";
+    var lr = p.lupaIn.getBoundingClientRect(), malas = 0;
+    var cajasR = p.real.querySelectorAll("[data-m]"), cajasA = p.ampli.querySelectorAll("[data-m]");
+    Array.prototype.forEach.call(cajasR, function (caja, i) {
+      var r = caja.getBoundingClientRect(), ts = textos(caja); if (!ts.length) return;
+      var pr = ts.filter(function (t) { return !t.sec; })[0] || ts[0], sec = ts.filter(function (t) { return t.sec; })[0];
+      var arriba = pr.base - pr.cap - r.top, abajo = r.bottom - pr.base, dif = arriba - abajo;
+      if (Math.abs(dif) >= .5) malas++;
+      var num = "-";
+      if (sec) {
+        var db = sec.base - pr.base;
+        num = (Math.abs(db) < .5 ? '<span class="ok">misma base</span>' : '<span class="mal">' + f1(Math.abs(db)) + (db < 0 ? " arriba" : " abajo") + "</span>") + " · " + f1(sec.base - sec.cap - r.top) + " / " + f1(r.bottom - sec.base);
+      }
+      var celdas = "<td>" + caja.dataset.m + "</td><td>" + f1(r.height) + "</td><td>" + f1(arriba) + "</td><td>" + f1(abajo) + "</td>" + difTxt(dif) + "<td>" + num + "</td>";
+      var tr = document.createElement("tr"); tr.innerHTML = celdas; p.tbody.appendChild(tr);
+      filasRes.push('<tr><td><a href="#p-' + p.id + '">' + p.nombre + "</a></td>" + celdas + "</tr>");
       if (!guias) return;
-      // Guías sobre la pastilla ampliada: mismas medidas, en coordenadas de la lupa (antes del zoom).
-      var q = ampli.children[i], qr = q.getBoundingClientRect();
-      var x0 = (qr.left - lr.left) / z, w = qr.width / z, y0 = (qr.top - lr.top) / z;
-      function g(cls, y, ww, xx) { var d = document.createElement("div"); d.className = "guia " + cls; d.style.left = (xx == null ? x0 : xx) + "px"; d.style.width = (ww || w) + "px"; d.style.top = y + "px"; d.style.borderTopWidth = (1 / z) + "px"; lupaIn.appendChild(d); }
-      var nl = (num.getBoundingClientRect().left - r.left), nw = num.getBoundingClientRect().width;
-      g("guia--centro", y0 + (r.height / 2));
-      g("guia--cap", y0 + (bN - r.top) - capN, nl, x0);
-      g("guia--base", y0 + (bN - r.top), nl, x0);
-      g("guia--n", y0 + (bD - r.top), nw, x0 + nl);
-      g("guia--n", y0 + (bD - r.top) - capD, nw, x0 + nl);
+      var q = cajasA[i], qr = q.getBoundingClientRect();
+      var x0 = (qr.left - lr.left) / Z, y0 = (qr.top - lr.top) / Z, w = qr.width / Z;
+      function g(cls, y, xx, ww) { var d = document.createElement("div"); d.className = "guia " + cls; d.style.left = xx + "px"; d.style.width = ww + "px"; d.style.top = y + "px"; d.style.borderTopWidth = (1 / Z) + "px"; p.lupaIn.appendChild(d); }
+      g("guia--centro", y0 + r.height / 2, x0, w);
+      ts.forEach(function (t) {
+        var xx = x0 + (t.izq - r.left), ww = t.ancho, yb = y0 + (t.base - r.top);
+        g(t.sec ? "guia--n" : "guia--base", yb, xx, ww);
+        g(t.sec ? "guia--n" : "guia--cap", yb - t.cap, xx, ww);
+      });
     });
+    p.idx.textContent = malas ? malas + " fuera" : "ok";
+    p.idx.className = malas ? "mal" : "ok";
   }
 
-  document.getElementById("cGuias").addEventListener("change", medir);
-  document.getElementById("cGrid").addEventListener("change", function (e) { document.getElementById("grid").style.display = e.target.checked ? "" : "none"; });
+  // --- Estado y CSS ---
+  function cambios(p) { var c = {}, d = DEF[p.id], v = V[p.id]; Object.keys(d).forEach(function (k) { c[k] = Math.abs(v[k] - d[k]) > 1e-6; }); return c; }
+  function reglas(p) { return p.css(V[p.id], DEF[p.id], cambios(p)); }
+  function cssTotal() {
+    var porArchivo = {}, orden = [];
+    PIEZAS.forEach(function (p) { reglas(p).forEach(function (r) { if (!porArchivo[r[0]]) { porArchivo[r[0]] = []; orden.push(r[0]); } porArchivo[r[0]].push(r[1]); }); });
+    if (!orden.length) return "";
+    return orden.map(function (a) { return "/* " + a + " */\n" + porArchivo[a].join("\n"); }).join("\n\n");
+  }
+  function aplicar() {
+    var css = [css0];
+    PIEZAS.forEach(function (p) {
+      var rs = reglas(p), pre = p.el.querySelector(".tw-css");
+      rs.forEach(function (r) { css.push(r[1]); });
+      pre.hidden = !rs.length; pre.textContent = rs.map(function (r) { return "/* " + r[0] + " */\n" + r[1]; }).join("\n");
+    });
+    ov.textContent = css.join("\n");
+    var t = cssTotal(); document.getElementById("cssTotal").textContent = t || "Sin cambios: todo queda como está publicado.";
+    var g = {}; PIEZAS.forEach(function (p) { var c = cambios(p), x = {}; Object.keys(c).forEach(function (k) { if (c[k]) x[k] = V[p.id][k]; }); if (Object.keys(x).length) g[p.id] = x; });
+    try { localStorage.setItem(KEY, JSON.stringify(g)); } catch (e) {}
+  }
+  function medirTodo() {
+    filasRes = [];
+    PIEZAS.forEach(function (p) { if (p.despues) { p.despues(p.real); p.despues(p.ampli); } medir(p); });
+    document.getElementById("tResumen").innerHTML = filasRes.join("");
+  }
+  var pend = 0;
+  function todo() { aplicar(); pintores.forEach(function (f) { f(); }); cancelAnimationFrame(pend); pend = requestAnimationFrame(function () { requestAnimationFrame(medirTodo); }); }
+
+  function arrancar() {
+    // Lo publicado se lee con la página sin cambios; después se cargan los ajustes guardados.
+    ov.textContent = css0;
+    PIEZAS.forEach(function (p) { if (p.despues) p.despues(p.real); DEF[p.id] = p.leer(p.real); V[p.id] = Object.assign({}, DEF[p.id], guardado[p.id] || {}); });
+    PIEZAS.forEach(function (p) {
+      var cont = p.el.querySelector(".tw-ctl"); cont.innerHTML = "";
+      p.ctl.forEach(function (c) {
+        pintores.push(control(cont, c[0], c[1], c[2], c[3], c[4], c[5], c[6],
+          function () { return V[p.id][c[0]]; }, function (x) { V[p.id][c[0]] = x; todo(); },
+          function () { return Math.abs(V[p.id][c[0]] - DEF[p.id][c[0]]) > 1e-6; }));
+      });
+    });
+    var zc = document.getElementById("ctlZoom"); zc.innerHTML = "";
+    pintores.push(control(zc, "z", "Zoom de las lupas", 1, 12, 1, "x", null, function () { return Z; }, function (x) { Z = x; document.documentElement.style.setProperty("--z", Z); todo(); }));
+    document.documentElement.style.setProperty("--z", Z);
+    todo();
+    if (location.hash) { var h = document.querySelector(location.hash); if (h) requestAnimationFrame(function () { h.scrollIntoView(); }); }
+  }
+
+  document.getElementById("cGuias").addEventListener("change", function (e) { guias = e.target.checked; medirTodo(); });
+  document.getElementById("cGrid").addEventListener("change", function (e) { document.getElementById("main").classList.toggle("sin-grid", !e.target.checked); });
   document.getElementById("cElegida").addEventListener("change", function (e) {
-    document.querySelectorAll(".pf-pastilla").forEach(function (b) { b.setAttribute("aria-pressed", e.target.checked ? "true" : "false"); });
+    document.querySelectorAll(".pf-pastilla, .pf-chip").forEach(function (b) { b.setAttribute("aria-pressed", e.target.checked ? "true" : b.dataset.m === "Elegida" || b.dataset.m === "Elegido" ? "true" : "false"); });
+    medirTodo();
   });
-  document.getElementById("bReset").addEventListener("click", function () { v = Object.assign({}, DEF); CTL.forEach(function (c) { inputs[c[0]].value = v[c[0]]; }); aplicar(); });
+  document.getElementById("bReset").addEventListener("click", function () { PIEZAS.forEach(function (p) { V[p.id] = Object.assign({}, DEF[p.id]); }); todo(); });
   document.getElementById("bCopiar").addEventListener("click", function (e) {
-    var b = e.target; navigator.clipboard.writeText(document.getElementById("css").textContent).then(function () { b.textContent = "Copiado"; setTimeout(function () { b.textContent = "Copiar CSS"; }, 1200); });
+    var b = e.target, t = cssTotal() || "/* Sin cambios */";
+    navigator.clipboard.writeText(t).then(function () { b.textContent = "Copiado"; setTimeout(function () { b.textContent = "Copiar CSS"; }, 1200); });
   });
-  window.addEventListener("resize", medir);
-  aplicar();
-  document.fonts.ready.then(function () { aplicar(); });
+  window.addEventListener("resize", function () { cancelAnimationFrame(pend); pend = requestAnimationFrame(medirTodo); });
+  document.fonts.ready.then(arrancar);
 })();
 </script>
 </body>
