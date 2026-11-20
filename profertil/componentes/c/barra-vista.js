@@ -18,6 +18,7 @@
       "Subiendo, si su lugar ya quedó tapado, entra desde atrás de la barra (380 ms con la curva --ease y fundido de 260 ms) y queda pegada 9 px debajo.",
       "Si con la fila pegada se vuelve a bajar, se suelta donde está y se va con el scroll. Arriba de todo se suelta sola en su lugar.",
       "La caja que la contiene empieza en un píxel entero (PFBarraVista.alPixel). Con medio píxel, en el iPhone la fila pegada y la barra azul redondean distinto y la fila tiembla un píxel.",
+      "Ningún ancestro de la fila recorta (overflow hidden o clip) con esquinas redondeadas: en el iPhone la fila pegada dentro de esa caja sube y baja un píxel mientras se scrollea. Si algo tiene que recortarse (filas que se deslizan al cambiar de vista), el recorte va en la lista, debajo de la fila.",
       "La página lee la dirección del scroll con un umbral de 8 px y llama a mover(dy). Los saltos que hace la página (filtrar, cambiar de vista) van por saltar(), que no anima.",
       "Va en componentes/barra-vista.js y en la pieza barra-vista de base.css: ninguna página la vuelve a escribir."
     ],

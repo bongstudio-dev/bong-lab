@@ -19,7 +19,11 @@
      La caja que contiene la fila empieza en un píxel entero. Una cabecera de alto fraccionario (alto en svh, título de cuerpo
      fluido) deja la lista en, por ejemplo, 568,39 px; en el iPhone, mientras se scrollea, la fila pegada y la barra azul
      redondean distinto y la fila sube y baja un píxel. La caja baja lo que falta para llegar al entero (menos de 1 px) y se
-     vuelve a medir si la cabecera cambia de alto. */
+     vuelve a medir si la cabecera cambia de alto.
+
+   Ningún ancestro de la fila recorta (overflow hidden o clip) con esquinas redondeadas: en el iPhone la fila pegada dentro de una
+   caja así sube y baja un píxel mientras se scrollea. Si hace falta recortar lo que se desliza al cambiar de vista, el recorte va en
+   la lista, debajo de la fila (.pf-docs en la Biblioteca, .pf-panel en la Sala). */
 window.PFBarraVista = (function () {
   var CURVA = "cubic-bezier(.22, 1, .36, 1)";   // --ease
 
