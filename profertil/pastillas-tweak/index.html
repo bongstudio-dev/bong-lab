@@ -96,10 +96,11 @@ body { margin: 0; font: 400 14px/1.4 var(--f-body); }
 .fila--color { padding: 14px; border-radius: 12px; background: var(--azul); }
 .lupa { position: relative; overflow: auto; background: var(--tiza); border-radius: 12px; }
 .lupa--color { background: var(--azul); }
-.lupa__in { position: relative; zoom: var(--z); padding: 6px; width: max-content; }
+/* La lupa amplía la pieza ya armada a tamaño real (transform), no la vuelve a armar a otro tamaño (zoom redondea distinto). */
+.lupa__in { position: relative; transform: scale(var(--z)); transform-origin: 0 0; padding: 6px; width: max-content; }
 .lupa__in .fila { flex-wrap: nowrap; }
 .lupa__in .fila--color { padding: 6px; border-radius: 0; background: transparent; }
-.lupa__grid { position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(to right, rgba(10,30,74,.10) 1px, transparent 1px), linear-gradient(to bottom, rgba(10,30,74,.10) 1px, transparent 1px); background-size: calc(var(--z) * 1px) calc(var(--z) * 1px); }
+.lupa__grid { position: absolute; top: 0; left: 0; pointer-events: none; background-image: linear-gradient(to right, rgba(10,30,74,.10) 1px, transparent 1px), linear-gradient(to bottom, rgba(10,30,74,.10) 1px, transparent 1px); background-size: calc(var(--z) * 1px) calc(var(--z) * 1px); }
 .lupa--color .lupa__grid { background-image: linear-gradient(to right, rgba(255,255,255,.12) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,.12) 1px, transparent 1px); }
 .sin-grid .lupa__grid { display: none; }
 .guia { position: absolute; height: 0; pointer-events: none; border-top: 1px solid; }
@@ -234,7 +235,7 @@ pre { margin: 0; padding: 14px; background: var(--ink); color: var(--tiza); bord
     },
     {
       id: "boton-color", nombre: "Botón sobre color", archivo: BASE + " · @pieza boton-color", fondo: true,
-      nota: "L 48 en desktop y M 44 en mobile. Familjen al 33,3% del alto, recortado a la mayúscula.",
+      nota: "L 48 en desktop y M 44 en mobile. DM Sans al 33,3% del alto, recortado a la mayúscula.",
       html: '<div class="fila fila--color"><a class="pf-boton-color" href="#" data-m="L 48">Leer la nota' + FLECHA + '</a><a class="pf-boton-color" href="#" style="--alto: var(--btn-m)" data-m="M 44">Leer la nota' + FLECHA + '</a></div>',
       caja: ".pf-boton-color",
       ctl: [["pc", "Cuerpo (% del alto)", 25, 45, .1, "%"], ["sube", "Subir texto", -6, 6, 1, "px"]],
@@ -246,7 +247,7 @@ pre { margin: 0; padding: 14px; background: var(--ink); color: var(--tiza); bord
     },
     {
       id: "etiqueta", nombre: "Etiqueta", archivo: BASE + " · @pieza etiqueta",
-      nota: "S 22, M 27 y L 32. Familjen al 48% del alto, rótulo y dato recortados a la mayúscula.",
+      nota: "S 22, M 27 y L 32. DM Sans al 48% del alto, rótulo y dato recortados a la mayúscula.",
       html: function () {
         var S = window.SIS;
         function e(t, id, dato, nom) { return S.etiqueta(id, dato).replace('class="pf-etiqueta"', 'class="pf-etiqueta" data-t="' + t + '"').replace('class="pf-etiqueta__rotulo"', 'class="pf-etiqueta__rotulo" data-m="' + nom + ' · rótulo"').replace('class="pf-etiqueta__dato"', 'class="pf-etiqueta__dato" data-m="' + nom + ' · dato"'); }
@@ -341,8 +342,12 @@ pre { margin: 0; padding: 14px; background: var(--ink); color: var(--tiza); bord
 
   var guias = true, filasRes = [];
   function medir(p) {
-    p.lupaIn.querySelectorAll(".guia").forEach(function (g) { g.remove(); });
+    var lupa = p.lupaIn.parentElement;
+    lupa.querySelectorAll(".guia").forEach(function (g) { g.remove(); });
     p.tbody.innerHTML = "";
+    // El transform no ocupa lugar: se reserva el tamaño ampliado con márgenes.
+    p.lupaIn.style.marginRight = p.lupaIn.offsetWidth * (Z - 1) + "px"; p.lupaIn.style.marginBottom = p.lupaIn.offsetHeight * (Z - 1) + "px";
+    var grid = lupa.querySelector(".lupa__grid"); grid.style.width = p.lupaIn.offsetWidth * Z + "px"; grid.style.height = p.lupaIn.offsetHeight * Z + "px";
     var lr = p.lupaIn.getBoundingClientRect(), malas = 0;
     var cajasR = p.real.querySelectorAll("[data-m]"), cajasA = p.ampli.querySelectorAll("[data-m]");
     Array.prototype.forEach.call(cajasR, function (caja, i) {
@@ -360,13 +365,14 @@ pre { margin: 0; padding: 14px; background: var(--ink); color: var(--tiza); bord
       filasRes.push('<tr><td><a href="#p-' + p.id + '">' + p.nombre + "</a></td>" + celdas + "</tr>");
       if (!guias) return;
       var q = cajasA[i], qr = q.getBoundingClientRect();
-      var x0 = (qr.left - lr.left) / Z, y0 = (qr.top - lr.top) / Z, w = qr.width / Z;
-      function g(cls, y, xx, ww) { var d = document.createElement("div"); d.className = "guia " + cls; d.style.left = xx + "px"; d.style.width = ww + "px"; d.style.top = y + "px"; d.style.borderTopWidth = (1 / Z) + "px"; p.lupaIn.appendChild(d); }
-      g("guia--centro", y0 + r.height / 2, x0, w);
+      // Las guías van en una capa que no se amplía (siempre 1 px de grosor), ubicadas en la pieza ampliada.
+      var LR = lupa.getBoundingClientRect(), x0 = qr.left - LR.left + lupa.scrollLeft, y0 = qr.top - LR.top + lupa.scrollTop, w = qr.width;
+      function g(cls, y, xx, ww) { var d = document.createElement("div"); d.className = "guia " + cls; d.style.left = xx + "px"; d.style.width = ww + "px"; d.style.top = y + "px"; lupa.appendChild(d); }
+      g("guia--centro", y0 + r.height / 2 * Z, x0, w);
       ts.forEach(function (t) {
-        var xx = x0 + (t.izq - r.left), ww = t.ancho, yb = y0 + (t.base - r.top);
+        var xx = x0 + (t.izq - r.left) * Z, ww = t.ancho * Z, yb = y0 + (t.base - r.top) * Z;
         g(t.sec ? "guia--n" : "guia--base", yb, xx, ww);
-        g(t.sec ? "guia--n" : "guia--cap", yb - t.cap, xx, ww);
+        g(t.sec ? "guia--n" : "guia--cap", yb - t.cap * Z, xx, ww);
       });
     });
     p.idx.textContent = malas ? malas + " fuera" : "ok";
