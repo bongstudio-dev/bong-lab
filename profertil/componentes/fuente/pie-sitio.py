@@ -19,7 +19,7 @@ COMP = os.path.normpath(os.path.join(AQUI, '..'))
 PROFERTIL = os.path.normpath(os.path.join(COMP, '..'))
 SALIDA = os.path.join(COMP, 'pie-sitio.js')
 
-# Enlaces del pie que ya tienen página en el Lab (relativos a profertil/). El resto queda en "#".
+# Enlaces del pie que ya tienen página en el Lab (relativos a profertil/). El resto queda como texto, sin enlace.
 ENLACES = {
     'Noticias': 'novedades/',
     'Sala de prensa': 'sala-de-prensa/',
@@ -53,7 +53,9 @@ js = '''/* Pie del sitio: el mismo en todas las páginas.
   var t = document.createElement("template"); t.innerHTML = HTML;
   var aca = location.pathname.replace(/index\\.html$/, "");
   t.content.querySelectorAll("a").forEach(function (a) {
-    var r = ENLACES[a.textContent.trim()]; if (!r) return;
+    var r = ENLACES[a.textContent.trim()];
+    // Solo se enlaza lo que ya tiene página; el resto queda como texto, con la misma clase.
+    if (!r) { var sp = document.createElement("span"); if (a.className) sp.className = a.className; sp.append.apply(sp, a.childNodes); a.replaceWith(sp); return; }
     var u = new URL("../" + r, yo.src); a.href = u.pathname;
     if (aca === u.pathname) a.setAttribute("aria-current", "page");
   });

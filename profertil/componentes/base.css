@@ -421,6 +421,8 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 .pf-aviso { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); z-index: 60; transform: translate(-50%, 16px); padding: 12px 18px; border-radius: 999px; background: var(--ink); color: var(--tiza); font-size: var(--texto-chico); opacity: 0; pointer-events: none; transition: opacity 240ms ease, transform 320ms var(--ease); }
 .pf-aviso.pf-on { opacity: 1; transform: translate(-50%, 0); }
 .pf-pie { margin-top: 120px; }
+/* Lo que todavía no tiene página va como texto (pie-sitio.js): mismo tono que los enlaces. */
+.pf-pie :is(ul, nav) span { opacity: .86; }
 @media (max-width: 640px) {
   .pf-pie { margin-top: 80px; }
 }
