@@ -1,0 +1,7 @@
+---
+// Dirección vieja de los documentos, ver/?d=<id>: lleva a biblioteca/<id>/ (con el # de la página, si lo hay).
+// Sin parámetro, al primero; con uno que no existe, a la Biblioteca.
+import Redireccion from "../../../../componentes/Redireccion.astro";
+import { DOCS_VISOR } from "../../../../lib/datos.mjs";
+---
+<Redireccion titulo="Biblioteca Virtual · Profertil" parametro="d" ids={DOCS_VISOR.map((d) => d.id)} sinParametro={DOCS_VISOR[0].id} desconocido={null} lista="../" />

@@ -1,0 +1,67 @@
+---
+// Página de un documento: biblioteca/<id>/, una por cada uno de los 715 (Biblioteca, hojas de seguridad, informes para
+// inversores y gacetillas de la Sala de prensa). Título arriba, y en tres columnas el índice de páginas, el PDF con scroll
+// continuo (pdf.js, desde la copia de ../pdf/) y los datos. Cierra con documentos de la misma categoría y el pie.
+// El comportamiento está en src/paginas/biblioteca/visor.js; la lista de todos los documentos (para las relacionadas)
+// la comparten todas estas páginas en ../datos-docs.js.
+import Pagina from "../../../componentes/Pagina.astro";
+import Cabeza from "../../../componentes/Cabeza.astro";
+import Simbolos from "../../../componentes/Simbolos.astro";
+import Barra from "../../../componentes/Barra.astro";
+import Pie from "../../../componentes/Pie.astro";
+import { armar, assets, js } from "../../../lib/sistema.mjs";
+import { DOCS_VISOR } from "../../../lib/datos.mjs";
+import CSS from "../../../paginas/biblioteca/visor.css?raw";
+import JS from "../../../paginas/biblioteca/visor.js?raw";
+import COMUN from "../../../paginas/biblioteca/comun.js?raw";
+
+export function getStaticPaths() {
+  return DOCS_VISOR.map((d) => ({ params: { doc: d.id }, props: { d } }));
+}
+const { d } = Astro.props;
+// Cada documento vuelve a su lista (la misma regla que visor.js, para que el título ya llegue puesto).
+const TITULOS: Record<string, string> = { msds: "Hojas de seguridad Profertil", gacetilla: "Sala de prensa Profertil", aviso: "Sala de prensa Profertil", inversores: "Profertil" };
+const titulo = d.t + " · " + (TITULOS[d.c] || "Biblioteca Virtual Profertil");
+const script = armar(JS, { "/*__COMUN__*/": COMUN, "/*__ASSETS__*/{}": js(assets()), '/*__DOC__*/""': js(d.id) });
+---
+<Pagina firma={{ nombre: "PROFERTIL · VISOR DE LA BIBLIOTECA", que: "Plantilla de documento con visor de PDF, sobre documentos reales del sitio actual.", contexto: "Prototipo de la página de documento para la web de Profertil." }} transicion="biblioteca" css={CSS}>
+<Cabeza slot="head" titulo={titulo} descripcion="Visor de documentos de profertil.com.ar sobre el concepto web del manual de marca: el PDF a lo largo de la página, con índice de páginas y modo lectura." raiz="../../" temaColor alcance={{ seccion: "documentos", nombre: "Biblioteca", en: "la Biblioteca", previa: true }} />
+
+<Simbolos>
+<symbol id="pf-badge-bg" viewBox="0 0 100 100"><path d="M32 0H68C76.4869 0 84.6263 3.37142 90.6274 9.37258C96.6286 15.3737 100 23.5131 100 32V68C100 76.4869 96.6286 84.6263 90.6274 90.6274C84.6263 96.6286 76.4869 100 68 100H32C23.5131 100 15.3737 96.6286 9.37258 90.6274C3.37142 84.6263 0 76.4869 0 68V32C0 23.5131 3.37142 15.3737 9.37258 9.37258C15.3737 3.37142 23.5131 0 32 0Z"/></symbol>
+</Simbolos>
+
+<a class="pf-saltar" href="#pf-doc">Ir al documento</a>
+
+<Barra solida logo={{ href: "../", etiqueta: "Profertil, ir a la Biblioteca" }} busca={{ etiqueta: "Buscar en la Biblioteca", placeholder: "Buscá: soja, boletín, urea…" }} progreso />
+
+<main id="pf-visor" aria-busy="true">
+  <div class="pf-v-grilla" id="pf-grilla">
+    <header class="pf-v-cab"><div class="pf-v-in" id="pf-cabIn"></div></header>
+    <nav class="pf-v-indice" id="pf-indice" aria-label="Páginas del documento" hidden></nav>
+    <div class="pf-v-doc" id="pf-doc" tabindex="-1"></div>
+    <div class="pf-v-datos" id="pf-datos"></div>
+  </div>
+  <section class="pf-v-sigue pf-col" aria-label="Más de la Biblioteca">
+    <div class="pf-v-sigue__cab"><h2 id="pf-sigueT">Más de la Biblioteca</h2><a id="pf-sigueTodos" href="../">Ver toda la Biblioteca</a></div>
+    <ul class="pf-docs" id="pf-rel"></ul>
+  </section>
+</main>
+
+<Pie />
+
+
+<button class="pf-v-salir" id="pf-focoSalir" type="button" hidden>Salir del modo lectura <kbd>Esc</kbd></button>
+<div class="pf-v-cuenta" id="pf-cuenta">
+  <span class="pf-v-cuenta__n" id="pf-cuentaN" aria-hidden="true"></span><i class="pf-v-cuenta__sep" aria-hidden="true"></i>
+  <span class="pf-v-zoom" role="group" aria-label="Zoom">
+    <button type="button" id="pf-zMenos" aria-label="Alejar" title="Alejar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12"/></svg></button>
+    <button type="button" class="pf-v-zoom__nivel" id="pf-zNivel" aria-label="Volver al ancho de la página" title="Volver al ancho de la página">100%</button>
+    <button type="button" id="pf-zMas" aria-label="Acercar" title="Acercar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6v12M6 12h12"/></svg></button>
+  </span>
+</div>
+<div class="pf-aviso" id="pf-aviso" role="status" aria-live="polite"></div>
+
+<script is:inline src="../datos-docs.js"></script>
+<script is:inline set:html={"\n" + script}></script>
+</Pagina>
