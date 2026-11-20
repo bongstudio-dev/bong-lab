@@ -62,24 +62,26 @@ export default function estaticos() {
     hooks: {
       "astro:config:done": ({ config }) => { base = config.base.replace(/\/?$/, "/"); },
       "astro:server:setup": ({ server }) => {
-        server.middlewares.use((req, res, next) => {
+        // Va primero en la cola: si no, Vite responde antes con los archivos de la raíz como módulos.
+        server.middlewares.stack.unshift({ route: "", handle: (req, res, next) => {
           const url = decodeURIComponent((req.url || "").split(/[?#]/)[0]);
-          if (!url.startsWith(base)) return next();
-          let rel = url.slice(base.length);
-          if (rel.split("/").some((p) => p === ".." || (p && FUERA(p)))) return next();
+          // En `astro dev` la dirección llega a veces sin la base (/bong-lab/): se aceptan las dos.
+          let rel = url.startsWith(base) ? url.slice(base.length) : url.slice(1);
+          if (rel.split("/").some((p) => p === "..")) return next();
+          if (rel.split("/").some((p) => p && FUERA(p))) { res.statusCode = 404; return res.end(); }   // como en el sitio publicado
           if (rel === "" || rel.endsWith("/")) rel += "index.html";
           if (!ENTRADAS.some((e) => rel === e || rel.startsWith(e + "/"))) return next();
           const abs = path.join(RAIZ, rel);
           if (!fs.statSync(abs, { throwIfNoEntry: false })?.isFile()) {
             if (fs.statSync(path.join(RAIZ, rel), { throwIfNoEntry: false })?.isDirectory()) {
-              res.statusCode = 301; res.setHeader("Location", url + "/"); return res.end();
+              res.statusCode = 301; res.setHeader("Location", base + rel + "/"); return res.end();
             }
             return next();
           }
           res.setHeader("Content-Type", TIPOS[path.extname(abs).toLowerCase()] || "application/octet-stream");
           res.setHeader("Cache-Control", "no-store");
           fs.createReadStream(abs).pipe(res);
-        });
+        } });
       },
       "astro:build:done": ({ dir, logger }) => {
         const dist = fileURLToPath(dir);
