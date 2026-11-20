@@ -218,6 +218,18 @@
 .pf-herramientas.pf-escondida { transform: translateY(calc(-100% - 18px)); opacity: 0; }
 .pf-herramientas.pf-escondida .pf-selector { pointer-events: none; }
 @media (prefers-reduced-motion: reduce) { .pf-herramientas { transition: opacity 200ms ease; } .pf-herramientas.pf-escondida { transform: none; } }
+/* Donde se puede, la fila va siempre fixed y la mueve el navegador atado al scroll: baja con la página hasta la barra y ahí queda (el JS
+   solo mide --herr-desde, --herr-hasta y --herr-recorrido). Así no depende de que el JS llegue a tiempo y no se pasa de largo aunque la
+   página esté ocupada (el carrusel). Para esconderla se usa translate, que se suma a la animación. */
+@keyframes pf-herr-baja { from { transform: translateY(var(--herr-desde, 0px)); } to { transform: translateY(var(--herr-hasta, 0px)); } }
+@supports (animation-timeline: scroll()) {
+  .pf-herramientas.pf-atada { position: fixed; top: 0; pointer-events: none; animation: pf-herr-baja linear both; animation-timeline: scroll(root block);
+    animation-range: 0px var(--herr-recorrido, 0px); transition: translate 380ms var(--ease), opacity 260ms ease; }
+  .pf-herramientas.pf-atada .pf-selector { pointer-events: auto; }
+  .pf-herramientas.pf-atada.pf-escondida { translate: 0 calc(-100% - 18px); }
+  .pf-herramientas.pf-atada.pf-escondida .pf-selector { pointer-events: none; }
+  @media (prefers-reduced-motion: reduce) { .pf-herramientas.pf-atada { transition: opacity 200ms ease; } .pf-herramientas.pf-atada.pf-escondida { translate: none; } }
+}
 /* El Selector es la pieza "selector" de base.css. Al cambiar de vista el indicador lo mueve la View
    Transition, junto con las tarjetas; al cambiar el orden, su transición. */
 .pf-selector.pf-vista .pf-selector__ind { view-transition-name: pf-ind-vista; }
@@ -1020,7 +1032,26 @@ a.pf-card, a.pf-d-cta { text-decoration: none; }
   herr.parentNode.insertBefore(herrLugar, herr);
   // Acá no hay --pf-barra-h (lo arma el campo de la cabecera, que Novedades no tiene): se mide la barra.
   function topFijo() { return $("pf-top").offsetHeight + 9; }
-  function herrFija() { return herr.classList.contains("pf-fija"); }
+  var atada = !!(window.CSS && CSS.supports && CSS.supports("animation-timeline: scroll()")), recorrido = 0, anchoAntes = -1;
+  function herrFija() { return atada ? window.scrollY >= recorrido - 1 : herr.classList.contains("pf-fija"); }
+  /* Donde el navegador lo soporta (también el iPhone), la fila no se fija por JS: va siempre fixed y la mueve el navegador atada al
+     scroll (CSS .pf-atada). Acá el carrusel tiene ocupada la página y el JS llegaba un cuadro tarde: la fila se pasaba de largo bajo la
+     barra y volvía de un salto. El JS solo mide dónde empieza (y0), dónde queda (debajo de la barra) y cuánto recorre. */
+  function atar() {
+    if (anchoAntes !== window.innerWidth) {   // el tamaño natural de la fila solo cambia con el ancho de la ventana
+      herr.classList.remove("pf-atada"); herrLugar.classList.remove("pf-activo"); herr.style.left = herr.style.width = "";
+      var n = herr.getBoundingClientRect();
+      herrLugar.style.width = n.width + "px"; herrLugar.style.height = n.height + "px";
+      herrLugar.classList.add("pf-activo"); herr.classList.add("pf-atada");
+      anchoAntes = window.innerWidth;
+    }
+    var r = herrLugar.getBoundingClientRect(), y0 = r.top + window.scrollY, T = topFijo();
+    recorrido = Math.max(0, y0 - T);
+    herr.style.left = r.left + "px"; herr.style.width = r.width + "px";
+    herr.style.setProperty("--herr-desde", y0 + "px");
+    herr.style.setProperty("--herr-hasta", T + "px");
+    herr.style.setProperty("--herr-recorrido", recorrido + "px");
+  }
   function mostrarHerr(si) { if (herr) herr.classList.toggle("pf-escondida", !si); }
   function soltarHerr() {
     herr.classList.remove("pf-fija"); herrLugar.classList.remove("pf-activo");
@@ -1034,10 +1065,18 @@ a.pf-card, a.pf-d-cta { text-decoration: none; }
     herrLugar.style.width = r.width + "px"; herrLugar.style.height = r.height + "px"; herrLugar.classList.add("pf-activo");
     herr.style.left = r.left + "px"; herr.style.width = r.width + "px"; herr.style.top = topFijo() + "px"; herr.classList.add("pf-fija");
   }
-  window.addEventListener("scroll", fijarHerr, { passive: true });
-  window.addEventListener("resize", function () { if (herrFija()) soltarHerr(); fijarHerr(); });
+  if (atada) {
+    atar();
+    window.addEventListener("resize", atar);
+    // Si algo de arriba cambia de alto (el carrusel, la grilla que crece, las fuentes), se vuelve a medir dónde empieza.
+    if (window.ResizeObserver) new ResizeObserver(function () { atar(); }).observe(document.body);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { anchoAntes = -1; atar(); });
+  } else {
+    window.addEventListener("scroll", fijarHerr, { passive: true });
+    window.addEventListener("resize", function () { if (herrFija()) soltarHerr(); fijarHerr(); });
+    fijarHerr();
+  }
   herr.addEventListener("focusin", function () { mostrarHerr(true); });
-  fijarHerr();
   // Saltos de scroll que hace la página (rehacer la grilla, ir a la lista): no son del usuario, así que ni el dock ni la fila los leen
   // como bajar o subir.
   var hastaSinDir = 0;
