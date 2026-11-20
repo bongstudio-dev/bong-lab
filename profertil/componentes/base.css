@@ -7,6 +7,8 @@
    - Toda clase, id y animación empieza con pf- (así nada choca con el tema de WordPress ni con otro plugin).
    - Colores, tamaños de texto, radios y sombras salen de tokens.css. Nada de valores sueltos.
    - Las proporciones que define el Master (alto de la pastilla, radio = 32% del alto, etc.) quedan como calc().
+   - Tipografía: Familjen solo en títulos y subtítulos. Todo lo que es interfaz (botones, pastillas, chips, etiquetas,
+     campos, menús, contadores) va en DM Sans (--f-body).
 
    Cada pieza va entre "@pieza nombre" y la siguiente: la librería las lee así para mostrar y copiar solo la que hace falta. */
 
@@ -156,7 +158,7 @@ a.pf-etiqueta { text-decoration: none; }
 .pf-barra__lupa { width: 46px; height: 46px; flex: none; padding: 0; border: 0; border-radius: 999px; background: transparent; color: var(--tiza); cursor: pointer; display: grid; place-items: center; }
 .pf-barra__busca.pf-abierto .pf-barra__lupa { color: var(--azul); }
 .pf-barra__lupa svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
-.pf-barra__busca input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font: 400 var(--texto-cuerpo)/1.2 var(--f-display); color: var(--ink); padding: 0 4px .1em; opacity: 0; transition: opacity 200ms ease; }
+.pf-barra__busca input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font: 400 var(--texto-cuerpo)/1.2 var(--f-body); color: var(--ink); padding: 0 4px .1em; opacity: 0; transition: opacity 200ms ease; }
 .pf-barra__busca.pf-abierto input { opacity: 1; }
 .pf-barra__busca input::placeholder { color: var(--ink-3); }
 .pf-barra__busca input::-webkit-search-cancel-button { display: none; }
