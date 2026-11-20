@@ -165,7 +165,7 @@
 .pf-herr-lugar { display: none; flex: none; }
 .pf-herr-lugar.pf-activo { display: block; }
 .pf-herramientas { position: relative; z-index: 20; transition: transform 380ms var(--ease), opacity 260ms ease; will-change: transform; }
-.pf-herramientas .pf-selector { background: linear-gradient(var(--line), var(--line)), var(--pf-papel, #fff); }
+.pf-herramientas .pf-selector { background: linear-gradient(var(--line), var(--line)), var(--pf-papel, var(--bg)); } /* acá no hay --pf-papel: el fondo de la página */
 .pf-herramientas.pf-fija { position: fixed; top: calc(var(--pf-barra-h, 76px) + 9px); pointer-events: none; }
 .pf-herramientas.pf-fija .pf-selector { pointer-events: auto; }
 .pf-herramientas.pf-escondida { transform: translateY(calc(-100% - 18px)); opacity: 0; }
