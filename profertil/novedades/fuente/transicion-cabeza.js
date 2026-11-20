@@ -2,7 +2,10 @@
    puestas y, si se llega desde otra página con la persiana, la deja tapando. */
 (function () {
   var d = document.documentElement, c = null, llega = null;
-  try { c = JSON.parse(localStorage.getItem("pf-transicion") || "null"); } catch (e) {}
+  // Panel de ajuste apagado: todos ven la transición de entrada. En true vuelve el panel
+  // (abajo a la izquierda) y se respeta lo que cada uno eligió en su navegador.
+  var PANEL = false;
+  if (PANEL) try { c = JSON.parse(localStorage.getItem("pf-transicion") || "null"); } catch (e) {}
   c = Object.assign({ v: "animada", color: "azul", dur: 700, la: 1100, curva: "fuerte" }, c || {});
   var CURVAS = { base: "cubic-bezier(.22, 1, .36, 1)", fuerte: "cubic-bezier(.67, 0, .24, .99)" };
   d.style.setProperty("--pf-tr-dur", c.dur + "ms");
@@ -21,5 +24,5 @@
     if (llega === c.v && (c.v === "persiana" || c.v === "animada")) d.classList.add("pf-tr-tapa");
     if (llega === "fundido" && c.v === "fundido" && !vt) d.classList.add("pf-tr-llega");
   }
-  window.PF_TR = { c: c, vt: vt, curvas: CURVAS };
+  window.PF_TR = { c: c, vt: vt, curvas: CURVAS, panel: PANEL };
 })();

@@ -79,7 +79,8 @@
     ocupado = false;
   }
 
-  /* Panel. */
+  /* Panel (apagado con PANEL en transicion-cabeza.js). */
+  if (!T.panel) return;
   var ICONO = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v6H4V5Zm0 8h16v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6Z" opacity=".45"/><path fill="currentColor" d="M4 11h16v2H4z"/></svg>';
   function seg(id, ops) {
     return '<div class="pf-tr-seg" data-k="' + id + '">' + ops.map(function (o) {
