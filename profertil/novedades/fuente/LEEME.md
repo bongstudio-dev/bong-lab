@@ -1,22 +1,27 @@
 # Novedades · fuente
 
-`../index.html` se genera desde esta carpeta. No editarlo a mano: tocar
-`template.html` (o los datos) y regenerar.
+Novedades (`../`) y la página de cada nota (`../<nota>/`) se arman con Astro: ver `src/LEEME.md` en la raíz del
+repo. Las páginas están en `src/pages/profertil/novedades/`; su estilo y su comportamiento, en
+`src/paginas/novedades/` (`novedades.css` y `novedades.js`, `nota.css` y `nota.js`, y `comun.js` con lo que comparten:
+tipos, etiquetas y arte de tarjeta). Acá quedan los datos y los scripts que los preparan. Después de tocar algo:
 
-- `template.html`: la página, con marcadores para datos, logos y foto.
+```bash
+npm run build
+```
+
 - `notas.json`: las 471 notas de /noticias-recientes/, salidas del crawl del
   sitio actual (`urls.csv`, en Drive).
-- `assets.json`: las 18 formas oficiales del sistema.
+- `src/compartido/assets.json`: las 18 formas oficiales del sistema.
 - `tokens.json`: colores, escalas y tiempos de animacion. Salen del Figma
   Master. Desde el 23/10/2026 la pagina no arma su propio `:root`: carga
   `../componentes/tokens.css` (que sale de este archivo con
   `componentes/fuente/generar-tokens.py`) y `../componentes/base.css`, las
   piezas compartidas con la libreria de componentes (Barra, Selector,
   Pastilla, Chip, Etiqueta, Boton). Si cambia un token: exportar
-  tokens.json, correr generar-tokens.py y despues build.py.
+  tokens.json, correr generar-tokens.py y despues `npm run build`.
 - Toda clase, id y animacion lleva el prefijo `pf-` (regla de todo el
   sistema web; ver arriba de `componentes/base.css`).
-- `logo-blanco.svg`, `simbolo-color.svg`: exportados del Figma Master.
+- `src/compartido/logo-blanco.svg` y `simbolo-color.svg`: exportados del Figma Master.
 - El hero es un carrusel a pantalla completa con las 5 notas mas recientes.
   Para elegir otras, cargar sus rutas (`u`) en `DESTACADAS`, en
   `template.html`. Cada placa es la foto de la nota recortada como hoja entre
@@ -55,21 +60,21 @@
 
 Con el chip **En: Novedades** filtra las notas; sin el chip busca en todo el sitio (documentos, notas y
 páginas). Es el componente compartido de `../../buscador/` (ver su `LEEME.md`), cargado en el head de
-`template.html`.
+cada página (`src/componentes/Cabeza.astro`).
 
 ## Página de Nota
 
 Desde Novedades se llega por enlace directo: cada tarjeta de la grilla y el
-botón "Leer la nota" del header llevan a `nota/?n=<ar>`. Las 471 notas tienen
-su página.
+botón "Leer la nota" del header llevan a `<ar>/`. Las 471 notas tienen
+su página, `novedades/<ar>/`, con el título, la bajada y la foto para
+compartirla ya puestos. La dirección de antes, `nota/?n=<ar>`, lleva a la nueva
+(sin parámetro o con uno que no existe, a la más reciente).
 
-`../nota/index.html` es la plantilla de una nota: `nota/?n=<ar>` (sin
-parámetro, la más reciente). Sale de `nota.html` con el mismo `build.py`, que
-le copia de `template.html` el bloque entre `@comun` y `@fin-comun` (tipos,
-etiquetas, arte de tarjeta), y le suma notas.json, las formas y el logo. El
-pie es el del sitio, `../../componentes/pie-sitio.js`, el mismo archivo en todas
-las páginas (sale de la librería, ver `componentes/fuente/pie-sitio.py`). El texto de cada
-nota lo lee al abrir de `../notas/<ar>.json`.
+La arma `src/pages/profertil/novedades/[nota].astro` con `nota.js` y
+`comun.js`. La lista de todas las notas (para las relacionadas) va en
+`../datos-notas.js`, un archivo que comparten todas las páginas de nota. El pie
+es el del sitio (`src/componentes/Pie.astro`, sale de la librería). El texto de
+cada nota lo lee al abrir de `../notas/<ar>.json`.
 
 - Sobria, sobre el fondo y sin cabecera de color. Arriba, a la izquierda y
   alineados con la foto: vuelta a
@@ -104,10 +109,10 @@ nota lo lee al abrir de `../notas/<ar>.json`.
   la más cercana en el tiempo.
 - Sin sombras.
 
-Regenerar la página:
+Volver a armar las páginas:
 
 ```bash
-python3 profertil/novedades/fuente/build.py
+npm run build
 ```
 
 Fotos de las tarjetas: cada tarjeta con imagen muestra la foto de su nota,
@@ -145,13 +150,13 @@ conecta en vivo. `SIN_FOTOS=1` saltea la bajada de fotos.
 
 ## Transición entre páginas
 
-Entre Novedades y cada Nota (y de una Nota a otra) corre el componente "Transiciones de página" de la librería. La elegida es Persiana con logo animado: azul, 700 ms por tramo, curva Fuerte. Vive en tres archivos que `build.py` mete en las dos páginas:
+Entre Novedades y cada Nota (y de una Nota a otra) corre el componente "Transiciones de página" de la librería. La elegida es Persiana con logo animado: azul, 700 ms por tramo, curva Fuerte. Vive en tres archivos de `src/compartido/transicion/novedades/` que el layout de las páginas (`src/componentes/Pagina.astro`) suma a Novedades y a cada nota:
 
-- `transicion.css`: el paño, el fundido y el panel. La animación del logo armado se toma del componente al compilar.
+- `transicion.css`: el paño, el fundido y el panel. La animación del logo armado se toma del componente al armar el sitio.
 - `transicion-cabeza.js`: va en el head, antes de pintar. Lee la elección, pone las variables y, si se llega con la persiana, deja el paño tapando para que siga de largo.
 - `transicion.js`: intercepta los links internos de Novedades, tapa y recién ahí cambia de página. Arma el panel.
 
-El panel (abajo a la izquierda) permite ajustar la variante (Persiana, Persiana con logo animado, Fundido o Ninguna), el color del paño, la duración, lo que tarda el logo en armarse y la curva. Lo que se cambia queda guardado en el navegador de quien prueba; sin tocarlo, corre la Persiana con logo animado. Con movimiento reducido no hay transición.
+El panel (abajo a la izquierda, apagado con `PANEL = false` en `transicion-cabeza.js`) permite ajustar la variante (Persiana, Persiana con logo animado, Fundido o Ninguna), el color del paño, la duración, lo que tarda el logo en armarse y la curva. Lo que se cambia queda guardado en el navegador de quien prueba; sin tocarlo, corre la Persiana con logo animado. Con movimiento reducido no hay transición.
 
 ## Tokens: Figma manda
 
@@ -168,14 +173,14 @@ Para cambiar un valor:
 2. Correr `exportar-tokens.figma.js` sobre el archivo (se corre con
    `use_figma`; tambien sirve la consola de un plugin de desarrollo) y guardar
    lo que devuelve en `tokens.json`, en `tokens`.
-3. Regenerar con `build.py`.
+3. Correr `componentes/fuente/generar-tokens.py` y volver a armar el sitio (`npm run build`).
 
 Si el exportador informa `conflictos`, dos variables usan el mismo nombre de
 CSS con valores distintos: se corrige en Figma antes de exportar.
 
-## Cabecera con campo (`campo.css` y `campo.js`)
+## Cabecera con campo (`src/compartido/campo/`)
 
-La Nota lleva la cabecera en una tarjeta sobre un campo fijo de Formas que crecen en grupos; foto, texto, relacionadas y pie suben por encima al hacer scroll. `build.py` la suma a la Nota compilada (no tiene plantilla propia) y lee la nota desde `window.PF_NOTA`.
+La Nota lleva la cabecera en una tarjeta sobre un campo fijo de Formas que crecen en grupos; foto, texto, relacionadas y pie suben por encima al hacer scroll. El layout la suma a cada nota (y el script, sin el CSS, a la Biblioteca, Hojas de seguridad y Sala de prensa, que lo configuran con `window.PF_CAMPO`); en la nota lee la nota desde `window.PF_NOTA`.
 
 - Color: el de la etiqueta del tipo de nota (azul, verde, amarillo o terra para Comercial), con su figura y su acento.
 - Formas: una sola, la de la categoría (la del badge de la etiqueta).
@@ -185,4 +190,4 @@ La Nota lleva la cabecera en una tarjeta sobre un campo fijo de Formas que crece
 - En escritorio la hoja de la nota va de borde a borde. En modo lectura el campo desaparece.
 - Para probar: `?p=azul|verde|amarillo|naranja`, `?formas=varias` (mezcla del tema), `?alto=40..100`.
 
-`../nota-campo/` fue la prueba de esta cabecera: ahora redirige a `../nota/` con la misma dirección.
+`../nota-campo/` fue la prueba de esta cabecera: ahora lleva a la nota, con la misma consulta (`?n=<ar>` va a `../<ar>/`).

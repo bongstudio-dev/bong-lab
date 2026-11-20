@@ -5,8 +5,8 @@ Lo usan la Biblioteca y Novedades con el mismo componente.
 
 - `alcance.css` y `alcance.js`: el componente. Se suma al buscador que ya tiene la página (pieza "barra" de
   `../componentes/base.css`), sin reemplazarlo.
-- `indice.json`: el índice de todo el sitio. Se genera, no se edita a mano.
-- `fuente/indice.py`: el script que lo arma.
+- `indice.json`: el índice de todo el sitio. Se arma en el build del sitio (`src/pages/profertil/buscador/indice.json.ts`).
+- `fuente/paginas.json`: las páginas del mapa de arquitectura que suma el índice; las baja `fuente/indice.py`.
 
 ## Cómo funciona
 
@@ -39,8 +39,7 @@ aviso sin resultados, si lo hay, `pf-empty`). En el head, después de `base.css`
 ```
 
 `data-seccion` es el id del grupo del índice que corresponde a la página; `data-nombre`, el texto del chip.
-En la Biblioteca va en `biblioteca/fuente/lista.html` y en Novedades en `novedades/fuente/template.html`; después,
-el `build.py` de cada una.
+En las páginas del sitio lo suma `src/componentes/Cabeza.astro` (prop `alcance`).
 
 **Páginas sin lista (Nota y visor de la Biblioteca):** van con `data-modo="previa"`. Ahí el componente abre y
 cierra el buscador de la barra él mismo; al escribir muestra una vista previa de la sección (o de todo el sitio con
@@ -50,26 +49,27 @@ el interruptor), y Enter o el pie del panel llevan a la lista con la búsqueda h
 ## El índice
 
 ```bash
-python3 profertil/buscador/fuente/indice.py            # documentos, notas y páginas
-python3 profertil/buscador/fuente/indice.py --sin-red  # sin pedir el mapa: conserva las páginas que ya había
+python3 profertil/buscador/fuente/indice.py   # baja las páginas del mapa a fuente/paginas.json
+npm run build                                 # arma el índice con documentos, hojas, gacetillas, notas y páginas
 ```
 
-Hay que correrlo cuando cambian `biblioteca/fuente/docs.json`, `novedades/fuente/notas.json` o el mapa de
-arquitectura. Cada ítem es `[título, url, resumen]`, con la url relativa a `profertil/` (o absoluta si va al
+El índice se rehace solo en cada build; `indice.py` hay que correrlo cuando cambia el mapa de arquitectura. Cada ítem es `[título, url, resumen]`, con la url relativa a `profertil/` (o absoluta si va al
 sitio actual).
 
 | Grupo | Sale de | Resumen | Lleva a |
 |---|---|---|---|
-| Biblioteca (668) | `biblioteca/fuente/docs.json` | categoría y año | `biblioteca/ver/?d=…` |
-| Notas (471) | `novedades/fuente/notas.json` | tipo, año y bajada (hasta 140 letras) | `novedades/nota/?n=…` |
-| Páginas (28) | mapa de arquitectura v0 (`/api/arquitectura`), solo nodos `pagina` | dónde está en el menú | la maqueta si existe (Novedades), si no la dirección del sitio actual |
+| Biblioteca (627) | `biblioteca/fuente/docs.json` | categoría y año | `biblioteca/<id>/` |
+| Hojas de seguridad (22) | `biblioteca/fuente/docs-msds.json` | Hoja de seguridad | `biblioteca/<id>/` |
+| Gacetillas (47) | `sala-de-prensa/fuente/prensa.json` | tipo, mes y año | `biblioteca/<id>/` |
+| Notas (471) | `novedades/fuente/notas.json` | tipo, año y bajada (hasta 140 letras) | `novedades/<nota>/` |
+| Páginas (28) | `fuente/paginas.json`, del mapa de arquitectura v0 (`/api/arquitectura`), solo nodos `pagina` | dónde está en el menú | la maqueta si existe (Novedades), si no la dirección del sitio actual |
 
 Queda afuera: el texto completo de las notas (`novedades/notas/`) y de los PDF, los nodos del mapa que no son
 página (registros, secciones, plantillas) y las notas de trabajo del mapa.
 
 ### Sumar un tipo de contenido
 
-1. En `fuente/indice.py`, una función que devuelva la lista de `[título, url, resumen]`.
+1. En `src/pages/profertil/buscador/indice.json.ts`, una función que devuelva la lista de `[título, url, resumen]`.
 2. Sumarla a `GRUPOS` con su id, nombre, singular, plural, artículo ("los" o "las") y la dirección de su lista
    con la búsqueda aplicada (por ejemplo `'productos/#q='`). Si no tiene lista, `''`: el panel muestra todos.
 3. Correr el script. El panel lo muestra solo, en el orden de `GRUPOS`.

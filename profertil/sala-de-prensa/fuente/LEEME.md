@@ -1,12 +1,12 @@
 # Sala de prensa · fuente
 
-`../index.html` se genera desde esta carpeta. No editarlo a mano: tocar `sala.html` o los datos y regenerar.
+La página se arma con Astro: ver `src/LEEME.md` en la raíz del repo. Está en
+`src/pages/profertil/sala-de-prensa/index.astro`, con su estilo y su comportamiento en `src/paginas/sala-de-prensa/`
+(`sala.css` y `sala.js`). Acá quedan los datos y el script que los prepara.
 
 ```bash
 python3 profertil/sala-de-prensa/fuente/prep-prensa.py --bajar   # prensa.json, PDF, fotos y logos (solo baja lo que falta)
-python3 profertil/sala-de-prensa/fuente/build.py                 # ../index.html
-python3 profertil/biblioteca/fuente/build.py                     # el visor de la Biblioteca, que abre las gacetillas
-python3 profertil/buscador/fuente/indice.py                      # el índice del buscador (grupo Gacetillas)
+npm run build                                                    # la página, las de cada gacetilla y el índice del buscador
 ```
 
 ## Cómo funciona hoy en el sitio actual
@@ -54,7 +54,7 @@ Gacetilla), hoja de borde a borde, buscador en la lupa, filtros en el dock y anc
   para que el dock mida 49, lo mismo que el ancla) y el panel muestra todos los grupos abiertos,
   sin acordeón. Con tres o más vuelve el dock de la Biblioteca tal cual.
 - **Gacetillas**: la fila de documento de `base.css` con la fecha completa. Abren en el visor de la Biblioteca
-  (`../biblioteca/ver/?d=prensa-...`), que vuelve a la Sala de prensa. Filtros Tipo (Gacetilla o Aviso a la comunidad,
+  (`../biblioteca/<id>/`), que vuelve a la Sala de prensa. Filtros Tipo (Gacetilla o Aviso a la comunidad,
   las mismas etiquetas que esos tipos en Novedades) y Año. Selector de vistas de la Biblioteca (compacta, lista,
   miniaturas; se recuerda en `prensa-vista`): en miniaturas va la foto de la gacetilla si tiene (8 de 47) y si no el arte
   de Formas de la Biblioteca. En miniaturas del celular la etiqueta de Aviso a la comunidad se

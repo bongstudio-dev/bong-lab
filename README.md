@@ -21,9 +21,13 @@ Portada: https://bongstudio-dev.github.io/bong-lab/
 
    `grupo` es la "carpeta" de la portada donde se muestra: solo agrupa visualmente y no cambia ninguna dirección. Si es un grupo nuevo, sumalo también a `ORDEN_GRUPOS` (define el orden).
 
-3. Hacé commit y push a `main`. Pages lo publica en uno o dos minutos en `https://bongstudio-dev.github.io/bong-lab/<cliente>/<experimento>/`.
+3. Hacé commit y push a `main`. Se publica en unos minutos en `https://bongstudio-dev.github.io/bong-lab/<cliente>/<experimento>/`.
 
-Para probarlo local, levantá un servidor desde la raíz (`python3 -m http.server 8777`) y abrí http://localhost:8777.
+Para probarlo local: `npm install` (la primera vez) y `npm run dev`, y abrí http://localhost:4321/bong-lab/.
+
+Los experimentos se publican tal cual, sin pasar por ningún paso de armado. Las páginas del sitio de Profertil
+(Novedades, notas, Biblioteca, documentos, Hojas de seguridad y Sala de prensa) se arman con Astro desde `src/`:
+ver `src/LEEME.md`. Al hacer push a `main`, GitHub Actions arma el sitio y lo publica.
 
 ---
 
