@@ -92,7 +92,8 @@ body { margin: 0; font: 400 14px/1.4 var(--f-body); }
 .ctls { display: grid; gap: 12px; padding: 14px; border-radius: 12px; background: color-mix(in srgb, var(--tiza) 60%, transparent); }
 .ctls .acc button { height: 28px; font-size: 12px; }
 .muestras { display: grid; gap: 10px; }
-.fila { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+/* Arriba y no al centro: piezas de distinto alto centradas caen en medio píxel y el navegador las redondea distinto. */
+.fila { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
 .fila--color { padding: 14px; border-radius: 12px; background: var(--azul); }
 .lupa { position: relative; overflow: auto; background: var(--tiza); border-radius: 12px; }
 .lupa--color { background: var(--azul); }
@@ -247,7 +248,7 @@ pre { margin: 0; padding: 14px; background: var(--ink); color: var(--tiza); bord
     },
     {
       id: "etiqueta", nombre: "Etiqueta", archivo: BASE + " · @pieza etiqueta",
-      nota: "S 22, M 27 y L 32. DM Sans al 48% del alto, rótulo y dato recortados a la mayúscula.",
+      nota: "S 22, M 27 y L 32. DM Sans en 10, 11 y 13, interlínea 1, sin recortar a la mayúscula.",
       html: function () {
         var S = window.SIS;
         function e(t, id, dato, nom) { return S.etiqueta(id, dato).replace('class="pf-etiqueta"', 'class="pf-etiqueta" data-t="' + t + '"').replace('class="pf-etiqueta__rotulo"', 'class="pf-etiqueta__rotulo" data-m="' + nom + ' · rótulo"').replace('class="pf-etiqueta__dato"', 'class="pf-etiqueta__dato" data-m="' + nom + ' · dato"'); }

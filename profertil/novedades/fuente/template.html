@@ -128,7 +128,7 @@
   height: var(--btn-l); padding: 0 22px 0 24px;
   border: 0; border-radius: 999px; cursor: pointer;
   background: var(--tiza); color: var(--azul);
-  font-family: var(--f-body); font-size: calc(var(--btn-l) * .274); font-weight: 500;
+  font-family: var(--f-body); font-size: round(calc(var(--btn-l) * .274), 1px); font-weight: 500;
   line-height: 1; text-box: trim-both cap alphabetic; /* igual que el botón sobre color de base.css */
   transition: background 200ms ease, color 200ms ease;
 }
@@ -307,7 +307,7 @@ a.pf-card, a.pf-d-cta { text-decoration: none; }
   .pf-d-in h2, .pf-d-in h2.pf-largo { font-size: 2.3rem; }
   .pf-d-kick { font-size: 0.86rem; gap: 10px; }
   .pf-d-kick .pf-etiqueta { --s: var(--etq-m); }
-  .pf-d-cta { height: var(--btn-m); font-size: calc(var(--btn-m) * .274); }
+  .pf-d-cta { height: var(--btn-m); font-size: round(calc(var(--btn-m) * .274), 1px); }
   .pf-d-nav { bottom: calc(22px + env(safe-area-inset-bottom, 0px)); }
   .pf-d-segs { gap: 6px; }
   .pf-d-flechas { display: none; }
