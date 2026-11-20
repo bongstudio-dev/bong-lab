@@ -28,7 +28,7 @@
         "/* Nace cerca del borde de arriba de la foto; al llegar al centro de la pantalla se queda quieto y la foto sigue subiendo, hasta que el botón queda en la mitad de la foto. */",
         ".pf-bf-boton { position: sticky; top: calc(50% - var(--alto) / 2); z-index: 2; align-self: flex-start; margin: var(--arranque, 40px) 0 calc(var(--h) / 2 - var(--alto) / 2);",
         "  display: inline-flex; align-items: center; gap: 10px; height: var(--alto); padding: 0 22px 0 24px; border-radius: 999px;",
-        "  font: 500 calc(var(--alto) * .333)/1 var(--f-body); text-decoration: none; white-space: nowrap; transition: background 200ms ease, color 200ms ease;  text-box: trim-both cap alphabetic; }",
+        "  font: 500 calc(var(--alto) * .274)/1 var(--f-body); text-decoration: none; white-space: nowrap; transition: background 200ms ease, color 200ms ease;  text-box: trim-both cap alphabetic; }",
         ".pf-bf[data-color=\"tiza\"] .pf-bf-boton { background: var(--tiza); color: var(--azul); }",
         ".pf-bf[data-color=\"azul\"] .pf-bf-boton { background: var(--azul); color: var(--tiza); }",
         ".pf-bf-boton svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 260ms var(--curva); }",

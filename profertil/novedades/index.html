@@ -51,7 +51,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=DM+Mono&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../componentes/tokens.css?v=74d64f7a">
-<link rel="stylesheet" href="../componentes/base.css?v=b637cc74">
+<link rel="stylesheet" href="../componentes/base.css?v=4370e274">
 <link rel="stylesheet" href="../buscador/alcance.css?v=4835451c">
 <script src="../buscador/alcance.js?v=c635dd1a" data-seccion="notas" data-nombre="Novedades" defer></script>
 <style>
@@ -175,7 +175,8 @@
   height: var(--btn-l); padding: 0 22px 0 24px;
   border: 0; border-radius: 999px; cursor: pointer;
   background: var(--tiza); color: var(--azul);
-  font-family: var(--f-body); font-size: 1.02rem; font-weight: 500;
+  font-family: var(--f-body); font-size: calc(var(--btn-l) * .274); font-weight: 500;
+  line-height: 1; text-box: trim-both cap alphabetic; /* igual que el botón sobre color de base.css */
   transition: background 200ms ease, color 200ms ease;
 }
 @media (hover: hover) and (pointer: fine) { .pf-d-cta:hover { background: #fff; } }
@@ -353,7 +354,7 @@ a.pf-card, a.pf-d-cta { text-decoration: none; }
   .pf-d-in h2, .pf-d-in h2.pf-largo { font-size: 2.3rem; }
   .pf-d-kick { font-size: 0.86rem; gap: 10px; }
   .pf-d-kick .pf-etiqueta { --s: var(--etq-m); }
-  .pf-d-cta { height: var(--btn-m); font-size: 0.96rem; }
+  .pf-d-cta { height: var(--btn-m); font-size: calc(var(--btn-m) * .274); }
   .pf-d-nav { bottom: calc(22px + env(safe-area-inset-bottom, 0px)); }
   .pf-d-segs { gap: 6px; }
   .pf-d-flechas { display: none; }

@@ -46,9 +46,9 @@
 @media (hover: none) { .pf-pastilla:active { background: color-mix(in srgb, var(--pc, var(--azul)) 86%, var(--ink)); } .pf-pastilla--todas:active { background: var(--line); } }
 
 /* @pieza chip
-   Web/Chip año: radio 32% del alto, azul tenue con texto azul; el elegido, azul con texto tiza. Alto 32. */
+   Web/Chip año: radio 32% del alto, azul tenue con texto azul; el elegido, azul con texto tiza. Alto 32, texto al 44% (14). */
 .pf-chip { --h: 32px; display: inline-flex; align-items: center; gap: 6px; flex: none; height: var(--h); padding: 0 calc(var(--h) * .42); border: 0; border-radius: calc(var(--h) * .32);
-  background: var(--chip-fondo); color: var(--chip-texto); font: 500 16px/1 var(--f-body); font-size: round(down, calc(var(--h) * .5), 2px); font-variant-numeric: tabular-nums; white-space: nowrap; cursor: pointer;
+  background: var(--chip-fondo); color: var(--chip-texto); font: 500 16px/1 var(--f-body); font-size: round(down, calc(var(--h) * .44), 2px); font-variant-numeric: tabular-nums; white-space: nowrap; cursor: pointer;
   transition: background 160ms ease, color 160ms ease; }
 @media (hover: hover) and (pointer: fine) { .pf-chip:hover { background: color-mix(in srgb, var(--azul) 28%, #fff); } }
 .pf-chip[aria-pressed="true"] { background: var(--chip-activo); color: var(--sobre-color); }
@@ -94,19 +94,21 @@
    Web/Botón nota: píldora tiza con texto azul y flecha, para llamados sobre color o foto (nunca sobre tiza).
    L 48 en desktop, M 44 en mobile (Web/Botón). DM Sans: ningún botón va en Familjen (se descentra). Hover: fondo blanco y la flecha avanza 3 px. */
 .pf-boton-color { position: relative; display: inline-flex; align-items: center; gap: 10px; height: var(--alto, var(--btn-l)); padding: 0 22px 0 24px; border: 0; border-radius: 999px;
-  background: var(--tiza); color: var(--azul); font: 500 calc(var(--alto, var(--btn-l)) * .333)/1 var(--f-body); text-decoration: none; cursor: pointer; transition: background 200ms ease; text-box: trim-both cap alphabetic; }
+  background: var(--tiza); color: var(--azul); font: 500 calc(var(--alto, var(--btn-l)) * .274)/1 var(--f-body); text-decoration: none; cursor: pointer; transition: background 200ms ease; text-box: trim-both cap alphabetic; }
 .pf-boton-color svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 260ms var(--ease); }
 @media (hover: hover) and (pointer: fine) { .pf-boton-color:hover { background: var(--color-blanco); } .pf-boton-color:hover svg { transform: translateX(3px); } }
 .pf-boton-color:active { background: var(--color-blanco); }
 
 /* @pieza etiqueta
    Etiqueta (Master, manual p. 64): badge con la forma de la categoría + rótulo blanco + dato y flecha opcionales.
-   Radio 32% del alto, texto al 48% en DM Sans (como pastillas y chips: Familjen se descentra en cuerpos chicos). Tamaños S 22 / M 27 / L 32 (--etq-s/m/l). Colores: --fo (forma) y --tx (texto).
+   Radio 32% del alto, texto al 43% en DM Sans (como pastillas y chips: Familjen se descentra en cuerpos chicos). Tamaños S 22 / M 27 / L 32 (--etq-s/m/l). Colores: --fo (forma) y --tx (texto).
    Como botón (filtro) se marca con aria-pressed; como link, la flecha toma el color al pasar. */
-.pf-etiqueta { --s: var(--etq-m); display: inline-flex; align-items: stretch; gap: calc(var(--s) * .06); height: var(--s); flex: none; font: 400 calc(var(--s) * .48)/1 var(--f-body); }
+.pf-etiqueta { --s: var(--etq-m); display: inline-flex; align-items: stretch; gap: calc(var(--s) * .06); height: var(--s); flex: none; font: 400 calc(var(--s) * .43)/1 var(--f-body); }
 .pf-etiqueta__badge { width: var(--s); height: var(--s); flex: none; display: block; }
 .pf-etiqueta__rotulo, .pf-etiqueta__dato, .pf-etiqueta__flecha { display: inline-flex; align-items: center; padding: 0 calc(var(--s) * .36); border-radius: calc(var(--s) * .32); white-space: nowrap; text-box: trim-both cap alphabetic; }
 .pf-etiqueta__rotulo { background: var(--color-blanco); color: var(--tx); }
+/* Recortado a la mayúscula, DM Sans queda alto en la caja: 2 px de aire arriba la centran (S, M y L). */
+.pf-etiqueta__rotulo, .pf-etiqueta__dato { padding-top: 2px; }
 /* El dato va en tiza sobre el color: el color de la familia sobre su complementario contrastaba poco. */
 .pf-etiqueta__dato { background: var(--fo); color: var(--tiza); font-variant-numeric: tabular-nums; }
 .pf-etiqueta__flecha { width: var(--s); padding: 0; justify-content: center; background: var(--color-blanco); color: var(--tx); }
