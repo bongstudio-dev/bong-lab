@@ -79,6 +79,18 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
 .pf-herramientas.pf-escondida { transform: translateY(calc(-100% - 18px)); opacity: 0; }
 .pf-herramientas.pf-escondida .pf-selector { pointer-events: none; }
 @media (prefers-reduced-motion: reduce) { .pf-herramientas { transition: opacity 200ms ease; } .pf-herramientas.pf-escondida { transform: none; } }
+/* Donde se puede (también el iPhone), la fila va siempre fixed y la mueve el navegador atada al scroll: baja con la página hasta la barra
+   y ahí queda (el JS solo mide --herr-desde, --herr-hasta y --herr-recorrido). Fijada por JS llegaba un cuadro tarde: al llegar a la
+   barra y empezar a esconderse se pasaba de largo y volvía de un salto. Para esconderla se usa translate, que se suma a la animación. */
+@keyframes pf-herr-baja { from { transform: translateY(var(--herr-desde, 0px)); } to { transform: translateY(var(--herr-hasta, 0px)); } }
+@supports (animation-timeline: scroll()) {
+  .pf-herramientas.pf-atada { position: fixed; top: 0; pointer-events: none; animation: pf-herr-baja linear both; animation-timeline: scroll(root block);
+    animation-range: 0px var(--herr-recorrido, 0px); transition: translate 380ms var(--ease), opacity 260ms ease; }
+  .pf-herramientas.pf-atada .pf-selector { pointer-events: auto; }
+  .pf-herramientas.pf-atada.pf-escondida { translate: 0 calc(-100% - 18px); }
+  .pf-herramientas.pf-atada.pf-escondida .pf-selector { pointer-events: none; }
+  @media (prefers-reduced-motion: reduce) { .pf-herramientas.pf-atada { transition: opacity 200ms ease; } .pf-herramientas.pf-atada.pf-escondida { translate: none; } }
+}
 
 /* --- Panel de filtros: barra fija full rounded con los cuatro
    grupos (cultivo, zona, año, nutriente); arriba se despliega el panel con los
@@ -1048,7 +1060,26 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
   herrLugar.className = "pf-herr-lugar";
   herr.parentNode.insertBefore(herrLugar, herr);
   function topFijo() { var v = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--pf-barra-h")); return (isNaN(v) ? 76 : v) + 9; }
-  function herrFija() { return herr.classList.contains("pf-fija"); }
+  var atada = !!(window.CSS && CSS.supports && CSS.supports("animation-timeline: scroll()")), recorrido = 0, anchoAntes = -1;
+  function herrFija() { return atada ? window.scrollY >= recorrido - 1 : herr.classList.contains("pf-fija"); }
+  /* Donde el navegador lo soporta (también el iPhone), la fila no se fija por JS: va siempre fixed y la mueve el navegador atada al
+     scroll (CSS .pf-atada). Fijada por JS llegaba un cuadro tarde y se trababa justo al esconderse. El JS solo mide dónde empieza (y0),
+     dónde queda (debajo de la barra) y cuánto recorre. */
+  function atar() {
+    if (anchoAntes !== window.innerWidth) {   // el tamaño natural de la fila solo cambia con el ancho de la ventana
+      herr.classList.remove("pf-atada"); herrLugar.classList.remove("pf-activo"); herr.style.left = herr.style.width = "";
+      var n = herr.getBoundingClientRect();
+      herrLugar.style.width = n.width + "px"; herrLugar.style.height = n.height + "px";
+      herrLugar.classList.add("pf-activo"); herr.classList.add("pf-atada");
+      anchoAntes = window.innerWidth;
+    }
+    var r = herrLugar.getBoundingClientRect(), y0 = r.top + window.scrollY, T = topFijo();
+    recorrido = Math.max(0, y0 - T);
+    herr.style.left = r.left + "px"; herr.style.width = r.width + "px";
+    herr.style.setProperty("--herr-desde", y0 + "px");
+    herr.style.setProperty("--herr-hasta", T + "px");
+    herr.style.setProperty("--herr-recorrido", recorrido + "px");
+  }
   function mostrarHerr(si) { herr.classList.toggle("pf-escondida", !si); }
   function soltarHerr() {
     herr.classList.remove("pf-fija"); herrLugar.classList.remove("pf-activo");
@@ -1062,10 +1093,18 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
     herrLugar.style.width = r.width + "px"; herrLugar.style.height = r.height + "px"; herrLugar.classList.add("pf-activo");
     herr.style.left = r.left + "px"; herr.style.width = r.width + "px"; herr.classList.add("pf-fija");
   }
-  window.addEventListener("scroll", fijarHerr, { passive: true });
-  window.addEventListener("resize", function () { if (herrFija()) soltarHerr(); fijarHerr(); });
+  if (atada) {
+    atar();
+    window.addEventListener("resize", atar);
+    // Si algo de arriba cambia de alto (la cabecera, la lista que crece, las fuentes), se vuelve a medir dónde empieza.
+    if (window.ResizeObserver) new ResizeObserver(function () { atar(); }).observe(document.body);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { anchoAntes = -1; atar(); });
+  } else {
+    window.addEventListener("scroll", fijarHerr, { passive: true });
+    window.addEventListener("resize", function () { if (herrFija()) soltarHerr(); fijarHerr(); });
+    fijarHerr();
+  }
   herr.addEventListener("focusin", function () { mostrarHerr(true); });
-  fijarHerr();
   // Saltos de scroll que hace la página (filtrar, cambiar de vista): no son del usuario, así que ni el dock ni la fila los leen como bajar o
   // subir (si no, al cambiar de vista la fila se escondía y el dock se achicaba).
   var hastaSinDir = 0;

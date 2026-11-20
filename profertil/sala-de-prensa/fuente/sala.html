@@ -114,6 +114,16 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 .pf-pest.pf-escondida { transform: translateY(calc(-100% - 8px)); opacity: 0; }
 .pf-pest.pf-escondida .pf-selector { pointer-events: none; }
 @media (prefers-reduced-motion: reduce) { .pf-pest { transition: opacity 200ms ease; } .pf-pest.pf-escondida { transform: none; } }
+/* Donde se puede (también el iPhone), la fila va siempre fixed y la mueve el navegador atada al scroll: baja con la página hasta la barra
+   y ahí queda (el JS solo mide --herr-desde, --herr-hasta y --herr-recorrido). Fijada por JS llegaba un cuadro tarde: al llegar a la
+   barra y empezar a esconderse se pasaba de largo y volvía de un salto. Para esconderla se usa translate, que se suma a la animación. */
+@keyframes pf-pest-baja { from { transform: translateY(var(--herr-desde, 0px)); } to { transform: translateY(var(--herr-hasta, 0px)); } }
+@supports (animation-timeline: scroll()) {
+  .pf-pest.pf-atada { position: fixed; top: 0; animation: pf-pest-baja linear both; animation-timeline: scroll(root block);
+    animation-range: 0px var(--herr-recorrido, 0px); transition: translate 380ms var(--ease), opacity 260ms ease; }
+  .pf-pest.pf-atada.pf-escondida { translate: 0 calc(-100% - 8px); }
+  @media (prefers-reduced-motion: reduce) { .pf-pest.pf-atada { transition: opacity 200ms ease; } .pf-pest.pf-atada.pf-escondida { translate: none; } }
+}
 @media (max-width: 640px) {
   /* Pestañas y selector en la misma fila: la cápsula de pestañas mide lo suyo (no cambia de ancho entre pestañas) y el
      selector va a la derecha, siempre con tres opciones. */
@@ -1166,10 +1176,31 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
     pestEl.classList.toggle("pf-fija", fija);
     if (!fija) { lugar.style.height = ""; pestEl.style.left = pestEl.style.width = ""; mostrarPest(true); }
   }
-  window.addEventListener("scroll", fijarPest, { passive: true });
-  window.addEventListener("resize", fijarPest);
-  if (window.ResizeObserver) new ResizeObserver(function () { if (pestEl.classList.contains("pf-fija")) lugar.style.height = pestEl.offsetHeight + "px"; fijarPest(); }).observe(pestEl);
-  fijarPest();
+  /* Donde el navegador lo soporta (también el iPhone), la fila no se fija por JS: va siempre fixed y la mueve el navegador atada al
+     scroll (CSS .pf-atada). Fijada por JS llegaba un cuadro tarde y se trababa justo al esconderse. El JS solo mide dónde empieza (y0),
+     dónde queda (debajo de la barra) y cuánto recorre. */
+  var atada = !!(window.CSS && CSS.supports && CSS.supports("animation-timeline: scroll()"));
+  function atarPest() {
+    pestEl.classList.add("pf-atada");
+    lugar.style.height = pestEl.offsetHeight + "px";
+    var r = lugar.getBoundingClientRect(), y0 = r.top + window.scrollY, T = topFijo();
+    pestEl.style.left = r.left + "px"; pestEl.style.width = r.width + "px";
+    pestEl.style.setProperty("--herr-desde", y0 + "px");
+    pestEl.style.setProperty("--herr-hasta", T + "px");
+    pestEl.style.setProperty("--herr-recorrido", Math.max(0, y0 - T) + "px");
+  }
+  if (atada) {
+    atarPest();
+    window.addEventListener("resize", atarPest);
+    // Si algo de arriba cambia de alto (la cabecera, el contacto que se despliega, las fuentes) o la fila misma, se vuelve a medir.
+    if (window.ResizeObserver) { var roPest = new ResizeObserver(function () { atarPest(); }); roPest.observe(document.body); roPest.observe(pestEl); }
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(atarPest);
+  } else {
+    window.addEventListener("scroll", fijarPest, { passive: true });
+    window.addEventListener("resize", fijarPest);
+    if (window.ResizeObserver) new ResizeObserver(function () { if (pestEl.classList.contains("pf-fija")) lugar.style.height = pestEl.offsetHeight + "px"; fijarPest(); }).observe(pestEl);
+    fijarPest();
+  }
   pestEl.addEventListener("focusin", function () { mostrarPest(true); });
   window.addEventListener("scroll", function () {
     var y = window.scrollY;
