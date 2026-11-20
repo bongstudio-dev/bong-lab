@@ -3,8 +3,8 @@
   python3 profertil/biblioteca/fuente/build.py
 
 Los datos salen de docs.json, docs-msds.json y docs-inversores.json (prep-docs.py) y de etiquetas.json
-(prep-etiquetas.py). La transición entre páginas, el pie y la firma de Bong
-se toman de las mismas fuentes que Novedades.
+(prep-etiquetas.py). La transición entre páginas y la firma de Bong se toman de las mismas fuentes que Novedades.
+El pie no se copia: las páginas cargan ../componentes/pie-sitio.js (ver componentes/fuente/pie-sitio.py).
 """
 import json, os, re, subprocess, unicodedata
 AQUI = os.path.dirname(os.path.abspath(__file__))
@@ -155,22 +155,10 @@ hacer_lista(os.path.join(AQUI, '..', '..', 'hojas-de-seguridad', 'index.html'), 
              'Prototipo de la página de Hojas de seguridad para la web de Profertil.'))
 
 # --- Visor: ../ver/index.html ---
-PIE = r'''
-const vm = require("vm"), fs = require("fs"), path = require("path");
-const dir = process.argv[1]; let comp;
-const ctx = { window: {}, Libreria: { sumar: c => { comp = c; } }, console };
-ctx.window = ctx; vm.createContext(ctx);
-for (const f of ["formas.js", "c/pie.js"]) vm.runInContext(fs.readFileSync(path.join(dir, f), "utf8"), ctx);
-const s = { variante: "institucional", fondo: "azul", etica: true };
-const html = comp.html(s).replace('<footer class="pf-pie"', '<footer class="pf-pie" data-variante="institucional" data-fondo="azul"');
-process.stdout.write(JSON.stringify({ html, css: comp.css(s) }));
-'''
-pie = json.loads(subprocess.run(['node', '-e', PIE, COMP], capture_output=True, text=True, check=True).stdout)
 badge = [l for l in lista.split('\n') if 'id="pf-badge-bg"' in l][0].strip()
 v = open('visor.html', encoding='utf-8').read()
 v = (v.replace('/*__COMUN__*/', comun).replace('/*__LOGOS__*/', LOGOS).replace('/*__BADGE__*/', badge)
-      .replace('/*__DOCS__*/[]', docs_visor).replace('/*__ASSETS__*/{}', assets)
-      .replace('/*__PIE_CSS__*/', pie['css']).replace('/*__PIE_HTML__*/', pie['html']))
+      .replace('/*__DOCS__*/[]', docs_visor).replace('/*__ASSETS__*/{}', assets))
 head, rest = v.split('</style>', 1)
 os.makedirs(os.path.join(AQUI, '..', 'ver'), exist_ok=True)
 salida = os.path.join(AQUI, '..', 'ver', 'index.html')

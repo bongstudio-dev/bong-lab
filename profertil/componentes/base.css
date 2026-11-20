@@ -351,6 +351,7 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   padding: 0; border: 0; background: none; cursor: pointer;
   will-change: transform; transform: scale(0);
   transform-origin: left bottom; /* al compactarse no se abre el hueco con el dock */
+  transition: opacity 300ms ease;
 }
 .pf-ancla-cuerpo {
   display: grid; place-items: center; width: 100%; height: 100%;
@@ -365,7 +366,7 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 @media (max-width: 640px) {
   .pf-ancla {
     left: calc(100% - 16px - var(--a));
-    transition: bottom var(--f-chica) var(--f-chica-curva), left var(--f-chica) var(--f-chica-curva), width var(--f-chica) var(--f-chica-curva), height var(--f-chica) var(--f-chica-curva);
+    transition: bottom var(--f-chica) var(--f-chica-curva), left var(--f-chica) var(--f-chica-curva), width var(--f-chica) var(--f-chica-curva), height var(--f-chica) var(--f-chica-curva), opacity 300ms ease;
   }
   .pf-filters.pf-chica:not(.pf-abierto) ~ .pf-ancla {
     bottom: calc(6px + env(safe-area-inset-bottom, 0px));
@@ -423,3 +424,7 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 @media (max-width: 640px) {
   .pf-pie { margin-top: 80px; }
 }
+/* Con el pie en pantalla (componentes/pie-sitio.js marca :root.pf-en-pie) el dock y el ancla se retiran,
+   igual que arriba de todo, para no tapar los enlaces. Si el dock está abierto, se queda. */
+:root.pf-en-pie .pf-filters:not(.pf-abierto) { transform: translateY(calc(100% + 40px)); opacity: 0; pointer-events: none; }
+:root.pf-en-pie .pf-ancla { opacity: 0; pointer-events: none; }

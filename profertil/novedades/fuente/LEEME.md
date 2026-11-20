@@ -66,9 +66,9 @@ su página.
 `../nota/index.html` es la plantilla de una nota: `nota/?n=<ar>` (sin
 parámetro, la más reciente). Sale de `nota.html` con el mismo `build.py`, que
 le copia de `template.html` el bloque entre `@comun` y `@fin-comun` (tipos,
-etiquetas, arte de tarjeta), y le suma notas.json, las formas, el logo y el
-pie de la librería (componente Pie de página, variante Institucional, que
-`build.py` arma con node desde `../../componentes/c/pie.js`). El texto de cada
+etiquetas, arte de tarjeta), y le suma notas.json, las formas y el logo. El
+pie es el del sitio, `../../componentes/pie-sitio.js`, el mismo archivo en todas
+las páginas (sale de la librería, ver `componentes/fuente/pie-sitio.py`). El texto de cada
 nota lo lee al abrir de `../notas/<ar>.json`.
 
 - Sobria, sobre el fondo y sin cabecera de color. Arriba, a la izquierda y

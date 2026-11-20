@@ -74,23 +74,10 @@ firmar(os.path.join(AQUI, '..', 'index.html'), 'PROFERTIL · NOVEDADES',
 # arte de tarjeta), los logos, las formas y notas.json. El texto de cada nota lo lee de ../notas/.
 import subprocess
 comun = re.search(r'  /\* @comun.*?\*/\n(.*?)  /\* @fin-comun \*/', t, re.S).group(1)
-# El pie es el componente "Pie de página" de la librería, variante Institucional sobre azul.
-PIE = r'''
-const vm = require("vm"), fs = require("fs"), path = require("path");
-const dir = process.argv[1]; let comp;
-const ctx = { window: {}, Libreria: { sumar: c => { comp = c; } }, console };
-ctx.window = ctx; vm.createContext(ctx);
-for (const f of ["formas.js", "c/pie.js"]) vm.runInContext(fs.readFileSync(path.join(dir, f), "utf8"), ctx);
-const s = { variante: "institucional", fondo: "azul", etica: true };
-const html = comp.html(s).replace('<footer class="pf-pie"', '<footer class="pf-pie" data-variante="institucional" data-fondo="azul"');
-process.stdout.write(JSON.stringify({ html, css: comp.css(s) }));
-'''
-pie = json.loads(subprocess.run(['node', '-e', PIE, os.path.join(AQUI, '..', '..', 'componentes')], capture_output=True, text=True, check=True).stdout)
 aj2 = json.loads(open('assets.json').read())
 nt = open('nota.html', encoding='utf-8').read()
 nt = nt.replace('/*__COMUN__*/', comun).replace('/*__LOGOS__*/', sym('logo-blanco.svg', 'pf-logo-blanco') + sym('simbolo-color.svg', 'pf-simbolo'))
 nt = nt.replace('/*__NOTAS__*/[]', n).replace('/*__ASSETS__*/{}', json.dumps(aj2, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/'))
-nt = nt.replace('/*__PIE_CSS__*/', pie['css']).replace('/*__PIE_HTML__*/', pie['html'])
 head, rest = nt.split('</style>', 1)
 doc = armar(head, rest)
 # Cabecera con campo: la tarjeta con el título sobre un campo fijo de Formas (campo.css y campo.js).
