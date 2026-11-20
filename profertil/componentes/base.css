@@ -15,10 +15,10 @@
 /* @pieza selector
    Web/Selector: opciones de una sola elección en una cápsula; el indicador tiza se desliza a la elegida (lo ubica el JS). */
 .pf-selector { position: relative; isolation: isolate; display: inline-flex; min-width: 0; padding: 3px; border-radius: 999px; background: var(--line); font-family: var(--f-body); }
-.pf-selector__ind { position: absolute; z-index: -1; top: 3px; left: 0; bottom: 3px; width: 0; border-radius: 999px; background: var(--tiza); box-shadow: var(--sombra-control); pointer-events: none;
+.pf-selector__ind { position: absolute; z-index: -1; top: 3px; left: 0; bottom: 3px; width: 0; border-radius: 999px; background: var(--tiza); pointer-events: none;
   transition: transform var(--pf-t, var(--t-vista)) var(--curva-vista), width var(--pf-t, var(--t-vista)) var(--curva-vista); }
 .pf-selector__ind.pf-quieto { transition: none; }
-.pf-selector button { display: inline-flex; align-items: center; justify-content: center; min-width: 0; padding: 6px 13px; border: 0; border-radius: 999px; background: transparent; color: var(--ink-2); font: 400 var(--texto-chico)/1.5 var(--f-body); white-space: nowrap; cursor: pointer; transition: color 240ms ease; }
+.pf-selector button { display: inline-flex; align-items: center; justify-content: center; min-width: 0; padding: 6px 12px; border: 0; border-radius: 999px; background: transparent; color: var(--ink-2); font: 400 var(--texto-chico)/1.5 var(--f-body); white-space: nowrap; cursor: pointer; transition: color 240ms ease; }
 .pf-selector button[aria-pressed="true"] { color: var(--azul); font-weight: 500; }
 /* A todo el ancho: las opciones se reparten parejo. */
 .pf-selector--ancho { display: flex; }
@@ -27,7 +27,7 @@
 .pf-selector--desborda { overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain; }
 .pf-selector--desborda::-webkit-scrollbar { display: none; }
 .pf-selector--desborda button { flex: 1 0 auto; }
-.pf-selector--iconos button { display: grid; place-items: center; padding: 6px 11px; }
+.pf-selector--iconos button { display: grid; place-items: center; padding: 9px 11px; }
 .pf-selector--iconos svg { width: 15px; height: 15px; fill: currentColor; }
 @media (prefers-reduced-motion: reduce) { .pf-selector__ind { transition: none; } }
 
@@ -327,9 +327,9 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   :root { --a: 57px; } /* toggle 46 + 2 x 4 de f-bar + 2 de borde + 1 del f-body */
   .pf-pastilla { --h: 30px; }
   .pf-f-in { padding: 16px 14px 12px; }
-  .pf-filters { width: var(--f-ancho-cerrado, calc(100% - 32px - var(--ancla-gap) - var(--a))); border-radius: 28px; transition: width var(--f-chica) var(--f-chica-curva), bottom var(--f-chica) var(--f-chica-curva), border-radius var(--f-cerrar) var(--f-curva), transform 520ms var(--ease), opacity 300ms ease; }
+  .pf-filters { width: var(--f-ancho-cerrado, calc(100% - 32px - var(--ancla-gap) - var(--a))); border-radius: 28px; transition: width var(--f-chica) var(--f-chica-curva), bottom var(--f-chica) var(--f-chica-curva), border-radius var(--f-cerrar) var(--f-curva), transform 520ms var(--ease), opacity 300ms ease, right var(--f-chica) var(--f-chica-curva); }
   .pf-f-count { position: static; order: 2; }
-  .pf-filters.pf-abierto { width: calc(100% - 32px - var(--ancla-gap) - var(--a)); transition-duration: var(--f-abrir), var(--f-abrir), var(--f-abrir), 520ms, 300ms; }
+  .pf-filters.pf-abierto { width: calc(100% - 32px - var(--ancla-gap) - var(--a)); transition-duration: var(--f-abrir), var(--f-abrir), var(--f-abrir), 520ms, 300ms, var(--f-chica); }
   .pf-f-main { display: none; }
   .pf-f-bar { justify-content: center; padding: 4px; }
   /* Toda la pastilla es el botón: ocupa la barra y su zona de toque cubre también el borde de 4 px. No se angosta ni
@@ -337,7 +337,9 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   .pf-f-toggle::after { content: ""; position: absolute; inset: -4px; border-radius: inherit; }
   .pf-f-toggle { flex: 1 0 auto; width: auto; height: 46px; padding: 0 22px 0 26px; color: var(--ink); font-family: var(--f-body); font-size: 1.04rem; transition: height var(--f-chica) var(--f-chica-curva), padding var(--f-chica) var(--f-chica-curva), gap var(--f-chica) var(--f-chica-curva), font-size var(--f-chica) var(--f-chica-curva); }
   .pf-f-toggle svg { transition: transform var(--f-flecha) var(--f-curva), width var(--f-chica) var(--f-chica-curva), height var(--f-chica) var(--f-chica-curva); }
-  .pf-filters.pf-chica:not(.pf-abierto) { width: 104px; bottom: calc(6px + env(safe-area-inset-bottom, 0px)); }
+  /* Compacta, la pastilla y la bola (41) van centradas juntas en la pantalla, como la barra de Safari: el hueco de la derecha
+     es el de la bola chica, no el de la grande. */
+  .pf-filters.pf-chica:not(.pf-abierto) { width: 104px; right: calc(41px + var(--ancla-gap)); bottom: calc(6px + env(safe-area-inset-bottom, 0px)); }
   .pf-filters.pf-chica:not(.pf-abierto):has(.pf-f-count:not([hidden])) { width: 128px; }
   .pf-filters.pf-chica:not(.pf-abierto) .pf-f-toggle { height: 30px; padding: 0 12px 0 15px; gap: 5px; font-size: 0.82rem; }
   .pf-filters.pf-chica:not(.pf-abierto) .pf-f-toggle svg { width: 13px; height: 13px; }
@@ -364,7 +366,9 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 .pf-ancla:focus-visible { outline: none; }
 .pf-ancla:focus-visible .pf-ancla-cuerpo { outline: 2px solid var(--celeste); outline-offset: 3px; }
 /* Mobile: el dock (ancho w) va centrado entre 0 y 100% - --a - gap; la bola arranca un gap después de su
-   borde derecho. Compacto, w es 104 (128 con contador) y la bola baja a 41 px con la misma transición. */
+   borde derecho. Compacto, w es 104 (128 con contador) y la bola baja a 41 px: el dock se centra entre 0 y
+   100% - 41 - gap, así el conjunto queda centrado en la pantalla, y la bola va en (100% - 41 - gap + w) / 2 + gap,
+   lineal en w y en right como el dock, con la misma transición. */
 @media (max-width: 640px) {
   .pf-ancla {
     left: calc(100% - 16px - var(--a));
@@ -372,10 +376,10 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   }
   .pf-filters.pf-chica:not(.pf-abierto) ~ .pf-ancla {
     bottom: calc(6px + env(safe-area-inset-bottom, 0px));
-    left: calc((100% - var(--a) + var(--ancla-gap) + 104px) / 2);
+    left: calc((100% - 41px - var(--ancla-gap) + 104px) / 2 + var(--ancla-gap));
     width: 41px; height: 41px;
   }
-  .pf-filters.pf-chica:not(.pf-abierto):has(.pf-f-count:not([hidden])) ~ .pf-ancla { left: calc((100% - var(--a) + var(--ancla-gap) + 128px) / 2); }
+  .pf-filters.pf-chica:not(.pf-abierto):has(.pf-f-count:not([hidden])) ~ .pf-ancla { left: calc((100% - 41px - var(--ancla-gap) + 128px) / 2 + var(--ancla-gap)); }
 }
 
 /* @pieza documento

@@ -53,7 +53,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=DM+Mono&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../componentes/tokens.css?v=74d64f7a">
-<link rel="stylesheet" href="../componentes/base.css?v=46b5f179">
+<link rel="stylesheet" href="../componentes/base.css?v=3d324c63">
 <link rel="stylesheet" href="../buscador/alcance.css?v=4835451c">
 <script src="../componentes/barra-vista.js?v=cd6adee1"></script>
 <script src="../buscador/alcance.js?v=c635dd1a" data-seccion="prensa" data-nombre="Prensa" data-en="la Sala de prensa" defer></script>
@@ -153,12 +153,16 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
    mueve acá; en el celular quedan en la línea del contador, porque al lado de las pestañas no entran). */
 .pf-pest { display: flex; align-items: stretch; justify-content: space-between; gap: 12px; }
 .pf-pest .pf-herramientas { align-items: stretch; }
-.pf-pest .pf-selector--iconos button { padding-inline: 13px; }
+/* Escritorio: pestañas y vista juntas a la derecha (la vista contra el borde) y el contador en la misma línea, a la izquierda:
+   la fila del resultado sube hasta quedar centrada con la de pestañas. */
+@media (min-width: 641px) {
+  .pf-pest { justify-content: flex-end; gap: 14px; }
+  .pf-cambia { margin-top: -59px; }
+  .pf-cambia .pf-result-row { padding-top: 12px; }
+}
 .pf-pest .pf-selector { pointer-events: auto; background: linear-gradient(var(--line), var(--line)), var(--pf-papel, #fff); } /* el mismo tono, opaco: fija, pasa sobre fotos y miniaturas */
-.pf-pest .pf-pestanas button { padding-inline: 16px; font-size: var(--texto-cuerpo); }
 .pf-selector__ind { box-shadow: none; }
 /* Escritorio: dos opciones por selector (sin la del medio), para que la fila fija ocupe menos. En el celular van las tres. */
-@media (min-width: 641px) { .pf-vista [data-vista="lista"], .pf-densidad [data-vista="medio"] { display: none; } }
 /* Al bajar, la fila fija se va por detrás de la barra azul; al subir vuelve (la misma regla que el dock, que se achica al bajar).
    Solo cuando ya está fija: en su lugar se ve siempre. */
 .pf-pest { transition: transform 380ms var(--ease), opacity 260ms ease; will-change: transform; } /* capa propia siempre: no se arma y desarma al esconderse */
@@ -184,8 +188,6 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
   /* Pestañas y selector en la misma fila: la cápsula de pestañas mide lo suyo (no cambia de ancho entre pestañas) y el
      selector va a la derecha, siempre con tres opciones. */
   .pf-pest { gap: 8px; }
-  .pf-pest .pf-pestanas button { padding-inline: 12px; font-size: var(--texto-chico); }
-  .pf-pest .pf-selector--iconos button { padding-inline: 9px; }
 }
 .pf-panel { overflow-x: clip; }
 .pf-panel[hidden] { display: none; }
@@ -226,8 +228,8 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 /* Celular: el selector de vistas va dentro del panel de filtros (fila "Vista", arriba de los grupos), donde llega el pulgar y
    junto a lo demás que cambia la lista. Arriba queda fija solo la fila de pestañas; el contador y los chips van en la página. */
 @media (max-width: 640px) {
-  .pf-result-row { padding-block: 14px 12px; gap: 12px; flex-wrap: nowrap; }
-  .pf-result-main { flex: 1; flex-wrap: nowrap; margin-right: -16px; width: calc(100% + 16px); }
+  .pf-result-row { padding-block: 0 12px; gap: 12px; flex-wrap: nowrap; }   /* 12 px de la barra al contador (10 de la fila de pestañas y 2 del centrado) */
+  .pf-result-main { min-height: 28px; flex: 1; flex-wrap: nowrap; margin-right: -16px; width: calc(100% + 16px); }
   .pf-result-text { flex: none; white-space: nowrap; }
   .pf-activos { flex-wrap: nowrap; flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none; padding-right: 16px; }
   .pf-activos::-webkit-scrollbar { display: none; }

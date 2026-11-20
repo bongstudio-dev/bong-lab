@@ -53,7 +53,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=DM+Mono&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../componentes/tokens.css?v=74d64f7a">
-<link rel="stylesheet" href="../componentes/base.css?v=46b5f179">
+<link rel="stylesheet" href="../componentes/base.css?v=3d324c63">
 <link rel="stylesheet" href="../buscador/alcance.css?v=4835451c">
 <script src="../componentes/barra-vista.js?v=cd6adee1"></script>
 <script src="../buscador/alcance.js?v=c635dd1a" data-seccion="documentos" data-nombre="Biblioteca" data-en="la Biblioteca" defer></script>
@@ -68,6 +68,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
 
 /* --- Resultado ------------------------------------------------------------ */
 .pf-herramientas { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.pf-herramientas .pf-vista { margin-left: auto; } /* la vista siempre contra el borde derecho */
 /* Selectores fijos al bajar (la lógica de la Sala de prensa): cuando la fila de selectores llega a la barra azul pasa a position: fixed,
    no sticky (en el celular lo sticky tiembla un píxel contra la barra cuando la del navegador se achica o se agranda). En su lugar
    queda un hueco del mismo tamaño (.pf-herr-lugar, lo arma el JS). Al bajar se va por detrás de la barra; al subir vuelve. La fila deja
@@ -470,16 +471,16 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
       <div class="pf-activos" id="pf-activos"></div>
     </div>
     <div class="pf-herramientas">
+      <div class="pf-selector pf-orden" role="group" aria-label="Orden">
+        <span class="pf-selector__ind" aria-hidden="true"></span>
+        <button type="button" id="pf-sortAz" aria-pressed="true">A a Z</button>
+        <button type="button" id="pf-sortAnio" aria-pressed="false">Por año</button>
+      </div>
       <div class="pf-selector pf-selector--iconos pf-vista" role="group" aria-label="Cómo se ven los documentos">
         <span class="pf-selector__ind" aria-hidden="true"></span>
         <button type="button" data-vista="compacta" aria-pressed="false" aria-label="Lista compacta" title="Compacta"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0.5" width="15" height="2" rx="1"/><rect x="0" y="4.5" width="15" height="2" rx="1"/><rect x="0" y="8.5" width="15" height="2" rx="1"/><rect x="0" y="12.5" width="15" height="2" rx="1"/></svg></button>
         <button type="button" data-vista="lista" aria-pressed="true" aria-label="Lista" title="Lista"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0" width="4" height="4" rx="1.3"/><rect x="6" y="1" width="9" height="2" rx="1"/><rect x="0" y="5.5" width="4" height="4" rx="1.3"/><rect x="6" y="6.5" width="9" height="2" rx="1"/><rect x="0" y="11" width="4" height="4" rx="1.3"/><rect x="6" y="12" width="9" height="2" rx="1"/></svg></button>
         <button type="button" data-vista="mini" aria-pressed="false" aria-label="Miniaturas" title="Miniaturas"><svg viewBox="0 0 15 15" aria-hidden="true"><rect x="0" y="0" width="6.5" height="6.5" rx="2.1"/><rect x="8.5" y="0" width="6.5" height="6.5" rx="2.1"/><rect x="0" y="8.5" width="6.5" height="6.5" rx="2.1"/><rect x="8.5" y="8.5" width="6.5" height="6.5" rx="2.1"/></svg></button>
-      </div>
-      <div class="pf-selector pf-orden" role="group" aria-label="Orden">
-        <span class="pf-selector__ind" aria-hidden="true"></span>
-        <button type="button" id="pf-sortAz" aria-pressed="true">A a Z</button>
-        <button type="button" id="pf-sortAnio" aria-pressed="false">Por año</button>
       </div>
     </div>
   </div>
