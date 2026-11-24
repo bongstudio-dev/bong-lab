@@ -13,7 +13,16 @@ export const MSDS = leerJson("profertil/biblioteca/fuente/docs-msds.json").docs.
   ...d,
   t: d.t.replace(/\s*\bMSDS\b\s*/g, " ").trim().replace(/\(([a-z]{2,4})\)/g, (_, s) => "(" + s.toUpperCase() + ")"),
 }));
-const INVERSORES = leerJson("profertil/biblioteca/fuente/docs-inversores.json").docs;
+// Situación financiera (docs-financiera.json) y Legajo impositivo (docs-legajo.json), de prep-legajo-financiera.py. `p` dice
+// a qué lista vuelve cada documento desde su página. Los balances que el sitio actual también publica como página propia
+// están en docs-inversores.json con el mismo id: se usa la versión de Situación financiera.
+export const FINANCIERA = leerJson("profertil/biblioteca/fuente/docs-financiera.json").docs.map((d) => ({ ...d, p: "financiera" }));
+const LEGAJO_JSON = leerJson("profertil/biblioteca/fuente/docs-legajo.json");
+export const LEGAJO = LEGAJO_JSON.docs.map((d) => ({ ...d, p: "legajo" }));
+export const LEGAJO_GRUPOS = LEGAJO_JSON.grupos;
+export const LEGAJO_ZIP = LEGAJO_JSON.zip;
+const EN_FINANCIERA = new Set(FINANCIERA.map((d) => d.id));
+const INVERSORES = leerJson("profertil/biblioteca/fuente/docs-inversores.json").docs.filter((d) => !EN_FINANCIERA.has(d.id));
 
 // Sala de prensa (sala-de-prensa/fuente/prensa.json, de prep-prensa.py). La página no lleva el texto de los PDF (solo
 // sirvió para sacar títulos y fechas) ni la foto original (va la copia local, fm).
@@ -37,6 +46,8 @@ export const GRUPOS = ET.grupos.map((g) => ({
   opciones: g.opciones.map((op) => Object.fromEntries(["id", "nombre", "sub", "provincia"].filter((k) => k in op).map((k) => [k, op[k]]))),
 }));
 
-// Todos los documentos que abre el visor (Biblioteca, hojas de seguridad, inversores y gacetillas), en orden alfabético.
-export const DOCS_VISOR = [...BIB, ...MSDS, ...INVERSORES, ...GACETILLAS]
+// Todos los documentos que abre el visor (Biblioteca, hojas de seguridad, inversores, balances, legajo y gacetillas), en
+// orden alfabético. En el visor no van las etiquetas ni el orden de la lista (e, o).
+const VISOR = (d) => { const { e, o, ...x } = d; return x; };
+export const DOCS_VISOR = [...BIB, ...MSDS, ...INVERSORES, ...FINANCIERA.map(VISOR), ...LEGAJO.map(VISOR), ...GACETILLAS]
   .map((d, i) => [plano(d.t), i, d]).sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : a[1] - b[1])).map((x) => x[2]);

@@ -39,10 +39,15 @@
     gacetilla: { href: "../../sala-de-prensa/#gacetillas", nombre: "Sala de prensa", titulo: "Sala de prensa Profertil", todos: "Ver todas las gacetillas", mas: "Más gacetillas",
       alcance: { seccion: "prensa", nombre: "Prensa", en: "la Sala de prensa" } },
     aviso: { href: "../../sala-de-prensa/#gacetillas", nombre: "Sala de prensa", titulo: "Sala de prensa Profertil", todos: "Ver todas las gacetillas", mas: "Más avisos a la comunidad",
-      alcance: { seccion: "prensa", nombre: "Prensa", en: "la Sala de prensa" } }
+      alcance: { seccion: "prensa", nombre: "Prensa", en: "la Sala de prensa" } },
+    // Estas dos van por la lista del documento (`p`) y no por la categoría: no todo lo de Inversores es un balance.
+    financiera: { href: "../../situacion-financiera/", nombre: "Situación financiera", titulo: "Situación financiera Profertil", todos: "Ver todos los balances", mas: "Más balances",
+      alcance: { seccion: "financiera", nombre: "Balances", en: "los balances" } },
+    legajo: { href: "../../legajo-impositivo/", nombre: "Legajo impositivo", titulo: "Legajo impositivo Profertil", todos: "Ver todo el legajo", mas: "Más del legajo",
+      alcance: { seccion: "legajo", nombre: "Legajo", en: "el legajo impositivo" } }
   };
-  var enBiblioteca = !/^(msds|inversores|gacetilla|aviso)$/.test(d.c);
-  var suLista = enBiblioteca ? LISTAS.biblioteca : LISTAS[d.c] || null;
+  var enBiblioteca = !d.p && !/^(msds|inversores|gacetilla|aviso|impositivo)$/.test(d.c);
+  var suLista = enBiblioteca ? LISTAS.biblioteca : LISTAS[d.p || d.c] || null;
   document.title = d.t + " · " + (suLista ? suLista.titulo : "Profertil");
   // El buscador de la barra sugiere primero la sección del documento abierto (../../buscador/alcance.js lo lee al iniciar).
   // Sin lista propia (inversores), busca en todo el sitio.
@@ -100,7 +105,8 @@
   }
   (function () {
     // Mismo año primero (si tiene), después los que tienen copia; el resto, por cercanía en el orden alfabético.
-    var otros = DOCS.filter(function (x) { return x.c === d.c && x.id !== d.id; });
+    // Los de una lista propia (`p`), de esa lista; el resto, de la misma categoría.
+    var otros = DOCS.filter(function (x) { return (d.p ? x.p === d.p : x.c === d.c && !x.p) && x.id !== d.id; });
     var pos = DOCS.indexOf(d);
     otros.sort(function (a, b) {
       var pa = (d.y && a.y === d.y ? 0 : 2) + (a.l ? 0 : 1), pb = (d.y && b.y === d.y ? 0 : 2) + (b.l ? 0 : 1);

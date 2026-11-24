@@ -1,0 +1,631 @@
+{
+ "docs": [
+  {
+   "id": "legajo-impositivo-11-2026-2",
+   "t": "Legajo impositivo completo, noviembre 2026",
+   "c": "impositivo",
+   "y": "",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2023/09/Legajo-Impositivo-11-2026-2.pdf",
+   "l": "Legajo-Impositivo-11-2026-2.pdf",
+   "e": {
+    "alcance": [
+     "legajo"
+    ]
+   },
+   "o": "000"
+  },
+  {
+   "id": "legajo-afip-administracion-federal-de-ingresos-publicos-3",
+   "t": "AFIP - Administración Federal de Ingresos Públicos",
+   "c": "impositivo",
+   "y": "",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2023/09/1.-AFIP-Administracion-Federal-de-Ingresos-Publicos-3.pdf",
+   "l": "1.-AFIP-Administracion-Federal-de-Ingresos-Publicos-3.pdf",
+   "e": {
+    "alcance": [
+     "nacional"
+    ]
+   },
+   "o": "001"
+  },
+  {
+   "id": "legajo-padron-web-profertil-s-a-1",
+   "t": "Padrón web Profertil S.A.",
+   "c": "impositivo",
+   "y": "",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2023/09/2.-Padron-Web-Profertil-S.A-1.pdf",
+   "l": "2.-Padron-Web-Profertil-S.A-1.pdf",
+   "e": {
+    "alcance": [
+     "nacional"
+    ]
+   },
+   "o": "002"
+  },
+  {
+   "id": "legajo-cm05-2025-profertil-sa",
+   "t": "CM05 2025 Profertil S.A.",
+   "c": "impositivo",
+   "y": "",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2023/09/3.-CM05-2025-Profertil-SA.pdf",
+   "l": "3.-CM05-2025-Profertil-SA.pdf",
+   "e": {
+    "alcance": [
+     "nacional"
+    ]
+   },
+   "o": "003"
+  },
+  {
+   "id": "legajo-acuse-cm05-2025-profertil-sa",
+   "t": "Acuse CM05 2025 Profertil S.A.",
+   "c": "impositivo",
+   "y": "",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2023/09/4.-Acuse-CM05-2025-Profertil-SA.pdf",
+   "l": "4.-Acuse-CM05-2025-Profertil-SA.pdf",
+   "e": {
+    "alcance": [
+     "nacional"
+    ]
+   },
+   "o": "004"
+  },
+  {
+   "id": "legajo-rg-830-31-12-26",
+   "t": "RG 830 al 31-12-2026",
+   "c": "impositivo",
+   "y": "",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2023/09/5.-RG-830-31-12-26.pdf",
+   "l": "5.-RG-830-31-12-26.pdf",
+   "e": {
+    "alcance": [
+     "nacional"
+    ]
+   },
+   "o": "005"
+  },
+  {
+   "id": "legajo-boletin-oficial-designacion-rg-18",
+   "t": "Boletín Oficial, designación RG 18",
+   "c": "impositivo",
+   "y": "",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2025/04/6.-Boletin-Oficial-Designacion-RG-18.pdf",
+   "l": "6.-Boletin-Oficial-Designacion-RG-18.pdf",
+   "e": {
+    "alcance": [
+     "nacional"
+    ]
+   },
+   "o": "006"
+  },
+  {
+   "id": "legajo-constancia-impo-expo",
+   "t": "Constancia de importador y exportador",
+   "c": "impositivo",
+   "y": "",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2025/04/7.-Constancia-impo-expo.pdf",
+   "l": "7.-Constancia-impo-expo.pdf",
+   "e": {
+    "alcance": [
+     "nacional"
+    ]
+   },
+   "o": "007"
+  },
+  {
+   "id": "legajo-rg2226-iva-cnr-vto-31-05-2027",
+   "t": "RG 2226 IVA - CNR",
+   "c": "impositivo",
+   "y": "Vence 31/05/2027",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2023/09/8.-RG2226-IVA-CNR-Vto-31-05-2027.pdf",
+   "l": "8.-RG2226-IVA-CNR-Vto-31-05-2027.pdf",
+   "e": {
+    "alcance": [
+     "nacional"
+    ]
+   },
+   "v": "2027-05-31",
+   "o": "008"
+  },
+  {
+   "id": "legajo-constancia-no-percepcion-catamarca-vto-30-09-2027",
+   "t": "Constancia de no percepción - Catamarca",
+   "c": "impositivo",
+   "y": "Vence 30/09/2027",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2023/09/7.-Constancia-No-Percepcion-Catamarca-Vto-30-09-2027-.pdf",
+   "l": "7.-Constancia-No-Percepcion-Catamarca-Vto-30-09-2027-.pdf",
+   "e": {
+    "alcance": [
+     "provincial"
+    ],
+    "provincia": [
+     "catamarca"
+    ]
+   },
+   "v": "2027-09-30",
+   "o": "009"
+  },
+  {
+   "id": "legajo-constancia-no-retencion-catamarca-vto-30-09-2027",
+   "t": "Constancia de no retención - Catamarca",
+   "c": "impositivo",
+   "y": "Vence 30/09/2027",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2023/09/8.-Constancia-No-Retencion-Catamarca-Vto-30-09-2027.pdf",
+   "l": "8.-Constancia-No-Retencion-Catamarca-Vto-30-09-2027.pdf",
+   "e": {
+    "alcance": [
+     "provincial"
+    ],
+    "provincia": [
+     "catamarca"
+    ]
+   },
+   "v": "2027-09-30",
+   "o": "010"
+  },
+  {
+   "id": "legajo-constancia-inscripcion-corrientes",
+   "t": "Constancia de inscripción - Corrientes",
+   "c": "impositivo",
+   "y": "",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2025/04/6.-Constancia-Inscripcion-Corrientes.pdf",
+   "l": "6.-Constancia-Inscripcion-Corrientes.pdf",
+   "e": {
+    "alcance": [
+     "provincial"
+    ],
+    "provincia": [
+     "corrientes"
+    ]
+   },
+   "o": "011"
+  },
+  {
+   "id": "legajo-certificado-de-exclusion-de-corrientes-vto-13-05-2027",
+   "t": "Certificado de exclusión - Corrientes",
+   "c": "impositivo",
+   "y": "Vence 13/05/2027",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2023/09/12.-Certificado-de-Exclusion-de-Corrientes-Vto-13-05-2027-.pdf",
+   "l": "12.-Certificado-de-Exclusion-de-Corrientes-Vto-13-05-2027-.pdf",
+   "e": {
+    "alcance": [
+     "provincial"
+    ],
+    "provincia": [
+     "corrientes"
+    ]
+   },
+   "v": "2027-05-13",
+   "o": "012"
+  },
+  {
+   "id": "legajo-certificado-de-exclusion-de-corrientes-vto-14-11-2026",
+   "t": "Certificado de exclusión - Corrientes",
+   "c": "impositivo",
+   "y": "Vence 14/11/2026",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2023/09/12.-Certificado-de-Exclusion-de-Corrientes-Vto-14-11-2026-.pdf",
+   "l": "12.-Certificado-de-Exclusion-de-Corrientes-Vto-14-11-2026-.pdf",
+   "e": {
+    "alcance": [
+     "provincial"
+    ],
+    "provincia": [
+     "corrientes"
+    ]
+   },
+   "v": "2026-11-14",
+   "o": "013"
+  },
+  {
+   "id": "legajo-constancia-agente-ret-perc-cordoba",
+   "t": "Constancia de agente de retención y percepción - Córdoba",
+   "c": "impositivo",
+   "y": "",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2025/04/2.-Constancia-Agente-Ret-Perc-Cordoba.pdf",
+   "l": "2.-Constancia-Agente-Ret-Perc-Cordoba.pdf",
+   "e": {
+    "alcance": [
+     "provincial"
+    ],
+    "provincia": [
+     "cordoba"
+    ]
+   },
+   "o": "014"
+  },
+  {
+   "id": "legajo-formosa-certificado-de-exclusion-de-percepciones-vto-28-02-2027",
+   "t": "Certificado de exclusión de percepciones - Formosa",
+   "c": "impositivo",
+   "y": "Vence 28/02/2027",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2023/09/18.-Formosa-Certificado-de-Exclusion-de-Percepciones-Vto-28-02-2027.pdf",
+   "l": "18.-Formosa-Certificado-de-Exclusion-de-Percepciones-Vto-28-02-2027.pdf",
+   "e": {
+    "alcance": [
+     "provincial"
+    ],
+    "provincia": [
+     "formosa"
+    ]
+   },
+   "v": "2027-02-28",
+   "o": "015"
+  },
+  {
+   "id": "legajo-formosa-certificado-de-exclusion-de-puesto-de-control-vto-28-02-2027",
+   "t": "Certificado de exclusión de puesto de control - Formosa",
+   "c": "impositivo",
+   "y": "Vence 28/02/2027",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2023/09/17.-Formosa-Certificado-de-Exclusion-de-Puesto-de-control-Vto-28-02-2027.pdf",
+   "l": "17.-Formosa-Certificado-de-Exclusion-de-Puesto-de-control-Vto-28-02-2027.pdf",
+   "e": {
+    "alcance": [
+     "provincial"
+    ],
+    "provincia": [
+     "formosa"
+    ]
+   },
+   "v": "2027-02-28",
+   "o": "016"
+  },
+  {
+   "id": "legajo-formosa-certificado-de-exclusion-de-retencion-vto-28-02-2027",
+   "t": "Certificado de exclusión de retención - Formosa",
+   "c": "impositivo",
+   "y": "Vence 28/02/2027",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2023/09/16.-Formosa-Certificado-de-Exclusion-de-Retencion-Vto-28-02-2027.pdf",
+   "l": "16.-Formosa-Certificado-de-Exclusion-de-Retencion-Vto-28-02-2027.pdf",
+   "e": {
+    "alcance": [
+     "provincial"
+    ],
+    "provincia": [
+     "formosa"
+    ]
+   },
+   "v": "2027-02-28",
+   "o": "017"
+  },
+  {
+   "id": "legajo-formosa-certificado-de-exclusion-de-percepciones-vto-30-11-2026",
+   "t": "Certificado de exclusión de percepciones - Formosa",
+   "c": "impositivo",
+   "y": "Vence 30/11/2026",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2023/09/16.-Formosa-Certificado-de-Exclusion-de-Percepciones-Vto-30-11-2026.pdf",
+   "l": "16.-Formosa-Certificado-de-Exclusion-de-Percepciones-Vto-30-11-2026.pdf",
+   "e": {
+    "alcance": [
+     "provincial"
+    ],
+    "provincia": [
+     "formosa"
+    ]
+   },
+   "v": "2026-11-30",
+   "o": "018"
+  },
+  {
+   "id": "legajo-formosa-certificado-de-exclusion-de-puesto-de-control-vto-30-11-2026",
+   "t": "Certificado de exclusión de puesto de control - Formosa",
+   "c": "impositivo",
+   "y": "Vence 30/11/2026",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2023/09/17.-Formosa-Certificado-de-Exclusion-de-Puesto-de-control-Vto-30-11-2026.pdf",
+   "l": "17.-Formosa-Certificado-de-Exclusion-de-Puesto-de-control-Vto-30-11-2026.pdf",
+   "e": {
+    "alcance": [
+     "provincial"
+    ],
+    "provincia": [
+     "formosa"
+    ]
+   },
+   "v": "2026-11-30",
+   "o": "019"
+  },
+  {
+   "id": "legajo-formosa-certificado-de-exclusion-de-retenciones-vto-30-11-2026",
+   "t": "Certificado de exclusión de retenciones - Formosa",
+   "c": "impositivo",
+   "y": "Vence 30/11/2026",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2023/09/18.-Formosa-Certificado-de-Exclusion-de-Retenciones-Vto-30-11-2026.pdf",
+   "l": "18.-Formosa-Certificado-de-Exclusion-de-Retenciones-Vto-30-11-2026.pdf",
+   "e": {
+    "alcance": [
+     "provincial"
+    ],
+    "provincia": [
+     "formosa"
+    ]
+   },
+   "v": "2026-11-30",
+   "o": "020"
+  },
+  {
+   "id": "legajo-constancia-agente-percepcion-mendoza",
+   "t": "Constancia de agente de percepción - Mendoza",
+   "c": "impositivo",
+   "y": "",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2025/04/1.-Constancia-Agente-Percepcion-Mendoza.pdf",
+   "l": "1.-Constancia-Agente-Percepcion-Mendoza.pdf",
+   "e": {
+    "alcance": [
+     "provincial"
+    ],
+    "provincia": [
+     "mendoza"
+    ]
+   },
+   "o": "021"
+  },
+  {
+   "id": "legajo-certificado-no-ret-perc-mendoza-vto-31-05-2027",
+   "t": "Certificado de no retención y percepción - Mendoza",
+   "c": "impositivo",
+   "y": "Vence 31/05/2027",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2023/09/9.-Certificado-no-ret-perc-Mendoza-Vto-31-05-2027.pdf",
+   "l": "9.-Certificado-no-ret-perc-Mendoza-Vto-31-05-2027.pdf",
+   "e": {
+    "alcance": [
+     "provincial"
+    ],
+    "provincia": [
+     "mendoza"
+    ]
+   },
+   "v": "2027-05-31",
+   "o": "022"
+  },
+  {
+   "id": "legajo-constancia-no-ret-no-percep-misiones-vto-24-02-2027",
+   "t": "Constancia de no retención y no percepción - Misiones",
+   "c": "impositivo",
+   "y": "Vence 24/02/2027",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2023/09/10.-Constancia-No-Ret-No-Percep-Misiones-Vto-24-02-2027.pdf",
+   "l": "10.-Constancia-No-Ret-No-Percep-Misiones-Vto-24-02-2027.pdf",
+   "e": {
+    "alcance": [
+     "provincial"
+    ],
+    "provincia": [
+     "misiones"
+    ]
+   },
+   "v": "2027-02-24",
+   "o": "023"
+  },
+  {
+   "id": "legajo-constancia-no-ret-no-percep-misiones-vto-31-08-2026",
+   "t": "Constancia de no retención y no percepción - Misiones",
+   "c": "impositivo",
+   "y": "Vence 31/08/2026",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2023/09/10.-Constancia-No-Ret-No-Percep-Misiones-Vto-31-08-2026.pdf",
+   "l": "10.-Constancia-No-Ret-No-Percep-Misiones-Vto-31-08-2026.pdf",
+   "e": {
+    "alcance": [
+     "provincial"
+    ],
+    "provincia": [
+     "misiones"
+    ]
+   },
+   "v": "2026-08-31",
+   "o": "024"
+  },
+  {
+   "id": "legajo-certificado-de-exclusion-de-rio-negro-vto-02-02-2027",
+   "t": "Certificado de exclusión - Río Negro",
+   "c": "impositivo",
+   "y": "Vence 02/02/2027",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2023/09/15.-Certificado-de-Exclusion-de-Rio-Negro-Vto-02-02-2027-.pdf",
+   "l": "15.-Certificado-de-Exclusion-de-Rio-Negro-Vto-02-02-2027-.pdf",
+   "e": {
+    "alcance": [
+     "provincial"
+    ],
+    "provincia": [
+     "rio-negro"
+    ]
+   },
+   "v": "2027-02-02",
+   "o": "025"
+  },
+  {
+   "id": "legajo-constancia-salta-exclusion-de-retenciones-y-percepciones-vto-31-03-2027",
+   "t": "Constancia de exclusión de retenciones y percepciones - Salta",
+   "c": "impositivo",
+   "y": "Vence 31/03/2027",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2023/09/14.-Constancia-Salta-Exclusion-de-Retenciones-y-Percepciones-Vto-31-03-2027.pdf",
+   "l": "14.-Constancia-Salta-Exclusion-de-Retenciones-y-Percepciones-Vto-31-03-2027.pdf",
+   "e": {
+    "alcance": [
+     "provincial"
+    ],
+    "provincia": [
+     "salta"
+    ]
+   },
+   "v": "2027-03-31",
+   "o": "026"
+  },
+  {
+   "id": "legajo-constancia-de-inscripcion-ingresos-brutos-api-sta-fe",
+   "t": "Constancia de inscripción en Ingresos Brutos (API) - Santa Fe",
+   "c": "impositivo",
+   "y": "",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2025/04/3.-CONSTANCIA-DE-INSCRIPCION-INGRESOS-BRUTOS-API-Sta-Fe.pdf",
+   "l": "3.-CONSTANCIA-DE-INSCRIPCION-INGRESOS-BRUTOS-API-Sta-Fe.pdf",
+   "e": {
+    "alcance": [
+     "provincial"
+    ],
+    "provincia": [
+     "santa-fe"
+    ]
+   },
+   "o": "027"
+  },
+  {
+   "id": "legajo-inscripcion-ag-percepcion-profertil-s-a-sta-fe",
+   "t": "Inscripción como agente de percepción - Santa Fe",
+   "c": "impositivo",
+   "y": "",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2025/04/4.-INSCRIPCION-AG.PERCEPCION-PROFERTIL-S.A-Sta-Fe.pdf",
+   "l": "4.-INSCRIPCION-AG.PERCEPCION-PROFERTIL-S.A-Sta-Fe.pdf",
+   "e": {
+    "alcance": [
+     "provincial"
+    ],
+    "provincia": [
+     "santa-fe"
+    ]
+   },
+   "o": "028"
+  },
+  {
+   "id": "legajo-inscripcion-ag-retencion-profertil-s-a-sta-fe",
+   "t": "Inscripción como agente de retención - Santa Fe",
+   "c": "impositivo",
+   "y": "",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2025/04/5.-INSCRIPCION-AG.RETENCION-PROFERTIL-S.A-Sta-Fe.pdf",
+   "l": "5.-INSCRIPCION-AG.RETENCION-PROFERTIL-S.A-Sta-Fe.pdf",
+   "e": {
+    "alcance": [
+     "provincial"
+    ],
+    "provincia": [
+     "santa-fe"
+    ]
+   },
+   "o": "029"
+  },
+  {
+   "id": "legajo-constancia-sgo-del-estero-excluision-de-retenciones-y-percepciones-vto-14-02-2027",
+   "t": "Constancia de exclusión de retenciones y percepciones - Santiago del Estero",
+   "c": "impositivo",
+   "y": "Vence 14/02/2027",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2023/09/13.-Constancia-Sgo-del-Estero-Excluision-de-Retenciones-y-Percepciones-Vto-14-02-2027.pdf",
+   "l": "13.-Constancia-Sgo-del-Estero-Excluision-de-Retenciones-y-Percepciones-Vto-14-02-2027.pdf",
+   "e": {
+    "alcance": [
+     "provincial"
+    ],
+    "provincia": [
+     "santiago-del-estero"
+    ]
+   },
+   "v": "2027-02-14",
+   "o": "030"
+  },
+  {
+   "id": "legajo-constancia-sgo-del-estero-excluision-de-retenciones-y-percepciones-vto-18-11-2026-1",
+   "t": "Constancia de exclusión de retenciones y percepciones - Santiago del Estero",
+   "c": "impositivo",
+   "y": "Vence 18/11/2026",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2023/09/13.-Constancia-Sgo-del-Estero-Excluision-de-Retenciones-y-Percepciones-Vto-18-11-2026-1.pdf",
+   "l": "13.-Constancia-Sgo-del-Estero-Excluision-de-Retenciones-y-Percepciones-Vto-18-11-2026-1.pdf",
+   "e": {
+    "alcance": [
+     "provincial"
+    ],
+    "provincia": [
+     "santiago-del-estero"
+    ]
+   },
+   "v": "2026-11-18",
+   "o": "031"
+  },
+  {
+   "id": "legajo-constancia-no-retencion-y-perc-tucuman-vto-31-12-26",
+   "t": "Constancia de no retención y percepción - Tucumán",
+   "c": "impositivo",
+   "y": "Vence 31/12/2026",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2023/09/11.-Constancia-No-Retencion-y-Perc-Tucuman-Vto-31-12-26.pdf",
+   "l": "11.-Constancia-No-Retencion-y-Perc-Tucuman-Vto-31-12-26.pdf",
+   "e": {
+    "alcance": [
+     "provincial"
+    ],
+    "provincia": [
+     "tucuman"
+    ]
+   },
+   "v": "2026-12-31",
+   "o": "032"
+  }
+ ],
+ "grupos": [
+  {
+   "id": "alcance",
+   "nombre": "Alcance",
+   "opciones": [
+    {
+     "id": "legajo",
+     "nombre": "Legajo completo"
+    },
+    {
+     "id": "nacional",
+     "nombre": "Nacional"
+    },
+    {
+     "id": "provincial",
+     "nombre": "Provincial"
+    }
+   ]
+  },
+  {
+   "id": "provincia",
+   "nombre": "Provincia",
+   "opciones": [
+    {
+     "id": "catamarca",
+     "nombre": "Catamarca"
+    },
+    {
+     "id": "corrientes",
+     "nombre": "Corrientes"
+    },
+    {
+     "id": "cordoba",
+     "nombre": "Córdoba"
+    },
+    {
+     "id": "formosa",
+     "nombre": "Formosa"
+    },
+    {
+     "id": "mendoza",
+     "nombre": "Mendoza"
+    },
+    {
+     "id": "misiones",
+     "nombre": "Misiones"
+    },
+    {
+     "id": "rio-negro",
+     "nombre": "Río Negro"
+    },
+    {
+     "id": "salta",
+     "nombre": "Salta"
+    },
+    {
+     "id": "santa-fe",
+     "nombre": "Santa Fe"
+    },
+    {
+     "id": "santiago-del-estero",
+     "nombre": "Santiago del Estero"
+    },
+    {
+     "id": "tucuman",
+     "nombre": "Tucumán"
+    }
+   ]
+  }
+ ],
+ "zip": {
+  "u": "https://www.profertil.com.ar/wp-content/uploads/2026/11/Legajo-Impositivo-11-2026-1.zip",
+  "l": "legajo-impositivo-11-2026-1.zip"
+ }
+}

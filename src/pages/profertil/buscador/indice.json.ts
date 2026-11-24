@@ -4,7 +4,7 @@
 // va al sitio actual). Las páginas salen del mapa de arquitectura: las baja profertil/buscador/fuente/indice.py a
 // paginas.json. Para sumar un tipo nuevo: una función que devuelva sus ítems y una entrada en GRUPOS.
 import { leerJson } from "../../../lib/sistema.mjs";
-import { BIB, MSDS } from "../../../lib/datos.mjs";
+import { BIB, MSDS, FINANCIERA, LEGAJO } from "../../../lib/datos.mjs";
 
 const RESUMEN_MAX = 140;
 const orden = (f) => (a, b) => { const x = f(a), y = f(b); return x < y ? -1 : x > y ? 1 : 0; };
@@ -23,6 +23,15 @@ const documentos = () => [...BIB].sort(orden((d) => d.t.toLowerCase()))
 
 // --- Hojas de seguridad: una por producto, con el mismo nombre que su lista ---
 const hojas = () => MSDS.map((d) => [d.t, "biblioteca/" + d.id + "/", "Hoja de seguridad"]).sort(orden((x) => x[0].toLowerCase()));
+
+// --- Balances de Situación financiera, del más reciente al más viejo ---
+const balances = () => [...FINANCIERA].sort((a, b) => (a.o < b.o ? 1 : -1))
+  .map((d) => [d.t, "biblioteca/" + d.id + "/", d.e.tipo[0] === "anual" ? "Balance anual" : "Balance trimestral"]);
+
+// --- Legajo impositivo, en el orden del legajo ---
+const ALCANCE = { legajo: "Legajo impositivo", nacional: "Constancia nacional", provincial: "Constancia provincial" };
+const legajo = () => [...LEGAJO].sort((a, b) => (a.o < b.o ? -1 : 1))
+  .map((d) => [d.t, "biblioteca/" + d.id + "/", [ALCANCE[d.e.alcance[0]], d.y].filter(Boolean).join(" · ")]);
 
 // --- Gacetillas de la Sala de prensa, de la más reciente a la más vieja ---
 const MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
@@ -47,6 +56,8 @@ const paginas = () => leerJson("profertil/buscador/fuente/paginas.json").items;
 const GRUPOS = [
   ["documentos", "Biblioteca", "documento", "documentos", "los", "biblioteca/#q=", documentos],
   ["hojas", "Hojas de seguridad", "hoja", "hojas", "las", "hojas-de-seguridad/#q=", hojas],
+  ["financiera", "Balances", "balance", "balances", "los", "situacion-financiera/#q=", balances],
+  ["legajo", "Legajo impositivo", "documento", "documentos", "los", "legajo-impositivo/#q=", legajo],
   ["prensa", "Gacetillas", "gacetilla", "gacetillas", "las", "sala-de-prensa/#gacetillas&q=", gacetillas],
   ["notas", "Notas", "nota", "notas", "las", "novedades/#q=", notas],
   ["paginas", "Páginas", "página", "páginas", "las", "", paginas],

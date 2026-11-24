@@ -1,0 +1,42 @@
+---
+// Legajo impositivo: el legajo completo y las constancias nacionales y provinciales, con la plantilla de la Biblioteca.
+// Filtros por alcance y provincia; sin selector de orden, van como el legajo (el completo, las nacionales y las
+// provinciales por provincia). La fila muestra el vencimiento si la constancia lo tiene. El zip con todo va arriba.
+import Lista from "../../../componentes/Lista.astro";
+import { LEGAJO, LEGAJO_GRUPOS, LEGAJO_ZIP } from "../../../lib/datos.mjs";
+const GRUPOS = LEGAJO_GRUPOS.map((g) => ({ ...g, sin: false }));
+const CSS = `
+/* Legajo impositivo: orden fijo y ancla fuera (la lista es corta). La fila es el ícono, la constancia, el vencimiento y la
+   descarga: el rótulo de la etiqueta sobra (todo es impositivo). */
+.pf-orden, .pf-ancla { display: none; }
+.pf-docs[data-vista="lista"] .pf-doc { grid-template-columns: 34px minmax(0, 1fr) max-content 36px; }
+.pf-docs[data-vista="lista"] .pf-etiqueta__rotulo { display: none; }
+.pf-docs[data-vista="compacta"] .pf-doc { grid-template-columns: 22px minmax(0, 1fr) max-content 30px; }
+.pf-doc__y { white-space: nowrap; }
+@media (max-width: 640px) {
+  .pf-docs[data-vista="lista"] .pf-doc { grid-template-columns: 30px minmax(0, 1fr) 36px; row-gap: 2px; }
+  .pf-docs[data-vista="lista"] .pf-doc .pf-etiqueta { grid-column: 1; grid-row: 1 / span 2; align-self: start; }
+  .pf-docs[data-vista="lista"] .pf-doc__t { grid-column: 2; grid-row: 1; }
+  .pf-docs[data-vista="lista"] .pf-doc__y { grid-column: 2; grid-row: 2; text-align: left; }
+  .pf-docs[data-vista="lista"] .pf-doc__y:empty { display: none; }
+  .pf-docs[data-vista="lista"] .pf-doc__d { grid-column: 3; grid-row: 1 / span 2; align-self: center; }
+}
+`;
+---
+<Lista
+  titulo="Legajo impositivo Profertil"
+  descripcion="Maqueta del Legajo impositivo de profertil.com.ar sobre el concepto web del manual de marca: el legajo y las constancias nacionales y provinciales reales, con filtros, buscador y visor de PDF."
+  firma={{ nombre: "PROFERTIL · LEGAJO IMPOSITIVO", que: "Maqueta del Legajo impositivo: el legajo y las constancias reales del sitio actual.", contexto: "Prototipo de la página de Legajo impositivo para la web de Profertil." }}
+  alcance={{ seccion: "legajo", nombre: "Legajo", en: "el legajo impositivo" }}
+  saltar="Ir a las constancias"
+  busca={{ etiqueta: "Buscar una constancia", placeholder: "Buscá: exclusión, Santa Fe, AFIP…" }}
+  h1="Legajo impositivo"
+  bajada="Encontrá nuestro legajo impositivo actualizado, con las constancias nacionales y provinciales."
+  vaciar="Ver todo el legajo"
+  docs={LEGAJO}
+  grupos={GRUPOS}
+  pag={{ base: "../biblioteca/", todo: "Todo el legajo", uno: "documento", varios: "documentos", orden: "o",
+    campo: { color: "naranja", forma: "escudo", tema: ["escudo", "circulos"] } }}
+  acciones={[{ href: "../biblioteca/archivos/" + LEGAJO_ZIP.l, texto: "Descargar todo (ZIP)", verde: true, descarga: true, icono: "bajar" }]}
+  css={CSS}
+/>

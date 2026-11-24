@@ -77,7 +77,10 @@
   }
   function filtrar() {
     lista = DOCS.filter(function (d) { return pasa(d); });
-    if (estado.orden === "anio") lista.sort(function (a, b) {
+    // Orden propio de la página (PAG.orden = "o"): el que trae cada documento en `o`, sin selector. Situación financiera va
+    // del más reciente al más viejo (PAG.desc) y el Legajo impositivo como el legajo (el completo, nacionales y provincias).
+    if (PAG.orden === "o") lista.sort(function (a, b) { return (a.o < b.o ? -1 : a.o > b.o ? 1 : 0) * (PAG.desc ? -1 : 1); });
+    else if (estado.orden === "anio") lista.sort(function (a, b) {
       if (a.y !== b.y) { if (!a.y) return 1; if (!b.y) return -1; return a.y < b.y ? 1 : -1; }
       return a.n < b.n ? -1 : a.n > b.n ? 1 : 0;
     });
@@ -96,12 +99,13 @@
   }
   var FORMAS_CAT = {
     cereales: ["trigo", "plantas"], oleaginosas: ["capas", "hoja", "flor"], pasturas: ["ondas", "plantas", "hoja"], industriales: ["industria", "urea", "sol"],
-    msds: ["casco", "escudo"], inversores: ["grafico", "barras"], biblioteca: ["lupa", "suelo", "capas"]
+    msds: ["casco", "escudo"], inversores: ["grafico", "barras"], biblioteca: ["lupa", "suelo", "capas"], impositivo: ["escudo", "circulos"]
   };
   var PARES = { azul: ["#003DA5", "#4086FF"], verde: ["#2D8035", "#5EB53A"], amarillo: ["#EABA2C", "#E57F19"], naranja: ["#E57F19", "#8A4818"] };
   var PARES_CONTRA = {
     cereales: ["azul", "amarillo", "naranja"], oleaginosas: ["azul", "verde"], pasturas: ["azul", "amarillo", "naranja"], industriales: ["azul", "verde"],
-    msds: ["azul", "verde", "naranja"], inversores: ["verde", "amarillo", "naranja"], biblioteca: ["verde", "amarillo", "naranja"]
+    msds: ["azul", "verde", "naranja"], inversores: ["verde", "amarillo", "naranja"], biblioteca: ["verde", "amarillo", "naranja"],
+    impositivo: ["azul", "verde", "amarillo"]
   };
   function usar(f, x, y, w, h, rot, color) {
     var cx = x + w / 2, cy = y + h / 2;
@@ -215,7 +219,8 @@
           h += '<div class="pf-f-sub">' + (k ? '<p class="pf-f-sub__t">' + esc(k) + "</p>" : "") + '<div class="pf-f-row">' + ops.map(function (o) { return opcion(g, o); }).join("") + "</div></div>";
         }
       });
-      if (TOTAL[g.id][SIN]) h += '<div class="pf-f-row">' + opcion(g, { id: SIN, nombre: "Sin clasificar" }) + "</div>";
+      // Un grupo puede no tener "Sin clasificar" (g.sin === false): en el Legajo, Provincia no aplica a las nacionales.
+      if (TOTAL[g.id][SIN] && g.sin !== false) h += '<div class="pf-f-row">' + opcion(g, { id: SIN, nombre: "Sin clasificar" }) + "</div>";
       return '<section class="pf-f-gr" data-grupo="' + g.id + '">' +
         '<button type="button" class="pf-f-gr__cab" data-grupo="' + g.id + '" aria-expanded="false" aria-controls="pf-fg-' + g.id + '">' +
         '<span class="pf-f-label">' + g.nombre + '</span><b class="pf-f-n" hidden></b><span class="pf-f-gr__res"></span>' + CHEVRON + "</button>" +

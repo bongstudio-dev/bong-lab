@@ -37,6 +37,20 @@ npm run build
   mayúscula (lo mismo en el visor y en el buscador). Los enlaces van al visor y a los PDF de la Biblioteca; el visor
   vuelve a esta lista. `window.PF_CAMPO` amarillo con la Forma casco, la de su badge.
   En `lista.js`, `PAG` (vacío en la Biblioteca) trae la base del visor, cómo se nombran los documentos y el campo.
+- **Situación financiera** (`../../situacion-financiera/`): la misma lista con los 30 balances anuales y trimestrales de
+  la página del sitio actual (`docs-financiera.json`). Filtros Tipo (anual o trimestral) y Año; sin selector de orden
+  (`PAG.orden = "o"` con `desc`: del más reciente al más viejo, por la fecha de cierre en `o`). La fila es ícono,
+  balance y descarga; arriba, el contacto de Inversores. Los balances que el sitio también publica como página propia
+  conservan el id que ya tenían en `docs-inversores.json` (el visor usa la versión de esta lista). El Balance 2022 da
+  404 en el original: queda con aviso.
+- **Legajo impositivo** (`../../legajo-impositivo/`): el legajo completo y las constancias nacionales y provinciales
+  (`docs-legajo.json`, 33). Filtros Alcance y Provincia (sin "Sin clasificar": `sin: false` en el grupo, porque
+  Provincia no aplica a las nacionales); orden como el legajo: el completo, las nacionales como en el sitio y las
+  provinciales por provincia, el vencimiento más lejano primero. La fila muestra el vencimiento (`y` = "Vence
+  dd/mm/aaaa", `v` en ISO) y arriba va el zip completo (copia en `../archivos/`). Categoría `impositivo` (Forma
+  escudo, terra) en `comun.js`.
+- Cada documento de estas dos listas lleva `p` (`financiera` o `legajo`): el visor vuelve a esa lista y sugiere
+  documentos de la misma lista, no de la categoría.
 - `docs.json`: los 627 documentos de la Biblioteca (secciones cereales, oleaginosas, pasturas, industriales y
   biblioteca). `docs-msds.json` (22 hojas de seguridad) y `docs-inversores.json` (19 informes) son de otras páginas
   del sitio nuevo: no van en la lista, pero el visor los abre igual. Las hojas de seguridad tienen su lista (arriba). Los tres los arma `prep-docs.py` desde el crawl.
@@ -51,6 +65,7 @@ npm run build
 ```bash
 python3 profertil/biblioteca/fuente/prep-docs.py        # docs.json, docs-msds.json, docs-inversores.json
 python3 profertil/biblioteca/fuente/prep-etiquetas.py   # etiquetas.json (lee la Biblioteca Virtual del sitio actual)
+python3 profertil/biblioteca/fuente/prep-legajo-financiera.py  # docs-financiera.json, docs-legajo.json y sus PDF
 npm run build                                           # las páginas
 ```
 

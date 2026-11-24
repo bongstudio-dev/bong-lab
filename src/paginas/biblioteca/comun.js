@@ -13,6 +13,8 @@
     { id: "msds", nombre: "MSDS", forma: "casco", f: fam("amarillo", true) },
     { id: "inversores", nombre: "Inversores", forma: "grafico", f: fam("azul", true) },
     { id: "biblioteca", nombre: "Biblioteca", forma: "lupa", f: fam("azul") },
+    // Legajo impositivo: el legajo y las constancias nacionales y provinciales.
+    { id: "impositivo", nombre: "Impositivo", forma: "escudo", f: fam("naranja", true) },
     // Sala de prensa: las mismas etiquetas que esos tipos de nota en Novedades (Institucional y Aviso a la comunidad).
     { id: "gacetilla", nombre: "Gacetilla", forma: "escudo", f: fam("azul") },
     { id: "aviso", nombre: "Aviso a la comunidad", forma: "casco", f: fam("amarillo") }
