@@ -30,9 +30,7 @@ frena si el sitio pasa de 950 MB (Pages admite hasta 1 GB; hoy pesa unos 650 MB,
 | Biblioteca | `profertil/biblioteca/` | `pages/profertil/biblioteca/index.astro` |
 | Un documento | `profertil/biblioteca/<id>/` (715) | `pages/profertil/biblioteca/[doc].astro` |
 | Hojas de seguridad | `profertil/hojas-de-seguridad/` | `pages/profertil/hojas-de-seguridad/index.astro` |
-| Situación financiera | `profertil/situacion-financiera/` | `pages/profertil/situacion-financiera/index.astro` |
-| Gobierno societario | `profertil/gobierno-societario/` | `pages/profertil/gobierno-societario/index.astro` |
-| Títulos de deuda | `profertil/titulos-de-deuda/` | `pages/profertil/titulos-de-deuda/index.astro` |
+| Inversores | `profertil/inversores/` | `pages/profertil/inversores/index.astro` (las direcciones de cada sección llevan a ella) |
 | Legajo impositivo | `profertil/legajo-impositivo/` | `pages/profertil/legajo-impositivo/index.astro` |
 | Proveedores | `profertil/proveedores/` | `pages/profertil/proveedores/index.astro` |
 | Sala de prensa | `profertil/sala-de-prensa/` | `pages/profertil/sala-de-prensa/index.astro` |
@@ -54,7 +52,7 @@ carpeta de `novedades/`, como `fotos` o `notas`).
     logo animado), la cabecera con campo si la lleva y el pie.
   - `Cabeza.astro`: título, descripción, fuentes, `tokens.css`, `base.css` y el buscador con alcance.
   - `Barra.astro`, `Dock.astro` (filtros), `Ancla.astro`, `Pie.astro`, `Simbolos.astro` (logos y badge para `<use>`).
-  - `Lista.astro`: la plantilla de lista de documentos (Biblioteca, Hojas de seguridad, Situación financiera, Legajo
+  - `Lista.astro`: la plantilla de lista de documentos (Biblioteca, Hojas de seguridad, Inversores con sus tres secciones, Legajo
     impositivo y Proveedores).
   - `Redireccion.astro`: lleva de una dirección vieja con parámetro a la nueva.
 - `paginas/`: el CSS y el script propios de cada página (`novedades/`, `biblioteca/`, `sala-de-prensa/`). Los datos

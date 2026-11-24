@@ -1,0 +1,54 @@
+---
+// Inversores: Situación financiera, Gobierno societario y Títulos de deuda en una sola página con la plantilla de la
+// Biblioteca. Las tres secciones se cambian con un selector en la fila de herramientas, como las vistas, sin cambiar de
+// página. Cada una con sus filtros: Tipo y Año (balances); ninguno (gobierno: sin dock ni ancla); Tipo, Calificadora,
+// Emisión y Año (deuda). Orden fijo en las tres. La página del documento y los PDF son los de la Biblioteca.
+import Lista from "../../../componentes/Lista.astro";
+import { FINANCIERA, GOBIERNO, DEUDA, DEUDA_GRUPOS } from "../../../lib/datos.mjs";
+const ANIOS = [...new Set(FINANCIERA.map((d) => d.y))].sort().reverse();
+const SECCIONES = [
+  { id: "situacion-financiera", nombre: "Situación financiera", corto: "Balances", docs: FINANCIERA,
+    grupos: [
+      { id: "tipo", nombre: "Tipo", sin: false, opciones: [{ id: "anual", nombre: "Anual" }, { id: "trimestral", nombre: "Trimestral" }] },
+      { id: "anio", nombre: "Año", sin: false, opciones: ANIOS.map((y) => ({ id: y, nombre: y })) },
+    ],
+    todo: "Todos los balances", uno: "balance", varios: "balances", orden: "o", desc: true },
+  { id: "gobierno-societario", nombre: "Gobierno societario", corto: "Gobierno", docs: GOBIERNO, grupos: [],
+    todo: "Gobierno societario", uno: "documento", varios: "documentos", orden: "o" },
+  { id: "titulos-de-deuda", nombre: "Títulos de deuda", corto: "Deuda", docs: DEUDA, grupos: DEUDA_GRUPOS.map((g) => ({ ...g, sin: false })),
+    todo: "Todos los títulos de deuda", uno: "documento", varios: "documentos", orden: "o" },
+];
+const CSS = `
+/* Inversores: orden fijo, sin selector de orden (su lugar lo toma el de secciones). La fila es el ícono, el documento y la
+   descarga: el rótulo de la etiqueta y el año sobran (todo es de Inversores y el título ya dice la fecha o la clase). */
+.pf-orden { display: none; }
+.pf-docs[data-vista="lista"] .pf-doc { grid-template-columns: 34px minmax(0, 1fr) 36px; }
+.pf-docs[data-vista="lista"] .pf-etiqueta__rotulo, .pf-docs[data-vista="lista"] .pf-doc__y { display: none; }
+.pf-docs[data-vista="compacta"] .pf-doc { grid-template-columns: 22px minmax(0, 1fr) 30px; }
+.pf-docs[data-vista="compacta"] .pf-doc__y { display: none; }
+@media (max-width: 640px) {
+  .pf-docs[data-vista="lista"] .pf-doc { grid-template-columns: 30px minmax(0, 1fr) 36px; row-gap: 0; }
+  .pf-docs[data-vista="lista"] .pf-doc .pf-etiqueta, .pf-docs[data-vista="lista"] .pf-doc__t, .pf-docs[data-vista="lista"] .pf-doc__d { grid-row: 1; }
+  .pf-docs[data-vista="lista"] .pf-doc .pf-etiqueta { grid-column: 1; }
+  .pf-docs[data-vista="lista"] .pf-doc__t { grid-column: 2; }
+  .pf-docs[data-vista="lista"] .pf-doc__d { grid-column: 3; align-self: center; }
+}
+`;
+---
+<Lista
+  titulo="Inversores Profertil"
+  descripcion="Maqueta de Inversores de profertil.com.ar sobre el concepto web del manual de marca: balances, gobierno societario y títulos de deuda reales en una sola página, con filtros, buscador y visor de PDF."
+  firma={{ nombre: "PROFERTIL · INVERSORES", que: "Maqueta de Inversores: los balances, el gobierno societario y los títulos de deuda reales del sitio actual.", contexto: "Prototipo de la página de Inversores para la web de Profertil." }}
+  alcance={{ seccion: "inversores", nombre: "Inversores", en: "Inversores" }}
+  saltar="Ir a los documentos"
+  busca={{ etiqueta: "Buscar un documento", placeholder: "Buscá: balance 2025, Moody's, estatuto…" }}
+  h1="Inversores"
+  bajada="Consultá la información financiera de Profertil, su gobierno societario y sus títulos de deuda, con todo lo que necesitás para invertir en nuestra compañía."
+  vaciar="Ver todos los documentos"
+  docs={[]}
+  grupos={[]}
+  pag={{ base: "../biblioteca/", titulo: "Inversores Profertil", secciones: SECCIONES,
+    campo: { color: "azul", forma: "grafico", tema: ["grafico", "barras"] } }}
+  acciones={[{ href: "mailto:inversoresprofertil@profertil.com.ar", texto: "Contacto de Inversores", icono: "mail" }]}
+  css={CSS}
+/>

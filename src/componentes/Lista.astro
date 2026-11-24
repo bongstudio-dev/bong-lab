@@ -31,6 +31,8 @@ const ICONOS = {
   ir: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12h10M13 8l4 4-4 4"/></svg>',
 };
 const p = Astro.props;
+// Secciones (Inversores): el selector va en la fila de herramientas, junto al de vistas. `corto` es el nombre en el celular.
+const SECCIONES = ((p.pag && p.pag.secciones) || []) as { id: string; nombre: string; corto?: string }[];
 const script = armar(JS, {
   "/*__COMUN__*/": COMUN, "/*__DOCS__*/[]": js(p.docs), "/*__GRUPOS__*/[]": js(p.grupos),
   "/*__ASSETS__*/{}": js(assets()), "/*__PAG__*/{}": p.pag ? js(p.pag) : "{}",
@@ -69,6 +71,16 @@ const script = armar(JS, {
       <div class="pf-activos" id="pf-activos"></div>
     </div>
     <div class="pf-herramientas">
+      {SECCIONES.length > 0 && (
+        <div class="pf-selector pf-seccion" role="group" aria-label="Sección">
+          <span class="pf-selector__ind" aria-hidden="true"></span>
+          {SECCIONES.map((s, i) => (
+            <button type="button" data-seccion={s.id} aria-pressed={i === 0 ? "true" : "false"}>
+              <span class="pf-seccion__largo">{s.nombre}</span><span class="pf-seccion__corto" aria-hidden="true">{s.corto || s.nombre}</span>
+            </button>
+          ))}
+        </div>
+      )}
       <div class="pf-selector pf-orden" role="group" aria-label="Orden">
         <span class="pf-selector__ind" aria-hidden="true"></span>
         <button type="button" id="pf-sortAz" aria-pressed="true">A a Z</button>

@@ -37,26 +37,29 @@ npm run build
   mayúscula (lo mismo en el visor y en el buscador). Los enlaces van al visor y a los PDF de la Biblioteca; el visor
   vuelve a esta lista. `window.PF_CAMPO` amarillo con la Forma casco, la de su badge.
   En `lista.js`, `PAG` (vacío en la Biblioteca) trae la base del visor, cómo se nombran los documentos y el campo.
-- **Situación financiera** (`../../situacion-financiera/`): la misma lista con los 30 balances anuales y trimestrales de
-  la página del sitio actual (`docs-financiera.json`). Filtros Tipo (anual o trimestral) y Año; sin selector de orden
-  (`PAG.orden = "o"` con `desc`: del más reciente al más viejo, por la fecha de cierre en `o`). La fila es ícono,
-  balance y descarga; arriba, el contacto de Inversores. Los balances que el sitio también publica como página propia
-  conservan el id que ya tenían en `docs-inversores.json` (el visor usa la versión de esta lista). El Balance 2022 da
-  404 en el original: queda con aviso.
+- **Inversores** (`../../inversores/`): una página con tres secciones que se cambian con un selector en la fila de
+  herramientas, junto al de vistas, sin cambiar de página (`PAG.secciones` en `lista.js`: cada sección trae sus
+  documentos, sus grupos, cómo se nombran y su orden; al cambiar se conservan la vista y la búsqueda, no los filtros).
+  En la dirección, la sección va sola al principio (`#titulos-de-deuda&calificadora=fix`); una búsqueda que llega sin
+  sección abre la primera donde encuentra algo. `situacion-financiera/`, `gobierno-societario/` y `titulos-de-deuda/`
+  llevan a su sección.
+  - **Situación financiera**: los 30 balances anuales y trimestrales (`docs-financiera.json`), filtros Tipo y Año,
+    del más reciente al más viejo (`o` es la fecha de cierre). El Balance 2022 da 404 en el original: queda con aviso.
+  - **Gobierno societario**: dos documentos (`docs-gobierno.json`), sin filtros (la página pone `pf-sin-filtros`:
+    sin dock ni ancla). La composición accionaria es en el sitio actual un texto sin enlace; el documento sale de su
+    página propia, la declaración de beneficiario final.
+  - **Títulos de deuda**: 33 documentos (`docs-deuda.json`): prospectos, calificaciones de riesgo y emisiones Clase I a
+    III, filtros Tipo, Calificadora, Emisión y Año, en el orden de la página. Las calificaciones llevan el título del
+    sitio, que nombra el período de los estados contables analizados (el informe "Marzo 2026" es de julio); el nombre
+    del archivo a veces dice otra cosa.
+  - Los que el sitio también publica como página propia conservan el id de `docs-inversores.json` (el visor usa esta
+    versión). Arriba, el contacto de Inversores.
 - **Legajo impositivo** (`../../legajo-impositivo/`): el legajo completo y las constancias nacionales y provinciales
   (`docs-legajo.json`, 33). Filtros Alcance y Provincia (sin "Sin clasificar": `sin: false` en el grupo, porque
   Provincia no aplica a las nacionales); orden como el legajo: el completo, las nacionales como en el sitio y las
   provinciales por provincia, el vencimiento más lejano primero. La fila muestra el vencimiento (`y` = "Vence
   dd/mm/aaaa", `v` en ISO) y arriba va el zip completo (copia en `../archivos/`). Categoría `impositivo` (Forma
   escudo, terra) en `comun.js`.
-- **Gobierno societario** (`../../gobierno-societario/`) y **Títulos de deuda** (`../../titulos-de-deuda/`): las otras
-  dos páginas de Inversores (`docs-gobierno.json`, `docs-deuda.json`). Gobierno son dos documentos, sin filtros ni ancla:
-  la composición accionaria (en el sitio actual es un texto sin enlace; el documento sale de su página propia, la
-  declaración de beneficiario final) y el estatuto. Títulos de deuda son 33: prospectos, calificaciones de riesgo y
-  emisiones Clase I a III, con filtros Tipo, Calificadora, Emisión y Año y el orden de la página. Las calificaciones
-  llevan el título del sitio, que nombra el período de los estados contables analizados (el informe "Marzo 2026" es de
-  julio); el nombre del archivo a veces dice otra cosa. Las tres páginas de Inversores se enlazan entre sí con botones en
-  la cabecera.
 - Cada documento de estas listas lleva `p` (`financiera` o `legajo`): el visor vuelve a esa lista y sugiere
   documentos de la misma lista, no de la categoría.
 - `docs.json`: los 627 documentos de la Biblioteca (secciones cereales, oleaginosas, pasturas, industriales y

@@ -14,6 +14,17 @@
   var PAG = /*__PAG__*/{};
   var BASE = PAG.base || "";
   var NOMBRE_TODO = PAG.todo || "Toda la Biblioteca", UNO = PAG.uno || "documento", VARIOS = PAG.varios || "documentos";
+  /* Secciones (PAG.secciones): una página con varias listas, como Inversores (Situación financiera, Gobierno societario y Títulos de
+     deuda). Se cambia con el selector de la fila de herramientas, como las vistas: sin cambiar de página. Cada sección trae sus
+     documentos, sus grupos de filtros, cómo se nombran sus documentos y su orden. */
+  var SECCIONES = PAG.secciones || [], seccion = null;
+  function usarSeccion(s) {
+    seccion = s;
+    DOCS = s.docs; GRUPOS = s.grupos;
+    NOMBRE_TODO = s.todo; UNO = s.uno; VARIOS = s.varios;
+    PAG.orden = s.orden; PAG.desc = s.desc;
+  }
+  if (SECCIONES.length) usarSeccion(SECCIONES[0]);
   var $ = function (id) { return document.getElementById(id); };
   /* Cabecera con campo (campo.js): el color y la Forma del badge de la sección, como en la Nota. */
   var CAMPO = PAG.campo || { color: "azul", forma: "lupa", tema: ["lupa", "suelo", "capas"] };
@@ -46,11 +57,14 @@
     }
     return out + esc(texto.slice(desde));
   }
-  DOCS.forEach(function (d, k) {
-    d.k = k;
-    d.n = plano(d.t);
-    d.buscable = plano([d.t, POR[d.c].nombre, d.y].join(" "));
-  });
+  function prepararDocs() {
+    DOCS.forEach(function (d, k) {
+      d.k = k;
+      d.n = plano(d.t);
+      d.buscable = plano([d.t, POR[d.c].nombre, d.y].join(" "));
+    });
+  }
+  prepararDocs();
 
   /* --- Estado ------------------------------------------------------------- */
   var SIN = "sin";   // la opción "Sin clasificar" de cada grupo: documentos sin etiqueta en ese grupo
@@ -177,7 +191,9 @@
      Las opciones salen de la portada de la Biblioteca Virtual, en su orden. Las que no tienen ningún documento en la Biblioteca no se
      muestran; al final de cada grupo va "Sin clasificar". El panel se arma una vez y después solo se actualiza (estado, conteos y
      atenuadas), así el acordeón no pierde su animación ni el teclado su lugar. */
-  var NOMBRE = {}, TOTAL = {};
+  var NOMBRE = {}, TOTAL = {}, POR_G = {};
+  function prepararGrupos() {
+  NOMBRE = {}; TOTAL = {}; POR_G = {};
   GRUPOS.forEach(function (g) {
     NOMBRE[g.id] = { sin: "Sin clasificar" }; TOTAL[g.id] = {};
     g.opciones.forEach(function (o) { NOMBRE[g.id][o.id] = o.nombre; });
@@ -188,8 +204,11 @@
     });
     g.visibles = g.opciones.filter(function (o) { return TOTAL[g.id][o.id]; });
   });
-  var POR_G = {};
   GRUPOS.forEach(function (g) { POR_G[g.id] = g; });
+  // Sin grupos (Gobierno societario) no hay dock ni ancla: la página lo sabe por esta clase.
+  document.documentElement.classList.toggle("pf-sin-filtros", !GRUPOS.length);
+  }
+  prepararGrupos();
   // Fuera de su grupo (chips y avisos) un nutriente se lee con su nombre de grupo: "S" solo no dice nada.
   function nombreOp(g, v) { return v === SIN ? POR_G[g].nombre + " sin clasificar" : (g === "nutriente" ? "Nutriente " : "") + NOMBRE[g][v]; }
   var abierto = null;   // el grupo abierto del acordeón
@@ -410,11 +429,13 @@
   var urlLista = false;
   function aUrl() {
     if (!urlLista) return;
-    var p = [], q = estado.q.trim();
+    var p = seccion && seccion !== SECCIONES[0] ? [seccion.id] : [], q = estado.q.trim();
     GRUPOS.forEach(function (g) { var ks = activos(estado.sel[g.id]); if (ks.length) p.push(g.id + "=" + ks.join(",")); });
     if (q) p.push("q=" + encodeURIComponent(q));
     if (estado.orden === "anio") p.push("orden=anio");
     try { history.replaceState(null, "", p.length ? "#" + p.join("&") : location.pathname + location.search); } catch (e) {}
+    // Los enlaces de la barra y del pie que apuntan a esta misma página no se tocan; el título sí dice la sección.
+    if (seccion) document.title = seccion.nombre + " · " + PAG.titulo;
   }
   function aplicar() {
     // Con la lista más corta el scroll quedaría pegado al final: se vuelve al principio de los resultados.
@@ -503,6 +524,29 @@
     }
   });
   marcarVista(false);
+  /* Cambiar de sección: otra lista en el mismo lugar. Se conservan la vista y la búsqueda; los filtros no (cada sección tiene los
+     suyos). Si se estaba dentro de la lista, se vuelve a su principio. */
+  var selSeccion = document.querySelector(".pf-selector.pf-seccion");
+  function marcarSeccion(animar) {
+    if (!selSeccion) return;
+    selSeccion.querySelectorAll("[data-seccion]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.seccion === seccion.id)); });
+    moverInd(selSeccion, animar);
+  }
+  function irSeccion(id, animar) {
+    var s = SECCIONES.filter(function (x) { return x.id === id; })[0];
+    if (!s || s === seccion) return false;
+    if (filtrosAbiertos()) abrirFiltros(false);
+    usarSeccion(s); prepararDocs(); prepararGrupos();
+    estado.sel = {}; GRUPOS.forEach(function (g) { estado.sel[g.id] = {}; });
+    abierto = null;
+    armarFiltros();
+    marcarSeccion(animar);
+    return true;
+  }
+  if (selSeccion) selSeccion.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-seccion]"); if (!b) return;
+    if (irSeccion(b.dataset.seccion, true)) aplicar();
+  });
   $("pf-sortAz").addEventListener("click", function () { ordenar("az"); });
   $("pf-sortAnio").addEventListener("click", function () { ordenar("anio"); });
 
@@ -805,6 +849,17 @@
   // La dirección trae la selección: #buscar abre el buscador; #cultivo=avena, #zona=pergamino,balcarce, #anio=2011, #nutriente=n,
   // #q=texto y #orden=anio se pueden combinar con &. Una opción que no existe se ignora.
   var pedido = location.hash.slice(1), conBusca = pedido === "buscar";
+  // Con secciones, la que se pide va sola al principio (#titulos-de-deuda&q=moody) y se elige antes que los filtros.
+  var conSeccion = false;
+  pedido.split("&").forEach(function (par) { if (par.indexOf("=") < 0 && irSeccion(par, false) !== undefined) conSeccion = SECCIONES.some(function (s) { return s.id === par; }) || conSeccion; });
+  // Una búsqueda que llega sin sección (desde el buscador del sitio) abre la primera sección donde encuentra algo.
+  var qPedida = (pedido.match(/(?:^|&)q=([^&]*)/) || [])[1];
+  if (SECCIONES.length && !conSeccion && qPedida) {
+    var qp = ""; try { qp = plano(decodeURIComponent(qPedida).trim()); } catch (e) {}
+    var con = SECCIONES.filter(function (s) { return s.docs.some(function (d) { return plano([d.t, POR[d.c].nombre, d.y].join(" ")).indexOf(qp) !== -1; }); })[0];
+    if (con) irSeccion(con.id, false);
+  }
+  marcarSeccion(false);
   pedido.split("&").forEach(function (par) {
     var i = par.indexOf("="); if (i < 1) return;
     var k = par.slice(0, i), v = par.slice(i + 1);

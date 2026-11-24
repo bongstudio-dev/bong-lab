@@ -1,49 +1,17 @@
 ---
-// Situación financiera: los balances anuales y trimestrales de Profertil, con la plantilla de la Biblioteca. Filtros por
-// tipo (anual o trimestral) y año; sin selector de orden, van del más reciente al más viejo. La página del documento y
-// los PDF son los de la Biblioteca.
-import Lista from "../../../componentes/Lista.astro";
-import { FINANCIERA } from "../../../lib/datos.mjs";
-const ANIOS = [...new Set(FINANCIERA.map((d) => d.y))].sort().reverse();
-const GRUPOS = [
-  { id: "tipo", nombre: "Tipo", sin: false, opciones: [{ id: "anual", nombre: "Anual" }, { id: "trimestral", nombre: "Trimestral" }] },
-  { id: "anio", nombre: "Año", sin: false, opciones: ANIOS.map((y) => ({ id: y, nombre: y })) },
-];
-const CSS = `
-/* Situación financiera: orden fijo, sin selector. La fila es el ícono, el balance y la descarga: el
-   rótulo de la etiqueta y el año sobran (todos son de Inversores y el título ya dice el año). */
-.pf-orden { display: none; }
-.pf-docs[data-vista="lista"] .pf-doc { grid-template-columns: 34px minmax(0, 1fr) 36px; }
-.pf-docs[data-vista="lista"] .pf-etiqueta__rotulo, .pf-docs[data-vista="lista"] .pf-doc__y { display: none; }
-.pf-docs[data-vista="compacta"] .pf-doc { grid-template-columns: 22px minmax(0, 1fr) 30px; }
-.pf-docs[data-vista="compacta"] .pf-doc__y { display: none; }
-@media (max-width: 640px) {
-  .pf-docs[data-vista="lista"] .pf-doc { grid-template-columns: 30px minmax(0, 1fr) 36px; row-gap: 0; }
-  .pf-docs[data-vista="lista"] .pf-doc .pf-etiqueta, .pf-docs[data-vista="lista"] .pf-doc__t, .pf-docs[data-vista="lista"] .pf-doc__d { grid-row: 1; }
-  .pf-docs[data-vista="lista"] .pf-doc .pf-etiqueta { grid-column: 1; }
-  .pf-docs[data-vista="lista"] .pf-doc__t { grid-column: 2; }
-  .pf-docs[data-vista="lista"] .pf-doc__d { grid-column: 3; align-self: center; }
-}
-`;
+// Dirección anterior: la sección vive ahora en Inversores (inversores/#situacion-financiera), con el resto del # (filtros y búsqueda).
 ---
-<Lista
-  titulo="Situación financiera Profertil"
-  descripcion="Maqueta de Situación financiera de profertil.com.ar sobre el concepto web del manual de marca: los balances anuales y trimestrales reales, con filtros, buscador y visor de PDF."
-  firma={{ nombre: "PROFERTIL · SITUACIÓN FINANCIERA", que: "Maqueta de Situación financiera: los balances reales del sitio actual.", contexto: "Prototipo de la página de Situación financiera para la web de Profertil." }}
-  alcance={{ seccion: "financiera", nombre: "Balances", en: "los balances" }}
-  saltar="Ir a los balances"
-  busca={{ etiqueta: "Buscar un balance", placeholder: "Buscá un balance: 2025, marzo…" }}
-  h1="Situación financiera"
-  bajada="Consultá los balances anuales y trimestrales de Profertil, con toda la información para invertir en nuestra compañía."
-  vaciar="Ver todos los balances"
-  docs={FINANCIERA}
-  grupos={GRUPOS}
-  pag={{ base: "../biblioteca/", todo: "Todos los balances", uno: "balance", varios: "balances", orden: "o", desc: true,
-    campo: { color: "azul", forma: "grafico", tema: ["grafico", "barras"] } }}
-  acciones={[
-    { href: "../gobierno-societario/", texto: "Gobierno societario", icono: "ir" },
-    { href: "../titulos-de-deuda/", texto: "Títulos de deuda", icono: "ir" },
-    { href: "mailto:inversoresprofertil@profertil.com.ar", texto: "Contacto de Inversores", icono: "mail" },
-  ]}
-  css={CSS}
-/>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Inversores Profertil</title>
+<meta name="robots" content="noindex">
+<script is:inline>
+  (function () { var h = location.hash.slice(1); location.replace("../inversores/#situacion-financiera" + (h ? "&" + h : "")); })();
+</script>
+</head>
+<body>
+<p><a href="../inversores/#situacion-financiera">Inversores</a></p>
+</body>
+</html>

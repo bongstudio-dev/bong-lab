@@ -34,6 +34,9 @@ const TIPO_DEUDA = { prospecto: "Prospecto", calificacion: "Calificación de rie
 const deuda = () => [...DEUDA].sort((a, b) => (a.o < b.o ? -1 : 1))
   .map((d) => [d.t, "biblioteca/" + d.id + "/", TIPO_DEUDA[d.e.tipo[0]]]);
 
+// --- Inversores: balances, gobierno societario y títulos de deuda, en ese orden (las tres secciones de la página) ---
+const inversores = () => [...balances(), ...gobierno(), ...deuda()];
+
 // --- Legajo impositivo, en el orden del legajo ---
 const ALCANCE = { legajo: "Legajo impositivo", nacional: "Constancia nacional", provincial: "Constancia provincial" };
 const legajo = () => [...LEGAJO].sort((a, b) => (a.o < b.o ? -1 : 1))
@@ -65,9 +68,7 @@ const paginas = () => leerJson("profertil/buscador/fuente/paginas.json").items;
 const GRUPOS = [
   ["documentos", "Biblioteca", "documento", "documentos", "los", "biblioteca/#q=", documentos],
   ["hojas", "Hojas de seguridad", "hoja", "hojas", "las", "hojas-de-seguridad/#q=", hojas],
-  ["financiera", "Balances", "balance", "balances", "los", "situacion-financiera/#q=", balances],
-  ["gobierno", "Gobierno societario", "documento", "documentos", "los", "gobierno-societario/#q=", gobierno],
-  ["deuda", "Títulos de deuda", "documento", "documentos", "los", "titulos-de-deuda/#q=", deuda],
+  ["inversores", "Inversores", "documento", "documentos", "los", "inversores/#q=", inversores],
   ["legajo", "Legajo impositivo", "documento", "documentos", "los", "legajo-impositivo/#q=", legajo],
   ["proveedores", "Proveedores", "documento", "documentos", "los", "proveedores/#q=", proveedores],
   ["prensa", "Gacetillas", "gacetilla", "gacetillas", "las", "sala-de-prensa/#gacetillas&q=", gacetillas],

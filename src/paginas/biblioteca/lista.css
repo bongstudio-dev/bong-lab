@@ -273,3 +273,12 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
   .pf-docs[data-vista="mini"] .pf-doc__y { grid-column: 1; grid-row: 3; }
   .pf-docs[data-vista="mini"] .pf-doc__d { grid-column: auto; grid-row: auto; }
 }
+
+/* Secciones (Inversores): el selector de sección es el de las vistas con texto. En el celular, el nombre corto. Una sección sin
+   filtros (Gobierno societario) no muestra el dock ni el ancla. */
+.pf-seccion__corto { display: none; }
+@media (max-width: 640px) {
+  .pf-seccion__largo { display: none; }
+  .pf-seccion__corto { display: inline; }
+}
+.pf-sin-filtros .pf-filters, .pf-sin-filtros .pf-ancla { display: none; }
