@@ -1,0 +1,44 @@
+---
+// Quiero ser proveedor: la documentación para proveedores con la plantilla de la Biblioteca. Son tres documentos: sin
+// filtros ni orden (van como en la página), sin ancla. El alta (formulario), los portales de pago y de certificados y el
+// contacto de Compras van como botones de la cabecera. La página del documento y los PDF son los de la Biblioteca.
+import Lista from "../../../componentes/Lista.astro";
+import { PROVEEDORES } from "../../../lib/datos.mjs";
+const CSS = `
+/* Proveedores: sin filtros, ancla ni orden. La fila es el ícono, el documento y la descarga: el rótulo de la etiqueta y
+   el año sobran (todo es para proveedores y nada tiene año). */
+.pf-filters, .pf-ancla, .pf-orden { display: none; }
+.pf-docs[data-vista="lista"] .pf-doc { grid-template-columns: 34px minmax(0, 1fr) 36px; }
+.pf-docs[data-vista="lista"] .pf-etiqueta__rotulo, .pf-docs[data-vista="lista"] .pf-doc__y { display: none; }
+.pf-docs[data-vista="compacta"] .pf-doc__y { display: none; }
+@media (max-width: 640px) {
+  .pf-docs[data-vista="lista"] .pf-doc { grid-template-columns: 30px minmax(0, 1fr) 36px; row-gap: 0; }
+  .pf-docs[data-vista="lista"] .pf-doc .pf-etiqueta, .pf-docs[data-vista="lista"] .pf-doc__t, .pf-docs[data-vista="lista"] .pf-doc__d { grid-row: 1; }
+  .pf-docs[data-vista="lista"] .pf-doc .pf-etiqueta { grid-column: 1; }
+  .pf-docs[data-vista="lista"] .pf-doc__t { grid-column: 2; }
+  .pf-docs[data-vista="lista"] .pf-doc__d { grid-column: 3; align-self: center; }
+}
+`;
+---
+<Lista
+  titulo="Proveedores Profertil"
+  descripcion="Maqueta de Quiero ser proveedor de profertil.com.ar sobre el concepto web del manual de marca: el alta de proveedores, la documentación aplicable con visor de PDF y los accesos a los portales."
+  firma={{ nombre: "PROFERTIL · PROVEEDORES", que: "Maqueta de Quiero ser proveedor: el alta, la documentación y los portales del sitio.", contexto: "Prototipo de la página de Proveedores para la web de Profertil." }}
+  alcance={{ seccion: "proveedores", nombre: "Proveedores", en: "la documentación para proveedores" }}
+  saltar="Ir a la documentación"
+  busca={{ etiqueta: "Buscar un documento", placeholder: "Buscá: condiciones, ética, seguridad…" }}
+  h1="Quiero ser proveedor"
+  bajada="Encontrá toda la información para registrarte como proveedor, acceder a nuestra plataforma de licitaciones y conocer la documentación que aplica."
+  vaciar="Ver toda la documentación"
+  docs={PROVEEDORES}
+  grupos={[]}
+  pag={{ base: "../biblioteca/", todo: "Toda la documentación", uno: "documento", varios: "documentos", orden: "o",
+    campo: { color: "amarillo", forma: "industria", tema: ["industria", "capas"] } }}
+  acciones={[
+    { href: "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=mSN4cDytpky4qa8rr7xXBH0y8EVhYWtJv-JN5bM1CXhUMlhFTTJINVRTOTNPSTkyU0VDSTQ1N09TSC4u", texto: "Completar el formulario", verde: true, fuera: true, icono: "ir" },
+    { href: "https://checkpagos.com/", texto: "Acceso a Checkpagos", fuera: true },
+    { href: "https://certronic.io/portal/pages/login.php", texto: "Acceso a Certronic", fuera: true },
+    { href: "mailto:compras@profertil.com.ar", texto: "compras@profertil.com.ar", icono: "mail" },
+  ]}
+  css={CSS}
+/>

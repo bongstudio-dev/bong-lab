@@ -17,7 +17,9 @@
     { id: "impositivo", nombre: "Impositivo", forma: "escudo", f: fam("naranja", true) },
     // Sala de prensa: las mismas etiquetas que esos tipos de nota en Novedades (Institucional y Aviso a la comunidad).
     { id: "gacetilla", nombre: "Gacetilla", forma: "escudo", f: fam("azul") },
-    { id: "aviso", nombre: "Aviso a la comunidad", forma: "casco", f: fam("amarillo") }
+    { id: "aviso", nombre: "Aviso a la comunidad", forma: "casco", f: fam("amarillo") },
+    // Quiero ser proveedor: la documentación para proveedores.
+    { id: "proveedores", nombre: "Proveedores", forma: "industria", f: fam("amarillo") }
   ];
   var POR = {};
   CATS.forEach(function (x) { POR[x.id] = x; });

@@ -99,13 +99,14 @@
   }
   var FORMAS_CAT = {
     cereales: ["trigo", "plantas"], oleaginosas: ["capas", "hoja", "flor"], pasturas: ["ondas", "plantas", "hoja"], industriales: ["industria", "urea", "sol"],
-    msds: ["casco", "escudo"], inversores: ["grafico", "barras"], biblioteca: ["lupa", "suelo", "capas"], impositivo: ["escudo", "circulos"]
+    msds: ["casco", "escudo"], inversores: ["grafico", "barras"], biblioteca: ["lupa", "suelo", "capas"], impositivo: ["escudo", "circulos"],
+    proveedores: ["industria", "capas"]
   };
   var PARES = { azul: ["#003DA5", "#4086FF"], verde: ["#2D8035", "#5EB53A"], amarillo: ["#EABA2C", "#E57F19"], naranja: ["#E57F19", "#8A4818"] };
   var PARES_CONTRA = {
     cereales: ["azul", "amarillo", "naranja"], oleaginosas: ["azul", "verde"], pasturas: ["azul", "amarillo", "naranja"], industriales: ["azul", "verde"],
     msds: ["azul", "verde", "naranja"], inversores: ["verde", "amarillo", "naranja"], biblioteca: ["verde", "amarillo", "naranja"],
-    impositivo: ["azul", "verde", "amarillo"]
+    impositivo: ["azul", "verde", "amarillo"], proveedores: ["azul", "verde"]
   };
   function usar(f, x, y, w, h, rot, color) {
     var cx = x + w / 2, cy = y + h / 2;

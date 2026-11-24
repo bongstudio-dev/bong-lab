@@ -10,6 +10,7 @@ const ENLACES: Record<string, string> = {
   "Inversores": "situacion-financiera/",
   "Biblioteca virtual": "biblioteca/",
   "Fichas y hojas de seguridad": "hojas-de-seguridad/",
+  "Proveedores": "proveedores/",
 };
 const aca = Astro.url.pathname;
 const html = PIE.html.replace(/<a\b([^>]*)>([\s\S]*?)<\/a>/g, (_, attrs: string, adentro: string) => {

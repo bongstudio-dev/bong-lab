@@ -176,7 +176,13 @@ def bajar_todos(nombres):
     # Las gacetillas de la Sala de prensa también guardan su copia acá (las baja su prep-prensa.py): no se tocan.
     prensa = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'sala-de-prensa', 'fuente', 'prensa.json')
     de_prensa = {g['l'] for g in json.load(open(prensa, encoding='utf-8'))['gacetillas'] if g.get('l')} if os.path.exists(prensa) else set()
-    sobran = set(os.listdir(CARPETA)) - set(nombres.values()) - de_prensa
+    # Lo mismo con las listas que arman otros scripts (prep-legajo-financiera.py) o que van a mano (proveedores).
+    otras = set()
+    for j in ('docs-financiera.json', 'docs-legajo.json', 'docs-proveedores.json'):
+        r = os.path.join(os.path.dirname(os.path.abspath(__file__)), j)
+        if os.path.exists(r):
+            otras |= {d['l'] for d in json.load(open(r, encoding='utf-8'))['docs'] if d.get('l') and '/' not in d['l']}
+    sobran = set(os.listdir(CARPETA)) - set(nombres.values()) - de_prensa - otras
     for n in sobran:
         os.remove(os.path.join(CARPETA, n))
     if sobran:

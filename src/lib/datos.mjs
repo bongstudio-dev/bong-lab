@@ -21,6 +21,8 @@ const LEGAJO_JSON = leerJson("profertil/biblioteca/fuente/docs-legajo.json");
 export const LEGAJO = LEGAJO_JSON.docs.map((d) => ({ ...d, p: "legajo" }));
 export const LEGAJO_GRUPOS = LEGAJO_JSON.grupos;
 export const LEGAJO_ZIP = LEGAJO_JSON.zip;
+// Quiero ser proveedor (docs-proveedores.json, armado a mano desde la página del sitio nuevo): los tres documentos.
+export const PROVEEDORES = leerJson("profertil/biblioteca/fuente/docs-proveedores.json").docs;
 const EN_FINANCIERA = new Set(FINANCIERA.map((d) => d.id));
 const INVERSORES = leerJson("profertil/biblioteca/fuente/docs-inversores.json").docs.filter((d) => !EN_FINANCIERA.has(d.id));
 
@@ -46,8 +48,8 @@ export const GRUPOS = ET.grupos.map((g) => ({
   opciones: g.opciones.map((op) => Object.fromEntries(["id", "nombre", "sub", "provincia"].filter((k) => k in op).map((k) => [k, op[k]]))),
 }));
 
-// Todos los documentos que abre el visor (Biblioteca, hojas de seguridad, inversores, balances, legajo y gacetillas), en
+// Todos los documentos que abre el visor (Biblioteca, hojas de seguridad, inversores, balances, legajo, proveedores y gacetillas), en
 // orden alfabético. En el visor no van las etiquetas ni el orden de la lista (e, o).
 const VISOR = (d) => { const { e, o, ...x } = d; return x; };
-export const DOCS_VISOR = [...BIB, ...MSDS, ...INVERSORES, ...FINANCIERA.map(VISOR), ...LEGAJO.map(VISOR), ...GACETILLAS]
+export const DOCS_VISOR = [...BIB, ...MSDS, ...INVERSORES, ...FINANCIERA.map(VISOR), ...LEGAJO.map(VISOR), ...PROVEEDORES.map(VISOR), ...GACETILLAS]
   .map((d, i) => [plano(d.t), i, d]).sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : a[1] - b[1])).map((x) => x[2]);

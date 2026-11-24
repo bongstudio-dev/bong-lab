@@ -4,7 +4,7 @@
 // va al sitio actual). Las páginas salen del mapa de arquitectura: las baja profertil/buscador/fuente/indice.py a
 // paginas.json. Para sumar un tipo nuevo: una función que devuelva sus ítems y una entrada en GRUPOS.
 import { leerJson } from "../../../lib/sistema.mjs";
-import { BIB, MSDS, FINANCIERA, LEGAJO } from "../../../lib/datos.mjs";
+import { BIB, MSDS, FINANCIERA, LEGAJO, PROVEEDORES } from "../../../lib/datos.mjs";
 
 const RESUMEN_MAX = 140;
 const orden = (f) => (a, b) => { const x = f(a), y = f(b); return x < y ? -1 : x > y ? 1 : 0; };
@@ -33,6 +33,9 @@ const ALCANCE = { legajo: "Legajo impositivo", nacional: "Constancia nacional", 
 const legajo = () => [...LEGAJO].sort((a, b) => (a.o < b.o ? -1 : 1))
   .map((d) => [d.t, "biblioteca/" + d.id + "/", [ALCANCE[d.e.alcance[0]], d.y].filter(Boolean).join(" · ")]);
 
+// --- Documentación para proveedores, en el orden de la página ---
+const proveedores = () => [...PROVEEDORES].sort((a, b) => (a.o < b.o ? -1 : 1)).map((d) => [d.t, "biblioteca/" + d.id + "/", "Proveedores"]);
+
 // --- Gacetillas de la Sala de prensa, de la más reciente a la más vieja ---
 const MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
 const gacetillas = () => [...leerJson("profertil/sala-de-prensa/fuente/prensa.json").gacetillas]
@@ -58,6 +61,7 @@ const GRUPOS = [
   ["hojas", "Hojas de seguridad", "hoja", "hojas", "las", "hojas-de-seguridad/#q=", hojas],
   ["financiera", "Balances", "balance", "balances", "los", "situacion-financiera/#q=", balances],
   ["legajo", "Legajo impositivo", "documento", "documentos", "los", "legajo-impositivo/#q=", legajo],
+  ["proveedores", "Proveedores", "documento", "documentos", "los", "proveedores/#q=", proveedores],
   ["prensa", "Gacetillas", "gacetilla", "gacetillas", "las", "sala-de-prensa/#gacetillas&q=", gacetillas],
   ["notas", "Notas", "nota", "notas", "las", "novedades/#q=", notas],
   ["paginas", "Páginas", "página", "páginas", "las", "", paginas],

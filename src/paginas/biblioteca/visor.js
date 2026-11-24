@@ -44,9 +44,11 @@
     financiera: { href: "../../situacion-financiera/", nombre: "Situación financiera", titulo: "Situación financiera Profertil", todos: "Ver todos los balances", mas: "Más balances",
       alcance: { seccion: "financiera", nombre: "Balances", en: "los balances" } },
     legajo: { href: "../../legajo-impositivo/", nombre: "Legajo impositivo", titulo: "Legajo impositivo Profertil", todos: "Ver todo el legajo", mas: "Más del legajo",
-      alcance: { seccion: "legajo", nombre: "Legajo", en: "el legajo impositivo" } }
+      alcance: { seccion: "legajo", nombre: "Legajo", en: "el legajo impositivo" } },
+    proveedores: { href: "../../proveedores/", nombre: "Proveedores", titulo: "Proveedores Profertil", todos: "Ver toda la documentación", mas: "Más para proveedores",
+      alcance: { seccion: "proveedores", nombre: "Proveedores", en: "la documentación para proveedores" } }
   };
-  var enBiblioteca = !d.p && !/^(msds|inversores|gacetilla|aviso|impositivo)$/.test(d.c);
+  var enBiblioteca = !d.p && !/^(msds|inversores|gacetilla|aviso|impositivo|proveedores)$/.test(d.c);
   var suLista = enBiblioteca ? LISTAS.biblioteca : LISTAS[d.p || d.c] || null;
   document.title = d.t + " · " + (suLista ? suLista.titulo : "Profertil");
   // El buscador de la barra sugiere primero la sección del documento abierto (../../buscador/alcance.js lo lee al iniciar).

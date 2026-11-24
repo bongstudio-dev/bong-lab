@@ -150,6 +150,13 @@ guarda solo lo que llegó entero y es PDF, borra de `../pdf/` lo que ya no corre
 fallos al final. `URLS_CSV` apunta al `urls.csv` del relevamiento (por defecto, el de
 `~/Documents/Desarrollo/relevamiento-profertil`).
 
+## Proveedores
+
+`docs-proveedores.json` va a mano: son los tres documentos de Quiero ser proveedor (código de ética para terceros,
+condiciones generales de compras y lineamientos de seguridad de la información), tomados de la página del sitio nuevo en
+prueba (`fuente` en el mismo archivo). Los PDF están en `../pdf/` y `prep-docs.py --bajar` no los borra. Si cambian,
+se edita el json, se baja el PDF a `../pdf/` y `npm run build`.
+
 ## Pendiente de diseño
 
 - Zoom y búsqueda dentro del documento (hoy se ve al ancho de la columna; se puede descargar).
