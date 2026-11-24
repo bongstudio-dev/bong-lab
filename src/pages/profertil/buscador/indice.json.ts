@@ -4,7 +4,7 @@
 // va al sitio actual). Las páginas salen del mapa de arquitectura: las baja profertil/buscador/fuente/indice.py a
 // paginas.json. Para sumar un tipo nuevo: una función que devuelva sus ítems y una entrada en GRUPOS.
 import { leerJson } from "../../../lib/sistema.mjs";
-import { BIB, MSDS, FINANCIERA, LEGAJO, PROVEEDORES } from "../../../lib/datos.mjs";
+import { BIB, MSDS, FINANCIERA, GOBIERNO, DEUDA, LEGAJO, PROVEEDORES } from "../../../lib/datos.mjs";
 
 const RESUMEN_MAX = 140;
 const orden = (f) => (a, b) => { const x = f(a), y = f(b); return x < y ? -1 : x > y ? 1 : 0; };
@@ -27,6 +27,12 @@ const hojas = () => MSDS.map((d) => [d.t, "biblioteca/" + d.id + "/", "Hoja de s
 // --- Balances de Situación financiera, del más reciente al más viejo ---
 const balances = () => [...FINANCIERA].sort((a, b) => (a.o < b.o ? 1 : -1))
   .map((d) => [d.t, "biblioteca/" + d.id + "/", d.e.tipo[0] === "anual" ? "Balance anual" : "Balance trimestral"]);
+
+// --- Gobierno societario y Títulos de deuda, en el orden de cada página ---
+const gobierno = () => GOBIERNO.map((d) => [d.t, "biblioteca/" + d.id + "/", "Gobierno societario"]);
+const TIPO_DEUDA = { prospecto: "Prospecto", calificacion: "Calificación de riesgo", emision: "Emisión de ON" };
+const deuda = () => [...DEUDA].sort((a, b) => (a.o < b.o ? -1 : 1))
+  .map((d) => [d.t, "biblioteca/" + d.id + "/", TIPO_DEUDA[d.e.tipo[0]]]);
 
 // --- Legajo impositivo, en el orden del legajo ---
 const ALCANCE = { legajo: "Legajo impositivo", nacional: "Constancia nacional", provincial: "Constancia provincial" };
@@ -60,6 +66,8 @@ const GRUPOS = [
   ["documentos", "Biblioteca", "documento", "documentos", "los", "biblioteca/#q=", documentos],
   ["hojas", "Hojas de seguridad", "hoja", "hojas", "las", "hojas-de-seguridad/#q=", hojas],
   ["financiera", "Balances", "balance", "balances", "los", "situacion-financiera/#q=", balances],
+  ["gobierno", "Gobierno societario", "documento", "documentos", "los", "gobierno-societario/#q=", gobierno],
+  ["deuda", "Títulos de deuda", "documento", "documentos", "los", "titulos-de-deuda/#q=", deuda],
   ["legajo", "Legajo impositivo", "documento", "documentos", "los", "legajo-impositivo/#q=", legajo],
   ["proveedores", "Proveedores", "documento", "documentos", "los", "proveedores/#q=", proveedores],
   ["prensa", "Gacetillas", "gacetilla", "gacetillas", "las", "sala-de-prensa/#gacetillas&q=", gacetillas],

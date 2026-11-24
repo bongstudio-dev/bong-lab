@@ -1,0 +1,697 @@
+{
+ "docs": [
+  {
+   "id": "deuda-profertil-sa-prospecto-27-04-2026",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Profertil-SA-Prospecto-27-04-2026.pdf",
+   "l": "profertil-sa-prospecto-27-04-2026.pdf",
+   "t": "Prospecto del Programa Global de ON 2026",
+   "c": "inversores",
+   "y": "2026",
+   "o": "000",
+   "e": {
+    "tipo": [
+     "prospecto"
+    ],
+    "anio": [
+     "2026"
+    ]
+   }
+  },
+  {
+   "id": "deuda-profertil-sa-prospecto-25-06-25",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Profertil-SA-Prospecto-25-06-25.pdf",
+   "l": "profertil-sa-prospecto-25-06-25.pdf",
+   "t": "Prospecto del Programa Global de ON 2025",
+   "c": "inversores",
+   "y": "2025",
+   "o": "001",
+   "e": {
+    "tipo": [
+     "prospecto"
+    ],
+    "anio": [
+     "2025"
+    ]
+   }
+  },
+  {
+   "id": "deuda-calificacion-marzo-2026-moodys-1",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Calificacion-Marzo-2026-Moody´s-1.pdf",
+   "l": "calificacion-marzo-2026-moodys-1.pdf",
+   "t": "Calificación Moody's - Marzo 2026",
+   "c": "inversores",
+   "y": "2026",
+   "o": "002",
+   "e": {
+    "tipo": [
+     "calificacion"
+    ],
+    "calificadora": [
+     "moodys"
+    ],
+    "anio": [
+     "2026"
+    ]
+   }
+  },
+  {
+   "id": "deuda-calificacion-marzo-2026-fix-rating",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Calificacion-Marzo-2026-Fix-Rating.pdf",
+   "l": "calificacion-marzo-2026-fix-rating.pdf",
+   "t": "Calificación Fix SCR - Marzo 2026",
+   "c": "inversores",
+   "y": "2026",
+   "o": "003",
+   "e": {
+    "tipo": [
+     "calificacion"
+    ],
+    "calificadora": [
+     "fix"
+    ],
+    "anio": [
+     "2026"
+    ]
+   }
+  },
+  {
+   "id": "deuda-calificacion-marzo-2026-moodys",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Calificacion-Marzo-2026-Moody´s.pdf",
+   "l": "calificacion-marzo-2026-moodys.pdf",
+   "t": "Calificación Moody's - Diciembre 2025",
+   "c": "inversores",
+   "y": "2025",
+   "o": "004",
+   "e": {
+    "tipo": [
+     "calificacion"
+    ],
+    "calificadora": [
+     "moodys"
+    ],
+    "anio": [
+     "2025"
+    ]
+   }
+  },
+  {
+   "id": "deuda-calificacion-diciembre-2025-fix-rating",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Calificacion-Diciembre-2025-Fix-Rating.pdf",
+   "l": "calificacion-diciembre-2025-fix-rating.pdf",
+   "t": "Calificación Fix SCR - Diciembre 2025",
+   "c": "inversores",
+   "y": "2025",
+   "o": "005",
+   "e": {
+    "tipo": [
+     "calificacion"
+    ],
+    "calificadora": [
+     "fix"
+    ],
+    "anio": [
+     "2025"
+    ]
+   }
+  },
+  {
+   "id": "deuda-calificacion-diciembre-2025-moodys",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Calificacion-Diciembre-2025-Moody´s.pdf",
+   "l": "calificacion-diciembre-2025-moodys.pdf",
+   "t": "Calificación Moody's - Septiembre 2025",
+   "c": "inversores",
+   "y": "2025",
+   "o": "006",
+   "e": {
+    "tipo": [
+     "calificacion"
+    ],
+    "calificadora": [
+     "moodys"
+    ],
+    "anio": [
+     "2025"
+    ]
+   }
+  },
+  {
+   "id": "deuda-calificacion-septiembre-2025-fix-rating",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Calificacion-Septiembre-2025-Fix-Rating.pdf",
+   "l": "calificacion-septiembre-2025-fix-rating.pdf",
+   "t": "Calificación Fix SCR - Septiembre 2025",
+   "c": "inversores",
+   "y": "2025",
+   "o": "007",
+   "e": {
+    "tipo": [
+     "calificacion"
+    ],
+    "calificadora": [
+     "fix"
+    ],
+    "anio": [
+     "2025"
+    ]
+   }
+  },
+  {
+   "id": "deuda-calificacion-junio-2025-moodys",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Calificacion-Junio-2025-Moody´s.pdf",
+   "l": "calificacion-junio-2025-moodys.pdf",
+   "t": "Calificación Moody's - Junio 2025",
+   "c": "inversores",
+   "y": "2025",
+   "o": "008",
+   "e": {
+    "tipo": [
+     "calificacion"
+    ],
+    "calificadora": [
+     "moodys"
+    ],
+    "anio": [
+     "2025"
+    ]
+   }
+  },
+  {
+   "id": "deuda-calificacion-junio-2025-fix-rating",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Calificacion-Junio-2025-Fix-Rating.pdf",
+   "l": "calificacion-junio-2025-fix-rating.pdf",
+   "t": "Calificación Fix SCR - Junio 2025",
+   "c": "inversores",
+   "y": "2025",
+   "o": "009",
+   "e": {
+    "tipo": [
+     "calificacion"
+    ],
+    "calificadora": [
+     "fix"
+    ],
+    "anio": [
+     "2025"
+    ]
+   }
+  },
+  {
+   "id": "deuda-calificacion-marzo-2025-moodys",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Calificacion-Marzo-2025-Moody´s-.pdf",
+   "l": "calificacion-marzo-2025-moodys.pdf",
+   "t": "Calificación Moody's - Marzo 2025",
+   "c": "inversores",
+   "y": "2025",
+   "o": "010",
+   "e": {
+    "tipo": [
+     "calificacion"
+    ],
+    "calificadora": [
+     "moodys"
+    ],
+    "anio": [
+     "2025"
+    ]
+   }
+  },
+  {
+   "id": "deuda-calificacion-marzo-2025-fix-rating",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Calificacion-Marzo-2025-Fix-Rating.pdf",
+   "l": "calificacion-marzo-2025-fix-rating.pdf",
+   "t": "Calificación Fix SCR - Marzo 2025",
+   "c": "inversores",
+   "y": "2025",
+   "o": "011",
+   "e": {
+    "tipo": [
+     "calificacion"
+    ],
+    "calificadora": [
+     "fix"
+    ],
+    "anio": [
+     "2025"
+    ]
+   }
+  },
+  {
+   "id": "deuda-calificacion-diciembre-2024-moodys",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Calificacion-Diciembre-2024-Moody´s.pdf",
+   "l": "calificacion-diciembre-2024-moodys.pdf",
+   "t": "Calificación Moody's - Diciembre 2024",
+   "c": "inversores",
+   "y": "2024",
+   "o": "012",
+   "e": {
+    "tipo": [
+     "calificacion"
+    ],
+    "calificadora": [
+     "moodys"
+    ],
+    "anio": [
+     "2024"
+    ]
+   }
+  },
+  {
+   "id": "deuda-calificacion-diciembre-2024-fix-rating",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Calificacion-Diciembre-2024-Fix-Rating.pdf",
+   "l": "calificacion-diciembre-2024-fix-rating.pdf",
+   "t": "Calificación Fix SCR - Diciembre 2024",
+   "c": "inversores",
+   "y": "2024",
+   "o": "013",
+   "e": {
+    "tipo": [
+     "calificacion"
+    ],
+    "calificadora": [
+     "fix"
+    ],
+    "anio": [
+     "2024"
+    ]
+   }
+  },
+  {
+   "id": "deuda-calificacion-septiembre-2024-moodys",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Calificacion-Septiembre-2024-Moody´s.pdf",
+   "l": "calificacion-septiembre-2024-moodys.pdf",
+   "t": "Calificación Moody's - Septiembre 2024",
+   "c": "inversores",
+   "y": "2024",
+   "o": "014",
+   "e": {
+    "tipo": [
+     "calificacion"
+    ],
+    "calificadora": [
+     "moodys"
+    ],
+    "anio": [
+     "2024"
+    ]
+   }
+  },
+  {
+   "id": "deuda-calificacion-septiembre-2024-fix-rating",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Calificacion-Septiembre-2024-Fix-Rating.pdf",
+   "l": "calificacion-septiembre-2024-fix-rating.pdf",
+   "t": "Calificación Fix SCR - Septiembre 2024",
+   "c": "inversores",
+   "y": "2024",
+   "o": "015",
+   "e": {
+    "tipo": [
+     "calificacion"
+    ],
+    "calificadora": [
+     "fix"
+    ],
+    "anio": [
+     "2024"
+    ]
+   }
+  },
+  {
+   "id": "deuda-calificacion-junio-2024-fix-rating",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Calificacion-Junio-2024-Fix-Rating.pdf",
+   "l": "calificacion-junio-2024-fix-rating.pdf",
+   "t": "Calificación Fix SCR - Junio 2024",
+   "c": "inversores",
+   "y": "2024",
+   "o": "016",
+   "e": {
+    "tipo": [
+     "calificacion"
+    ],
+    "calificadora": [
+     "fix"
+    ],
+    "anio": [
+     "2024"
+    ]
+   }
+  },
+  {
+   "id": "deuda-calificacion-marzo-2024-moodys",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Calificacion-Marzo-2024-Moody´s.pdf",
+   "l": "calificacion-marzo-2024-moodys.pdf",
+   "t": "Calificación Moody's - Marzo 2024",
+   "c": "inversores",
+   "y": "2024",
+   "o": "017",
+   "e": {
+    "tipo": [
+     "calificacion"
+    ],
+    "calificadora": [
+     "moodys"
+    ],
+    "anio": [
+     "2024"
+    ]
+   }
+  },
+  {
+   "id": "deuda-calificacion-marzo-2024-fix-rating",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Calificacion-Marzo-2024-Fix-Rating.pdf",
+   "l": "calificacion-marzo-2024-fix-rating.pdf",
+   "t": "Calificación Fix SCR - Marzo 2024",
+   "c": "inversores",
+   "y": "2024",
+   "o": "018",
+   "e": {
+    "tipo": [
+     "calificacion"
+    ],
+    "calificadora": [
+     "fix"
+    ],
+    "anio": [
+     "2024"
+    ]
+   }
+  },
+  {
+   "id": "deuda-calificacion-anual-2023-moodys",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Calificacion-Anual-2023-Moody´s.pdf",
+   "l": "calificacion-anual-2023-moodys.pdf",
+   "t": "Calificación Moody's - Diciembre 2023",
+   "c": "inversores",
+   "y": "2023",
+   "o": "019",
+   "e": {
+    "tipo": [
+     "calificacion"
+    ],
+    "calificadora": [
+     "moodys"
+    ],
+    "anio": [
+     "2023"
+    ]
+   }
+  },
+  {
+   "id": "deuda-calificacion-anual-2023-fix-rating",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Calificacion-Anual-2023-Fix-Rating.pdf",
+   "l": "calificacion-anual-2023-fix-rating.pdf",
+   "t": "Calificación Fix SCR - Diciembre 2023",
+   "c": "inversores",
+   "y": "2023",
+   "o": "020",
+   "e": {
+    "tipo": [
+     "calificacion"
+    ],
+    "calificadora": [
+     "fix"
+    ],
+    "anio": [
+     "2023"
+    ]
+   }
+  },
+  {
+   "id": "deuda-profertil-sa-suplemento-clase-1",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Profertil-SA-Suplemento-Clase-1.pdf",
+   "l": "profertil-sa-suplemento-clase-1.pdf",
+   "t": "Suplemento de precio - Clase I",
+   "c": "inversores",
+   "y": "",
+   "o": "021",
+   "e": {
+    "tipo": [
+     "emision"
+    ],
+    "clase": [
+     "clase-1"
+    ]
+   }
+  },
+  {
+   "id": "deuda-profertil-aviso-de-colocacion-clase-i",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Profertil-Aviso-de-Colocacion-Clase-I.pdf",
+   "l": "profertil-aviso-de-colocacion-clase-i.pdf",
+   "t": "Aviso de colocación - Clase I",
+   "c": "inversores",
+   "y": "",
+   "o": "022",
+   "e": {
+    "tipo": [
+     "emision"
+    ],
+    "clase": [
+     "clase-1"
+    ]
+   }
+  },
+  {
+   "id": "deuda-aviso-de-resultados-clase-1-firmado",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Aviso-de-Resultados-Clase-1-Firmado.pdf",
+   "l": "aviso-de-resultados-clase-1-firmado.pdf",
+   "t": "Aviso de resultados - Clase I",
+   "c": "inversores",
+   "y": "",
+   "o": "023",
+   "e": {
+    "tipo": [
+     "emision"
+    ],
+    "clase": [
+     "clase-1"
+    ]
+   }
+  },
+  {
+   "id": "calificacion-profertil",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/06/Calificacion-Profertil-21-05-21.pdf",
+   "s": "https://www.profertil.com.ar/index.php/inversores/calificacion-profertil",
+   "l": "calificacion-profertil-21-05-21.pdf",
+   "t": "Calificación - Clase I",
+   "c": "inversores",
+   "y": "",
+   "o": "024",
+   "e": {
+    "tipo": [
+     "emision"
+    ],
+    "clase": [
+     "clase-1"
+    ]
+   }
+  },
+  {
+   "id": "deuda-on-profertil-clase-2-suplemento",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/ON-PROFERTIL-CLASE-2-Suplemento.pdf",
+   "l": "on-profertil-clase-2-suplemento.pdf",
+   "t": "Suplemento de precio - Clase II",
+   "c": "inversores",
+   "y": "",
+   "o": "025",
+   "e": {
+    "tipo": [
+     "emision"
+    ],
+    "clase": [
+     "clase-2"
+    ]
+   }
+  },
+  {
+   "id": "deuda-on-profertil-clase-2-aviso-de-suscripcion",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/ON-PROFERTIL-CLASE-2-Aviso-de-Suscripcion.pdf",
+   "l": "on-profertil-clase-2-aviso-de-suscripcion.pdf",
+   "t": "Aviso de suscripción - Clase II",
+   "c": "inversores",
+   "y": "",
+   "o": "026",
+   "e": {
+    "tipo": [
+     "emision"
+    ],
+    "clase": [
+     "clase-2"
+    ]
+   }
+  },
+  {
+   "id": "deuda-profertil-clase-2-aviso-de-resultados",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Profertil-Clase-2-Aviso-de-Resultados.pdf",
+   "l": "profertil-clase-2-aviso-de-resultados.pdf",
+   "t": "Aviso de resultados - Clase II",
+   "c": "inversores",
+   "y": "",
+   "o": "027",
+   "e": {
+    "tipo": [
+     "emision"
+    ],
+    "clase": [
+     "clase-2"
+    ]
+   }
+  },
+  {
+   "id": "deuda-calificacion-julio-2025-moodys-1-1",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Calificacion-Julio-2025-Moody´s-1-1.pdf",
+   "l": "calificacion-julio-2025-moodys-1-1.pdf",
+   "t": "Calificación - Clase II",
+   "c": "inversores",
+   "y": "",
+   "o": "028",
+   "e": {
+    "tipo": [
+     "emision"
+    ],
+    "clase": [
+     "clase-2"
+    ]
+   }
+  },
+  {
+   "id": "deuda-profertil-sa-suplemento-clase-3",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Profertil-SA-Suplemento-Clase-3.pdf",
+   "l": "profertil-sa-suplemento-clase-3.pdf",
+   "t": "Suplemento de precio - Clase III",
+   "c": "inversores",
+   "y": "",
+   "o": "029",
+   "e": {
+    "tipo": [
+     "emision"
+    ],
+    "clase": [
+     "clase-3"
+    ]
+   }
+  },
+  {
+   "id": "deuda-profertil-sa-aviso-de-suscripcion-clase-3",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Profertil-SA-Aviso-de-Suscripcion-Clase-3.pdf",
+   "l": "profertil-sa-aviso-de-suscripcion-clase-3.pdf",
+   "t": "Aviso de suscripción - Clase III",
+   "c": "inversores",
+   "y": "",
+   "o": "030",
+   "e": {
+    "tipo": [
+     "emision"
+    ],
+    "clase": [
+     "clase-3"
+    ]
+   }
+  },
+  {
+   "id": "deuda-profertil-sa-aviso-de-resultados-clase-3",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Profertil-SA-Aviso-de-Resultados-Clase-3.pdf",
+   "l": "profertil-sa-aviso-de-resultados-clase-3.pdf",
+   "t": "Aviso de resultados - Clase III",
+   "c": "inversores",
+   "y": "",
+   "o": "031",
+   "e": {
+    "tipo": [
+     "emision"
+    ],
+    "clase": [
+     "clase-3"
+    ]
+   }
+  },
+  {
+   "id": "deuda-profertil-sa-informe-de-calificacion",
+   "u": "https://www.profertil.com.ar/wp-content/uploads/2021/04/Profertil-SA-Informe-de-Calificacion.pdf",
+   "l": "profertil-sa-informe-de-calificacion.pdf",
+   "t": "Calificación - Clase III",
+   "c": "inversores",
+   "y": "",
+   "o": "032",
+   "e": {
+    "tipo": [
+     "emision"
+    ],
+    "clase": [
+     "clase-3"
+    ]
+   }
+  }
+ ],
+ "grupos": [
+  {
+   "id": "tipo",
+   "nombre": "Tipo",
+   "opciones": [
+    {
+     "id": "prospecto",
+     "nombre": "Prospectos"
+    },
+    {
+     "id": "calificacion",
+     "nombre": "Calificaciones de riesgo"
+    },
+    {
+     "id": "emision",
+     "nombre": "Emisiones"
+    }
+   ]
+  },
+  {
+   "id": "calificadora",
+   "nombre": "Calificadora",
+   "opciones": [
+    {
+     "id": "moodys",
+     "nombre": "Moody's"
+    },
+    {
+     "id": "fix",
+     "nombre": "Fix SCR"
+    }
+   ]
+  },
+  {
+   "id": "clase",
+   "nombre": "Emisión",
+   "opciones": [
+    {
+     "id": "clase-1",
+     "nombre": "Clase I"
+    },
+    {
+     "id": "clase-2",
+     "nombre": "Clase II"
+    },
+    {
+     "id": "clase-3",
+     "nombre": "Clase III"
+    }
+   ]
+  },
+  {
+   "id": "anio",
+   "nombre": "Año",
+   "opciones": [
+    {
+     "id": "2026",
+     "nombre": "2026"
+    },
+    {
+     "id": "2025",
+     "nombre": "2025"
+    },
+    {
+     "id": "2024",
+     "nombre": "2024"
+    },
+    {
+     "id": "2023",
+     "nombre": "2023"
+    }
+   ]
+  }
+ ]
+}

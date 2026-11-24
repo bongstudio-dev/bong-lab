@@ -49,7 +49,15 @@ npm run build
   provinciales por provincia, el vencimiento más lejano primero. La fila muestra el vencimiento (`y` = "Vence
   dd/mm/aaaa", `v` en ISO) y arriba va el zip completo (copia en `../archivos/`). Categoría `impositivo` (Forma
   escudo, terra) en `comun.js`.
-- Cada documento de estas dos listas lleva `p` (`financiera` o `legajo`): el visor vuelve a esa lista y sugiere
+- **Gobierno societario** (`../../gobierno-societario/`) y **Títulos de deuda** (`../../titulos-de-deuda/`): las otras
+  dos páginas de Inversores (`docs-gobierno.json`, `docs-deuda.json`). Gobierno son dos documentos, sin filtros ni ancla:
+  la composición accionaria (en el sitio actual es un texto sin enlace; el documento sale de su página propia, la
+  declaración de beneficiario final) y el estatuto. Títulos de deuda son 33: prospectos, calificaciones de riesgo y
+  emisiones Clase I a III, con filtros Tipo, Calificadora, Emisión y Año y el orden de la página. Las calificaciones
+  llevan el título del sitio, que nombra el período de los estados contables analizados (el informe "Marzo 2026" es de
+  julio); el nombre del archivo a veces dice otra cosa. Las tres páginas de Inversores se enlazan entre sí con botones en
+  la cabecera.
+- Cada documento de estas listas lleva `p` (`financiera` o `legajo`): el visor vuelve a esa lista y sugiere
   documentos de la misma lista, no de la categoría.
 - `docs.json`: los 627 documentos de la Biblioteca (secciones cereales, oleaginosas, pasturas, industriales y
   biblioteca). `docs-msds.json` (22 hojas de seguridad) y `docs-inversores.json` (19 informes) son de otras páginas
@@ -65,7 +73,7 @@ npm run build
 ```bash
 python3 profertil/biblioteca/fuente/prep-docs.py        # docs.json, docs-msds.json, docs-inversores.json
 python3 profertil/biblioteca/fuente/prep-etiquetas.py   # etiquetas.json (lee la Biblioteca Virtual del sitio actual)
-python3 profertil/biblioteca/fuente/prep-legajo-financiera.py  # docs-financiera.json, docs-legajo.json y sus PDF
+python3 profertil/biblioteca/fuente/prep-legajo-financiera.py  # docs-financiera.json, docs-legajo.json, docs-gobierno.json, docs-deuda.json y sus PDF
 npm run build                                           # las páginas
 ```
 

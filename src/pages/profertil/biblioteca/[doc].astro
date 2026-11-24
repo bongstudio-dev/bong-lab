@@ -21,7 +21,7 @@ export function getStaticPaths() {
 const { d } = Astro.props;
 // Cada documento vuelve a su lista (la misma regla que visor.js, para que el título ya llegue puesto).
 const TITULOS: Record<string, string> = { msds: "Hojas de seguridad Profertil", gacetilla: "Sala de prensa Profertil", aviso: "Sala de prensa Profertil", inversores: "Profertil",
-  financiera: "Situación financiera Profertil", legajo: "Legajo impositivo Profertil", proveedores: "Proveedores Profertil" };
+  financiera: "Situación financiera Profertil", gobierno: "Gobierno societario Profertil", deuda: "Títulos de deuda Profertil", legajo: "Legajo impositivo Profertil", proveedores: "Proveedores Profertil" };
 const titulo = d.t + " · " + (TITULOS[d.p || d.c] || "Biblioteca Virtual Profertil");
 const script = armar(JS, { "/*__COMUN__*/": COMUN, "/*__ASSETS__*/{}": js(assets()), '/*__DOC__*/""': js(d.id) });
 ---

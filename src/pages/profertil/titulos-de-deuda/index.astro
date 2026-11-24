@@ -1,0 +1,45 @@
+---
+// Títulos de deuda: los prospectos del Programa Global de ON, las calificaciones de riesgo y los documentos de cada
+// emisión, con la plantilla de la Biblioteca. Filtros por tipo, calificadora, emisión y año; sin selector de orden, van
+// como en la página (prospectos, calificaciones de la más reciente a la más vieja y emisiones por clase).
+import Lista from "../../../componentes/Lista.astro";
+import { DEUDA, DEUDA_GRUPOS } from "../../../lib/datos.mjs";
+const GRUPOS = DEUDA_GRUPOS.map((g) => ({ ...g, sin: false }));
+const CSS = `
+/* Títulos de deuda: orden fijo, sin selector. La fila es el ícono, el documento y la descarga: el rótulo de la etiqueta
+   y el año sobran (todo es de Inversores y el título ya dice la fecha o la clase). */
+.pf-orden { display: none; }
+.pf-docs[data-vista="lista"] .pf-doc { grid-template-columns: 34px minmax(0, 1fr) 36px; }
+.pf-docs[data-vista="lista"] .pf-etiqueta__rotulo, .pf-docs[data-vista="lista"] .pf-doc__y { display: none; }
+.pf-docs[data-vista="compacta"] .pf-doc { grid-template-columns: 22px minmax(0, 1fr) 30px; }
+.pf-docs[data-vista="compacta"] .pf-doc__y { display: none; }
+@media (max-width: 640px) {
+  .pf-docs[data-vista="lista"] .pf-doc { grid-template-columns: 30px minmax(0, 1fr) 36px; row-gap: 0; }
+  .pf-docs[data-vista="lista"] .pf-doc .pf-etiqueta, .pf-docs[data-vista="lista"] .pf-doc__t, .pf-docs[data-vista="lista"] .pf-doc__d { grid-row: 1; }
+  .pf-docs[data-vista="lista"] .pf-doc .pf-etiqueta { grid-column: 1; }
+  .pf-docs[data-vista="lista"] .pf-doc__t { grid-column: 2; }
+  .pf-docs[data-vista="lista"] .pf-doc__d { grid-column: 3; align-self: center; }
+}
+`;
+---
+<Lista
+  titulo="Títulos de deuda Profertil"
+  descripcion="Maqueta de Títulos de deuda de profertil.com.ar sobre el concepto web del manual de marca: prospectos, calificaciones de riesgo y emisiones de obligaciones negociables reales, con filtros, buscador y visor de PDF."
+  firma={{ nombre: "PROFERTIL · TÍTULOS DE DEUDA", que: "Maqueta de Títulos de deuda: los documentos reales del sitio actual.", contexto: "Prototipo de la página de Títulos de deuda para la web de Profertil." }}
+  alcance={{ seccion: "deuda", nombre: "Deuda", en: "los títulos de deuda" }}
+  saltar="Ir a los documentos"
+  busca={{ etiqueta: "Buscar un documento", placeholder: "Buscá: Moody's, clase II, prospecto…" }}
+  h1="Títulos de deuda"
+  bajada="Consultá los prospectos de nuestro Programa Global de Obligaciones Negociables, las calificaciones de riesgo y los documentos de cada emisión."
+  vaciar="Ver todos los documentos"
+  docs={DEUDA}
+  grupos={GRUPOS}
+  pag={{ base: "../biblioteca/", todo: "Todos los títulos de deuda", uno: "documento", varios: "documentos", orden: "o",
+    campo: { color: "azul", forma: "grafico", tema: ["grafico", "barras"] } }}
+  acciones={[
+    { href: "../situacion-financiera/", texto: "Situación financiera", icono: "ir" },
+    { href: "../gobierno-societario/", texto: "Gobierno societario", icono: "ir" },
+    { href: "mailto:inversoresprofertil@profertil.com.ar", texto: "Contacto de Inversores", icono: "mail" },
+  ]}
+  css={CSS}
+/>

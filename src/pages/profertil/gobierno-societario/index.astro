@@ -1,0 +1,44 @@
+---
+// Gobierno societario: la composición accionaria y el estatuto, con la plantilla de la Biblioteca. Son dos documentos:
+// sin filtros ni orden (van como en la página). La página del documento y los PDF son los de la Biblioteca.
+import Lista from "../../../componentes/Lista.astro";
+import { GOBIERNO } from "../../../lib/datos.mjs";
+const CSS = `
+/* Gobierno societario: sin filtros ni orden, y sin ancla (con dos documentos no hay a dónde bajar y, sin el dock, quedaría
+   suelta en la esquina). La fila es el ícono, el documento y la descarga: el rótulo de la etiqueta y
+   el año sobran (todo es de Inversores y nada tiene año). */
+.pf-filters, .pf-orden, .pf-ancla { display: none; }
+.pf-docs[data-vista="lista"] .pf-doc { grid-template-columns: 34px minmax(0, 1fr) 36px; }
+.pf-docs[data-vista="lista"] .pf-etiqueta__rotulo, .pf-docs[data-vista="lista"] .pf-doc__y { display: none; }
+.pf-docs[data-vista="compacta"] .pf-doc { grid-template-columns: 22px minmax(0, 1fr) 30px; }
+.pf-docs[data-vista="compacta"] .pf-doc__y { display: none; }
+@media (max-width: 640px) {
+  .pf-docs[data-vista="lista"] .pf-doc { grid-template-columns: 30px minmax(0, 1fr) 36px; row-gap: 0; }
+  .pf-docs[data-vista="lista"] .pf-doc .pf-etiqueta, .pf-docs[data-vista="lista"] .pf-doc__t, .pf-docs[data-vista="lista"] .pf-doc__d { grid-row: 1; }
+  .pf-docs[data-vista="lista"] .pf-doc .pf-etiqueta { grid-column: 1; }
+  .pf-docs[data-vista="lista"] .pf-doc__t { grid-column: 2; }
+  .pf-docs[data-vista="lista"] .pf-doc__d { grid-column: 3; align-self: center; }
+}
+`;
+---
+<Lista
+  titulo="Gobierno societario Profertil"
+  descripcion="Maqueta de Gobierno societario de profertil.com.ar sobre el concepto web del manual de marca: la composición accionaria y el estatuto reales, con visor de PDF."
+  firma={{ nombre: "PROFERTIL · GOBIERNO SOCIETARIO", que: "Maqueta de Gobierno societario: los documentos reales del sitio actual.", contexto: "Prototipo de la página de Gobierno societario para la web de Profertil." }}
+  alcance={{ seccion: "gobierno", nombre: "Gobierno", en: "Gobierno societario" }}
+  saltar="Ir a los documentos"
+  busca={{ etiqueta: "Buscar un documento", placeholder: "Buscá: estatuto, grupo económico…" }}
+  h1="Gobierno societario"
+  bajada="Conocé nuestro estatuto y nuestra composición accionaria."
+  vaciar="Ver todos los documentos"
+  docs={GOBIERNO}
+  grupos={[]}
+  pag={{ base: "../biblioteca/", todo: "Gobierno societario", uno: "documento", varios: "documentos", orden: "o",
+    campo: { color: "azul", forma: "grafico", tema: ["grafico", "barras"] } }}
+  acciones={[
+    { href: "../situacion-financiera/", texto: "Situación financiera", icono: "ir" },
+    { href: "../titulos-de-deuda/", texto: "Títulos de deuda", icono: "ir" },
+    { href: "mailto:inversoresprofertil@profertil.com.ar", texto: "Contacto de Inversores", icono: "mail" },
+  ]}
+  css={CSS}
+/>

@@ -43,6 +43,10 @@
     // Estas dos van por la lista del documento (`p`) y no por la categoría: no todo lo de Inversores es un balance.
     financiera: { href: "../../situacion-financiera/", nombre: "Situación financiera", titulo: "Situación financiera Profertil", todos: "Ver todos los balances", mas: "Más balances",
       alcance: { seccion: "financiera", nombre: "Balances", en: "los balances" } },
+    gobierno: { href: "../../gobierno-societario/", nombre: "Gobierno societario", titulo: "Gobierno societario Profertil", todos: "Ver todo Gobierno societario", mas: "Más de Gobierno societario",
+      alcance: { seccion: "gobierno", nombre: "Gobierno", en: "Gobierno societario" } },
+    deuda: { href: "../../titulos-de-deuda/", nombre: "Títulos de deuda", titulo: "Títulos de deuda Profertil", todos: "Ver todos los títulos de deuda", mas: "Más de Títulos de deuda",
+      alcance: { seccion: "deuda", nombre: "Deuda", en: "los títulos de deuda" } },
     legajo: { href: "../../legajo-impositivo/", nombre: "Legajo impositivo", titulo: "Legajo impositivo Profertil", todos: "Ver todo el legajo", mas: "Más del legajo",
       alcance: { seccion: "legajo", nombre: "Legajo", en: "el legajo impositivo" } },
     proveedores: { href: "../../proveedores/", nombre: "Proveedores", titulo: "Proveedores Profertil", todos: "Ver toda la documentación", mas: "Más para proveedores",

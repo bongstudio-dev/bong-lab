@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Datos de Situación financiera y Legajo impositivo: lee las dos páginas del sitio actual y arma
-docs-financiera.json y docs-legajo.json. Baja a ../pdf/ los PDF que falten (dos a la vez) y el zip del legajo a
+"""Datos de Situación financiera, Legajo impositivo, Gobierno societario y Títulos de deuda: lee esas páginas del sitio
+actual y arma docs-financiera.json, docs-legajo.json, docs-gobierno.json y docs-deuda.json. Baja a ../pdf/ los PDF que falten (dos a la vez) y el zip del legajo a
 ../archivos/.
 
     python3 profertil/biblioteca/fuente/prep-legajo-financiera.py            # datos y descargas
@@ -12,7 +12,7 @@ Legajo impositivo: el legajo completo y las constancias nacionales y provinciale
 constancia en el sitio actual se repite entre las dos listas y entre versiones, por eso no va en el título; el
 vencimiento sale del título y se muestra aparte.
 """
-import html, json, re, subprocess, sys, unicodedata
+import html, json, re, subprocess, sys, unicodedata, urllib.parse
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -24,6 +24,7 @@ UA = "Mozilla/5.0 (Macintosh) bong-lab"
 
 
 def curl(url):
+    url = urllib.parse.quote(url, safe=":/?=&%#~")  # algunos PDF traen acentos en el nombre
     r = subprocess.run(["curl", "-sfL", "--retry", "2", "--max-time", "600", "-A", UA, url], capture_output=True)
     if r.returncode:
         raise RuntimeError("curl %d: %s" % (r.returncode, url))
@@ -187,6 +188,123 @@ def legajo():
     return docs, grupos, zipurl
 
 
+# --- Gobierno societario y Títulos de deuda ---------------------------------------------------------------------
+def archivo(href):
+    """Nombre de la copia local: sin acentos ni signos raros (los PDF de Moody's traen un acento agudo suelto)."""
+    base = urllib.parse.unquote(href.rstrip("/").split("/")[-1])
+    return slug(base[:-4]) + ".pdf" if base.lower().endswith(".pdf") else None
+
+
+def previo_o_nuevo(href, inversores, prefijo):
+    """Lo que el sitio ya publica como página propia conserva su id (docs-inversores.json); el resto, uno nuevo."""
+    por_pagina = {d["s"].rstrip("/").split("/")[-1].lower(): d for d in inversores}
+    por_pdf = {d["u"].split("/")[-1].lower(): d for d in inversores}
+    base = href.rstrip("/").split("/")[-1].lower()
+    previo = por_pdf.get(base) or por_pagina.get(base)
+    if previo:
+        return {k: previo[k] for k in ("id", "u", "s", "l") if k in previo}
+    return {"id": prefijo + slug(archivo(href)[:-4]), "u": href, "l": archivo(href)}
+
+
+def gobierno(inversores):
+    s = bajar_texto(SITIO + "inversores-es/gobierno-societario")
+    i = re.compile(r"<h6[^>]*>Composici").search(s).start()
+    j = s.find("CONTACTO", i)
+    trozo = s[i:j]
+    docs = []
+    # "Grupo Económico" figura como texto sin enlace; el sitio lo publica como página propia (la declaración de
+    # beneficiario final), que se suma con ese título.
+    if re.search(r">\s*Grupo Econ[oó]mico\s*<", trozo):
+        g = next(d for d in inversores if d["id"] == "grupo-economico")
+        docs.append({k: g[k] for k in ("id", "u", "s", "l") if k in g} | {"t": "Composición accionaria: grupo económico"})
+    for href, txt in links(trozo):
+        if href.lower().endswith(".pdf"):
+            d = previo_o_nuevo(href, inversores, "gobierno-")
+            d["t"] = "Estatuto" if txt.lower().startswith("estatuto") else txt
+            docs.append(d)
+    for k, d in enumerate(docs):
+        d.update({"c": "inversores", "y": "", "o": "%03d" % k})
+    return docs
+
+
+ROMANOS = {"I": "1", "II": "2", "III": "3"}
+MES_N = {m: i + 1 for i, m in enumerate(["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto",
+                                         "septiembre", "octubre", "noviembre", "diciembre"])}
+
+
+def deuda(inversores):
+    s = bajar_texto(SITIO + "inversores-es/titulos-de-deuda")
+    i = re.compile(r"<h6[^>]*>Calificaciones de Riesgo").search(s).start()
+    j = s.find("CONTACTO", i)
+    docs, vistos = [], set()
+    # Cada bloque es un acordeón (h4) con su lista de enlaces; el h6 de arriba es la sección.
+    partes = re.split(r"(<h[46][^>]*>.*?</h[46]>)", s[i:j], flags=re.S)
+    seccion = bloque = ""
+    for parte in partes:
+        m = re.match(r"<h([46])[^>]*>(.*?)</h[46]>", parte, re.S)
+        if m:
+            texto = html.unescape(re.sub(r"<[^>]+>", "", m.group(2))).strip()
+            if m.group(1) == "6":
+                seccion = texto
+            else:
+                bloque = texto
+            continue
+        # Un mismo enlace partido en dos (<a>Calificación</a><a> Moody's - Diciembre 2023</a>) se junta.
+        pares = []
+        for href, txt in links(parte):
+            if pares and pares[-1][0] == href:
+                pares[-1] = (href, (pares[-1][1] + " " + txt).strip())
+            else:
+                pares.append((href, txt))
+        for href, txt in pares:
+            if href in vistos:
+                continue
+            vistos.add(href)
+            txt = re.sub(r"\s+", " ", txt.replace("\u2019", "'")).replace(" – ", " - ").strip()
+            d = previo_o_nuevo(href, inversores, "deuda-")
+            e, anio = {}, ""
+            if seccion.lower().startswith("calificaciones"):
+                e["tipo"] = ["calificacion"]
+                e["calificadora"] = ["moodys" if "moody" in bloque.lower() else "fix"]
+                m2 = re.search(r"- (\w+) (\d{4})$", txt)
+                anio = m2.group(2)
+                orden = "1-%s-%02d" % (9999 - int(anio), 12 - MES_N[m2.group(1).lower()])
+                titulo = txt
+            elif "prospecto" in bloque.lower():
+                e["tipo"] = ["prospecto"]
+                anio = re.search(r"\d{4}", txt).group(0)
+                orden = "0-%s" % (9999 - int(anio))
+                titulo = "Prospecto del Programa Global de ON " + anio
+            else:
+                clase = bloque.split()[-1]
+                e["tipo"] = ["emision"]
+                e["clase"] = ["clase-" + ROMANOS[clase]]
+                base = txt.split(" - ")[0].strip()
+                base = base[0] + base[1:].lower()  # "Suplemento de Precio" -> "Suplemento de precio"
+                if base.lower().startswith("calificaci"):
+                    base = "Calificación"
+                titulo = "%s - Clase %s" % (base, clase)
+                orden = "2-%s-%d" % (ROMANOS[clase], len(docs))
+            if anio:
+                e["anio"] = [anio]
+            d.update({"t": titulo, "c": "inversores", "y": anio, "o": orden, "e": e})
+            docs.append(d)
+    docs.sort(key=lambda d: d["o"])
+    for k, d in enumerate(docs):
+        d["o"] = "%03d" % k
+    anios = sorted({a for d in docs for a in d["e"].get("anio", [])}, reverse=True)
+    grupos = [
+        {"id": "tipo", "nombre": "Tipo", "opciones": [{"id": "prospecto", "nombre": "Prospectos"},
+                                                     {"id": "calificacion", "nombre": "Calificaciones de riesgo"},
+                                                     {"id": "emision", "nombre": "Emisiones"}]},
+        {"id": "calificadora", "nombre": "Calificadora", "opciones": [{"id": "moodys", "nombre": "Moody's"},
+                                                                     {"id": "fix", "nombre": "Fix SCR"}]},
+        {"id": "clase", "nombre": "Emisión", "opciones": [{"id": "clase-" + n, "nombre": "Clase " + r} for r, n in ROMANOS.items()]},
+        {"id": "anio", "nombre": "Año", "opciones": [{"id": a, "nombre": a} for a in anios]},
+    ]
+    return docs, grupos
+
+
 def descargar(url, destino):
     if destino.exists() and destino.stat().st_size > 0:
         return "ya estaba"
@@ -204,18 +322,23 @@ def main():
     inversores = json.loads((AQUI / "docs-inversores.json").read_text())["docs"]
     fin = financiera(inversores)
     leg, grupos, zipurl = legajo()
+    gob = gobierno(inversores)
+    deu, grupos_deuda = deuda(inversores)
     zipnombre = zipurl.split("/")[-1].lower()
-    print("Situación financiera: %d balances · Legajo impositivo: %d documentos" % (len(fin), len(leg)))
+    print("Situación financiera: %d · Legajo impositivo: %d · Gobierno societario: %d · Títulos de deuda: %d"
+          % (len(fin), len(leg), len(gob), len(deu)))
     if "--sin-bajar" not in sys.argv:
-        bajar_todo(fin, leg, zipurl, zipnombre)
+        bajar_todo(fin + gob + deu, leg, zipurl, zipnombre)
     # Sin copia (el PDF original da error), el documento queda sin `l`: la fila y el visor llevan al original con aviso.
-    for d in fin + leg:
+    for d in fin + leg + gob + deu:
         if d.get("l") and not (PDF / d["l"]).exists():
             print("  sin copia:", d["id"], d["u"])
             del d["l"]
     (AQUI / "docs-financiera.json").write_text(json.dumps({"docs": fin}, ensure_ascii=False, indent=1) + "\n")
     (AQUI / "docs-legajo.json").write_text(json.dumps({"docs": leg, "grupos": grupos, "zip": {"u": zipurl, "l": zipnombre}},
                                                       ensure_ascii=False, indent=1) + "\n")
+    (AQUI / "docs-gobierno.json").write_text(json.dumps({"docs": gob}, ensure_ascii=False, indent=1) + "\n")
+    (AQUI / "docs-deuda.json").write_text(json.dumps({"docs": deu, "grupos": grupos_deuda}, ensure_ascii=False, indent=1) + "\n")
 
 
 def bajar_todo(fin, leg, zipurl, zipnombre):
