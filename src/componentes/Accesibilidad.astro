@@ -1,0 +1,130 @@
+---
+// Accesibilidad: botón fijo abajo a la izquierda y panel con cuatro ajustes (tamaño del texto, alto contraste,
+// reducir movimiento, subrayar links y marcar el foco). Las preferencias quedan guardadas en el navegador y valen
+// en todas las páginas. Cómo se ve cada modo y cómo se aplica antes de pintar: AccesibilidadCabeza.astro.
+//
+// Controles del sistema: Web/Selector para el tamaño, UI/Fila toggle para los interruptores, UI/Botón para
+// restablecer. El panel es un popover: se cierra con Esc o tocando afuera, sin script propio para eso.
+const CSS = `
+.pf-a11y-boton { position: fixed; left: 16px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 41;
+  display: grid; place-items: center; width: var(--a, 49px); height: var(--a, 49px); padding: 0; border: 0; border-radius: 50%;
+  background: var(--azul); color: var(--tiza); cursor: pointer; transition: opacity 300ms ease, transform .15s var(--ease); }
+.pf-a11y-boton:active { transform: scale(.94); }
+.pf-a11y-boton svg { width: 52%; height: 52%; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.pf-a11y-boton svg circle { fill: currentColor; stroke: none; }
+.pf-a11y-boton:focus-visible { outline: 2px solid var(--celeste); outline-offset: 3px; }
+:root.pf-en-pie .pf-a11y-boton:not([aria-expanded="true"]) { opacity: 0; pointer-events: none; }
+
+.pf-a11y { position: fixed; inset: auto auto calc(14px + var(--a, 49px) + 10px + env(safe-area-inset-bottom, 0px)) 16px; margin: 0;
+  width: min(380px, 100% - 32px); max-height: calc(100% - 120px); overflow-y: auto; overscroll-behavior: contain;
+  padding: 22px 18px 18px; border: 1px solid var(--line); border-radius: var(--radio-tarjeta);
+  background: var(--card); color: var(--ink); font-family: var(--f-body); }
+.pf-a11y:popover-open { display: grid; gap: 14px; }
+.pf-a11y h2 { margin: 0 4px 4px; font: 600 var(--texto-subtitulo)/1.1 var(--f-display); letter-spacing: -0.02em; color: var(--azul); }
+.pf-a11y__grupo { display: grid; gap: 8px; }
+.pf-a11y__rotulo { margin: 0 4px; font: 500 var(--texto-chico)/1.3 var(--f-body); color: var(--ink); }
+.pf-a11y .pf-fila-interruptor { width: 100%; }
+/* Sin sombra en la perilla: dentro del panel la separa el color del riel. */
+.pf-a11y .pf-interruptor::after { box-shadow: none; }
+/* En la fila, el estado lo lleva el botón (role="switch"): el interruptor lo copia. */
+.pf-a11y .pf-fila-interruptor[aria-checked="true"] .pf-interruptor { background: var(--verde); }
+.pf-a11y .pf-fila-interruptor[aria-checked="true"] .pf-interruptor::after { transform: translateX(24px); }
+.pf-a11y .pf-fila-interruptor[aria-disabled="true"] { cursor: default; }
+.pf-a11y .pf-fila-interruptor[aria-disabled="true"] .pf-interruptor { opacity: .55; }
+.pf-a11y__pie { display: flex; justify-content: flex-end; margin-top: 2px; }
+@media (max-width: 640px) { .pf-a11y { inset-inline: 16px; width: auto; } }
+@media (prefers-reduced-motion: no-preference) {
+  .pf-a11y:popover-open { animation: pf-a11y-entra 260ms var(--ease); }
+}
+@keyframes pf-a11y-entra { from { opacity: 0; transform: translateY(8px) scale(.98); } }
+`;
+const SCRIPT = `
+(function () {
+  var CLAVE = "pf-accesibilidad", r = document.documentElement;
+  var panel = document.getElementById("pf-a11y"), boton = document.querySelector(".pf-a11y-boton");
+  if (!panel || !boton) return;
+  var p = {};
+  try { p = JSON.parse(localStorage.getItem(CLAVE)) || {}; } catch (e) {}
+  var sistemaQuieto = false;
+  try { sistemaQuieto = !r.classList.contains("pf-a11y-quieto") && window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
+
+  function guardar() { try { localStorage.setItem(CLAVE, JSON.stringify(p)); } catch (e) {} }
+  function aplicar() {
+    r.classList.toggle("pf-a11y-texto-1", p.texto === 1);
+    r.classList.toggle("pf-a11y-texto-2", p.texto === 2);
+    r.classList.toggle("pf-a11y-contraste", !!p.contraste);
+    r.classList.toggle("pf-a11y-quieto", !!p.quieto);
+    r.classList.toggle("pf-a11y-links", !!p.links);
+    pintar();
+  }
+
+  // Tamaño del texto (Web/Selector): el indicador se ubica sobre la opción elegida.
+  var sel = panel.querySelector(".pf-selector"), ind = sel.querySelector(".pf-selector__ind"), ops = sel.querySelectorAll("button");
+  function moverIndicador(quieto) {
+    var b = ops[p.texto || 0];
+    if (!b || !b.offsetWidth) return;
+    ind.classList.toggle("pf-quieto", !!quieto);
+    ind.style.width = b.offsetWidth + "px";
+    ind.style.transform = "translateX(" + b.offsetLeft + "px)";
+  }
+  ops.forEach(function (b, i) {
+    b.addEventListener("click", function () { p.texto = i; guardar(); aplicar(); moverIndicador(false); });
+  });
+
+  // Interruptores (UI/Fila toggle): cada fila es todo el control.
+  var filas = panel.querySelectorAll(".pf-fila-interruptor");
+  filas.forEach(function (f) {
+    f.addEventListener("click", function () {
+      if (f.getAttribute("aria-disabled") === "true") return;
+      var k = f.dataset.modo; p[k] = !p[k]; guardar(); aplicar();
+    });
+  });
+
+  function pintar() {
+    ops.forEach(function (b, i) { b.setAttribute("aria-pressed", String((p.texto || 0) === i)); });
+    filas.forEach(function (f) {
+      var k = f.dataset.modo, on = !!p[k];
+      if (k === "quieto" && sistemaQuieto) {
+        on = true; f.setAttribute("aria-disabled", "true");
+        f.querySelector(".pf-a11y__desc").textContent = "Ya está activado por la configuración de tu dispositivo.";
+      }
+      f.setAttribute("aria-checked", String(on));
+    });
+  }
+
+  panel.querySelector(".pf-a11y__restablecer").addEventListener("click", function () {
+    p = {}; guardar(); aplicar(); moverIndicador(false);
+  });
+
+  // Al abrir: indicador en su lugar sin animar y foco en la primera opción.
+  panel.addEventListener("toggle", function (e) {
+    var abierto = e.newState === "open";
+    boton.setAttribute("aria-expanded", String(abierto));
+    if (abierto) { moverIndicador(true); (ops[p.texto || 0] || ops[0]).focus({ preventScroll: true }); }
+  });
+  window.addEventListener("resize", function () { if (panel.matches(":popover-open")) moverIndicador(true); });
+  pintar();
+})();
+`;
+---
+<style is:inline set:html={CSS}></style>
+<button type="button" class="pf-a11y-boton" popovertarget="pf-a11y" aria-expanded="false" aria-label="Opciones de accesibilidad">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="4.6" r="2"/><path d="M5 8.6l7 1.6 7-1.6M12 10.2v4.6M12 14.8 9 21M12 14.8 15 21"/></svg>
+</button>
+<div id="pf-a11y" class="pf-a11y" popover role="dialog" aria-labelledby="pf-a11y-titulo">
+  <h2 id="pf-a11y-titulo">Accesibilidad</h2>
+  <div class="pf-a11y__grupo" role="group" aria-labelledby="pf-a11y-texto">
+    <p class="pf-a11y__rotulo" id="pf-a11y-texto">Tamaño del texto</p>
+    <div class="pf-selector pf-selector--ancho">
+      <span class="pf-selector__ind" aria-hidden="true"></span>
+      <button type="button" aria-pressed="true">Normal</button>
+      <button type="button" aria-pressed="false">Grande</button>
+      <button type="button" aria-pressed="false">Muy grande</button>
+    </div>
+  </div>
+  <button type="button" class="pf-fila-interruptor" role="switch" aria-checked="false" data-modo="contraste"><span><b>Alto contraste</b><span class="pf-a11y__desc">Todo el texto en tinta y las líneas más marcadas.</span></span><span class="pf-interruptor" aria-hidden="true"></span></button>
+  <button type="button" class="pf-fila-interruptor" role="switch" aria-checked="false" data-modo="quieto"><span><b>Reducir movimiento</b><span class="pf-a11y__desc">Sin animaciones ni transiciones entre páginas.</span></span><span class="pf-interruptor" aria-hidden="true"></span></button>
+  <button type="button" class="pf-fila-interruptor" role="switch" aria-checked="false" data-modo="links"><span><b>Resaltar links y foco</b><span class="pf-a11y__desc">Links subrayados y un borde claro al navegar con teclado.</span></span><span class="pf-interruptor" aria-hidden="true"></span></button>
+  <div class="pf-a11y__pie"><button type="button" class="pf-boton pf-a11y__restablecer">Restablecer</button></div>
+</div>
+<script is:inline set:html={SCRIPT}></script>

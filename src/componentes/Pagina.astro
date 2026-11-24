@@ -7,6 +7,8 @@
 // si se llega con la persiana, deja el paño tapando), el CSS de la cabecera con campo si lo lleva y el del pie.
 import { firma } from "../lib/firma.mjs";
 import { transicion, CAMPO, PIE } from "../lib/sistema.mjs";
+import AccesibilidadCabeza from "./AccesibilidadCabeza.astro";
+import Accesibilidad from "./Accesibilidad.astro";
 interface Props {
   firma: { nombre: string; que: string; contexto: string };
   transicion: "novedades" | "biblioteca";
@@ -31,6 +33,7 @@ const PIE_VISTO = `
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<AccesibilidadCabeza />
 <slot name="head" />
 <style is:inline set:html={css + "\n" + tr.css}></style>
 <script is:inline set:html={"\n" + tr.cabeza}></script>
@@ -43,5 +46,6 @@ const PIE_VISTO = `
 <script is:inline set:html={"\n" + tr.js}></script>
 {campo && <script is:inline set:html={"\n" + CAMPO.js}></script>}
 <script is:inline set:html={PIE_VISTO}></script>
+<Accesibilidad />
 </body>
 </html>

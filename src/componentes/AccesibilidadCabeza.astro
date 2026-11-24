@@ -1,0 +1,53 @@
+---
+// Accesibilidad, parte del <head>: aplica las preferencias guardadas antes de pintar (así no hay salto al cargar)
+// y define cómo se ve cada modo. El botón y el panel están en Accesibilidad.astro.
+//
+// Cada modo es una clase en <html>:
+//   pf-a11y-texto-1 / -2   texto más grande: sube la escala tipográfica de tokens.css, no hace zoom a la página
+//   pf-a11y-contraste      textos secundarios en tinta, líneas y vidrios más firmes
+//   pf-a11y-quieto         sin animaciones ni transiciones; los scripts lo leen como prefers-reduced-motion
+//   pf-a11y-links          links del texto subrayados y foco del teclado bien marcado
+// Va antes de los scripts de la página: "Reducir movimiento" tiene que estar resuelto cuando ellos preguntan.
+const SCRIPT = `
+(function () {
+  var p = {};
+  try { p = JSON.parse(localStorage.getItem("pf-accesibilidad")) || {}; } catch (e) {}
+  var r = document.documentElement;
+  if (p.texto === 1 || p.texto === 2) r.classList.add("pf-a11y-texto-" + p.texto);
+  if (p.contraste) r.classList.add("pf-a11y-contraste");
+  if (p.links) r.classList.add("pf-a11y-links");
+  if (p.quieto) {
+    r.classList.add("pf-a11y-quieto");
+    // Los scripts que animan consultan prefers-reduced-motion: con el modo prendido, la respuesta es "sí".
+    var mm = window.matchMedia && window.matchMedia.bind(window);
+    if (mm) window.matchMedia = function (q) {
+      if (/prefers-reduced-motion\\s*:\\s*reduce/.test(q)) return { matches: true, media: q, onchange: null,
+        addEventListener: function () {}, removeEventListener: function () {}, addListener: function () {}, removeListener: function () {}, dispatchEvent: function () { return false; } };
+      return mm(q);
+    };
+  }
+})();
+`;
+const CSS = `
+/* Texto más grande: la escala de tokens.css en dos pasos (+12% y +25%, en píxel par). */
+html.pf-a11y-texto-1 { --texto-subtitulo: 24px; --texto-destacado: 20px; --texto-cuerpo: 18px; --texto-chico: 16px; --texto-mini: 14px; }
+html.pf-a11y-texto-2 { --texto-subtitulo: 28px; --texto-destacado: 22px; --texto-cuerpo: 20px; --texto-chico: 18px; --texto-mini: 16px; }
+
+/* Alto contraste: todo el texto en tinta, líneas visibles y superficies sin transparencia. */
+html.pf-a11y-contraste { --ink-2: var(--ink); --ink-3: var(--ink); --line: rgba(10, 30, 74, .35); --glass: var(--tiza); --barra: var(--azul); --foto-texto: var(--tiza); --foto-borde: rgba(255, 254, 239, .6); }
+html.pf-a11y-contraste ::placeholder { color: var(--ink); opacity: .8; }
+
+/* Reducir movimiento: todo cambia de estado sin animar. */
+html.pf-a11y-quieto, html.pf-a11y-quieto *, html.pf-a11y-quieto *::before, html.pf-a11y-quieto *::after {
+  animation-duration: 1ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important;
+  transition-duration: 1ms !important; transition-delay: 0s !important; scroll-behavior: auto !important; }
+html.pf-a11y-quieto::view-transition-group(*), html.pf-a11y-quieto::view-transition-old(*), html.pf-a11y-quieto::view-transition-new(*) { animation: none !important; }
+
+/* Links y foco: los links dentro del texto, subrayados; el foco del teclado, con un anillo de 3 px. */
+html.pf-a11y-links :is(p, li, td, figcaption, blockquote) a { text-decoration: underline !important; text-decoration-thickness: 2px !important; text-underline-offset: .2em !important; }
+html.pf-a11y-links :focus-visible { outline: 3px solid var(--ink) !important; outline-offset: 3px !important; }
+html.pf-a11y-links .pf-barra :focus-visible { outline-color: var(--tiza) !important; }
+`;
+---
+<script is:inline set:html={SCRIPT}></script>
+<style is:inline set:html={CSS}></style>
