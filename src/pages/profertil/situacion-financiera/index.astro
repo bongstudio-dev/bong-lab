@@ -10,9 +10,9 @@ const GRUPOS = [
   { id: "anio", nombre: "Año", sin: false, opciones: ANIOS.map((y) => ({ id: y, nombre: y })) },
 ];
 const CSS = `
-/* Situación financiera: orden fijo y ancla fuera (la lista es corta). La fila es el ícono, el balance y la descarga: el
+/* Situación financiera: orden fijo, sin selector. La fila es el ícono, el balance y la descarga: el
    rótulo de la etiqueta y el año sobran (todos son de Inversores y el título ya dice el año). */
-.pf-orden, .pf-ancla { display: none; }
+.pf-orden { display: none; }
 .pf-docs[data-vista="lista"] .pf-doc { grid-template-columns: 34px minmax(0, 1fr) 36px; }
 .pf-docs[data-vista="lista"] .pf-etiqueta__rotulo, .pf-docs[data-vista="lista"] .pf-doc__y { display: none; }
 .pf-docs[data-vista="compacta"] .pf-doc { grid-template-columns: 22px minmax(0, 1fr) 30px; }

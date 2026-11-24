@@ -6,9 +6,9 @@ import Lista from "../../../componentes/Lista.astro";
 import { LEGAJO, LEGAJO_GRUPOS, LEGAJO_ZIP } from "../../../lib/datos.mjs";
 const GRUPOS = LEGAJO_GRUPOS.map((g) => ({ ...g, sin: false }));
 const CSS = `
-/* Legajo impositivo: orden fijo y ancla fuera (la lista es corta). La fila es el ícono, la constancia, el vencimiento y la
+/* Legajo impositivo: orden fijo, sin selector. La fila es el ícono, la constancia, el vencimiento y la
    descarga: el rótulo de la etiqueta sobra (todo es impositivo). */
-.pf-orden, .pf-ancla { display: none; }
+.pf-orden { display: none; }
 .pf-docs[data-vista="lista"] .pf-doc { grid-template-columns: 34px minmax(0, 1fr) max-content 36px; }
 .pf-docs[data-vista="lista"] .pf-etiqueta__rotulo { display: none; }
 .pf-docs[data-vista="compacta"] .pf-doc { grid-template-columns: 22px minmax(0, 1fr) max-content 30px; }
