@@ -291,7 +291,6 @@ html[data-pestanas="a"] .pf-pestanas, html[data-pestanas="b"] .pf-pestanas, html
   position: relative; isolation: isolate; display: flex; max-width: 100%; overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain; }
 .pf-pestanas::-webkit-scrollbar { display: none; }
 .pf-pestanas button { position: relative; flex: none; display: inline-flex; align-items: center; border: 0; background: none; cursor: pointer; white-space: nowrap; transition: color 240ms ease; }
-.pf-pestanas__n { margin-left: 6px; font: 500 var(--texto-mini)/1 var(--f-body); font-variant-numeric: tabular-nums; }
 
 /* a · Índice en la cabecera: las secciones cierran la tarjeta del título, como su índice, con una línea azul que viaja. */
 html[data-pestanas="a"] .pf-pestanas { align-self: stretch; gap: 28px; margin-top: 6px; padding-top: 18px; border-top: 1px solid var(--line); }
@@ -300,24 +299,50 @@ html[data-pestanas="a"] .pf-pestanas button[aria-pressed="true"] { color: var(--
 html[data-pestanas="a"] .pf-pestanas__ind { top: auto; bottom: 0; height: 3px; border-radius: 3px; background: var(--azul); }
 @media (min-width: 720px) { html[data-pestanas="a"] .pf-pestanas { gap: 36px; } html[data-pestanas="a"] .pf-pestanas button { font-size: clamp(22px, 2.2vw, 30px); } }
 
-/* b · Solapas: las secciones salen del borde de la hoja; la elegida es del mismo papel que la hoja y se continúa en ella. */
-html[data-pestanas="b"] .pf-pestanas { gap: 4px; margin-top: calc(-8px - 50px); height: 50px; }
-html[data-pestanas="b"] .pf-pestanas button { align-items: center; padding: 0 18px; border-radius: 18px 18px 0 0; color: var(--foto-texto); font: 600 var(--texto-destacado)/1 var(--f-display); letter-spacing: -.01em; }
-html[data-pestanas="b"] .pf-pestanas button:not([aria-pressed="true"]) { background: var(--foto-fondo); }
-html[data-pestanas="b"] .pf-pestanas button[aria-pressed="true"] { color: var(--azul); }
-html[data-pestanas="b"] .pf-pestanas__ind { top: 0; bottom: -1px; border-radius: 18px 18px 0 0; background: var(--pf-papel, #fff); }
-/* Empalme cóncavo a cada lado de la solapa elegida: la solapa se abre hacia la hoja en vez de apoyarse en ángulo recto. */
-html[data-pestanas="b"] .pf-pestanas { overflow: visible; }
-html[data-pestanas="b"] .pf-pestanas__ind::before, html[data-pestanas="b"] .pf-pestanas__ind::after { content: ""; position: absolute; bottom: 1px; width: 14px; height: 14px; }
-html[data-pestanas="b"] .pf-pestanas__ind::before { left: -14px; background: radial-gradient(circle at 0 0, transparent 14px, var(--pf-papel, #fff) 14.5px); }
-html[data-pestanas="b"] .pf-pestanas__ind::after { right: -14px; background: radial-gradient(circle at 100% 0, transparent 14px, var(--pf-papel, #fff) 14.5px); }
-html[data-pestanas="b"] .pf-campo-seguir { display: none; } /* la pista de scroll quedaba entre las solapas: las solapas ya invitan a bajar */
-@media (hover: hover) and (pointer: fine) { html[data-pestanas="b"] .pf-pestanas button:not([aria-pressed="true"]):hover { background: var(--foto-borde); } }
-@media (min-width: 720px) {
-  html[data-pestanas="b"] .pf-pestanas { gap: 6px; margin-top: calc(-24px - 60px); height: 60px; }
-  html[data-pestanas="b"] .pf-pestanas button { padding: 0 26px; font-size: var(--texto-subtitulo); border-radius: 22px 22px 0 0; }
-  html[data-pestanas="b"] .pf-pestanas__ind { border-radius: 22px 22px 0 0; }
+/* b · Solapas: las secciones salen del borde de la hoja; la elegida es del mismo papel que la hoja y se continúa en ella.
+   Todo sale de las variables --sol-*, que se ajustan en vivo en profertil/solapas-tweak/:
+   alto, texto, relleno a los lados, radio de la solapa, radio del empalme, separación, deslizamiento del indicador (duración y curva)
+   y el cambio de fondo de las solapas (duración del fundido, demora de la que se deja y de la que se elige). */
+html[data-pestanas="b"] {
+  --sol-alto: 48px; --sol-texto: var(--texto-mini); --sol-relleno: 8px; --sol-radio: 13px; --sol-empalme: 11px; --sol-sep: 2px;
+  --sol-dur: var(--t-vista); --sol-curva: var(--curva-vista);
+  --sol-fundido: 180ms; --sol-demora: 300ms; --sol-demora-nueva: 260ms;
 }
+@media (min-width: 720px) {
+  html[data-pestanas="b"] { --sol-alto: 48px; --sol-texto: var(--texto-destacado); --sol-relleno: 21px; --sol-radio: 18px; --sol-empalme: 11px; --sol-sep: 5px; }
+}
+html[data-pestanas="b"] .pf-pestanas { gap: var(--sol-sep); height: var(--sol-alto); margin-top: calc(-24px - var(--sol-alto)); overflow: visible; }
+html[data-pestanas="b"] .pf-pestanas button { align-items: center; padding: 0 var(--sol-relleno); border-radius: var(--sol-radio) var(--sol-radio) 0 0;
+  color: var(--foto-texto); font: 600 var(--sol-texto)/1 var(--f-display); letter-spacing: -.01em; }
+/* El fondo de cada solapa acompaña al indicador para que ninguna quede vacía mientras viaja: la que se deja sigue de papel (con sus
+   empalmes) hasta que el indicador ya se fue y recién ahí funde a vidrio; la que se elige sigue de vidrio hasta que el indicador llega y
+   recién ahí pasa a papel. Como se funde entre dos fondos con cuerpo, en ningún cuadro la solapa queda transparente. */
+html[data-pestanas="b"] .pf-pestanas button:not([aria-pressed="true"]) { background-color: var(--foto-fondo);
+  transition: color 240ms ease, background-color var(--sol-fundido) ease var(--sol-demora); }
+html[data-pestanas="b"] .pf-pestanas button[aria-pressed="true"] { color: var(--azul); background-color: var(--pf-papel, #fff);
+  transition: color 240ms ease, background-color var(--sol-fundido) ease var(--sol-demora-nueva); }
+html[data-pestanas="b"] .pf-pestanas__ind { top: 0; bottom: -1px; border-radius: var(--sol-radio) var(--sol-radio) 0 0; background: var(--pf-papel, #fff);
+  transition: transform var(--sol-dur) var(--sol-curva), width var(--sol-dur) var(--sol-curva); }
+html[data-pestanas="b"] .pf-pestanas__ind.pf-quieto { transition: none; }
+/* Empalme cóncavo a cada lado de la solapa elegida: la solapa se abre hacia la hoja en vez de apoyarse en ángulo recto. Lo lleva el
+   indicador mientras viaja y también la solapa, que lo conserva con la misma demora que su fondo. Todos quedan detrás de las solapas. */
+html[data-pestanas="b"] .pf-pestanas__ind::before, html[data-pestanas="b"] .pf-pestanas__ind::after,
+html[data-pestanas="b"] .pf-pestanas button::before, html[data-pestanas="b"] .pf-pestanas button::after {
+  content: ""; position: absolute; z-index: -1; bottom: 0; width: var(--sol-empalme); height: var(--sol-empalme); pointer-events: none; }
+html[data-pestanas="b"] .pf-pestanas__ind::before, html[data-pestanas="b"] .pf-pestanas__ind::after { bottom: 1px; }
+html[data-pestanas="b"] .pf-pestanas__ind::before, html[data-pestanas="b"] .pf-pestanas button::before { left: calc(-1 * var(--sol-empalme));
+  background: radial-gradient(circle at 0 0, transparent var(--sol-empalme), var(--pf-papel, #fff) calc(var(--sol-empalme) + .5px)); }
+html[data-pestanas="b"] .pf-pestanas__ind::after, html[data-pestanas="b"] .pf-pestanas button::after { right: calc(-1 * var(--sol-empalme));
+  background: radial-gradient(circle at 100% 0, transparent var(--sol-empalme), var(--pf-papel, #fff) calc(var(--sol-empalme) + .5px)); }
+html[data-pestanas="b"] .pf-pestanas button::before, html[data-pestanas="b"] .pf-pestanas button::after { opacity: 0;
+  transition: opacity var(--sol-fundido) ease var(--sol-demora); }
+html[data-pestanas="b"] .pf-pestanas button[aria-pressed="true"]::before, html[data-pestanas="b"] .pf-pestanas button[aria-pressed="true"]::after { opacity: 1;
+  transition: opacity var(--sol-fundido) ease var(--sol-demora-nueva); }
+html[data-pestanas="b"] .pf-campo-seguir { display: none; } /* la pista de scroll quedaba entre las solapas: las solapas ya invitan a bajar */
+@media (hover: hover) and (pointer: fine) {
+  html[data-pestanas="b"] .pf-pestanas button:not([aria-pressed="true"]):hover { background-color: var(--foto-borde); transition: color 240ms ease, background-color 160ms ease; } }
+@media (prefers-reduced-motion: reduce) {
+  html[data-pestanas="b"] { --sol-dur: 0ms; --sol-fundido: 0ms; --sol-demora: 0ms; --sol-demora-nueva: 0ms; } }
 
 /* c · El título es la pestaña: los nombres de las secciones encabezan la lista en tamaño de título; la elegida, en azul. */
 html[data-pestanas="c"] .pf-pestanas { gap: 26px; padding: 8px 0 14px; }
@@ -325,7 +350,6 @@ html[data-pestanas="c"] .pf-pestanas button { padding: 0; color: var(--ink-3); f
 html[data-pestanas="c"] .pf-pestanas button:not([aria-pressed="true"]) { opacity: .55; }
 html[data-pestanas="c"] .pf-pestanas button[aria-pressed="true"] { color: var(--azul); }
 html[data-pestanas="c"] .pf-pestanas__ind { display: none; }
-html[data-pestanas="c"] .pf-pestanas__n { font-size: var(--texto-chico); }
 @media (hover: hover) and (pointer: fine) { html[data-pestanas="c"] .pf-pestanas button:not([aria-pressed="true"]):hover { opacity: .85; } }
 @media (min-width: 720px) { html[data-pestanas="c"] .pf-pestanas { gap: 40px; padding: 12px 0 18px; } html[data-pestanas="c"] .pf-pestanas button { font-size: clamp(30px, 3.2vw, 42px); } }
 @media (max-width: 640px) {
@@ -333,12 +357,10 @@ html[data-pestanas="c"] .pf-pestanas__n { font-size: var(--texto-chico); }
   html[data-pestanas="a"] .pf-pestanas button { font-size: 18px; }
 }
 @media (max-width: 719px) {
-  /* Solapas en el celular: el nombre entero en dos líneas, las tres a lo ancho. Arrancan pasando la curva de la esquina de la hoja
-     (26 de radio + 14 del empalme = 40 desde el borde). */
-  html[data-pestanas="b"] .pf-pestanas { gap: 3px; height: 60px; margin-top: calc(-8px - 60px); padding-inline: 24px; overflow: visible; }
-  html[data-pestanas="b"] .pf-pestanas button { flex: 1 1 0; min-width: 0; padding: 0 10px; font-size: 15px; line-height: 1.1; text-align: left; white-space: normal; text-wrap: balance; border-radius: 16px 16px 0 0; }
-  html[data-pestanas="b"] .pf-pestanas__ind { border-radius: 16px 16px 0 0; }
-  html[data-pestanas="b"] .pf-pestanas__n { margin-left: 4px; }
+  /* Solapas en el celular: el nombre entero en dos líneas, las tres a lo ancho. Arrancan pasando la curva de la esquina de la hoja:
+     radio de la hoja + radio del empalme desde su borde (la lista ya está a 16 del borde de la hoja). */
+  html[data-pestanas="b"] .pf-pestanas { margin-top: calc(-8px - var(--sol-alto)); padding-inline: calc(var(--radio-tarjeta) + var(--sol-empalme) - 16px); }
+  html[data-pestanas="b"] .pf-pestanas button { flex: 1 1 0; min-width: 0; line-height: 1.1; text-align: left; white-space: normal; text-wrap: balance; }
   html[data-pestanas="b"] .pf-seccion__largo { display: inline; }
   html[data-pestanas="b"] .pf-seccion__corto { display: none; }
 }

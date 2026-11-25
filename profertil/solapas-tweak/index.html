@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<!-- firma:bong
+
+      ##########         #########
+      ###########      #############
+      ############   #################
+      ###########   ###################
+      ##########    ###################
+      ############  ###################
+      #############  #################
+      #############   ###############
+      ############      ###########
+
+                            #####
+      ##     ######     ##########
+      ####   ######   ###########
+      #####  ######  ###########
+      #############  ##########
+      #############  ###################
+      #############  ##################
+      #############   #################
+      #############     #############
+      #############        #######
+
+      PROFERTIL · TWEAK DE SOLAPAS
+      Ajuste en vivo de las solapas de sección de las listas: forma, deslizamiento y fundido, sobre la página real.
+
+      Hola. Si estás leyendo esto, te gusta ver cómo están hechas las cosas.
+      A nosotros también.
+
+      Diseño y desarrollo: Bong Studio
+      Estudio de branding. Córdoba, Argentina. Desde 2019.
+      Herramienta para ajustar las solapas de sección de la web de Profertil.
+
+      CRÉDITOS
+      María Lopez / Brand Designer
+      Marcos Cousseau / Creative Director
+
+      CONTACTO
+      https://bongstudio.ar
+
+      BONG STUDIO · 2026 — Brutally Clear Branding — bongstudio.ar
+-->
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tweak de solapas</title>
+<meta name="description" content="Ajuste en vivo de las solapas de sección de las listas de Profertil: alto, texto, radios, empalme, deslizamiento y fundido, en escritorio y celular, sobre la página real.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=DM+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../componentes/tokens.css">
+<style>
+/* ==========================================================================
+   Tweak de las solapas de sección (variante b de las pestañas de las listas).
+   Carga la página real de Inversores en un iframe del mismo origen y le
+   escribe las variables --sol-* en :root. Las de forma (alto, texto,
+   relleno, radios, separación) tienen un valor para escritorio y otro para
+   el celular; las de movimiento son las mismas en los dos.
+   Lo que sale de acá va a src/paginas/biblioteca/lista.css, en las reglas
+   html[data-pestanas="b"] del principio del bloque de solapas.
+   ========================================================================== */
+:root { color-scheme: light; --f-mono: "DM Mono", ui-monospace, Menlo, monospace; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.45; -webkit-font-smoothing: antialiased; }
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--celeste); outline-offset: 2px; }
+
+.app { display: grid; grid-template-columns: 380px minmax(0, 1fr); height: 100%; }
+.ctrl { overflow-y: auto; background: var(--tiza); border-right: 1px solid var(--line); padding: 22px 20px 28px; display: grid; gap: 22px; align-content: start; }
+.vista { position: relative; display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0; }
+
+h1 { margin: 0; font-family: var(--f-display); font-weight: 600; font-size: 26px; line-height: 1.05; letter-spacing: -0.02em; color: var(--azul); }
+.bajada { margin: 6px 0 0; color: var(--ink-2); font-size: 14px; }
+.grupo { display: grid; gap: 10px; }
+.rotulo { margin: 0; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+.rotulo b { color: var(--azul); font-weight: 500; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; height: 32px; padding: 0 14px; border: 0; border-radius: 999px; background: var(--chip-fondo); color: var(--azul); cursor: pointer; font: 400 14px/1 var(--f-body); white-space: nowrap; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--tiza); }
+
+/* Editor de curva */
+.curva svg { width: 100%; height: auto; display: block; background: var(--color-blanco); border-radius: 16px; border: 1px solid var(--line); touch-action: none; }
+.curva .eje { stroke: var(--line); stroke-width: 1; }
+.curva .guia { stroke: var(--ink-3); stroke-width: 1; stroke-dasharray: 3 4; }
+.curva .trazo { fill: none; stroke: var(--azul); stroke-width: 3; stroke-linecap: round; }
+.curva .brazo { stroke: var(--celeste); stroke-width: 1.5; }
+.curva .punto { fill: var(--celeste); stroke: var(--color-blanco); stroke-width: 3; cursor: grab; }
+.curva .extremo { fill: var(--azul); }
+.nums { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.nums input { width: 100%; height: 34px; padding: 0 8px; border: 1px solid var(--line); border-radius: 10px; background: var(--color-blanco); font-family: var(--f-mono); font-size: 13px; text-align: center; }
+
+/* Deslizadores: el valor que cambió respecto de lo publicado se marca en verde. */
+.campo { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 4px 10px; }
+.campo label { font-size: 14px; }
+.campo output { font-family: var(--f-mono); font-size: 13px; color: var(--azul); font-variant-numeric: tabular-nums; }
+.campo.cambio output { color: var(--verde); }
+.campo.cambio output::before { content: "● "; }
+.campo input[type="range"] { grid-column: 1 / -1; width: 100%; accent-color: var(--azul); margin: 0; }
+.ayuda { grid-column: 1 / -1; margin: -2px 0 0; font-size: 12px; color: var(--ink-3); }
+
+.llaves { display: grid; gap: 8px; }
+.llave { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 14px; cursor: pointer; }
+.llave input { appearance: none; -webkit-appearance: none; width: 44px; height: 26px; border-radius: 999px; background: var(--line); position: relative; cursor: pointer; flex: none; margin: 0; }
+.llave input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 999px; background: var(--color-blanco); transition: transform 240ms var(--f-chica-curva); }
+.llave input:checked { background: var(--verde); }
+.llave input:checked::after { transform: translateX(18px); }
+
+.acciones { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.btn { height: 44px; padding: 0 16px; border: 0; border-radius: 14px; cursor: pointer; font-weight: 500; background: var(--line); color: var(--ink); }
+.btn.prim { grid-column: 1 / -1; background: var(--azul); color: var(--tiza); }
+
+pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink); color: var(--tiza); font-family: var(--f-mono); font-size: 12px; line-height: 1.6; white-space: pre-wrap; }
+.aviso { min-height: 1.2em; margin: 0; font-size: 13px; color: var(--verde); }
+.medida { margin: 0; font-size: 13px; color: var(--ink-2); }
+.medida b { color: var(--verde); font-weight: 500; }
+.medida.mal b { color: var(--naranja); }
+
+/* Vista previa */
+.barra-vista { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; }
+.seg { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--line); }
+.seg button { border: 0; background: transparent; cursor: pointer; padding: 6px 14px; border-radius: 999px; font-size: 14px; color: var(--ink-2); }
+.seg button[aria-pressed="true"] { background: var(--tiza); color: var(--azul); font-weight: 500; }
+.estado { font-size: 13px; color: var(--ink-3); }
+.escena { position: relative; min-height: 0; overflow: hidden; }
+.marco { position: absolute; top: 0; left: 50%; transform-origin: top center; border-radius: 20px; overflow: hidden; background: var(--bg); outline: 1px solid var(--line); }
+.marco iframe { display: block; width: 100%; height: 100%; border: 0; }
+
+@media (max-width: 900px) {
+  .app { grid-template-columns: 1fr; height: auto; }
+  .ctrl { border-right: 0; border-bottom: 1px solid var(--line); order: 2; }
+  .vista { height: 78vh; order: 1; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="ctrl">
+    <div>
+      <h1>Solapas de sección</h1>
+      <p class="bajada">Ajuste en vivo de las solapas que cambian de sección en las listas (Inversores, Proveedores). Forma por separado para escritorio y celular; el movimiento es el mismo en los dos.</p>
+    </div>
+
+    <div class="grupo" id="forma"></div>
+
+    <div class="grupo" id="mov"></div>
+
+    <div class="grupo curva">
+      <p class="rotulo">Curva del deslizamiento</p>
+      <div class="chips" id="curvas"></div>
+      <svg id="curva" viewBox="-30 -30 260 300" aria-label="Curva de aceleración: arrastrá los dos puntos celestes">
+        <line class="eje" x1="0" y1="240" x2="200" y2="240"/>
+        <line class="eje" x1="0" y1="40" x2="200" y2="40"/>
+        <line class="eje" x1="0" y1="40" x2="0" y2="240"/>
+        <line class="eje" x1="200" y1="40" x2="200" y2="240"/>
+        <line class="guia" x1="0" y1="240" x2="200" y2="40"/>
+        <line class="brazo" id="b1"/>
+        <line class="brazo" id="b2"/>
+        <path class="trazo" id="trazo"/>
+        <circle class="extremo" cx="0" cy="240" r="5"/>
+        <circle class="extremo" cx="200" cy="40" r="5"/>
+        <circle class="punto" id="p1" r="9"/>
+        <circle class="punto" id="p2" r="9"/>
+      </svg>
+      <div class="nums">
+        <input id="x1" type="number" step="0.01" min="0" max="1" aria-label="x1">
+        <input id="y1" type="number" step="0.01" min="-0.5" max="1.5" aria-label="y1">
+        <input id="x2" type="number" step="0.01" min="0" max="1" aria-label="x2">
+        <input id="y2" type="number" step="0.01" min="-0.5" max="1.5" aria-label="y2">
+      </div>
+    </div>
+
+    <div class="grupo llaves">
+      <p class="rotulo">Opciones</p>
+      <label class="llave">Cámara lenta (×4) <input type="checkbox" id="lenta"></label>
+      <label class="llave">Pasar de solapa solo <input type="checkbox" id="loop"></label>
+    </div>
+
+    <div class="acciones">
+      <button class="btn prim" id="probar" type="button">Pasar a la solapa siguiente</button>
+      <button class="btn" id="medir" type="button">Medir huecos</button>
+      <button class="btn" id="reset" type="button">Volver a lo publicado</button>
+      <button class="btn" id="copiarCss" type="button">Copiar CSS</button>
+      <button class="btn" id="copiarLink" type="button">Copiar link</button>
+    </div>
+    <p class="medida" id="medida">Medir huecos recorre el cambio de solapa cuadro por cuadro (60 por segundo) y cuenta los cuadros en que alguna solapa queda sin fondo.</p>
+    <p class="aviso" id="aviso" aria-live="polite"></p>
+
+    <div class="grupo">
+      <p class="rotulo">CSS de lo que cambió · src/paginas/biblioteca/lista.css</p>
+      <pre id="css"></pre>
+    </div>
+  </aside>
+
+  <section class="vista">
+    <div class="barra-vista">
+      <div class="seg" role="group" aria-label="Vista">
+        <button type="button" data-vista="escritorio" aria-pressed="true">Escritorio</button>
+        <button type="button" data-vista="celular" aria-pressed="false">Celular</button>
+      </div>
+      <span class="estado" id="estado">Cargando la página…</span>
+    </div>
+    <div class="escena" id="escena">
+      <div class="marco" id="marco"><iframe id="frame" src="../inversores/" title="Inversores Profertil, con las solapas de sección"></iframe></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+
+  /* --- Valores --------------------------------------------------------------
+     Mismos nombres que las variables --sol-* de la página, sin el prefijo.
+     Lo publicado se lee de la página ya dibujada (una vez por vista), no se
+     copia a mano: si cambia el CSS, el tweak arranca de lo nuevo. */
+  var FORMA = [
+    { k: "alto", nombre: "Alto", min: 28, max: 80, paso: 1, u: "px", ayuda: "También corre la solapa hacia arriba lo mismo, para que siga apoyada en la hoja." },
+    { k: "texto", nombre: "Tamaño del texto", min: 9, max: 30, paso: 1, u: "px", ayuda: "" },
+    { k: "relleno", nombre: "Relleno a los lados", min: 0, max: 48, paso: 1, u: "px", ayuda: "" },
+    { k: "radio", nombre: "Radio de la solapa", min: 0, max: 36, paso: 1, u: "px", ayuda: "" },
+    { k: "empalme", nombre: "Radio del empalme", min: 0, max: 30, paso: 1, u: "px", ayuda: "La curva cóncava que une la solapa elegida con la hoja. En el celular también define dónde arranca la primera solapa: radio de la hoja + empalme desde el borde." },
+    { k: "sep", nombre: "Separación", min: 0, max: 20, paso: 1, u: "px", ayuda: "" }
+  ];
+  var MOV = [
+    { k: "dur", nombre: "Deslizamiento del indicador", min: 0, max: 1400, paso: 10, u: "ms", ayuda: "Lo que tarda el papel en viajar de una solapa a otra." },
+    { k: "fundido", nombre: "Duración del fundido", min: 0, max: 800, paso: 10, u: "ms", ayuda: "Cambio de fondo de cada solapa, entre papel y vidrio." },
+    { k: "demora", nombre: "Demora de la que se deja", min: 0, max: 1200, paso: 10, u: "ms", ayuda: "Cuánto sigue de papel (con sus empalmes) antes de fundir a vidrio." },
+    { k: "demoraNueva", nombre: "Demora de la que se elige", min: 0, max: 1200, paso: 10, u: "ms", ayuda: "Cuánto sigue de vidrio antes de pasar a papel. Conviene que termine cuando llega el indicador." }
+  ];
+  var VARS = { alto: "--sol-alto", texto: "--sol-texto", relleno: "--sol-relleno", radio: "--sol-radio", empalme: "--sol-empalme", sep: "--sol-sep",
+    dur: "--sol-dur", curva: "--sol-curva", fundido: "--sol-fundido", demora: "--sol-demora", demoraNueva: "--sol-demora-nueva" };
+  var CURVAS = [
+    { nombre: "Vista", token: "var(--curva-vista)", c: [0.67, 0, 0.24, 0.99] },
+    { nombre: "Base", token: "var(--ease)", c: [0.22, 1, 0.36, 1] },
+    { nombre: "Hoja", token: "var(--f-chica-curva)", c: [0.32, 0.72, 0, 1] },
+    { nombre: "Carrusel", token: "var(--carrusel-curva)", c: [0.65, 0, 0.25, 1] }
+  ];
+  var CLAVE = "solapas-tweak-v1";
+  var DEF = { escritorio: null, celular: null, mov: null };   // lo publicado
+  var V = { escritorio: {}, celular: {}, mov: {} };           // lo ajustado (solo lo que difiere se guarda)
+  var vista = "escritorio";
+  var guardado = null;
+  try {
+    var h = location.hash.slice(1);
+    guardado = h ? JSON.parse(decodeURIComponent(h)) : JSON.parse(localStorage.getItem(CLAVE) || "null");
+  } catch (e) { guardado = null; }
+
+  /* --- Controles -------------------------------------------------------------- */
+  function campoHtml(c, grupo) {
+    return '<div class="campo" id="f-' + grupo + "-" + c.k + '"><label for="c-' + grupo + "-" + c.k + '">' + c.nombre + '</label><output id="o-' + grupo + "-" + c.k + '"></output>' +
+      '<input type="range" id="c-' + grupo + "-" + c.k + '" min="' + c.min + '" max="' + c.max + '" step="' + c.paso + '">' +
+      (c.ayuda ? '<p class="ayuda">' + c.ayuda + "</p>" : "") + "</div>";
+  }
+  $("forma").innerHTML = '<p class="rotulo">Forma · <b id="rotVista">escritorio</b></p>' + FORMA.map(function (c) { return campoHtml(c, "forma"); }).join("");
+  $("mov").innerHTML = '<p class="rotulo">Movimiento · escritorio y celular</p>' + MOV.map(function (c) { return campoHtml(c, "mov"); }).join("");
+  FORMA.forEach(function (c) { $("c-forma-" + c.k).addEventListener("input", function (e) { V[vista][c.k] = +e.target.value; cambio(); }); });
+  MOV.forEach(function (c) { $("c-mov-" + c.k).addEventListener("input", function (e) { V.mov[c.k] = +e.target.value; cambio(); }); });
+
+  $("curvas").innerHTML = CURVAS.map(function (c, i) { return '<button type="button" class="chip" data-i="' + i + '">' + c.nombre + "</button>"; }).join("");
+  $("curvas").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-i]"); if (!b) return;
+    V.mov.curva = CURVAS[+b.dataset.i].c.slice(); cambio(); pasar();
+  });
+  ["x1", "y1", "x2", "y2"].forEach(function (id, i) {
+    $(id).addEventListener("change", function (e) {
+      var n = parseFloat(e.target.value); if (isNaN(n)) return;
+      var c = val("mov", "curva").slice();
+      c[i] = i % 2 === 0 ? Math.min(1, Math.max(0, n)) : Math.min(1.5, Math.max(-0.5, n));
+      V.mov.curva = c; cambio();
+    });
+  });
+
+  function val(g, k) { return V[g][k] !== undefined ? V[g][k] : DEF[g][k]; }
+  function igual(a, b) { return JSON.stringify(a) === JSON.stringify(b); }
+  function difiere(g, k) { return V[g][k] !== undefined && !igual(V[g][k], DEF[g][k]); }
+
+  /* --- Editor de curva ------------------------------------------------------- */
+  var svg = $("curva");
+  function aPx(x, y) { return [x * 200, 240 - y * 200]; }
+  function curvaTxt(c) {
+    var t = CURVAS.filter(function (x) { return igual(x.c, c); })[0];
+    return t ? t.token : "cubic-bezier(" + c.map(function (n) { return +n.toFixed(2); }).join(", ") + ")";
+  }
+  function dibujarCurva() {
+    var c = val("mov", "curva"), p1 = aPx(c[0], c[1]), p2 = aPx(c[2], c[3]);
+    $("trazo").setAttribute("d", "M0 240C" + p1.join(" ") + " " + p2.join(" ") + " 200 40");
+    $("p1").setAttribute("cx", p1[0]); $("p1").setAttribute("cy", p1[1]);
+    $("p2").setAttribute("cx", p2[0]); $("p2").setAttribute("cy", p2[1]);
+    var b1 = $("b1"), b2 = $("b2");
+    b1.setAttribute("x1", 0); b1.setAttribute("y1", 240); b1.setAttribute("x2", p1[0]); b1.setAttribute("y2", p1[1]);
+    b2.setAttribute("x1", 200); b2.setAttribute("y1", 40); b2.setAttribute("x2", p2[0]); b2.setAttribute("y2", p2[1]);
+    ["x1", "y1", "x2", "y2"].forEach(function (id, i) { if (document.activeElement !== $(id)) $(id).value = c[i]; });
+    Array.prototype.forEach.call($("curvas").children, function (b) { b.setAttribute("aria-pressed", String(igual(CURVAS[+b.dataset.i].c, c))); });
+  }
+  var arrastre = null;
+  function puntoSvg(e) { var pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; return pt.matrixTransform(svg.getScreenCTM().inverse()); }
+  ["p1", "p2"].forEach(function (id, i) {
+    $(id).addEventListener("pointerdown", function (e) { arrastre = i; svg.setPointerCapture(e.pointerId); e.preventDefault(); });
+  });
+  svg.addEventListener("pointermove", function (e) {
+    if (arrastre === null) return;
+    var p = puntoSvg(e), c = val("mov", "curva").slice();
+    c[arrastre * 2] = Math.round(Math.min(1, Math.max(0, p.x / 200)) * 100) / 100;
+    c[arrastre * 2 + 1] = Math.round(Math.min(1.5, Math.max(-0.5, (240 - p.y) / 200)) * 100) / 100;
+    V.mov.curva = c; cambio();
+  });
+  svg.addEventListener("pointerup", function () { if (arrastre !== null) { arrastre = null; pasar(); } });
+
+  /* --- Salida ------------------------------------------------------------------ */
+  function txt(g, k) { var x = val(g, k); return k === "curva" ? curvaTxt(x) : x + (k === "dur" || k === "fundido" || k === "demora" || k === "demoraNueva" ? "ms" : "px"); }
+  function lineas(g, claves) {
+    return claves.filter(function (k) { return DEF[g] && difiere(g, k); }).map(function (k) { return VARS[k] + ": " + txt(g, k) + ";"; });
+  }
+  function cssTxt() {
+    var fk = FORMA.map(function (c) { return c.k; }), mk = MOV.map(function (c) { return c.k; }).concat("curva");
+    var cel = lineas("celular", fk).concat(lineas("mov", mk)), esc = lineas("escritorio", fk), out = [];
+    if (cel.length) out.push('/* Celular y movimiento: regla html[data-pestanas="b"] */\n' + cel.join("\n"));
+    if (esc.length) out.push('/* Escritorio: html[data-pestanas="b"] dentro de @media (min-width: 720px) */\n' + esc.join("\n"));
+    return out.join("\n\n");
+  }
+  function guardar() {
+    var g = { escritorio: V.escritorio, celular: V.celular, mov: V.mov };
+    try { localStorage.setItem(CLAVE, JSON.stringify(g)); } catch (e) {}
+    history.replaceState(null, "", "#" + encodeURIComponent(JSON.stringify(g)));
+  }
+  function pintar() {
+    if (!DEF[vista] || !DEF.mov) return;
+    $("rotVista").textContent = vista;
+    FORMA.forEach(function (c) {
+      $("c-forma-" + c.k).value = val(vista, c.k); $("o-forma-" + c.k).textContent = val(vista, c.k) + " " + c.u;
+      $("f-forma-" + c.k).classList.toggle("cambio", difiere(vista, c.k));
+    });
+    MOV.forEach(function (c) {
+      $("c-mov-" + c.k).value = val("mov", c.k); $("o-mov-" + c.k).textContent = val("mov", c.k) + " " + c.u;
+      $("f-mov-" + c.k).classList.toggle("cambio", difiere("mov", c.k));
+    });
+    dibujarCurva();
+    $("css").textContent = cssTxt() || "Sin cambios: todo queda como está publicado.";
+  }
+  function cambio() { pintar(); aplicar(); guardar(); }
+
+  /* --- La página real ------------------------------------------------------------ */
+  var frame = $("frame");
+  function doc() { try { return frame.contentDocument; } catch (e) { return null; } }
+  function nav() { var d = doc(); return d && d.getElementById("pf-pestanas"); }
+  function k() { return $("lenta").checked ? 4 : 1; }
+  function aplicar() {
+    var d = doc(); if (!d || !DEF[vista]) return;
+    var r = d.documentElement.style;
+    FORMA.forEach(function (c) { if (difiere(vista, c.k)) r.setProperty(VARS[c.k], val(vista, c.k) + "px"); else r.removeProperty(VARS[c.k]); });
+    ["dur", "fundido", "demora", "demoraNueva"].forEach(function (x) {
+      if (difiere("mov", x) || k() > 1) r.setProperty(VARS[x], val("mov", x) * k() + "ms"); else r.removeProperty(VARS[x]);
+    });
+    if (difiere("mov", "curva")) r.setProperty(VARS.curva, curvaTxt(val("mov", "curva"))); else r.removeProperty(VARS.curva);
+    // El indicador se ubica por JS: con otro alto, relleno o texto cambia el ancho de las solapas.
+    var w = frame.contentWindow; if (w) w.dispatchEvent(new w.Event("resize"));
+  }
+  function limpiar() { var d = doc(); if (!d) return; Object.keys(VARS).forEach(function (x) { d.documentElement.style.removeProperty(VARS[x]); }); }
+  function ms(s) { s = s.trim(); return s.slice(-2) === "ms" ? parseFloat(s) : parseFloat(s) * 1000; }
+  function leer() {
+    var d = doc(); if (!d) return false;
+    limpiar();
+    var cs = d.defaultView.getComputedStyle(d.documentElement), g = function (n) { return cs.getPropertyValue(n).trim(); };
+    if (!g("--sol-alto")) return false;
+    var f = {}; FORMA.forEach(function (c) { f[c.k] = parseFloat(g(VARS[c.k])); });
+    DEF[vista] = f;
+    if (!DEF.mov) {
+      var cu = (g("--sol-curva").match(/cubic-bezier\(([^)]+)\)/) || [])[1];
+      DEF.mov = { dur: ms(g("--sol-dur")), fundido: ms(g("--sol-fundido")), demora: ms(g("--sol-demora")), demoraNueva: ms(g("--sol-demora-nueva")),
+        curva: cu ? cu.split(",").map(Number) : CURVAS[0].c.slice() };
+    }
+    return true;
+  }
+  function encuadrarSolapas() {
+    var n = nav(), w = frame.contentWindow; if (!n || !w) return;
+    w.scrollTo(0, Math.max(0, n.getBoundingClientRect().top + w.scrollY - 140));
+  }
+  function botones() { var n = nav(); return n ? Array.prototype.slice.call(n.querySelectorAll("button[data-seccion]")) : []; }
+  function pasar() {
+    var bs = botones(); if (!bs.length) return;
+    var i = bs.findIndex(function (b) { return b.getAttribute("aria-pressed") === "true"; });
+    bs[(i + 1) % bs.length].click();
+    $("estado").textContent = bs[(i + 1) % bs.length].querySelector(".pf-seccion__largo").textContent;
+  }
+  $("probar").addEventListener("click", pasar);
+  $("lenta").addEventListener("change", aplicar);
+  var tLoop;
+  function ciclo() {
+    clearTimeout(tLoop);
+    if (!$("loop").checked) return;
+    pasar();
+    var m = DEF.mov ? Math.max(val("mov", "dur"), Math.max(val("mov", "demora"), val("mov", "demoraNueva")) + val("mov", "fundido")) : 600;
+    tLoop = setTimeout(ciclo, m * k() + 900);
+  }
+  $("loop").addEventListener("change", ciclo);
+
+  /* --- Medir huecos ---------------------------------------------------------------
+     Congela las transiciones del cambio de solapa y las recorre de a un cuadro
+     (1/60 s). Hay hueco cuando una solapa tiene menos fondo que el vidrio y el
+     indicador no la tapa entera. */
+  function alfa(c) { var m = (c.match(/rgba?\(([^)]+)\)/) || [])[1]; if (!m) return 0; var p = m.split(",").map(Number); return p.length > 3 ? p[3] : 1; }
+  $("medir").addEventListener("click", function () {
+    var n = nav(), d = doc(); if (!n) return;
+    var bs = botones(), ind = n.querySelector(".pf-pestanas__ind"), w = d.defaultView;
+    var vidrio = alfa(w.getComputedStyle(bs.filter(function (b) { return b.getAttribute("aria-pressed") !== "true"; })[0]).backgroundColor);
+    pasar();
+    bs.forEach(function (b) { w.getComputedStyle(b).backgroundColor; }); w.getComputedStyle(ind).transform;
+    var an = d.getAnimations().filter(function (a) { return a.effect && n.contains(a.effect.target); });
+    an.forEach(function (a) { a.pause(); });
+    var fin = 0; an.forEach(function (a) { var t = a.effect.getComputedTiming(); fin = Math.max(fin, t.endTime); });
+    var cuadros = 0, malos = 0;
+    for (var t = 0; t <= fin + 1; t += 1000 / 60) {
+      cuadros++;
+      an.forEach(function (a) { a.currentTime = t; });
+      var ri = ind.getBoundingClientRect(), hueco = false;
+      bs.forEach(function (b) {
+        var r = b.getBoundingClientRect(), cub = Math.max(0, Math.min(r.right, ri.right) - Math.max(r.left, ri.left)) / r.width;
+        if (alfa(w.getComputedStyle(b).backgroundColor) < vidrio - 0.001 && cub < 0.999) hueco = true;
+      });
+      if (hueco) malos++;
+    }
+    an.forEach(function (a) { a.finish(); });
+    $("medida").className = "medida" + (malos ? " mal" : "");
+    $("medida").innerHTML = "<b>" + malos + " cuadros con hueco</b> de " + cuadros + " (" + Math.round(fin) + " ms de cambio" + (k() > 1 ? ", en cámara lenta" : "") + ").";
+  });
+
+  /* --- Carga y vistas ----------------------------------------------------------------- */
+  var VISTAS = { escritorio: [1280, 760], celular: [390, 760] };
+  function encuadrar() {
+    var e = $("escena"), m = $("marco"), tam = VISTAS[vista];
+    var esc = Math.min(1, (e.clientWidth - 32) / tam[0], (e.clientHeight - 16) / tam[1]);
+    m.style.width = tam[0] + "px"; m.style.height = tam[1] + "px";
+    m.style.transform = "translateX(-50%) scale(" + esc + ")";
+  }
+  // Al cambiar de vista el iframe cambia de ancho: se lee lo publicado de esa vista (si no se leyó) y se vuelven a escribir los ajustes.
+  function entrar(intentos) {
+    requestAnimationFrame(function () {
+      if (!DEF[vista] && !leer()) { if ((intentos || 0) < 40) setTimeout(function () { entrar((intentos || 0) + 1); }, 150); return; }
+      pintar(); aplicar(); encuadrarSolapas();
+      $("estado").textContent = "Listo · " + vista;
+    });
+  }
+  document.querySelector(".seg").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-vista]"); if (!b || b.dataset.vista === vista) return;
+    vista = b.dataset.vista;
+    Array.prototype.forEach.call(this.children, function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+    limpiar(); encuadrar(); entrar();
+  });
+  window.addEventListener("resize", encuadrar);
+  encuadrar();
+
+  function alCargar() {
+    if (alCargar.listo) return; alCargar.listo = true;
+    if (guardado) ["escritorio", "celular", "mov"].forEach(function (g) { if (guardado[g]) V[g] = guardado[g]; });
+    var d = doc();
+    (d.fonts ? d.fonts.ready : Promise.resolve()).then(function () { entrar(); });
+  }
+  frame.addEventListener("load", alCargar);
+  (function esperar() {
+    var d = doc();
+    if (d && d.readyState === "complete" && d.getElementById("pf-pestanas")) alCargar();
+    else if (!alCargar.listo) setTimeout(esperar, 150);
+  })();
+
+  $("reset").addEventListener("click", function () { V = { escritorio: {}, celular: {}, mov: {} }; cambio(); });
+
+  /* --- Copiar -------------------------------------------------------------------------- */
+  function copiar(t, msj) {
+    function ok() { $("aviso").textContent = msj; setTimeout(function () { $("aviso").textContent = ""; }, 2400); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, function () { prompt("Copiá esto:", t); });
+    else prompt("Copiá esto:", t);
+  }
+  $("copiarCss").addEventListener("click", function () { copiar(cssTxt() || "/* Sin cambios */", "CSS copiado."); });
+  $("copiarLink").addEventListener("click", function () { copiar(location.href, "Link copiado, con estos valores."); });
+})();
+</script>
+</body>
+</html>
