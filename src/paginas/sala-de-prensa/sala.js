@@ -798,7 +798,7 @@
     if (ab) {
       var yaAbierto = $("pf-filters").classList.contains("pf-abierto");
       if (yaAbierto && abierto === ab.dataset.abrir) { abrirFiltros(false); return; }
-      if (!yaAbierto) { abrirGrupo(ab.dataset.abrir); abrirFiltros(true); } else cambiarGrupo(ab.dataset.abrir);
+      if (!yaAbierto) abrirFiltros(true, ab.dataset.abrir); else cambiarGrupo(ab.dataset.abrir);
       return;
     }
     var cab = e.target.closest("button.pf-f-gr__cab");
@@ -810,20 +810,32 @@
     aplicar();
   });
   var tListo;
-  function abrirFiltros(si) {
+  function abrirFiltros(si, grupo) {
     var f = $("pf-filters"), b = $("pf-fBody"), gr = $("pf-fGrupos");
     clearTimeout(tListo);
     cortarAcordeon();
     if (si && !f.classList.contains("pf-abierto")) f.style.setProperty("--f-w-cerrada", f.getBoundingClientRect().width + "px");
-    if (si) { gr.classList.add("pf-quieto"); abrirGrupo(abierto || primerGrupo()); void gr.offsetHeight; }
     var desde = b.offsetHeight, anchoAhora = b.firstElementChild.offsetWidth;
     var yaCerrada = !si && !f.classList.contains("pf-abierto");
     f.style.transition = b.style.transition = "none";
     f.classList.remove("pf-listo");
     f.classList.toggle("pf-abierto", si);
     b.style.height = "";
-    var hasta = si ? (f.classList.add("pf-listo"), b.offsetHeight) : 0;
-    var ancho = si ? b.clientWidth : anchoAhora;
+    // El grupo que va a quedar abierto se abre recién acá, con el contenido ya fijo al ancho del panel abierto y sin su propia
+    // animación: el panel llega con su alto final. Si se abría antes, con el dock cerrado o compacto (104 px en el celular),
+    // los chips se acomodaban en una columna angosta y Safari en iPhone se quedaba con el alto de esa fila del grupo: la
+    // primera vez quedaba un hueco debajo de los chips que se iba al cerrar y volver a abrir.
+    var hasta = 0, ancho = anchoAhora;
+    if (si) {
+      f.classList.add("pf-listo");
+      ancho = b.clientWidth;
+      b.firstElementChild.style.width = ancho + "px";
+      gr.classList.add("pf-quieto");
+      abrirGrupo(grupo || abierto || primerGrupo());
+      // Con barras de scroll clásicas el grupo abierto puede sumar la barra: se vuelve a tomar el ancho.
+      if (b.clientWidth !== ancho) { ancho = b.clientWidth; b.firstElementChild.style.width = ancho + "px"; }
+      hasta = b.offsetHeight;
+    }
     b.firstElementChild.style.width = ancho + "px";
     f.classList.remove("pf-listo");
     f.classList.toggle("pf-abierto", !si);
