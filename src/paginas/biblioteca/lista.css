@@ -360,7 +360,7 @@ html[data-pestanas="c"] .pf-pestanas__ind { display: none; }
   /* Solapas en el celular: el nombre entero en dos líneas, las tres a lo ancho. Arrancan pasando la curva de la esquina de la hoja:
      radio de la hoja + radio del empalme desde su borde (la lista ya está a 16 del borde de la hoja). */
   html[data-pestanas="b"] .pf-pestanas { margin-top: calc(-8px - var(--sol-alto)); padding-inline: calc(var(--radio-tarjeta) + var(--sol-empalme) - 16px); }
-  html[data-pestanas="b"] .pf-pestanas button { flex: 1 1 0; min-width: 0; line-height: 1.1; text-align: left; white-space: normal; text-wrap: balance; }
+  html[data-pestanas="b"] .pf-pestanas button { flex: 1 1 0; min-width: 0; justify-content: center; line-height: 1.1; text-align: center; white-space: normal; text-wrap: balance; }
   html[data-pestanas="b"] .pf-seccion__largo { display: inline; }
   html[data-pestanas="b"] .pf-seccion__corto { display: none; }
 }
