@@ -17,7 +17,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
 .pf-herr-lugar { display: none; flex: none; }
 .pf-herr-lugar.pf-activo { display: block; }
 .pf-herramientas { position: relative; z-index: 20; transition: transform 380ms var(--ease), opacity 260ms ease; will-change: transform; }
-.pf-herramientas .pf-selector { background: linear-gradient(var(--line), var(--line)), var(--pf-papel, #fff); }
+.pf-herramientas .pf-selector { background: linear-gradient(var(--line), var(--line)), var(--pf-papel, var(--bg)); }
 .pf-herramientas.pf-fija { position: fixed; top: calc(var(--pf-barra-h, 76px) + 9px); pointer-events: none; }
 .pf-herramientas.pf-fija .pf-selector { pointer-events: auto; }
 .pf-herramientas.pf-escondida { transform: translateY(calc(-100% - 18px)); opacity: 0; }
@@ -160,13 +160,13 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
 #pf-campo { position: fixed; inset: 0; width: 100%; height: 100lvh; z-index: 0; display: block; pointer-events: none; }
 .pf-campo-cab { position: relative; z-index: 1; min-height: var(--pf-campo-alto, 70svh); padding: calc(var(--pf-barra-h, 64px) + 12px) 12px 88px; }
 .pf-bh { display: grid; gap: 16px; justify-items: start; width: min(100%, 760px); margin-inline: auto;
-  background: var(--pf-papel, #fff); border-radius: var(--radio-tarjeta, 24px); padding: 22px 20px 26px; }
+  background: var(--pf-papel, var(--bg)); border-radius: var(--radio-tarjeta, 24px); padding: 22px 20px 26px; }
 .pf-bh h1 { margin: 0; font: 600 2.1rem/1.02 var(--f-display); letter-spacing: -0.035em; color: var(--pf-campo-fondo, var(--azul)); /* el color del fondo del campo de la cabecera (campo.js lo deja en :root) */ text-wrap: balance; }
 .pf-bh__acciones { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
 .pf-bh p { margin: 0; max-width: 60ch; font-size: var(--texto-cuerpo); line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
 /* Pista de scroll */
 .pf-campo-seguir { position: absolute; left: 50%; bottom: 24px; translate: -50% 0; width: 44px; height: 44px; border-radius: 50%;
-  background: var(--pf-papel, #fff); color: var(--ink, #111); display: grid; place-items: center; transition: opacity 300ms ease; }
+  background: var(--pf-papel, var(--bg)); color: var(--ink, #111); display: grid; place-items: center; transition: opacity 300ms ease; }
 .pf-campo-seguir svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .pf-campo-bajo .pf-campo-seguir { opacity: 0; }
 /* La hoja con la lista es opaca y tapa el campo; de borde a borde, con la columna adentro. */
@@ -174,7 +174,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
    píxel mientras se scrollea. El recorte va en la lista (.pf-docs): al cambiar de vista las filas se deslizan desde su lugar viejo (una
    tarjeta de la columna derecha arranca corrida a la derecha) y, sin recorte, la página se ensanchaba un instante y Safari en iPhone
    la alejaba entera para que entre. */
-.pf-hoja { position: relative; z-index: 2; min-height: 100svh; padding-top: 8px; background: var(--pf-papel, #fff);
+.pf-hoja { position: relative; z-index: 2; min-height: 100svh; padding-top: 8px; background: var(--pf-papel, var(--bg));
   border-radius: var(--radio-tarjeta, 24px) var(--radio-tarjeta, 24px) 0 0; }
 @media (min-width: 720px) {
   .pf-campo-cab { padding: calc(var(--pf-barra-h, 64px) + 24px) 24px 96px; }
@@ -330,9 +330,9 @@ html[data-pestanas="b"] .pf-pestanas button { align-items: center; padding: 0 va
    Así nunca queda texto claro sobre papel ni azul sobre vidrio, que llaman la atención por contraste mientras viaja el indicador. */
 html[data-pestanas="b"] .pf-pestanas button:not([aria-pressed="true"]) { background-color: var(--foto-fondo);
   transition: color var(--sol-fundido) ease var(--sol-demora), background-color var(--sol-fundido) ease var(--sol-demora); }
-html[data-pestanas="b"] .pf-pestanas button[aria-pressed="true"] { color: var(--azul); background-color: var(--pf-papel, #fff);
+html[data-pestanas="b"] .pf-pestanas button[aria-pressed="true"] { color: var(--azul); background-color: var(--pf-papel, var(--bg));
   transition: color var(--sol-fundido) ease var(--sol-demora-nueva), background-color var(--sol-fundido) ease var(--sol-demora-nueva); }
-html[data-pestanas="b"] .pf-pestanas__ind { top: 0; bottom: -1px; border-radius: var(--sol-radio) var(--sol-radio) 0 0; background: var(--pf-papel, #fff);
+html[data-pestanas="b"] .pf-pestanas__ind { top: 0; bottom: -1px; border-radius: var(--sol-radio) var(--sol-radio) 0 0; background: var(--pf-papel, var(--bg));
   transition: transform var(--sol-dur) var(--sol-curva), width var(--sol-dur) var(--sol-curva); }
 html[data-pestanas="b"] .pf-pestanas__ind.pf-quieto { transition: none; }
 /* Empalme cóncavo a cada lado de la solapa elegida: la solapa se abre hacia la hoja en vez de apoyarse en ángulo recto. Lo lleva el
@@ -342,13 +342,16 @@ html[data-pestanas="b"] .pf-pestanas button::before, html[data-pestanas="b"] .pf
   content: ""; position: absolute; z-index: -1; bottom: 0; width: var(--sol-empalme); height: var(--sol-empalme); pointer-events: none; }
 html[data-pestanas="b"] .pf-pestanas__ind::before, html[data-pestanas="b"] .pf-pestanas__ind::after { bottom: 1px; }
 html[data-pestanas="b"] .pf-pestanas__ind::before, html[data-pestanas="b"] .pf-pestanas button::before { left: calc(-1 * var(--sol-empalme));
-  background: radial-gradient(circle at 0 0, transparent var(--sol-empalme), var(--pf-papel, #fff) calc(var(--sol-empalme) + .5px)); }
+  background: radial-gradient(circle at 0 0, transparent var(--sol-empalme), var(--pf-papel, var(--bg)) calc(var(--sol-empalme) + .5px)); }
 html[data-pestanas="b"] .pf-pestanas__ind::after, html[data-pestanas="b"] .pf-pestanas button::after { right: calc(-1 * var(--sol-empalme));
-  background: radial-gradient(circle at 100% 0, transparent var(--sol-empalme), var(--pf-papel, #fff) calc(var(--sol-empalme) + .5px)); }
+  background: radial-gradient(circle at 100% 0, transparent var(--sol-empalme), var(--pf-papel, var(--bg)) calc(var(--sol-empalme) + .5px)); }
 html[data-pestanas="b"] .pf-pestanas button::before, html[data-pestanas="b"] .pf-pestanas button::after { opacity: 0;
   transition: opacity var(--sol-fundido) ease var(--sol-demora); }
 html[data-pestanas="b"] .pf-pestanas button[aria-pressed="true"]::before, html[data-pestanas="b"] .pf-pestanas button[aria-pressed="true"]::after { opacity: 1;
   transition: opacity var(--sol-fundido) ease var(--sol-demora-nueva); }
+/* Al cargar (o al llegar con otra sección en la dirección) la solapa ya está elegida: se pinta de papel desde el primer cuadro, sin fundido. */
+html[data-pestanas="b"] .pf-pestanas.pf-quieto button, html[data-pestanas="b"] .pf-pestanas.pf-quieto button::before,
+html[data-pestanas="b"] .pf-pestanas.pf-quieto button::after { transition: none; }
 html[data-pestanas="b"] .pf-campo-seguir { display: none; } /* la pista de scroll quedaba entre las solapas: las solapas ya invitan a bajar */
 @media (hover: hover) and (pointer: fine) {
   html[data-pestanas="b"] .pf-pestanas button:not([aria-pressed="true"]):hover { background-color: var(--foto-borde); transition: color var(--sol-fundido) ease var(--sol-demora), background-color 160ms ease; } }

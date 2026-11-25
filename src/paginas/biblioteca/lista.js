@@ -544,8 +544,10 @@
   function marcarSeccion(animar) {
     [selSeccion, pest].forEach(function (cont) {
       if (!cont) return;
+      if (!animar) cont.classList.add("pf-quieto");
       cont.querySelectorAll("[data-seccion]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.seccion === seccion.id)); });
       moverInd(cont, animar);
+      if (!animar) { void cont.offsetWidth; cont.classList.remove("pf-quieto"); }
     });
     // En el celular las pestañas se deslizan de costado: la elegida queda a la vista.
     var b = pest && pest.querySelector('[aria-pressed="true"]');
