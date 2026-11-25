@@ -110,6 +110,11 @@ img { display: block; max-width: 100%; }
 .pf-dock__caja { position: absolute; inset: 0; z-index: -1; pointer-events: none; background: var(--tiza); border-radius: 0 0 var(--dock-r) var(--dock-r);
   transform: translateY(-100%); transition: transform var(--dock-t) var(--ease); }
 .pf-dock.pf-abierto .pf-dock__caja { transform: none; }
+/* Celular: la rayita al pie de la hoja avisa que se puede tirar hacia arriba para cerrarla. Va en la caja, así se
+   mueve con ella. Con los resultados del buscador no aparece: ahí la hoja no se cierra tirando. */
+.pf-dock__caja::after { content: ""; position: absolute; left: 50%; bottom: 10px; width: 40px; height: 5px; margin-left: -20px; border-radius: 999px;
+  background: color-mix(in srgb, var(--ink) 18%, transparent); opacity: 0; transition: opacity 200ms ease; }
+.pf-dock.pf-tirable .pf-dock__caja::after { opacity: 1; }
 /* La fila de la barra queda encima de la hoja mientras pasa. */
 .pf-dock .pf-barra__in { position: relative; z-index: 1; }
 .pf-dock__logo { display: block; width: 74px; aspect-ratio: 1458 / 1021; background: currentColor;
@@ -515,7 +520,7 @@ function tiroPintar(dy) {
 dock.addEventListener('touchstart', (e) => {
   if (!esMovil() || !abierta || abierta === 'busca' || cerrando || e.touches.length > 1) { tiro = null; return; }
   const t = e.touches[0];
-  tiro = { x: t.clientX, y: t.clientY, dy: 0, v: 0, ty: performance.now(), activo: false, h: dock.offsetHeight };
+  tiro = { x: t.clientX, y: t.clientY, dy: 0, m: [], activo: false, h: dock.offsetHeight };
 }, { passive: true });
 dock.addEventListener('touchmove', (e) => {
   if (!tiro) return;
@@ -529,13 +534,16 @@ dock.addEventListener('touchmove', (e) => {
   }
   e.preventDefault();
   const ahora = performance.now(), y = t.clientY - tiro.y;
-  tiro.v = (y - tiro.dy) / Math.max(1, ahora - tiro.ty); tiro.dy = y; tiro.ty = ahora;
+  tiro.dy = y; tiro.m.push([ahora, y]);
+  while (tiro.m.length > 2 && ahora - tiro.m[0][0] > 80) tiro.m.shift();   // la velocidad, de los últimos ~80 ms
   tiroPintar(y);
 }, { passive: false });
 function tiroSoltar(e) {
   if (!tiro || !tiro.activo) { tiro = null; return; }
   if (e.cancelable) e.preventDefault();   // sin clic al soltar sobre un botón
-  const { dy, v, h } = tiro; tiro = null;
+  const { dy, m, h } = tiro; tiro = null;
+  const [t0, y0] = m[0] || [0, 0], ult = m[m.length - 1] || [0, 0];
+  const v = performance.now() - ult[0] > 100 ? 0 : (ult[1] - y0) / Math.max(1, ult[0] - t0);   // quieto antes de soltar = sin impulso
   const cierra = dy < -h / 3 || v < -.45;
   // Lo que falta recorrer, con un tiempo acorde a lo que ya se movió.
   const base = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--t-barra')) || 520;
@@ -566,6 +574,7 @@ function abrir(id, el) {
   const venia = abierta;
   abierta = id;
   modo();
+  dock.classList.toggle('pf-tirable', esMovil() && id !== 'busca');
   if (!venia) {
     document.documentElement.classList.add('pf-dock-abierto');
     if (esMovil()) document.documentElement.classList.add('pf-dock-bloqueo');
