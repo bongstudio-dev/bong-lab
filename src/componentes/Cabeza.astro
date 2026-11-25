@@ -9,9 +9,10 @@ interface Props {
   temaColor?: boolean;                    // barra del navegador en azul
   mono?: boolean;                         // DM Mono (cifras de las listas)
   barraVista?: boolean;                   // componentes/barra-vista.js: la barra de vista de las listas
+  solapas?: boolean;                      // componentes/solapas.js: las solapas de sección (Inversores, Sala de prensa)
   alcance: { seccion: string; nombre: string; en?: string; previa?: boolean };
 }
-const { titulo, descripcion, raiz, temaColor = false, mono = false, barraVista = false, alcance } = Astro.props;
+const { titulo, descripcion, raiz, temaColor = false, mono = false, barraVista = false, solapas = false, alcance } = Astro.props;
 const fuentes = "https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600" + (mono ? "&family=DM+Mono" : "") + "&display=swap";
 ---
 <title>{titulo}</title>
@@ -26,4 +27,5 @@ const fuentes = "https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@
 <link rel="stylesheet" href={raiz + "componentes/base.css"}>
 <link rel="stylesheet" href={raiz + "buscador/alcance.css"}>
 {barraVista && <script is:inline src={raiz + "componentes/barra-vista.js"}></script>}
+{solapas && <script is:inline src={raiz + "componentes/solapas.js"}></script>}
 <script is:inline src={raiz + "buscador/alcance.js"} data-seccion={alcance.seccion} data-nombre={alcance.nombre} data-en={alcance.en} data-modo={alcance.previa ? "previa" : undefined} defer></script>

@@ -396,7 +396,7 @@
   $("pf-fClear").addEventListener("click", limpiar);
   $("pf-emptyReset").addEventListener("click", limpiar);
 
-  /* --- Pestañas --------------------------------------------------------------- */
+  /* --- Solapas y selectores de vista ------------------------------------------------ */
   function moverInd(seg, animar) {
     var ind = seg.querySelector(".pf-selector__ind"), b = seg.querySelector('button[aria-pressed="true"]');
     if (!b || !b.offsetWidth) return;
@@ -405,7 +405,6 @@
     ind.style.transform = "translateX(" + b.offsetLeft + "px)";
     if (!animar) { void ind.offsetWidth; ind.classList.remove("pf-quieto"); }
   }
-  var pest = document.querySelector(".pf-pestanas");
   function marcarVistas(animar) {
     document.querySelectorAll(".pf-herramientas .pf-selector").forEach(function (sel) {
       sel.hidden = sel.dataset.para !== tab;
@@ -414,9 +413,11 @@
       if (!sel.hidden) moverInd(sel, animar);
     });
   }
-  /* Cambio de pestaña: el indicador viaja enseguida; lo de abajo se funde afuera (140 ms; el cambio espera 170), cambia sin verse (también el salto al
+  /* Cambio de pestaña: el papel de las solapas viaja enseguida (la pieza "solapas", componentes/solapas.js); lo de abajo se funde afuera (140 ms; el cambio espera 170), cambia sin verse (también el salto al
      principio de la lista, si se estaba más abajo) y entra fundiéndose y subiendo 12 px (300 y 460 ms). Un clic nuevo en el medio toma el último pedido. */
   var cambia = $("pf-cambia"), herr = $("pf-herr"), tCambio = 0;
+  // El título de la pestaña del navegador dice la solapa elegida (como Inversores); en la primera, solo el de la página.
+  var TITULO = document.title, NOMBRE_TAB = { gacetillas: "Gacetillas", fotos: "Fotos", logos: "Logos" };
   function selDe(t) { return herr.querySelector('.pf-selector[data-para="' + t + '"]'); }
   function irA(t, animar) {
     if (!TABS[t]) return;
@@ -424,8 +425,8 @@
     mostrarPest(true);
     if ($("pf-filters").classList.contains("pf-abierto")) abrirFiltros(false);
     tab = t;
-    pest.querySelectorAll("[data-tab]").forEach(function (b) { var si = b.dataset.tab === t; b.setAttribute("aria-pressed", String(si)); b.setAttribute("aria-selected", String(si)); b.tabIndex = si ? 0 : -1; });
-    moverInd(pest, animar);
+    solapas.marcar(t, animar);
+    document.title = (t === "gacetillas" ? "" : NOMBRE_TAB[t] + " · ") + TITULO;
     function cambiar() {
       Object.keys(TABS).forEach(function (k) { $(k).hidden = k !== tab; });
       var oi = viejo && viejo.querySelector(".pf-selector__ind"), w = oi && oi.style.width, tr = oi && oi.style.transform;
@@ -446,12 +447,7 @@
     $("pf-filters").classList.add("pf-fuera");   // el dock se va y vuelve (o no, en Logos) con la pestaña nueva
     tCambio = setTimeout(cambiar, 170);
   }
-  pest.addEventListener("click", function (e) { var b = e.target.closest("[data-tab]"); if (b && b.dataset.tab !== tab) irA(b.dataset.tab, true); });
-  pest.addEventListener("keydown", function (e) {
-    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
-    var ks = Object.keys(TABS), i = ks.indexOf(tab) + (e.key === "ArrowRight" ? 1 : -1);
-    i = (i + ks.length) % ks.length; irA(ks[i], true); $("pf-t-" + ks[i]).focus();
-  });
+  var solapas = PFSolapas.armar($("pf-solapas"), function (t) { irA(t, true); });
 
   /* Cambiar de vista (la lógica de la Biblioteca): cada fila o foto visible se arma en su lugar nuevo y viaja desde donde estaba. Las
      filas cambian de forma (aparece la miniatura, se achica el título), así que además se funden desde 35%. Las que no se veían y ahora
@@ -921,10 +917,10 @@
     if (!corriendo) { corriendo = true; requestAnimationFrame(anim); }
   }
   window.addEventListener("scroll", function () { despertar(200); }, { passive: true });
-  window.addEventListener("resize", function () { despertar(700); moverInd(pest, false); if (vistasDeEscritorio()) pintar(); marcarVistas(false); });
+  window.addEventListener("resize", function () { despertar(700); if (vistasDeEscritorio()) pintar(); marcarVistas(false); });
   $("pf-filters").addEventListener("click", function () { despertar(900); });
   $("pf-filters").addEventListener("transitionend", function () { despertar(120); });
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { despertar(300); moverInd(pest, false); marcarVistas(false); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { despertar(300); marcarVistas(false); });
   ancla.addEventListener("pointerdown", function () { M.q.t = APRETAR; despertar(); });
   function soltarAncla() { M.q.t = 1; despertar(); }
   ancla.addEventListener("pointerup", soltarAncla);

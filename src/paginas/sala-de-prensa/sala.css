@@ -96,7 +96,16 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 .pf-pest .pf-herramientas { align-items: stretch; }
 /* Escritorio: pestañas y vista juntas a la derecha (la vista contra el borde) y el contador en la misma línea, a la izquierda:
    la fila del resultado sube hasta quedar centrada con la de pestañas. */
+/* Debajo de las solapas (la pieza "solapas" de base.css) la fila de selectores deja el mismo aire que en Inversores. El margen va en la
+   marca de su lugar (.pf-vuelve-marca, que pone el JS justo antes): la fila fija no lo arrastra. */
+.pf-solapas + .pf-vuelve-marca { margin-top: 16px; }
+@media (max-width: 640px) {
+  .pf-pest:not(:has(.pf-selector:not([hidden]))) { padding-block: 0; }   /* Logos no tiene selector: la fila no deja un hueco */
+}
 @media (min-width: 641px) {
+  .pf-solapas + .pf-vuelve-marca { margin-top: 20px; }
+  /* El alto del selector de íconos aunque no haya ninguno (Logos): el contador queda a la misma altura en las tres pestañas. */
+  .pf-pest { min-height: 59px; box-sizing: border-box; }
   .pf-pest { justify-content: flex-end; gap: 14px; }
   .pf-cambia { margin-top: -59px; }
   .pf-cambia .pf-result-row { padding-top: 12px; }

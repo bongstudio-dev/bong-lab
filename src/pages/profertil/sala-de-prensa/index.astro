@@ -1,5 +1,5 @@
 ---
-// Sala de prensa: una sola página con pestañas (Gacetillas, Fotos, Logos), el contacto de prensa en la cabecera con
+// Sala de prensa: una sola página con solapas (Gacetillas, Fotos, Logos; la pieza "solapas" de base.css), el contacto de prensa en la cabecera con
 // campo, filtros en el dock y ancla. Las gacetillas abren en la página de cada documento de la Biblioteca
 // (biblioteca/<id>/). El comportamiento está en src/paginas/sala-de-prensa/sala.js y el estilo en sala.css.
 import Pagina from "../../../componentes/Pagina.astro";
@@ -16,7 +16,7 @@ import JS from "../../../paginas/sala-de-prensa/sala.js?raw";
 const script = armar(JS, { "/*__PRENSA__*/{}": js(PRENSA), "/*__ASSETS__*/{}": js(assets()) });
 ---
 <Pagina firma={{ nombre: "PROFERTIL · SALA DE PRENSA", que: "Maqueta de la Sala de prensa: gacetillas, fotos y logos reales del sitio actual.", contexto: "Prototipo de la Sala de prensa para la web de Profertil." }} transicion="biblioteca" css={CSS} campo="js">
-<Cabeza slot="head" titulo="Sala de prensa Profertil" descripcion="Maqueta de la Sala de prensa de profertil.com.ar sobre el concepto web del manual de marca: las gacetillas, fotos y logos reales del sitio actual, en una sola página con pestañas, filtros y el contacto de prensa." raiz="../" temaColor mono barraVista alcance={{ seccion: "prensa", nombre: "Prensa", en: "la Sala de prensa" }} />
+<Cabeza slot="head" titulo="Sala de prensa Profertil" descripcion="Maqueta de la Sala de prensa de profertil.com.ar sobre el concepto web del manual de marca: las gacetillas, fotos y logos reales del sitio actual, en una sola página con pestañas, filtros y el contacto de prensa." raiz="../" temaColor mono barraVista solapas alcance={{ seccion: "prensa", nombre: "Prensa", en: "la Sala de prensa" }} />
 
 <Simbolos badge />
 
@@ -40,13 +40,13 @@ const script = armar(JS, { "/*__PRENSA__*/{}": js(PRENSA), "/*__ASSETS__*/{}": j
 
 <div class="pf-hoja" id="pf-hoja">
 <main class="pf-col" id="pf-lista" tabindex="-1">
+  <nav class="pf-solapas" id="pf-solapas" role="tablist" aria-label="Material de prensa">
+    <span class="pf-solapas__ind" aria-hidden="true"></span>
+    <button type="button" role="tab" id="pf-t-gacetillas" data-solapa="gacetillas" aria-controls="gacetillas" aria-pressed="true" aria-selected="true"><span class="pf-solapas__t">Gacetillas</span></button>
+    <button type="button" role="tab" id="pf-t-fotos" data-solapa="fotos" aria-controls="fotos" aria-pressed="false" aria-selected="false" tabindex="-1"><span class="pf-solapas__t">Fotos</span></button>
+    <button type="button" role="tab" id="pf-t-logos" data-solapa="logos" aria-controls="logos" aria-pressed="false" aria-selected="false" tabindex="-1"><span class="pf-solapas__t">Logos</span></button>
+  </nav>
   <div class="pf-pest" id="pf-pest">
-    <div class="pf-selector pf-pestanas" role="tablist" aria-label="Material de prensa">
-      <span class="pf-selector__ind" aria-hidden="true"></span>
-      <button type="button" role="tab" id="pf-t-gacetillas" data-tab="gacetillas" aria-controls="gacetillas" aria-pressed="true" aria-selected="true">Gacetillas</button>
-      <button type="button" role="tab" id="pf-t-fotos" data-tab="fotos" aria-controls="fotos" aria-pressed="false" aria-selected="false">Fotos</button>
-      <button type="button" role="tab" id="pf-t-logos" data-tab="logos" aria-controls="logos" aria-pressed="false" aria-selected="false">Logos</button>
-    </div>
     <div class="pf-herramientas" id="pf-herr">
       <div class="pf-selector pf-selector--iconos pf-vista" data-para="gacetillas" role="group" aria-label="Cómo se ven las gacetillas">
         <span class="pf-selector__ind" aria-hidden="true"></span>

@@ -530,38 +530,10 @@
   });
   marcarVista(false);
   /* Cambiar de sección: otra lista en el mismo lugar. Se conservan la vista y la búsqueda; los filtros no (cada sección tiene los
-     suyos). Si se estaba dentro de la lista, se vuelve a su principio. */
-  var selSeccion = document.querySelector(".pf-selector.pf-seccion");
-  /* Pestañas de sección fuera de la fila de herramientas, en prueba con tres variantes (?pestanas=a|b|c; 0 = el selector de la fila).
-     a: índice dentro de la tarjeta de la cabecera. b: solapas que salen de la hoja. c: el título de la lista es la pestaña. */
-  var pest = $("pf-pestanas");
-  var VARIANTE = (location.search.match(/[?&]pestanas=([0abc])/) || [])[1] || "b";
-  if (pest) {
-    document.documentElement.setAttribute("data-pestanas", VARIANTE);
-    if (VARIANTE === "a") document.querySelector(".pf-bh").appendChild(pest);
-    else if (VARIANTE === "b" || VARIANTE === "c") $("pf-lista").insertBefore(pest, $("pf-lista").firstChild);
-  }
-  function marcarSeccion(animar) {
-    [selSeccion, pest].forEach(function (cont) {
-      if (!cont) return;
-      if (!animar) cont.classList.add("pf-quieto");
-      cont.querySelectorAll("[data-seccion]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.seccion === seccion.id)); });
-      moverInd(cont, animar);
-      if (!animar) { void cont.offsetWidth; cont.classList.remove("pf-quieto"); }
-    });
-    // En el celular las pestañas se deslizan de costado: la elegida queda a la vista.
-    var b = pest && pest.querySelector('[aria-pressed="true"]');
-    if (b && pest.scrollWidth > pest.clientWidth) pest.scrollTo({ left: b.offsetLeft - 16, behavior: animar ? "smooth" : "auto" });
-  }
-  if (pest) {
-    pest.addEventListener("click", function (e) {
-      var b = e.target.closest("[data-seccion]"); if (!b) return;
-      if (irSeccion(b.dataset.seccion, true)) aplicar();
-    });
-    window.addEventListener("resize", function () { moverInd(pest, false); });
-    if (document.fonts) document.fonts.ready.then(function () { moverInd(pest, false); });
-    requestAnimationFrame(function () { marcarSeccion(false); });
-  }
+     suyos). Si se estaba dentro de la lista, se vuelve a su principio. Las secciones son solapas que salen del borde de la hoja
+     (la pieza "solapas" de base.css y componentes/solapas.js). */
+  var solapas = $("pf-solapas") && PFSolapas.armar($("pf-solapas"), function (id) { if (irSeccion(id, true)) aplicar(); });
+  function marcarSeccion(animar) { if (solapas) solapas.marcar(seccion.id, animar); }
   function irSeccion(id, animar) {
     var s = SECCIONES.filter(function (x) { return x.id === id; })[0];
     if (!s || s === seccion) return false;
@@ -574,10 +546,6 @@
     entradaSeccion = !!animar;
     return true;
   }
-  if (selSeccion) selSeccion.addEventListener("click", function (e) {
-    var b = e.target.closest("[data-seccion]"); if (!b) return;
-    if (irSeccion(b.dataset.seccion, true)) aplicar();
-  });
   $("pf-sortAz").addEventListener("click", function () { ordenar("az"); });
   $("pf-sortAnio").addEventListener("click", function () { ordenar("anio"); });
 

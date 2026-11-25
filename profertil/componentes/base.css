@@ -436,3 +436,71 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
    igual que arriba de todo, para no tapar los enlaces. Si el dock está abierto, se queda. */
 :root.pf-en-pie .pf-filters:not(.pf-abierto) { transform: translateY(calc(100% + 40px)); opacity: 0; pointer-events: none; }
 :root.pf-en-pie .pf-ancla { opacity: 0; pointer-events: none; }
+
+/* @pieza solapas
+   Solapas: las secciones hermanas de una página (Inversores, Sala de prensa) salen del borde de arriba de la hoja y cambian el
+   contenido en el lugar, con peso de navegación y no de filtro. La elegida es del mismo papel que la hoja y se continúa en ella
+   con un empalme cóncavo a cada lado; las demás, de vidrio sobre el campo. El JS es solapas.js (PFSolapas.armar), que ubica el
+   indicador (el papel que viaja de una solapa a otra) y marca la elegida.
+   Va como primer hijo de la lista (.pf-col), dentro de .pf-hoja: sube lo que mide más el aire de arriba de la hoja (24 px, 8 en
+   el celular) para quedar apoyada en su borde.
+   Todo sale de las variables --sol-*, que se ajustan en vivo en profertil/solapas-tweak/: alto, texto, relleno a los lados, radio
+   de la solapa, radio del empalme, separación, deslizamiento del indicador (duración y curva) y el cambio de fondo de las solapas
+   (duración del fundido, demora de la que se deja y de la que se elige). */
+:root {
+  --sol-alto: 46px; --sol-texto: var(--texto-cuerpo); --sol-relleno: 8px; --sol-radio: 13px; --sol-empalme: 11px; --sol-sep: 2px;
+  --sol-dur: var(--t-vista); --sol-curva: var(--curva-vista);
+  --sol-fundido: 180ms; --sol-demora: 300ms; --sol-demora-nueva: 160ms;
+}
+@media (min-width: 720px) {
+  :root { --sol-alto: 48px; --sol-texto: var(--texto-destacado); --sol-relleno: 21px; --sol-radio: 18px; --sol-empalme: 11px; --sol-sep: 5px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root { --sol-dur: 0ms; --sol-fundido: 0ms; --sol-demora: 0ms; --sol-demora-nueva: 0ms; }
+}
+.pf-solapas { position: relative; isolation: isolate; display: flex; max-width: 100%;
+  gap: var(--sol-sep); height: var(--sol-alto); margin-top: calc(-24px - var(--sol-alto));
+  padding-inline: max(0px, var(--radio-tarjeta) + var(--sol-empalme) - (100cqw - 100%) / 2); }
+/* La primera solapa arranca pasando la curva de la esquina de la hoja (radio de la hoja + radio del empalme desde su borde), en
+   cualquier ancho: la hoja es el contenedor (100cqw es su ancho) y la lista va centrada en ella, así que (100cqw - 100%) / 2 es lo que
+   ya hay entre el borde de la hoja y la lista. Donde la lista está lejos del borde no suma nada. */
+.pf-hoja:has(.pf-solapas) { container-type: inline-size; }
+.pf-solapas button { position: relative; flex: none; display: inline-flex; align-items: center; padding: 0 var(--sol-relleno); border: 0;
+  border-radius: var(--sol-radio) var(--sol-radio) 0 0; cursor: pointer; white-space: nowrap;
+  color: var(--foto-texto); font: 600 var(--sol-texto)/1 var(--f-display); letter-spacing: -.01em; }
+/* El fondo de cada solapa acompaña al indicador para que ninguna quede vacía mientras viaja: la que se deja sigue de papel (con sus
+   empalmes) hasta que el indicador ya se fue y recién ahí funde a vidrio; la que se elige sigue de vidrio hasta que el indicador llega y
+   recién ahí pasa a papel. Como se funde entre dos fondos con cuerpo, en ningún cuadro la solapa queda transparente.
+   El texto cambia junto con su fondo, con la misma demora y duración: azul mientras la solapa es de papel, claro mientras es de vidrio.
+   Así nunca queda texto claro sobre papel ni azul sobre vidrio, que llaman la atención por contraste mientras viaja el indicador.
+   El papel es el de la hoja (--pf-papel, que fija el campo); hasta que llega, el fondo de la página, que tiene el mismo valor. */
+.pf-solapas button:not([aria-pressed="true"]) { background-color: var(--foto-fondo);
+  transition: color var(--sol-fundido) ease var(--sol-demora), background-color var(--sol-fundido) ease var(--sol-demora); }
+.pf-solapas button[aria-pressed="true"] { color: var(--azul); background-color: var(--pf-papel, var(--bg));
+  transition: color var(--sol-fundido) ease var(--sol-demora-nueva), background-color var(--sol-fundido) ease var(--sol-demora-nueva); }
+.pf-solapas__ind { position: absolute; z-index: -1; top: 0; bottom: -1px; left: 0; width: 0; pointer-events: none;
+  border-radius: var(--sol-radio) var(--sol-radio) 0 0; background: var(--pf-papel, var(--bg));
+  transition: transform var(--sol-dur) var(--sol-curva), width var(--sol-dur) var(--sol-curva); }
+.pf-solapas__ind.pf-quieto { transition: none; }
+/* Empalme cóncavo a cada lado de la solapa elegida: la solapa se abre hacia la hoja en vez de apoyarse en ángulo recto. Lo lleva el
+   indicador mientras viaja y también la solapa, que lo conserva con la misma demora que su fondo. Todos quedan detrás de las solapas. */
+.pf-solapas__ind::before, .pf-solapas__ind::after, .pf-solapas button::before, .pf-solapas button::after {
+  content: ""; position: absolute; z-index: -1; bottom: 0; width: var(--sol-empalme); height: var(--sol-empalme); pointer-events: none; }
+.pf-solapas__ind::before, .pf-solapas__ind::after { bottom: 1px; }
+.pf-solapas__ind::before, .pf-solapas button::before { left: calc(-1 * var(--sol-empalme));
+  background: radial-gradient(circle at 0 0, transparent var(--sol-empalme), var(--pf-papel, var(--bg)) calc(var(--sol-empalme) + .5px)); }
+.pf-solapas__ind::after, .pf-solapas button::after { right: calc(-1 * var(--sol-empalme));
+  background: radial-gradient(circle at 100% 0, transparent var(--sol-empalme), var(--pf-papel, var(--bg)) calc(var(--sol-empalme) + .5px)); }
+.pf-solapas button::before, .pf-solapas button::after { opacity: 0; transition: opacity var(--sol-fundido) ease var(--sol-demora); }
+.pf-solapas button[aria-pressed="true"]::before, .pf-solapas button[aria-pressed="true"]::after { opacity: 1;
+  transition: opacity var(--sol-fundido) ease var(--sol-demora-nueva); }
+/* Al cargar (o al llegar con otra sección en la dirección) la solapa ya está elegida: se pinta de papel desde el primer cuadro, sin fundido. */
+.pf-solapas.pf-quieto button, .pf-solapas.pf-quieto button::before, .pf-solapas.pf-quieto button::after { transition: none; }
+html:has(.pf-solapas) .pf-campo-seguir { display: none; } /* la pista de scroll quedaba entre las solapas: las solapas ya invitan a bajar */
+@media (hover: hover) and (pointer: fine) {
+  .pf-solapas button:not([aria-pressed="true"]):hover { background-color: var(--foto-borde); transition: color var(--sol-fundido) ease var(--sol-demora), background-color 160ms ease; } }
+/* Celular: el nombre entero (en dos líneas si no entra), las solapas a lo ancho. */
+@media (max-width: 719px) {
+  .pf-solapas { margin-top: calc(-8px - var(--sol-alto)); }
+  .pf-solapas button { flex: 1 1 0; min-width: 0; justify-content: center; line-height: 1.1; text-align: center; white-space: normal; text-wrap: balance; }
+}

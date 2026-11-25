@@ -1,25 +1,25 @@
 ---
 // Inversores: Situación financiera, Gobierno societario y Títulos de deuda en una sola página con la plantilla de la
-// Biblioteca. Las tres secciones se cambian con un selector en la fila de herramientas, como las vistas, sin cambiar de
-// página. Cada una con sus filtros: Tipo y Año (balances); ninguno (gobierno: sin dock ni ancla); Tipo, Calificadora,
+// Biblioteca. Las tres secciones son solapas que salen del borde de la hoja (la pieza "solapas" de base.css) y cambian
+// la lista sin cambiar de página. Cada una con sus filtros: Tipo y Año (balances); ninguno (gobierno: sin dock ni ancla); Tipo, Calificadora,
 // Emisión y Año (deuda). Orden fijo en las tres. La página del documento y los PDF son los de la Biblioteca.
 import Lista from "../../../componentes/Lista.astro";
 import { FINANCIERA, GOBIERNO, DEUDA, DEUDA_GRUPOS } from "../../../lib/datos.mjs";
 const ANIOS = [...new Set(FINANCIERA.map((d) => d.y))].sort().reverse();
 const SECCIONES = [
-  { id: "situacion-financiera", nombre: "Situación financiera", corto: "Balances", docs: FINANCIERA,
+  { id: "situacion-financiera", nombre: "Situación financiera", docs: FINANCIERA,
     grupos: [
       { id: "tipo", nombre: "Tipo", sin: false, opciones: [{ id: "anual", nombre: "Anual" }, { id: "trimestral", nombre: "Trimestral" }] },
       { id: "anio", nombre: "Año", sin: false, opciones: ANIOS.map((y) => ({ id: y, nombre: y })) },
     ],
     todo: "Todos los balances", uno: "balance", varios: "balances", orden: "o", desc: true },
-  { id: "gobierno-societario", nombre: "Gobierno societario", corto: "Gobierno", docs: GOBIERNO, grupos: [],
+  { id: "gobierno-societario", nombre: "Gobierno societario", docs: GOBIERNO, grupos: [],
     todo: "Gobierno societario", uno: "documento", varios: "documentos", orden: "o" },
-  { id: "titulos-de-deuda", nombre: "Títulos de deuda", corto: "Deuda", docs: DEUDA, grupos: DEUDA_GRUPOS.map((g) => ({ ...g, sin: false })),
+  { id: "titulos-de-deuda", nombre: "Títulos de deuda", docs: DEUDA, grupos: DEUDA_GRUPOS.map((g) => ({ ...g, sin: false })),
     todo: "Todos los títulos de deuda", uno: "documento", varios: "documentos", orden: "o" },
 ];
 const CSS = `
-/* Inversores: orden fijo, sin selector de orden (su lugar lo toma el de secciones). La fila es el ícono, el documento y la
+/* Inversores: orden fijo, sin selector de orden. La fila es el ícono, el documento y la
    descarga: el rótulo de la etiqueta y el año sobran (todo es de Inversores y el título ya dice la fecha o la clase). */
 .pf-orden { display: none; }
 .pf-docs[data-vista="lista"] .pf-doc { grid-template-columns: 34px minmax(0, 1fr) 36px; }

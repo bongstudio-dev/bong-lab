@@ -53,13 +53,14 @@
 <link rel="stylesheet" href="../componentes/tokens.css">
 <style>
 /* ==========================================================================
-   Tweak de las solapas de sección (variante b de las pestañas de las listas).
-   Carga la página real de Inversores en un iframe del mismo origen y le
-   escribe las variables --sol-* en :root. Las de forma (alto, texto,
+   Tweak de las solapas de sección (la pieza "solapas" de base.css).
+   Carga la página real (Inversores o Sala de prensa) en un iframe del mismo
+   origen y le escribe las variables --sol-* en :root. Las de forma (alto, texto,
    relleno, radios, separación) tienen un valor para escritorio y otro para
    el celular; las de movimiento son las mismas en los dos.
-   Lo que sale de acá va a src/paginas/biblioteca/lista.css, en las reglas
-   html[data-pestanas="b"] del principio del bloque de solapas.
+   Lo que sale de acá va a profertil/componentes/base.css, pieza "solapas"
+   (las variables del principio): vale para todas las páginas con solapas.
+   La entrada de la lista nueva es de las listas (Inversores, lista.css).
    ========================================================================== */
 :root { color-scheme: light; --f-mono: "DM Mono", ui-monospace, Menlo, monospace; }
 * { box-sizing: border-box; }
@@ -141,7 +142,7 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
   <aside class="ctrl">
     <div>
       <h1>Solapas de sección</h1>
-      <p class="bajada">Ajuste en vivo de las solapas que cambian de sección en las listas (Inversores, Proveedores). Forma por separado para escritorio y celular; el movimiento es el mismo en los dos.</p>
+      <p class="bajada">Ajuste en vivo de las solapas que cambian de sección dentro de una página (Inversores, Sala de prensa). Es una sola pieza: lo que se ajusta vale para todas. Forma por separado para escritorio y celular; el movimiento es el mismo en los dos.</p>
     </div>
 
     <div class="grupo" id="forma"></div>
@@ -192,21 +193,25 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
     <p class="aviso" id="aviso" aria-live="polite"></p>
 
     <div class="grupo">
-      <p class="rotulo">CSS de lo que cambió · src/paginas/biblioteca/lista.css</p>
+      <p class="rotulo">CSS de lo que cambió · profertil/componentes/base.css</p>
       <pre id="css"></pre>
     </div>
   </aside>
 
   <section class="vista">
     <div class="barra-vista">
-      <div class="seg" role="group" aria-label="Vista">
+      <div class="seg" id="paginas" role="group" aria-label="Página">
+        <button type="button" data-pagina="inversores" aria-pressed="true">Inversores</button>
+        <button type="button" data-pagina="sala-de-prensa" aria-pressed="false">Sala de prensa</button>
+      </div>
+      <div class="seg" id="vistas" role="group" aria-label="Vista">
         <button type="button" data-vista="escritorio" aria-pressed="true">Escritorio</button>
         <button type="button" data-vista="celular" aria-pressed="false">Celular</button>
       </div>
       <span class="estado" id="estado">Cargando la página…</span>
     </div>
     <div class="escena" id="escena">
-      <div class="marco" id="marco"><iframe id="frame" src="../inversores/" title="Inversores Profertil, con las solapas de sección"></iframe></div>
+      <div class="marco" id="marco"><iframe id="frame" src="../inversores/" title="La página con las solapas de sección"></iframe></div>
     </div>
   </section>
 </div>
@@ -330,9 +335,9 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
   function cssTxt() {
     var fk = FORMA.map(function (c) { return c.k; }), mk = MOV.map(function (c) { return c.k; }).concat("curva"), ek = ENTRA.map(function (c) { return c.k; });
     var cel = lineas("celular", fk).concat(lineas("mov", mk)), esc = lineas("escritorio", fk), ent = lineas("mov", ek), out = [];
-    if (cel.length) out.push('/* Celular y movimiento: regla html[data-pestanas="b"] */\n' + cel.join("\n"));
-    if (esc.length) out.push('/* Escritorio: html[data-pestanas="b"] dentro de @media (min-width: 720px) */\n' + esc.join("\n"));
-    if (ent.length) out.push('/* Entrada de la lista nueva: valores por defecto de .pf-doc.pf-entra-sec (los var(..., x)) */\n' + ent.join("\n"));
+    if (cel.length) out.push('/* Celular y movimiento: :root de la pieza solapas */\n' + cel.join("\n"));
+    if (esc.length) out.push('/* Escritorio: :root de la pieza solapas, dentro de @media (min-width: 720px) */\n' + esc.join("\n"));
+    if (ent.length) out.push('/* Entrada de la lista nueva (src/paginas/biblioteca/lista.css): valores por defecto de .pf-doc.pf-entra-sec (los var(..., x)) */\n' + ent.join("\n"));
     return out.join("\n\n");
   }
   function guardar() {
@@ -359,7 +364,7 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
   /* --- La página real ------------------------------------------------------------ */
   var frame = $("frame");
   function doc() { try { return frame.contentDocument; } catch (e) { return null; } }
-  function nav() { var d = doc(); return d && d.getElementById("pf-pestanas"); }
+  function nav() { var d = doc(); return d && d.getElementById("pf-solapas"); }
   function k() { return $("lenta").checked ? 4 : 1; }
   function aplicar() {
     var d = doc(); if (!d || !DEF[vista]) return;
@@ -390,8 +395,8 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
       DEF.mov = { dur: ms(g("--sol-dur")), fundido: ms(g("--sol-fundido")), demora: ms(g("--sol-demora")), demoraNueva: ms(g("--sol-demora-nueva")),
         curva: cu ? cu.split(",").map(Number) : CURVAS[0].c.slice() };
       // La entrada se lee de la regla (sus valores por defecto van dentro del var()): se arma una fila de prueba.
-      var li = d.createElement("li"); li.className = "pf-doc pf-entra-sec"; li.style.cssText = "position:absolute;visibility:hidden";
-      d.getElementById("pf-docs").appendChild(li);
+      var li = d.createElement("li"), lista = d.getElementById("pf-docs"); li.className = "pf-doc pf-entra-sec"; li.style.cssText = "position:absolute;visibility:hidden";
+      (lista || d.body).appendChild(li);
       var a = li.getAnimations()[0], tm = a ? a.effect.getTiming() : null, kf = a ? a.effect.getKeyframes()[0] : null;
       li.style.setProperty("--i", 1); var a1 = li.getAnimations()[0];
       DEF.mov.entraDur = tm ? Math.round(tm.duration) : 520;
@@ -405,12 +410,12 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
     var n = nav(), w = frame.contentWindow; if (!n || !w) return;
     w.scrollTo(0, Math.max(0, n.getBoundingClientRect().top + w.scrollY - 140));
   }
-  function botones() { var n = nav(); return n ? Array.prototype.slice.call(n.querySelectorAll("button[data-seccion]")) : []; }
+  function botones() { var n = nav(); return n ? Array.prototype.slice.call(n.querySelectorAll("button[data-solapa]")) : []; }
   function pasar() {
     var bs = botones(); if (!bs.length) return;
     var i = bs.findIndex(function (b) { return b.getAttribute("aria-pressed") === "true"; });
     bs[(i + 1) % bs.length].click();
-    $("estado").textContent = bs[(i + 1) % bs.length].querySelector(".pf-seccion__largo").textContent;
+    $("estado").textContent = bs[(i + 1) % bs.length].querySelector(".pf-solapas__t").textContent;
   }
   $("probar").addEventListener("click", pasar);
   $("lenta").addEventListener("change", aplicar);
@@ -436,7 +441,7 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
   function luz(c) { var p = rgba(c); return (0.2126 * p[0] + 0.7152 * p[1] + 0.0722 * p[2]) / 255; }
   $("medir").addEventListener("click", function () {
     var n = nav(), d = doc(); if (!n) return;
-    var bs = botones(), ind = n.querySelector(".pf-pestanas__ind"), w = d.defaultView;
+    var bs = botones(), ind = n.querySelector(".pf-solapas__ind"), w = d.defaultView;
     var vidrio = alfa(w.getComputedStyle(bs.filter(function (b) { return b.getAttribute("aria-pressed") !== "true"; })[0]).backgroundColor);
     var desde = bs.findIndex(function (b) { return b.getAttribute("aria-pressed") === "true"; }), hasta = (desde + 1) % bs.length;
     pasar();
@@ -456,7 +461,7 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
       if (hueco) malos++;
       var mal = false;
       [desde, hasta].forEach(function (i) {
-        var b = bs[i], tx = b.querySelector(".pf-pestanas__t").getBoundingClientRect(), cs = w.getComputedStyle(b);
+        var b = bs[i], tx = b.querySelector(".pf-solapas__t").getBoundingClientRect(), cs = w.getComputedStyle(b);
         var cub = Math.max(0, Math.min(tx.right, ri.right) - Math.max(tx.left, ri.left)) / tx.width;
         var papel = Math.max((alfa(cs.backgroundColor) - vidrio) / (1 - vidrio), cub), l = luz(cs.color);
         if ((l > 0.75 && papel > 0.75) || (l < 0.3 && papel < 0.25)) mal = true;
@@ -485,7 +490,7 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
       $("estado").textContent = "Listo · " + vista;
     });
   }
-  document.querySelector(".seg").addEventListener("click", function (e) {
+  $("vistas").addEventListener("click", function (e) {
     var b = e.target.closest("[data-vista]"); if (!b || b.dataset.vista === vista) return;
     vista = b.dataset.vista;
     Array.prototype.forEach.call(this.children, function (x) { x.setAttribute("aria-pressed", String(x === b)); });
@@ -500,10 +505,27 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
     var d = doc();
     (d.fonts ? d.fonts.ready : Promise.resolve()).then(function () { entrar(); });
   }
-  frame.addEventListener("load", alCargar);
+  frame.addEventListener("load", function () {
+    if (!alCargar.listo) { alCargar(); return; }
+    var d = doc(); (d.fonts ? d.fonts.ready : Promise.resolve()).then(function () { entrar(); });
+  });
+  /* Página: las dos usan la misma pieza; se cambia el iframe y se vuelven a escribir los ajustes. La entrada de la lista nueva es
+     de Inversores (Sala de prensa cambia el panel entero): en Sala sus deslizadores no se ven. */
+  var pagina = "inversores";
+  function ponerPagina(pg) {
+    pagina = pg;
+    Array.prototype.forEach.call($("paginas").children, function (x) { x.setAttribute("aria-pressed", String(x.dataset.pagina === pg)); });
+    $("entra").hidden = pg !== "inversores";
+    $("estado").textContent = "Cargando la página…";
+    frame.src = "../" + pg + "/";
+  }
+  $("paginas").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-pagina]"); if (!b || b.dataset.pagina === pagina) return;
+    ponerPagina(b.dataset.pagina);
+  });
   (function esperar() {
     var d = doc();
-    if (d && d.readyState === "complete" && d.getElementById("pf-pestanas")) alCargar();
+    if (d && d.readyState === "complete" && d.getElementById("pf-solapas")) alCargar();
     else if (!alCargar.listo) setTimeout(esperar, 150);
   })();
 
