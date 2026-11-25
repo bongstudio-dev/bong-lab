@@ -153,10 +153,14 @@
   try { vista = localStorage.getItem("documentos-vista") || "lista"; } catch (e) {}
   if (["compacta", "lista", "mini"].indexOf(vista) === -1) vista = "lista";
   var sinEntrada = false;
-  function fila(d) {
+  /* Al cambiar de sección la lista es otra: las filas de la primera tanda entran una detrás de otra (pf-entra-sec, con su orden en
+     --i). Al filtrar o al bajar se mantiene el fundido quieto de siempre. */
+  var entradaSeccion = false;
+  function fila(d, i) {
     var q = plano(estado.q.trim());
     var li = document.createElement("li");
-    li.className = "pf-doc" + (sinEntrada ? " pf-quieta" : "");
+    li.className = "pf-doc" + (sinEntrada ? " pf-quieta" : entradaSeccion ? " pf-entra-sec" : "");
+    if (entradaSeccion && !sinEntrada) li.style.setProperty("--i", Math.min(i || 0, 14));
     li.dataset.k = d.k;
     var bajar = d.l ? 'href="' + esc(/^https?:\/\//.test(d.l) ? d.l : BASE + "pdf/" + encodeURIComponent(d.l)) + '" download' : 'href="' + esc(d.u) + '" target="_blank" rel="noopener"';
     li.innerHTML = (vista === "mini" ? '<div class="pf-doc__arte">' + arte(d) + "</div>" : "") + etq(d.c, vista === "mini" ? "" : "").replace('class="pf-etiqueta"', 'class="pf-etiqueta" title="' + POR[d.c].nombre + '"') +
@@ -167,7 +171,7 @@
   }
   function pintarTanda() {
     var hasta = Math.min(pintadas + TANDA, lista.length), f = document.createDocumentFragment();
-    for (var i = pintadas; i < hasta; i++) f.appendChild(fila(lista[i]));
+    for (var i = pintadas; i < hasta; i++) f.appendChild(fila(lista[i], i));
     docs.appendChild(f);
     pintadas = hasta;
   }
@@ -184,6 +188,7 @@
     $("pf-empty").hidden = lista.length > 0;
     $("pf-filters").classList.toggle("pf-vacio", !lista.length);
     docs.style.minHeight = "";
+    entradaSeccion = false;
     if (window.scrollY !== y) saltar(y);
   }
 
@@ -564,6 +569,7 @@
     abierto = null;
     armarFiltros();
     marcarSeccion(animar);
+    entradaSeccion = !!animar;
     return true;
   }
   if (selSeccion) selSeccion.addEventListener("click", function (e) {

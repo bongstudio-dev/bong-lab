@@ -148,6 +148,8 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
 
     <div class="grupo" id="mov"></div>
 
+    <div class="grupo" id="entra"></div>
+
     <div class="grupo curva">
       <p class="rotulo">Curva del deslizamiento</p>
       <div class="chips" id="curvas"></div>
@@ -232,8 +234,15 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
     { k: "demora", nombre: "Demora de la que se deja", min: 0, max: 1200, paso: 10, u: "ms", ayuda: "Cuánto sigue de papel, con sus empalmes y el texto azul, antes de fundir a vidrio." },
     { k: "demoraNueva", nombre: "Demora de la que se elige", min: 0, max: 1200, paso: 10, u: "ms", ayuda: "Cuánto sigue de vidrio, con el texto claro, antes de pasar a papel. Conviene que el cruce coincida con la llegada del papel del indicador, para que el texto no quede claro sobre papel." }
   ];
+  var ENTRA = [
+    { k: "entraDur", nombre: "Duración de cada fila", min: 0, max: 1200, paso: 10, u: "ms", ayuda: "Las filas de la sección nueva aparecen subiendo apenas, con la curva base." },
+    { k: "entraPaso", nombre: "Paso entre filas", min: 0, max: 160, paso: 5, u: "ms", ayuda: "Cuánto espera cada fila a la anterior (hasta la 15, las demás entran juntas)." },
+    { k: "entraDist", nombre: "Recorrido", min: 0, max: 60, paso: 1, u: "px", ayuda: "Cuánto suben mientras aparecen. En 0 solo funden." }
+  ];
   var VARS = { alto: "--sol-alto", texto: "--sol-texto", relleno: "--sol-relleno", radio: "--sol-radio", empalme: "--sol-empalme", sep: "--sol-sep",
-    dur: "--sol-dur", curva: "--sol-curva", fundido: "--sol-fundido", demora: "--sol-demora", demoraNueva: "--sol-demora-nueva" };
+    dur: "--sol-dur", curva: "--sol-curva", fundido: "--sol-fundido", demora: "--sol-demora", demoraNueva: "--sol-demora-nueva",
+    entraDur: "--sec-entra-dur", entraPaso: "--sec-entra-paso", entraDist: "--sec-entra-dist" };
+  var UNIDAD = {}; [].concat(FORMA, MOV, ENTRA).forEach(function (c) { UNIDAD[c.k] = c.u; });
   var CURVAS = [
     { nombre: "Vista", token: "var(--curva-vista)", c: [0.67, 0, 0.24, 0.99] },
     { nombre: "Base", token: "var(--ease)", c: [0.22, 1, 0.36, 1] },
@@ -260,6 +269,8 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
   $("mov").innerHTML = '<p class="rotulo">Movimiento · escritorio y celular</p>' + MOV.map(function (c) { return campoHtml(c, "mov"); }).join("");
   FORMA.forEach(function (c) { $("c-forma-" + c.k).addEventListener("input", function (e) { V[vista][c.k] = +e.target.value; cambio(); }); });
   MOV.forEach(function (c) { $("c-mov-" + c.k).addEventListener("input", function (e) { V.mov[c.k] = +e.target.value; cambio(); }); });
+  $("entra").innerHTML = '<p class="rotulo">Entrada de la lista nueva</p>' + ENTRA.map(function (c) { return campoHtml(c, "mov"); }).join("");
+  ENTRA.forEach(function (c) { $("c-mov-" + c.k).addEventListener("input", function (e) { V.mov[c.k] = +e.target.value; cambio(); }); });
 
   $("curvas").innerHTML = CURVAS.map(function (c, i) { return '<button type="button" class="chip" data-i="' + i + '">' + c.nombre + "</button>"; }).join("");
   $("curvas").addEventListener("click", function (e) {
@@ -312,15 +323,16 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
   svg.addEventListener("pointerup", function () { if (arrastre !== null) { arrastre = null; pasar(); } });
 
   /* --- Salida ------------------------------------------------------------------ */
-  function txt(g, k) { var x = val(g, k); return k === "curva" ? curvaTxt(x) : x + (k === "dur" || k === "fundido" || k === "demora" || k === "demoraNueva" ? "ms" : "px"); }
+  function txt(g, k) { var x = val(g, k); return k === "curva" ? curvaTxt(x) : x + UNIDAD[k]; }
   function lineas(g, claves) {
     return claves.filter(function (k) { return DEF[g] && difiere(g, k); }).map(function (k) { return VARS[k] + ": " + txt(g, k) + ";"; });
   }
   function cssTxt() {
-    var fk = FORMA.map(function (c) { return c.k; }), mk = MOV.map(function (c) { return c.k; }).concat("curva");
-    var cel = lineas("celular", fk).concat(lineas("mov", mk)), esc = lineas("escritorio", fk), out = [];
+    var fk = FORMA.map(function (c) { return c.k; }), mk = MOV.map(function (c) { return c.k; }).concat("curva"), ek = ENTRA.map(function (c) { return c.k; });
+    var cel = lineas("celular", fk).concat(lineas("mov", mk)), esc = lineas("escritorio", fk), ent = lineas("mov", ek), out = [];
     if (cel.length) out.push('/* Celular y movimiento: regla html[data-pestanas="b"] */\n' + cel.join("\n"));
     if (esc.length) out.push('/* Escritorio: html[data-pestanas="b"] dentro de @media (min-width: 720px) */\n' + esc.join("\n"));
+    if (ent.length) out.push('/* Entrada de la lista nueva: valores por defecto de .pf-doc.pf-entra-sec (los var(..., x)) */\n' + ent.join("\n"));
     return out.join("\n\n");
   }
   function guardar() {
@@ -335,7 +347,7 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
       $("c-forma-" + c.k).value = val(vista, c.k); $("o-forma-" + c.k).textContent = val(vista, c.k) + " " + c.u;
       $("f-forma-" + c.k).classList.toggle("cambio", difiere(vista, c.k));
     });
-    MOV.forEach(function (c) {
+    MOV.concat(ENTRA).forEach(function (c) {
       $("c-mov-" + c.k).value = val("mov", c.k); $("o-mov-" + c.k).textContent = val("mov", c.k) + " " + c.u;
       $("f-mov-" + c.k).classList.toggle("cambio", difiere("mov", c.k));
     });
@@ -357,6 +369,10 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
       if (difiere("mov", x) || k() > 1) r.setProperty(VARS[x], val("mov", x) * k() + "ms"); else r.removeProperty(VARS[x]);
     });
     if (difiere("mov", "curva")) r.setProperty(VARS.curva, curvaTxt(val("mov", "curva"))); else r.removeProperty(VARS.curva);
+    ENTRA.forEach(function (c) {
+      var x = c.u === "ms" ? val("mov", c.k) * k() : val("mov", c.k);
+      if (difiere("mov", c.k) || (c.u === "ms" && k() > 1)) r.setProperty(VARS[c.k], x + c.u); else r.removeProperty(VARS[c.k]);
+    });
     // El indicador se ubica por JS: con otro alto, relleno o texto cambia el ancho de las solapas.
     var w = frame.contentWindow; if (w) w.dispatchEvent(new w.Event("resize"));
   }
@@ -373,6 +389,15 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
       var cu = (g("--sol-curva").match(/cubic-bezier\(([^)]+)\)/) || [])[1];
       DEF.mov = { dur: ms(g("--sol-dur")), fundido: ms(g("--sol-fundido")), demora: ms(g("--sol-demora")), demoraNueva: ms(g("--sol-demora-nueva")),
         curva: cu ? cu.split(",").map(Number) : CURVAS[0].c.slice() };
+      // La entrada se lee de la regla (sus valores por defecto van dentro del var()): se arma una fila de prueba.
+      var li = d.createElement("li"); li.className = "pf-doc pf-entra-sec"; li.style.cssText = "position:absolute;visibility:hidden";
+      d.getElementById("pf-docs").appendChild(li);
+      var a = li.getAnimations()[0], tm = a ? a.effect.getTiming() : null, kf = a ? a.effect.getKeyframes()[0] : null;
+      li.style.setProperty("--i", 1); var a1 = li.getAnimations()[0];
+      DEF.mov.entraDur = tm ? Math.round(tm.duration) : 520;
+      DEF.mov.entraPaso = a1 ? Math.round(a1.effect.getTiming().delay) : 40;
+      DEF.mov.entraDist = kf && kf.transform ? Math.abs(parseFloat((kf.transform.match(/-?[\d.]+(?=px\))/) || [16])[0])) : 16;
+      li.remove();
     }
     return true;
   }

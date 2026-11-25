@@ -227,6 +227,10 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
 /* --- Vistas: compacta, lista (la de siempre) y miniaturas. El selector es el de Novedades; al cambiar, solo la lista se funde y el
    indicador viaja a su lugar. No usa View Transitions: capturan la página entera y activarían la animación de página de
    transicion.css (::view-transition-old/new(root)). */
+/* Entrada al cambiar de sección: la lista nueva sube apenas y aparece fila por fila (--i es el orden; ver lista.js). Duración, paso
+   entre filas y recorrido se ajustan en profertil/solapas-tweak/. */
+.pf-doc.pf-entra-sec { animation: pf-entra-sec var(--sec-entra-dur, 520ms) var(--ease) calc(var(--i, 0) * var(--sec-entra-paso, 40ms)) backwards; }
+@keyframes pf-entra-sec { from { opacity: 0; transform: translateY(var(--sec-entra-dist, 16px)); } }
 .pf-doc.pf-quieta { animation: none; } /* filas que se arman al cambiar de vista: nacen sin la entrada y no la reciben después */
 .pf-doc__arte { display: none; }
 
