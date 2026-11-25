@@ -502,6 +502,54 @@ function hojaSubir() {
   }, quieto() ? 0 : t);
 }
 
+/* ---------- Celular: tirar la hoja hacia arriba la cierra ---------- */
+// La hoja sigue al dedo (hacia abajo apenas cede). Al soltar se cierra si subió un tercio de su alto o si el gesto
+// iba rápido hacia arriba; si no, vuelve a su lugar. Si el contenido tiene scroll, primero se recorre hasta el final.
+// Solo decide arrastrar cuando el gesto es vertical: los toques y los pasos entre niveles no cambian.
+let tiro = null;
+function tiroPintar(dy) {
+  const d = dy > 0 ? dy * .2 : dy;
+  caja.style.transform = panel.style.transform = `translateY(${d}px)`;
+  scrim.style.opacity = String(Math.max(0, 1 + d / tiro.h));
+}
+dock.addEventListener('touchstart', (e) => {
+  if (!esMovil() || !abierta || abierta === 'busca' || cerrando || e.touches.length > 1) { tiro = null; return; }
+  const t = e.touches[0];
+  tiro = { x: t.clientX, y: t.clientY, dy: 0, v: 0, ty: performance.now(), activo: false, h: dock.offsetHeight };
+}, { passive: true });
+dock.addEventListener('touchmove', (e) => {
+  if (!tiro) return;
+  const t = e.touches[0], dx = t.clientX - tiro.x, dy = t.clientY - tiro.y;
+  if (!tiro.activo) {
+    if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+    const alFinal = panel.scrollTop + panel.clientHeight >= panel.scrollHeight - 1;
+    if (Math.abs(dy) <= Math.abs(dx) || dy > 0 || !alFinal) { tiro = null; return; }
+    tiro.activo = true; tiro.y = t.clientY;
+    caja.style.transition = panel.style.transition = scrim.style.transition = 'none';
+  }
+  e.preventDefault();
+  const ahora = performance.now(), y = t.clientY - tiro.y;
+  tiro.v = (y - tiro.dy) / Math.max(1, ahora - tiro.ty); tiro.dy = y; tiro.ty = ahora;
+  tiroPintar(y);
+}, { passive: false });
+function tiroSoltar(e) {
+  if (!tiro || !tiro.activo) { tiro = null; return; }
+  if (e.cancelable) e.preventDefault();   // sin clic al soltar sobre un botón
+  const { dy, v, h } = tiro; tiro = null;
+  const cierra = dy < -h / 3 || v < -.45;
+  // Lo que falta recorrer, con un tiempo acorde a lo que ya se movió.
+  const base = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--t-barra')) || 520;
+  const resto = cierra ? (h + dy) / h : Math.min(1, Math.abs(dy) / h + .3);
+  const ms = Math.round(Math.max(180, base * resto));
+  caja.style.transition = panel.style.transition = scrim.style.transition = '';
+  caja.style.transitionDuration = panel.style.transitionDuration = scrim.style.transitionDuration = ms + 'ms';
+  caja.style.transform = ''; scrim.style.opacity = '';
+  if (cierra) cerrar(); else panel.style.transform = 'none';
+  setTimeout(() => { caja.style.transitionDuration = panel.style.transitionDuration = scrim.style.transitionDuration = ''; }, ms + 40);
+}
+dock.addEventListener('touchend', tiroSoltar);
+dock.addEventListener('touchcancel', tiroSoltar);
+
 /* ---------- Abrir, cambiar y cerrar ---------- */
 function pintarEscritorio() {
   const s = SECCIONES.find((x) => x.id === abierta);
