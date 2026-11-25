@@ -120,14 +120,21 @@ img { display: block; max-width: 100%; }
 
 /* Menú: la cápsula de vidrio de la barra. Abierto, la cápsula se vuelve parte de la caja tiza. */
 .pf-dock .pf-barra__menu { transition: opacity 220ms ease, background var(--dock-t) var(--ease), border-color var(--dock-t) var(--ease); }
-.pf-dock .pf-barra__menu > button { transition: background 200ms ease, color 200ms ease; }
+/* El color del texto cambia al mismo ritmo que viaja la pastilla, así no se blanquea antes de que llegue. */
+.pf-dock .pf-barra__menu > button { transition: background 200ms ease, color var(--t-vista) var(--curva-vista); }
 @media (hover: hover) and (pointer: fine) {
   .pf-dock .pf-barra__menu > button:hover { background: var(--foto-boton); color: var(--tiza); }
   .pf-dock.pf-abierto .pf-barra__menu > button:hover { background: var(--line); color: var(--ink); }
 }
 .pf-dock.pf-abierto .pf-barra__menu { background: transparent; border-color: transparent; }
 .pf-dock.pf-abierto .pf-barra__menu > button { color: var(--ink-2); }
-.pf-dock .pf-barra__menu > button[aria-expanded="true"] { background: var(--azul) !important; color: var(--tiza) !important; font-weight: 500; }
+/* La sección abierta se marca con una pastilla azul que viaja de un ítem a otro (como el indicador del Selector):
+   al pasar de Empresa a Sostenibilidad se desliza y toma el ancho del nuevo. Al abrir aparece en su lugar; al cerrar se apaga. */
+.pf-dock .pf-barra__menu { position: relative; isolation: isolate; }
+.pf-dock .pf-barra__menu > .pf-dock__ind { position: absolute; z-index: -1; top: 7px; bottom: 7px; left: 0; width: 0; padding: 0; border-radius: 999px; background: var(--azul); opacity: 0; pointer-events: none;
+  transition: transform var(--t-vista) var(--curva-vista), width var(--t-vista) var(--curva-vista), opacity 200ms ease; }
+.pf-dock .pf-barra__menu > .pf-dock__ind.pf-quieto { transition: opacity 200ms ease; }
+.pf-dock .pf-barra__menu > button[aria-expanded="true"] { background: transparent !important; color: var(--tiza) !important; font-weight: 500; }
 
 /* Lupa y campo sobre la caja tiza: el gris del fondo de página en lugar del vidrio. */
 .pf-dock.pf-abierto .pf-barra__busca, .pf-dock.pf-abierto .pf-barra__cerrar { background: var(--bg); border-color: transparent; }
@@ -294,7 +301,7 @@ img { display: block; max-width: 100%; }
   .pf-dock .pf-alc__item { padding-block: 11px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .pf-dock__panel, .pf-dock__caja, .pf-dock-scrim { transition: none !important; }
+  .pf-dock__panel, .pf-dock__caja, .pf-dock-scrim, .pf-dock .pf-barra__menu > .pf-dock__ind { transition: none !important; }
   .pf-dock__vista, .pf-dock__vista > *, .pf-dock .pf-alc__panel { animation: none; }
   .pf-tarjeta__foto img, .pf-b__foto img { transition: opacity 200ms ease; transform: none !important; }
 }
@@ -518,6 +525,7 @@ function abrir(id, el) {
     if (esMovil()) document.documentElement.classList.add('pf-dock-bloqueo');
   }
   menu.querySelectorAll('button').forEach((b) => b.setAttribute('aria-expanded', String(b.dataset.sec === id)));
+  moverInd();
   if (id === 'busca') { /* el contenido lo pone el buscador */ }
   else if (esMovil()) { movil.setAttribute('aria-expanded', 'true'); movil.querySelector('span').textContent = 'Cerrar'; vistas.innerHTML = '<div class="pf-m"></div>'; irA(movilMenu(), 0); }
   else pintarEscritorio();
@@ -530,6 +538,7 @@ function cerrar() {
   hojaSubir();
   document.documentElement.classList.remove('pf-dock-abierto', 'pf-dock-bloqueo');
   menu.querySelectorAll('button').forEach((b) => b.setAttribute('aria-expanded', 'false'));
+  moverInd();
   movil.setAttribute('aria-expanded', 'false'); movil.querySelector('span').textContent = 'Menú';
   if (eraBusca && nav.classList.contains('pf-buscando')) $('#pf-qClose').click();
 }
@@ -555,7 +564,20 @@ function irA(html, dir) {
   const f = nueva.querySelector('button, a'); if (f) f.focus({ preventScroll: true });
 }
 
-menu.innerHTML = SECCIONES.map((s) => `<button type="button" data-sec="${s.id}" aria-expanded="false" aria-controls="panel">${esc(s.nombre)}</button>`).join('');
+menu.innerHTML = '<i class="pf-dock__ind" id="menuInd" aria-hidden="true"></i>' + SECCIONES.map((s) => `<button type="button" data-sec="${s.id}" aria-expanded="false" aria-controls="panel">${esc(s.nombre)}</button>`).join('');
+
+/* Pastilla de la sección abierta: viaja entre ítems. Si estaba apagada, aparece en su lugar sin deslizarse. */
+const menuInd = $('#menuInd');
+function moverInd() {
+  const b = menu.querySelector('button[aria-expanded="true"]');
+  if (!b) { menuInd.style.opacity = '0'; return; }
+  const venia = menuInd.style.opacity === '1';
+  if (!venia) menuInd.classList.add('pf-quieto');
+  menuInd.style.width = b.offsetWidth + 'px';
+  menuInd.style.transform = `translateX(${b.offsetLeft}px)`;
+  if (!venia) { menuInd.offsetWidth; menuInd.classList.remove('pf-quieto'); }
+  menuInd.style.opacity = '1';
+}
 
 /* Escritorio: abre al señalar (con una pausa corta para no abrir al pasar de largo) y con clic. */
 let tAbrir, tCerrar;
