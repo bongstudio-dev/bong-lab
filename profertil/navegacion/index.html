@@ -180,9 +180,8 @@ img { display: block; max-width: 100%; }
 .pf-tarjeta__foto img { width: 100%; height: 100%; object-fit: cover; transition: transform 700ms var(--ease); }
 .pf-tarjeta__foto::after { content: ""; position: absolute; inset: 0; background: rgba(0, 0, 0, .28); transition: background 300ms ease; }
 .pf-tarjeta__nombre { position: absolute; z-index: 1; left: 14px; right: 14px; bottom: 12px; display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; color: var(--tiza); font: 500 var(--texto-cuerpo)/1.2 var(--f-body); }
+/* La foto no reacciona al pasar: solo la flecha se corre. */
 @media (hover: hover) and (pointer: fine) {
-  .pf-tarjeta__foto:hover img { transform: scale(1.05); }
-  .pf-tarjeta__foto:hover::after { background: rgba(0, 0, 0, .18); }
   .pf-tarjeta__foto:hover .pf-ir svg, .pf-tarjeta__foto.pf-ir:hover svg { transform: translateX(3px); }
 }
 .pf-tarjeta ul { list-style: none; margin: 0; padding: 0 4px; display: grid; gap: 2px; }
