@@ -122,6 +122,17 @@ img { display: block; max-width: 100%; }
 @media (max-width: 640px) { .pf-dock__logo { width: 62px; } }
 .pf-dock .pf-barra__logo { transition: color var(--dock-t) var(--ease), opacity 200ms ease; }
 .pf-dock.pf-abierto .pf-barra__logo { color: var(--azul); }
+/* Con la hoja abierta (fondo tiza) va el logo a color, con la espiga amarilla. Es el mismo dibujo que el monocromático,
+   en la misma caja: el azul del monocromático llega al azul del de color y encima se funde el de color, con el tiempo
+   y la curva de la hoja. Así nada se corre: solo aparece el amarillo. La caja tiene alto entero para que los dos
+   caigan en los mismos píxeles. */
+.pf-dock .pf-barra__logo { display: grid; }
+.pf-dock .pf-barra__logo > span { grid-area: 1 / 1; }
+.pf-dock__logo, .pf-dock__logo-color { width: 74px; height: 52px; aspect-ratio: auto; }
+.pf-dock__logo-color { display: block; background: url(../sala-de-prensa/logos/Profertil_Logo_Principal_Color.svg) center / contain no-repeat; opacity: 0;
+  transition: opacity var(--dock-t) var(--ease); }
+.pf-dock.pf-abierto .pf-dock__logo-color { opacity: 1; }
+@media (max-width: 640px) { .pf-dock__logo, .pf-dock__logo-color { width: 62px; height: 44px; } }
 
 /* Menú: la cápsula de vidrio de la barra. Abierto, la cápsula se vuelve parte de la caja tiza. */
 .pf-dock .pf-barra__menu { transition: opacity 220ms ease, background var(--dock-t) var(--ease), border-color var(--dock-t) var(--ease); }
@@ -338,7 +349,7 @@ img { display: block; max-width: 100%; }
   <div class="pf-dock__caja" id="caja" aria-hidden="true"></div>
   <div class="pf-barra__in">
     <nav class="pf-barra__nav" id="pf-nav" aria-label="Sitio">
-      <a class="pf-barra__logo" href="./" aria-label="Profertil"><span class="pf-dock__logo"></span></a>
+      <a class="pf-barra__logo" href="./" aria-label="Profertil"><span class="pf-dock__logo"></span><span class="pf-dock__logo-color" aria-hidden="true"></span></a>
       <div class="pf-barra__menu" id="menu"></div>
       <button class="pf-barra__menu-mobile pf-dock__movil" id="movil" type="button" aria-expanded="false" aria-controls="panel"><i><b></b><b></b><b></b><b></b></i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg><span>Menú</span></button>
       <div class="pf-barra__busca" id="pf-busca" role="search">
