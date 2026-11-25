@@ -52,30 +52,34 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../componentes/tokens.css">
+<link rel="stylesheet" href="../componentes/base.css">
+<link rel="stylesheet" href="../buscador/alcance.css">
+<script>window.PF_ALCANCE = { seccion: "" };</script>
+<script src="../buscador/alcance.js" data-modo="previa" defer></script>
 <style>
 /* ==========================================================================
    Navegación en dock.
-   La barra es una sola pieza flotante (logo, menú y lupa). Al abrir una
-   sección, esa misma pieza crece hacia abajo y adentro aparece la sección:
-   no es un desplegable que cuelga de la barra ni un menú a pantalla completa.
-   El alto se anima entre el contenido de cada sección (lo mide el JS con un
-   ResizeObserver), así que pasar de Empresa a Novedades no cierra y abre.
+   La barra es la del sitio (pieza "barra" de base.css): mismo ancho, misma grilla, logo, menú y lupa en el mismo
+   lugar. Al abrir una sección, la barra crece hacia abajo y adentro aparece la sección: no es un desplegable que
+   cuelga ni un menú a pantalla completa.
+
+   La caja del dock abarca toda la barra, de borde a borde, como la franja azul de la barra sólida: así el panel
+   tiene el ancho de la grilla de la página y el logo, el menú y la lupa no se mueven al abrir. Pero nace de lo que
+   se tocó: la caja aparece recortada a la cápsula del menú (o a la pastilla Menú, o al campo del buscador) y se
+   abre desde ahí hasta ocupar la barra entera. Al cerrar vuelve a esa cápsula.
+
+   El buscador es el de la barra con el componente de alcance (../buscador/): sus resultados se muestran dentro
+   del mismo dock. Abrir la lupa cierra la sección que estuviera abierta y la caja crece desde el campo.
 
    Dos propuestas para el escritorio (?v=a o ?v=b):
    a  Tarjetas. Cada subsección es una foto con su nombre; debajo, sus páginas.
-   b  Foto de sección. Lista a la izquierda y una foto grande a la derecha que
-      cambia con el ítem que se señala.
-   En el celular las dos se comportan igual: lista de secciones con miniatura
-   y, al tocar una, sus subsecciones en tarjetas.
+   b  Foto de sección. Lista a la izquierda y una foto grande a la derecha que cambia con el ítem que se señala.
+   En el celular las dos se comportan igual: lista de secciones y, al tocar una, se entra a ese nivel.
    ========================================================================== */
-:root { color-scheme: light; --dock-gap: 12px; --dock-r: var(--radio-tarjeta); --dock-t: var(--t-barra); }
-* { box-sizing: border-box; }
-html, body { margin: 0; }
+:root { --dock-t: var(--t-barra); --barra-h: 76px; --dock-r: var(--radio-tarjeta); }
+@media (max-width: 640px) { :root { --barra-h: 66px; --dock-r: 28px; } }
 html.pf-dock-bloqueo { overflow: hidden; }
-body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: var(--texto-cuerpo); line-height: 1.5; -webkit-font-smoothing: antialiased; }
-a { color: inherit; text-decoration: none; }
-button { font: inherit; color: inherit; }
-:focus-visible { outline: 2px solid var(--celeste); outline-offset: 2px; }
+a { text-decoration: none; }
 img { display: block; max-width: 100%; }
 
 /* ---------- Página de fondo (solo para ver el dock sobre foto y sobre color) ---------- */
@@ -91,44 +95,56 @@ img { display: block; max-width: 100%; }
 .pf-relleno article b { display: block; font: 600 var(--texto-subtitulo)/1.1 var(--f-display); color: var(--azul); margin-bottom: 10px; }
 .pf-relleno article p { margin: 0; color: var(--ink-2); }
 
-/* ---------- Scrim: oscurece lo de atrás mientras el dock está abierto ---------- */
-.pf-dock-scrim { position: fixed; inset: 0; z-index: 40; background: rgba(10, 30, 74, .36); opacity: 0; visibility: hidden; transition: opacity var(--dock-t) var(--ease), visibility 0s linear var(--dock-t); }
+/* ---------- Velo: oscurece lo de atrás mientras el dock está abierto (el mismo tono que el del buscador) ---------- */
+.pf-dock-scrim { position: fixed; inset: 0; z-index: 40; background: color-mix(in srgb, var(--ink) 30%, transparent); opacity: 0; visibility: hidden; transition: opacity var(--dock-t) var(--ease), visibility 0s linear var(--dock-t); }
 .pf-dock-abierto .pf-dock-scrim { opacity: 1; visibility: visible; transition: opacity var(--dock-t) var(--ease), visibility 0s; }
+/* El velo del buscador no hace falta: los resultados van dentro del dock, con el velo de arriba. */
+.pf-alc__velo { display: none !important; }
 
-/* ---------- El dock ---------- */
-.pf-dock { position: fixed; z-index: 50; top: calc(var(--dock-gap) + env(safe-area-inset-top, 0px)); left: 0; right: 0; width: min(100% - var(--dock-gap) * 2, 1320px); margin-inline: auto;
-  border-radius: var(--dock-r); color: var(--tiza); isolation: isolate; }
-/* El fondo va en una capa aparte: así pasa de vidrio a azul a tiza sin mover nada de lo que tiene adentro. */
-.pf-dock::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: var(--foto-fondo); border: 1px solid var(--foto-borde);
-  backdrop-filter: blur(18px) saturate(1.2); -webkit-backdrop-filter: blur(18px) saturate(1.2); transition: background var(--dock-t) var(--ease), border-color var(--dock-t) var(--ease); }
-.pf-dock--solida::before { background: var(--barra); border-color: transparent; }
-.pf-dock.pf-abierto { color: var(--ink); }
-.pf-dock.pf-abierto::before { background: var(--tiza); border-color: var(--color-blanco); }
+/* ---------- La barra del sitio, con el dock ---------- */
+/* La franja azul de la barra sólida queda del alto de la barra aunque el dock crezca. Sin sombra. */
+.pf-dock::before { bottom: auto; height: calc(var(--barra-h) + env(safe-area-inset-top, 0px)); }
+.pf-dock.pf-barra--solida::before { box-shadow: none; }
+/* La caja: tiza, de borde a borde. El JS la recorta a la pieza que se tocó y la abre hasta la barra entera. */
+.pf-dock__caja { position: absolute; inset: 0; z-index: -1; pointer-events: none; background: var(--tiza); opacity: 0;
+  transition: clip-path var(--dock-t) var(--ease), opacity 160ms ease; }
+.pf-dock__logo { display: block; width: 74px; aspect-ratio: 1458 / 1021; background: currentColor;
+  -webkit-mask: url(../sala-de-prensa/logos/Profertil_Logo_Monocromatico_Blanco.svg) center / contain no-repeat; mask: url(../sala-de-prensa/logos/Profertil_Logo_Monocromatico_Blanco.svg) center / contain no-repeat; }
+@media (max-width: 640px) { .pf-dock__logo { width: 62px; } }
+.pf-dock .pf-barra__logo { transition: color var(--dock-t) var(--ease), opacity 200ms ease; }
+.pf-dock.pf-abierto .pf-barra__logo { color: var(--azul); }
 
-.pf-dock__barra { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 14px; height: 64px; padding: 0 8px 0 20px; }
-.pf-dock__logo { justify-self: start; display: block; width: 62px; aspect-ratio: 1458 / 1021; background: currentColor; color: var(--tiza);
-  -webkit-mask: url(../sala-de-prensa/logos/Profertil_Logo_Monocromatico_Blanco.svg) center / contain no-repeat; mask: url(../sala-de-prensa/logos/Profertil_Logo_Monocromatico_Blanco.svg) center / contain no-repeat;
-  transition: color var(--dock-t) var(--ease); }
-.pf-abierto .pf-dock__logo { color: var(--azul); }
-.pf-dock__menu { display: flex; gap: 2px; }
-.pf-dock__item { position: relative; display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 14px; border: 0; border-radius: 999px; background: transparent; color: inherit;
-  font: 400 var(--texto-chico)/1 var(--f-body); white-space: nowrap; cursor: pointer; opacity: .9; transition: background 200ms ease, color 200ms ease, opacity 200ms ease; }
-.pf-dock__item svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform var(--dock-t) var(--ease); }
-.pf-dock__item[aria-expanded="true"] svg { transform: rotate(180deg); }
-@media (hover: hover) and (pointer: fine) { .pf-dock__item:hover { opacity: 1; background: var(--foto-boton); } .pf-abierto .pf-dock__item:hover { background: var(--line); } }
-.pf-abierto .pf-dock__item { color: var(--ink-2); opacity: 1; }
-.pf-dock__item[aria-expanded="true"] { background: var(--azul) !important; color: var(--tiza) !important; font-weight: 500; }
-.pf-dock__lado { justify-self: end; display: flex; align-items: center; gap: 6px; }
-.pf-dock__util { display: inline-flex; align-items: center; height: 40px; padding: 0 12px; border-radius: 999px; font-size: var(--texto-chico); opacity: .9; transition: background 200ms ease, opacity 200ms ease; }
-@media (hover: hover) and (pointer: fine) { .pf-dock__util:hover { opacity: 1; background: var(--foto-boton); } .pf-abierto .pf-dock__util:hover { background: var(--line); } }
-.pf-dock__lupa { width: var(--btn-l); height: var(--btn-l); display: grid; place-items: center; padding: 0; border: 0; border-radius: 999px; background: var(--foto-boton); color: inherit; cursor: pointer; transition: background 200ms ease; }
-.pf-abierto .pf-dock__lupa { background: var(--line); }
-.pf-dock__lupa svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
-.pf-dock__movil { display: none; }
+/* Menú: la cápsula de vidrio de la barra. Abierto, la cápsula se vuelve parte de la caja tiza. */
+.pf-dock .pf-barra__menu { transition: opacity 220ms ease, background var(--dock-t) var(--ease), border-color var(--dock-t) var(--ease); }
+.pf-dock .pf-barra__menu > button { transition: background 200ms ease, color 200ms ease; }
+@media (hover: hover) and (pointer: fine) {
+  .pf-dock .pf-barra__menu > button:hover { background: var(--foto-boton); color: var(--tiza); }
+  .pf-dock.pf-abierto .pf-barra__menu > button:hover { background: var(--line); color: var(--ink); }
+}
+.pf-dock.pf-abierto .pf-barra__menu { background: transparent; border-color: transparent; }
+.pf-dock.pf-abierto .pf-barra__menu > button { color: var(--ink-2); }
+.pf-dock .pf-barra__menu > button[aria-expanded="true"] { background: var(--azul) !important; color: var(--tiza) !important; font-weight: 500; }
 
-/* El panel crece desde la barra: el alto lo pone el JS (el del contenido que se muestra). */
-.pf-dock__panel { height: 0; overflow: hidden; transition: height var(--dock-t) var(--ease); }
-.pf-dock__panel-in { padding: 8px 20px 20px; }
+/* Lupa y campo sobre la caja tiza: el gris del fondo de página en lugar del vidrio. */
+.pf-dock.pf-abierto .pf-barra__busca, .pf-dock.pf-abierto .pf-barra__cerrar { background: var(--bg); border-color: transparent; }
+.pf-dock.pf-abierto .pf-barra__lupa, .pf-dock.pf-abierto .pf-barra__cerrar { color: var(--azul); }
+
+/* Pastilla Menú (en la barra real es un rótulo; acá es el botón). Área de toque de 44 px sin agrandarla. */
+.pf-dock__movil { position: relative; border: 1px solid var(--foto-borde); background: var(--foto-fondo); cursor: pointer; transition: background 200ms ease, color 200ms ease, border-color 200ms ease, opacity 220ms ease; }
+.pf-dock__movil::after { content: ""; position: absolute; inset: -6px -4px; }
+.pf-dock__movil svg { display: none; width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.pf-dock__movil[aria-expanded="true"] { background: var(--azul); border-color: var(--azul); color: var(--tiza); }
+.pf-dock__movil[aria-expanded="true"] i { display: none; }
+.pf-dock__movil[aria-expanded="true"] svg { display: block; }
+.pf-dock__movil:active { background: color-mix(in srgb, var(--azul) 86%, #000); }
+@media (max-width: 860px) {
+  .pf-dock .pf-barra__menu { display: none; }
+  .pf-dock .pf-barra__menu-mobile { display: inline-flex; border-radius: 999px; }
+}
+
+/* El panel crece desde la barra: el alto lo pone el JS (el del contenido que se muestra). Va en la grilla de la página. */
+.pf-dock__panel { height: 0; overflow: hidden; transition: height var(--dock-t) var(--ease), clip-path var(--dock-t) var(--ease); }
+.pf-dock__panel-in { width: min(100% - 32px, 1320px); margin-inline: auto; padding: 8px 0 28px; }
 .pf-dock__vista { animation: pf-dock-entra var(--dock-t) var(--ease) both; }
 .pf-dock__vista > * { animation: pf-dock-sube var(--dock-t) var(--ease) backwards; }
 .pf-dock__vista > :nth-child(2) { animation-delay: 40ms; } .pf-dock__vista > :nth-child(3) { animation-delay: 80ms; } .pf-dock__vista > :nth-child(4) { animation-delay: 120ms; } .pf-dock__vista > :nth-child(5) { animation-delay: 160ms; }
@@ -142,12 +158,12 @@ img { display: block; max-width: 100%; }
 @media (hover: hover) and (pointer: fine) { .pf-dock__pie a:hover { background: var(--azul); color: var(--tiza); } }
 .pf-dock__pie span { margin-left: auto; color: var(--ink-3); font-size: var(--texto-mini); }
 
-/* Flechas cortas (las del menú de Arquitectura). Base sin especificidad: cada pieza la ajusta si hace falta. */
+/* Flechas cortas. Base sin especificidad: cada pieza la ajusta si hace falta. */
 :where(.pf-dock__panel) svg { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .pf-ir svg, .pf-ext svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: none; transition: transform 240ms var(--ease); }
 
 /* Columna de presentación de la sección (las dos propuestas). */
-.pf-sec { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 14px 8px 0 4px; }
+.pf-sec { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 14px 8px 0 0; }
 .pf-sec h2 { margin: 0; font: 600 clamp(26px, 2.4vw, 34px)/1 var(--f-display); letter-spacing: -.02em; color: var(--azul); }
 .pf-sec p { margin: 0; max-width: 30ch; color: var(--ink-2); font-size: var(--texto-chico); }
 .pf-sec a { display: inline-flex; align-items: center; gap: 8px; margin-top: 4px; height: 40px; padding: 0 16px; border-radius: var(--radio-control); background: var(--azul); color: var(--tiza); font: 500 var(--texto-chico)/1 var(--f-body); }
@@ -163,16 +179,14 @@ img { display: block; max-width: 100%; }
 @media (hover: hover) and (pointer: fine) {
   .pf-tarjeta__foto:hover img { transform: scale(1.05); }
   .pf-tarjeta__foto:hover::after { background: rgba(0, 0, 0, .18); }
-  .pf-tarjeta__foto:hover .pf-ir svg { transform: translateX(3px); }
+  .pf-tarjeta__foto:hover .pf-ir svg, .pf-tarjeta__foto.pf-ir:hover svg { transform: translateX(3px); }
 }
 .pf-tarjeta ul { list-style: none; margin: 0; padding: 0 4px; display: grid; gap: 2px; }
 .pf-tarjeta li a { display: inline-flex; padding: 3px 0; color: var(--ink-2); font-size: var(--texto-chico); transition: color 200ms ease; }
 @media (hover: hover) and (pointer: fine) { .pf-tarjeta li a:hover { color: var(--azul); } }
-/* Novedades: título debajo de la foto, con fecha. */
 .pf-nota__fecha { color: var(--ink-3); font-size: var(--texto-mini); padding: 0 4px; }
 .pf-nota__titulo { padding: 0 4px; font: 500 var(--texto-chico)/1.35 var(--f-body); color: var(--ink); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .pf-tarjeta--nota .pf-tarjeta__foto::after { background: rgba(0, 0, 0, 0); }
-/* Enlaces sueltos de la sección (los que no tienen foto). */
 .pf-a__links { grid-column: 2 / -1; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
 .pf-a__links a { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; border-radius: var(--radio-control); border: 1px solid var(--line); color: var(--ink); font-size: var(--texto-chico); transition: background 200ms ease; }
 @media (hover: hover) and (pointer: fine) { .pf-a__links a:hover { background: var(--bg); } .pf-a__links a:hover svg { transform: translateX(3px); } }
@@ -186,6 +200,7 @@ img { display: block; max-width: 100%; }
 .pf-b__fila svg { opacity: 0; transform: translateX(-6px); transition: opacity 200ms ease, transform 300ms var(--ease); }
 .pf-b__lista > li.pf-sel > .pf-b__fila { color: var(--azul); padding-left: 10px; }
 .pf-b__lista > li.pf-sel > .pf-b__fila svg { opacity: 1; transform: none; }
+.pf-b__fila--extra { font-size: var(--texto-cuerpo); color: var(--ink-2); }
 .pf-b__hijos { list-style: none; margin: -4px 0 0; padding: 0 4px 12px 10px; display: flex; flex-wrap: wrap; gap: 4px 14px; }
 .pf-b__hijos a { color: var(--ink-2); font-size: var(--texto-chico); transition: color 200ms ease; }
 @media (hover: hover) and (pointer: fine) { .pf-b__hijos a:hover { color: var(--azul); } }
@@ -198,54 +213,86 @@ img { display: block; max-width: 100%; }
 .pf-b--notas .pf-b__fila { font-size: var(--texto-cuerpo); line-height: 1.3; }
 .pf-b--notas .pf-b__fila small { display: block; margin-top: 4px; color: var(--ink-3); font: 400 var(--texto-mini)/1 var(--f-body); }
 
+/* ---------- Resultados del buscador dentro del dock ---------- */
+/* El panel del componente de alcance se muda adentro del dock: pierde su caja flotante y toma la grilla del panel. */
+.pf-dock .pf-alc__panel { position: static; width: auto; max-height: none; overflow: visible; padding: 0; border: 0; border-radius: 0; background: none; animation: pf-dock-entra var(--dock-t) var(--ease) both; }
+.pf-dock .pf-alc__panel:not([hidden]) { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 0 28px; align-items: start; }
+.pf-dock .pf-alc__cab { grid-column: 1 / -1; padding: 6px 0 14px; }
+.pf-dock .pf-alc__titulo { font-size: var(--texto-cuerpo); }
+.pf-dock .pf-alc__nada { grid-column: 1 / -1; padding: 6px 0 4px; }
+.pf-dock .pf-alc__grupo { padding: 0 0 12px; }
+/* Sin rótulos en mayúscula: el nombre del grupo va como el resto de la interfaz. */
+.pf-dock .pf-alc__g { padding: 14px 0 6px; text-transform: none; letter-spacing: 0; font: 500 var(--texto-cuerpo)/1.2 var(--f-body); color: var(--ink); }
+.pf-dock .pf-alc__item { margin-inline: -10px; }
+.pf-dock .pf-alc__ver { margin-left: -10px; }
+
 /* ---------- Celular ---------- */
-.pf-m-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-.pf-m-lista button { display: flex; align-items: center; gap: 14px; width: 100%; padding: 8px 12px 8px 8px; border: 0; border-radius: var(--radio-aviso); background: var(--bg); text-align: left; cursor: pointer; font: 500 var(--texto-destacado)/1.2 var(--f-body); color: var(--ink); }
-.pf-m-lista img { width: 56px; height: 56px; flex: none; border-radius: 12px; object-fit: cover; }
-.pf-m-lista button > svg { margin-left: auto; width: 18px; height: 18px; fill: none; stroke: var(--ink-3); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.pf-m-lista button:active { background: color-mix(in srgb, var(--bg) 80%, var(--ink)); }
-.pf-m-volver { display: inline-flex; align-items: center; gap: 6px; height: 36px; margin: 0 0 6px -4px; padding: 0 12px 0 8px; border: 0; border-radius: 999px; background: var(--bg); color: var(--ink-2); font-size: var(--texto-chico); cursor: pointer; }
-.pf-m-volver svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.pf-m-sec { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
-.pf-m-sec h2 { margin: 0; font: 600 28px/1 var(--f-display); letter-spacing: -.02em; color: var(--azul); }
-.pf-m-sec a { display: inline-flex; align-items: center; gap: 6px; color: var(--azul); font: 500 var(--texto-chico)/1 var(--f-body); white-space: nowrap; }
-.pf-m-grilla { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.pf-m-grilla .pf-tarjeta__nombre { left: 10px; right: 10px; bottom: 9px; font-size: var(--texto-chico); }
-.pf-m-grilla .pf-tarjeta ul { display: none; }
-/* Con cantidad impar, la primera va a lo ancho: la grilla cierra sin hueco. */
-.pf-m-grilla > :first-child:nth-last-child(odd) { grid-column: 1 / -1; }
-.pf-m-grilla > :first-child:nth-last-child(odd) .pf-tarjeta__foto { aspect-ratio: 16 / 7; }
-.pf-m-links { display: grid; margin-top: 14px; }
-.pf-m-links a { display: flex; align-items: center; justify-content: space-between; padding: 12px 4px; border-top: 1px solid var(--line); font-size: var(--texto-cuerpo); }
+/* Los niveles: cada uno es una pantalla. Entrar a una sección empuja la lista hacia la izquierda y la sección
+   llega desde la derecha; volver hace lo contrario. Mientras dura el paso, la que sale queda encima sin ocupar alto. */
+.pf-m { position: relative; }
+.pf-m-pant { padding-top: 8px; }
+.pf-m-pant.pf-sale { position: absolute; left: 0; right: 0; pointer-events: none; }
+
+/* Nivel 1: las secciones. Filas grandes, con su foto y una línea de qué hay adentro. */
+.pf-m-secs { list-style: none; margin: 0; padding: 0; }
+.pf-m-secs li + li { border-top: 1px solid var(--line); }
+.pf-m-secs button { display: grid; grid-template-columns: 56px minmax(0, 1fr) 20px; align-items: center; column-gap: 14px; width: 100%; min-height: 80px; padding: 12px 0; border: 0; background: none; text-align: left; cursor: pointer;
+  -webkit-user-select: none; user-select: none; transition: opacity 120ms ease; }
+.pf-m-secs button:active { opacity: .6; }
+.pf-m-secs img { width: 56px; height: 56px; border-radius: 14px; object-fit: cover; }
+.pf-m-secs b { display: block; font: 500 20px/1.2 var(--f-body); color: var(--ink); letter-spacing: -.01em; }
+.pf-m-secs small { display: -webkit-box; margin-top: 4px; font-size: var(--texto-chico); line-height: 1.35; color: var(--ink-2); -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.pf-m-secs button > svg { width: 20px; height: 20px; color: var(--ink-3); }
+
+/* Utilidad: botones de 48 px en dos columnas, no pastillas apretadas. */
+.pf-m-util { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--line); }
+.pf-m-util a { display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 48px; padding: 0 14px 0 16px; border-radius: var(--radio-control); background: var(--bg); color: var(--ink); font-size: var(--texto-chico); -webkit-user-select: none; user-select: none; transition: background 120ms ease; }
+.pf-m-util a:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.pf-m-util a svg { color: var(--ink-3); }
+.pf-m-util a:active { background: color-mix(in srgb, var(--bg) 86%, var(--ink)); }
+.pf-m-firma { margin: 16px 0 0; color: var(--ink-3); font-size: var(--texto-mini); }
+
+/* Nivel 2: la sección. Volver, título con su bajada, subsecciones con foto, páginas sueltas y el paso a la sección. */
+.pf-m-volver { position: relative; display: inline-flex; align-items: center; gap: 4px; height: 36px; margin: 2px 0 0 -2px; padding: 0 14px 0 8px; border: 0; border-radius: 999px; background: var(--chip-fondo); color: var(--chip-texto); font: 500 var(--texto-chico)/1 var(--f-body); cursor: pointer; -webkit-user-select: none; user-select: none; transition: background 120ms ease; }
+.pf-m-volver::after { content: ""; position: absolute; inset: -4px -4px; }
+.pf-m-volver svg { width: 18px; height: 18px; }
+.pf-m-volver:active { background: color-mix(in srgb, var(--azul) 24%, #fff); }
+.pf-m-titulo { margin: 20px 0 0; font: 600 34px/1 var(--f-display); letter-spacing: -.02em; color: var(--azul); }
+.pf-m-bajada { margin: 10px 0 0; color: var(--ink-2); font-size: var(--texto-cuerpo); line-height: 1.45; }
+.pf-m-subs { list-style: none; margin: 20px 0 0; padding: 0; border-top: 1px solid var(--line); }
+.pf-m-subs li { border-bottom: 1px solid var(--line); }
+.pf-m-subs a { display: grid; grid-template-columns: 72px minmax(0, 1fr) 18px; align-items: center; column-gap: 14px; min-height: 96px; padding: 12px 0; -webkit-user-select: none; user-select: none; transition: opacity 120ms ease; }
+.pf-m-subs a:active { opacity: .6; }
+.pf-m-subs img { width: 72px; height: 72px; border-radius: 16px; object-fit: cover; }
+.pf-m-subs b { display: block; font: 500 var(--texto-destacado)/1.25 var(--f-body); color: var(--ink); }
+.pf-m-subs small { display: -webkit-box; margin-top: 4px; font-size: var(--texto-chico); line-height: 1.4; color: var(--ink-2); -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.pf-m-subs--notas b { font-size: var(--texto-cuerpo); line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.pf-m-subs > li > a > svg { color: var(--ink-3); }
+.pf-m-mas { display: grid; margin-top: 8px; }
+.pf-m-mas a { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; border-bottom: 1px solid var(--line); color: var(--ink); font-size: var(--texto-cuerpo); -webkit-user-select: none; user-select: none; }
+.pf-m-mas a svg { color: var(--ink-3); }
+.pf-m-mas a:active { color: var(--azul); }
+.pf-m-todo { display: flex; align-items: center; justify-content: center; gap: 8px; height: 52px; margin-top: 24px; border-radius: var(--radio-control); background: var(--azul); color: var(--tiza); font: 500 var(--texto-cuerpo)/1 var(--f-body); -webkit-user-select: none; user-select: none; transition: background 120ms ease; }
+.pf-m-todo:active { background: color-mix(in srgb, var(--azul) 86%, #000); }
 
 @media (max-width: 1100px) {
   .pf-a { grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); }
-  .pf-a > .pf-sec { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; align-items: center; padding: 6px 4px 8px; }
+  .pf-a > .pf-sec { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; align-items: center; padding: 6px 0 8px; }
   .pf-a > .pf-sec p { flex: 1 1 260px; max-width: none; }
   .pf-a__links { grid-column: 1 / -1; }
   .pf-b { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); }
-  .pf-b > .pf-sec { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; align-items: center; padding: 6px 4px 0; }
+  .pf-b > .pf-sec { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; align-items: center; padding: 6px 0 0; }
   .pf-b > .pf-sec p { flex: 1 1 260px; max-width: none; }
-  .pf-dock__util { display: none; }
 }
 @media (max-width: 860px) {
-  :root { --dock-gap: 8px; --dock-r: 22px; }
-  .pf-dock__barra { height: 60px; padding: 0 6px 0 16px; }
-  .pf-dock__logo { width: 56px; }
-  .pf-dock__menu { display: none; }
-  .pf-dock__movil { display: inline-flex; align-items: center; gap: 8px; height: 42px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--foto-boton); color: inherit; font: 500 var(--texto-chico)/1 var(--f-body); cursor: pointer; }
-  .pf-dock__movil i { display: grid; grid-template-columns: repeat(2, 6px); gap: 3px; }
-  .pf-dock__movil i b { width: 6px; height: 6px; border-radius: 999px; border: 1.5px solid currentColor; }
-  .pf-abierto .pf-dock__movil { background: var(--azul); color: var(--tiza); }
-  .pf-dock__lupa { width: 44px; height: 44px; }
-  .pf-dock__panel-in { padding: 6px 10px 12px; }
-  .pf-dock__panel { overscroll-behavior: contain; }
-  .pf-dock__pie { margin-top: 14px; padding-top: 12px; }
-  .pf-dock__pie span { display: none; }
+  .pf-dock__panel { overflow-x: hidden; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+  .pf-dock__panel-in { padding: 0 0 calc(24px + env(safe-area-inset-bottom, 0px)); }
+  .pf-dock .pf-alc__panel:not([hidden]) { display: block; padding-top: 4px; }
+  .pf-dock .pf-alc__item { padding-block: 11px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .pf-dock__panel, .pf-dock::before, .pf-dock-scrim { transition: none; }
-  .pf-dock__vista, .pf-dock__vista > * { animation: none; }
+  .pf-dock__panel, .pf-dock__caja, .pf-dock-scrim { transition: none; }
+  .pf-dock__vista, .pf-dock__vista > *, .pf-dock .pf-alc__panel { animation: none; }
   .pf-tarjeta__foto img, .pf-b__foto img { transition: opacity 200ms ease; transform: none !important; }
 }
 
@@ -263,19 +310,25 @@ img { display: block; max-width: 100%; }
 
 <div class="pf-dock-scrim" id="scrim"></div>
 
-<header class="pf-dock" id="dock">
-  <div class="pf-dock__barra">
-    <a class="pf-dock__logo" href="./" aria-label="Profertil"></a>
-    <nav class="pf-dock__menu" id="menu" aria-label="Principal"></nav>
-    <button class="pf-dock__movil" id="movil" type="button" aria-expanded="false" aria-controls="panel"><i><b></b><b></b><b></b><b></b></i>Menú</button>
-    <div class="pf-dock__lado">
-      <a class="pf-dock__util" href="#">Inversores</a>
-      <a class="pf-dock__util" href="#">Contacto</a>
-      <button class="pf-dock__lupa" type="button" aria-label="Buscar"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></button>
-    </div>
+<header class="pf-barra pf-dock" id="pf-top">
+  <div class="pf-dock__caja" id="caja" aria-hidden="true"></div>
+  <div class="pf-barra__in">
+    <nav class="pf-barra__nav" id="pf-nav" aria-label="Sitio">
+      <a class="pf-barra__logo" href="./" aria-label="Profertil"><span class="pf-dock__logo"></span></a>
+      <div class="pf-barra__menu" id="menu"></div>
+      <button class="pf-barra__menu-mobile pf-dock__movil" id="movil" type="button" aria-expanded="false" aria-controls="panel"><i><b></b><b></b><b></b><b></b></i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg><span>Menú</span></button>
+      <div class="pf-barra__busca" id="pf-busca" role="search">
+        <button class="pf-barra__lupa" id="pf-goSearch" type="button" aria-label="Buscar en el sitio" aria-expanded="false" aria-controls="pf-q"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg></button>
+        <input id="pf-q" name="q" type="search" autocomplete="off" spellcheck="false" enterkeyhint="search" placeholder="Buscá en el sitio" aria-label="Buscar en el sitio" tabindex="-1">
+      </div>
+      <button class="pf-barra__cerrar" id="pf-qClose" type="button" aria-label="Cerrar buscador" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </nav>
   </div>
   <div class="pf-dock__panel" id="panel" role="region" aria-label="Menú">
-    <div class="pf-dock__panel-in" id="panelIn"></div>
+    <div class="pf-dock__panel-in" id="panelIn">
+      <div id="vistas"></div>
+      <div id="buscaSlot"></div>
+    </div>
   </div>
 </header>
 
@@ -338,21 +391,24 @@ const SECCIONES = [
       { t: 'Donación al CFP N°401 que fortalece la formación en oficios', fe: '23 abr 2026', f: N + 'donacion-al-cfp-n401-que-fortalece-la-formacion-en-oficios.webp' },
     ] },
 ];
-const UTIL = [['Sala de prensa'], ['Inversores'], ['Proveedores'], ['Sumate a nuestro equipo', true], ['Contacto']];
+const UTIL = [['Sala de prensa'], ['Inversores'], ['Proveedores'], ['Contacto'], ['Sumate a nuestro equipo', true]];
 
 /* ---------- Íconos ---------- */
 const IR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12h10M13 8l4 4-4 4"/></svg>';
 const EXT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 16l8-8M10 8h6v6"/></svg>';
-const CHEV = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
 const DER = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>';
 const IZQ = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>';
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
-const dock = $('#dock'), panel = $('#panel'), panelIn = $('#panelIn'), menu = $('#menu'), scrim = $('#scrim'), movil = $('#movil');
-const esMovil = () => matchMedia('(max-width: 860px)').matches;
+const dock = $('#pf-top'), caja = $('#caja'), nav = $('#pf-nav'), panel = $('#panel'), panelIn = $('#panelIn'), vistas = $('#vistas'), slot = $('#buscaSlot');
+const menu = $('#menu'), scrim = $('#scrim'), movil = $('#movil'), busca = $('#pf-busca');
+const MQ = matchMedia('(max-width: 860px)');
+const esMovil = () => MQ.matches;
+const quieto = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 let V = new URLSearchParams(location.search).get('v') === 'b' ? 'b' : 'a';
-let abierta = null;      // id de la sección abierta (escritorio) o 'menu' / id (celular)
+let abierta = null;   // id de la sección, 'menu' (celular) o 'busca'
+let origen = null;    // la pieza de la que nace la caja: cápsula, pastilla Menú o campo del buscador
 
 /* ---------- Piezas ---------- */
 const sec = (s) => `<div class="pf-sec"><h2>${esc(s.nombre)}</h2><p>${esc(s.bajada)}</p><a class="pf-ir" href="#">Ver todo${IR}</a></div>`;
@@ -369,103 +425,194 @@ function vistaB(s) {
   const filas = s.notas
     ? s.notas.map((n, i) => `<li data-i="${i}"${i ? '' : ' class="pf-sel"'}><a class="pf-b__fila" href="#"><span>${esc(n.t)}<small>${n.fe}</small></span>${IR}</a></li>`)
     : s.items.map((it, i) => `<li data-i="${i}"${i ? '' : ' class="pf-sel"'}><a class="pf-b__fila" href="#">${esc(it.n)}${IR}</a>${it.h ? `<ul class="pf-b__hijos">${it.h.map((h) => `<li><a href="#">${esc(h)}</a></li>`).join('')}</ul>` : ''}</li>`);
-  const extra = s.links ? s.links.map((l) => `<li><a class="pf-b__fila" href="#" style="font-size:var(--texto-cuerpo);color:var(--ink-2)">${esc(l)}${IR}</a></li>`) : [];
+  const extra = s.links ? s.links.map((l) => `<li><a class="pf-b__fila pf-b__fila--extra" href="#">${esc(l)}${IR}</a></li>`) : [];
   const lista = s.notas ? s.notas : s.items;
   const fotos = lista.map((it, i) => `<img src="${it.f}" alt="" data-i="${i}"${i === 0 ? ' class="pf-ve"' : ''}>`).join('');
   const t0 = s.notas ? { b: 'Novedades', s: lista[0].fe } : { b: lista[0].n, s: lista[0].d };
   return `<div class="pf-dock__vista pf-b${s.notas ? ' pf-b--notas' : ''}">${sec(s)}<ul class="pf-b__lista">${filas.join('')}${extra.join('')}</ul><div class="pf-b__foto">${fotos}<div class="pf-b__pie"><b>${esc(t0.b)}</b><span>${esc(t0.s)}</span></div></div></div>${pie()}`;
 }
-function vistaMovilMenu() {
-  return `<div class="pf-dock__vista"><ul class="pf-m-lista">${SECCIONES.map((s) => `<li><button type="button" data-sec="${s.id}"><img src="${s.foto || s.notas[0].f}" alt="">${esc(s.nombre)}${DER}</button></li>`).join('')}</ul></div>${pie()}`;
+
+/* Celular, nivel 1: las secciones y la utilidad. */
+function movilMenu() {
+  const filas = SECCIONES.map((s) => `<li><button type="button" data-sec="${s.id}"><img src="${s.foto || s.notas[0].f}" alt=""><span><b>${esc(s.nombre)}</b><small>${esc(s.bajada)}</small></span>${DER}</button></li>`).join('');
+  const util = UTIL.map(([t, ext]) => `<a href="#">${esc(t)}${ext ? EXT : IR}</a>`).join('');
+  return `<ul class="pf-m-secs">${filas}</ul><nav class="pf-m-util" aria-label="Más">${util}</nav><p class="pf-m-firma">Profertil · Bahía Blanca, Argentina</p>`;
 }
-function vistaMovilSec(s) {
-  const grilla = s.notas ? s.notas.map(nota) : s.items.map(tarjeta);
-  const subs = s.notas ? [] : s.items.flatMap((it) => it.h || []).concat(s.links || []);
-  return `<div class="pf-dock__vista"><button class="pf-m-volver" type="button" data-volver>${IZQ}Menú</button><div class="pf-m-sec"><h2>${esc(s.nombre)}</h2><a class="pf-ir" href="#">Ver todo${IR}</a></div><div class="pf-m-grilla">${grilla.join('')}</div>${subs.length ? `<div class="pf-m-links">${subs.map((l) => `<a class="pf-ir" href="#">${esc(l)}${IR}</a>`).join('')}</div>` : ''}</div>`;
+/* Celular, nivel 2: una sección. */
+function movilSec(s) {
+  const subs = s.notas
+    ? s.notas.map((n) => `<li><a href="#"><img src="${n.f}" alt="" loading="lazy"><span><b>${esc(n.t)}</b><small>${n.fe}</small></span>${IR}</a></li>`)
+    : s.items.map((it) => `<li><a href="#"><img src="${it.f}" alt="" loading="lazy"><span><b>${esc(it.n)}</b><small>${esc(it.d)}</small></span>${IR}</a></li>`);
+  const mas = s.notas ? [] : s.items.flatMap((it) => it.h || []).concat(s.links || []);
+  const todo = s.notas ? 'Ver todas las novedades' : 'Ver todo ' + s.nombre;
+  return `<button class="pf-m-volver" type="button" data-volver>${IZQ}Menú</button>` +
+    `<h2 class="pf-m-titulo">${esc(s.nombre)}</h2><p class="pf-m-bajada">${esc(s.bajada)}</p>` +
+    `<ul class="pf-m-subs${s.notas ? ' pf-m-subs--notas' : ''}">${subs.join('')}</ul>` +
+    (mas.length ? `<div class="pf-m-mas">${mas.map((l) => `<a href="#">${esc(l)}${IR}</a>`).join('')}</div>` : '') +
+    `<a class="pf-m-todo" href="#">${esc(todo)}${IR}</a>`;
 }
 
 /* ---------- Alto del panel: sigue al contenido ---------- */
-function topeAlto() { return innerHeight - dock.getBoundingClientRect().top - 60 - 16; }
+function tope() { return innerHeight - nav.getBoundingClientRect().bottom - (esMovil() ? 64 : 48); }
 function medir() {
   if (!abierta) { panel.style.height = '0px'; return; }
-  const h = panelIn.offsetHeight, tope = topeAlto();
-  panel.style.height = Math.min(h, tope) + 'px';
-  panel.style.overflowY = h > tope ? 'auto' : 'hidden';
+  const h = panelIn.offsetHeight, t = tope();
+  panel.style.height = Math.min(h, t) + 'px';
+  panel.style.overflowY = h > t ? 'auto' : 'hidden';
 }
 new ResizeObserver(medir).observe(panelIn);
 addEventListener('resize', medir);
 
+/* ---------- La caja: nace de la pieza tocada y se abre hasta la barra entera ---------- */
+function recorte(el, ref = dock) {
+  const h = ref.getBoundingClientRect(), r = el.getBoundingClientRect();
+  return `inset(${r.top - h.top}px ${h.right - r.right}px calc(100% - ${r.bottom - h.top}px) ${r.left - h.left}px round ${r.height / 2}px)`;
+}
+const entero = () => `inset(0px 0px 0px 0px round 0px 0px ${getComputedStyle(document.documentElement).getPropertyValue('--dock-r').trim()} ${getComputedStyle(document.documentElement).getPropertyValue('--dock-r').trim()})`;
+// El panel se recorta igual que la caja: lo que tiene adentro no asoma fuera de ella mientras crece.
+function cajaAbrir(el) {
+  caja.style.transition = panel.style.transition = 'none';
+  caja.style.clipPath = recorte(el);
+  panel.style.clipPath = recorte(el, panel);
+  caja.style.opacity = '0';
+  caja.offsetWidth;
+  caja.style.transition = panel.style.transition = '';
+  caja.style.opacity = '1';
+  caja.style.clipPath = panel.style.clipPath = entero();
+}
+function cajaCerrar(el) {
+  const t = getComputedStyle(document.documentElement).getPropertyValue('--dock-t').trim();
+  // Vuelve a la pieza y recién al final se funde: deja ver otra vez el vidrio de la cápsula.
+  caja.style.transition = `clip-path ${t} var(--ease), opacity 180ms ease calc(${t} - 220ms)`;
+  const ok = el && el.offsetParent;
+  caja.style.clipPath = ok ? recorte(el) : 'inset(0px 0px 100% 0px)';
+  panel.style.clipPath = ok ? recorte(el, panel) : 'inset(0px 0px 100% 0px)';
+  caja.style.opacity = '0';
+}
+
 /* ---------- Abrir, cambiar y cerrar ---------- */
-function pintar() {
-  if (!abierta) return;
-  if (esMovil()) panelIn.innerHTML = abierta === 'menu' ? vistaMovilMenu() : vistaMovilSec(SECCIONES.find((s) => s.id === abierta));
-  else { const s = SECCIONES.find((x) => x.id === abierta); panelIn.innerHTML = V === 'a' ? vistaA(s) : vistaB(s); }
+function pintarEscritorio() {
+  const s = SECCIONES.find((x) => x.id === abierta);
+  vistas.innerHTML = V === 'a' ? vistaA(s) : vistaB(s);
   panel.scrollTop = 0;
 }
-function abrir(id) {
+function modo() {
+  const b = abierta === 'busca';
+  vistas.hidden = b; slot.hidden = !b;
+  panel.setAttribute('aria-label', b ? 'Resultados de la búsqueda' : 'Menú');
+}
+function abrir(id, el) {
   if (abierta === id) return;
+  const venia = abierta;
   abierta = id;
-  dock.classList.add('pf-abierto');
-  document.documentElement.classList.add('pf-dock-abierto');
-  if (esMovil()) document.documentElement.classList.add('pf-dock-bloqueo');
+  modo();
+  if (!venia) {
+    origen = el;
+    cajaAbrir(el);
+    dock.classList.add('pf-abierto');
+    document.documentElement.classList.add('pf-dock-abierto');
+    if (esMovil()) document.documentElement.classList.add('pf-dock-bloqueo');
+  }
   menu.querySelectorAll('button').forEach((b) => b.setAttribute('aria-expanded', String(b.dataset.sec === id)));
-  movil.setAttribute('aria-expanded', 'true');
-  pintar();
+  if (id === 'busca') { /* el contenido lo pone el buscador */ }
+  else if (esMovil()) { movil.setAttribute('aria-expanded', 'true'); movil.querySelector('span').textContent = 'Cerrar'; vistas.innerHTML = '<div class="pf-m"></div>'; irA(movilMenu(), 0); }
+  else pintarEscritorio();
   medir();
 }
 function cerrar() {
   if (!abierta) return;
+  const eraBusca = abierta === 'busca';
   abierta = null;
+  cajaCerrar(eraBusca ? $('#pf-goSearch') : origen);
   dock.classList.remove('pf-abierto');
   document.documentElement.classList.remove('pf-dock-abierto', 'pf-dock-bloqueo');
   menu.querySelectorAll('button').forEach((b) => b.setAttribute('aria-expanded', 'false'));
-  movil.setAttribute('aria-expanded', 'false');
+  movil.setAttribute('aria-expanded', 'false'); movil.querySelector('span').textContent = 'Menú';
   medir();
+  if (eraBusca && nav.classList.contains('pf-buscando')) $('#pf-qClose').click();
   // El contenido se borra cuando termina de cerrar, para que no desaparezca mientras baja el alto.
   const t = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--t-barra')) || 520;
-  clearTimeout(cerrar.t); cerrar.t = setTimeout(() => { if (!abierta) panelIn.innerHTML = ''; }, t);
+  clearTimeout(cerrar.t); cerrar.t = setTimeout(() => { if (!abierta) vistas.innerHTML = ''; }, t);
 }
 
-menu.innerHTML = SECCIONES.map((s) => `<button class="pf-dock__item" type="button" data-sec="${s.id}" aria-expanded="false" aria-controls="panel">${esc(s.nombre)}${CHEV}</button>`).join('');
+/* Celular: cada nivel es una pantalla; entrar empuja hacia la izquierda, volver hacia la derecha. */
+function irA(html, dir) {
+  const cont = vistas.querySelector('.pf-m'); if (!cont) return;
+  const vieja = cont.querySelector('.pf-m-pant:not(.pf-sale)');
+  const nueva = document.createElement('div');
+  nueva.className = 'pf-m-pant';
+  nueva.innerHTML = html;
+  const scroll = panel.scrollTop;
+  cont.appendChild(nueva);
+  panel.scrollTop = 0;
+  if (!vieja) return;
+  if (!dir || quieto()) { vieja.remove(); return; }
+  vieja.classList.add('pf-sale');
+  vieja.style.top = -scroll + 'px';
+  const o = { duration: 420, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' };
+  nueva.animate([{ transform: `translateX(calc(${dir * 100}% + ${dir * 16}px))` }, { transform: 'none' }], o);
+  vieja.animate([{ transform: 'none', opacity: 1 }, { transform: `translateX(${-dir * 30}%)`, opacity: 0 }], { ...o, fill: 'forwards' }).finished.then(() => vieja.remove());
+  // El foco va al principio del nivel nuevo: al botón de volver o a la primera sección.
+  const f = nueva.querySelector('button, a'); if (f) f.focus({ preventScroll: true });
+}
+
+menu.innerHTML = SECCIONES.map((s) => `<button type="button" data-sec="${s.id}" aria-expanded="false" aria-controls="panel">${esc(s.nombre)}</button>`).join('');
 
 /* Escritorio: abre al señalar (con una pausa corta para no abrir al pasar de largo) y con clic. */
 let tAbrir, tCerrar;
 menu.addEventListener('pointerover', (e) => {
-  const b = e.target.closest('[data-sec]'); if (!b || e.pointerType !== 'mouse') return;
+  const b = e.target.closest('[data-sec]'); if (!b || e.pointerType !== 'mouse' || abierta === 'busca') return;
   clearTimeout(tCerrar); clearTimeout(tAbrir);
-  tAbrir = setTimeout(() => abrir(b.dataset.sec), abierta ? 60 : 140);
+  tAbrir = setTimeout(() => abrir(b.dataset.sec, menu), abierta ? 60 : 140);
 });
 menu.addEventListener('pointerout', () => clearTimeout(tAbrir));
 menu.addEventListener('click', (e) => {
   const b = e.target.closest('[data-sec]'); if (!b) return;
   clearTimeout(tAbrir);
-  abierta === b.dataset.sec ? cerrar() : abrir(b.dataset.sec);
+  abierta === b.dataset.sec ? cerrar() : abrir(b.dataset.sec, menu);
 });
-dock.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse' && !esMovil()) tCerrar = setTimeout(cerrar, 320); });
+dock.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse' && !esMovil() && abierta !== 'busca') tCerrar = setTimeout(cerrar, 320); });
 dock.addEventListener('pointerenter', () => clearTimeout(tCerrar));
 scrim.addEventListener('click', cerrar);
-addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrar(); });
+addEventListener('keydown', (e) => { if (e.key === 'Escape' && abierta && abierta !== 'busca') { const m = abierta; cerrar(); (esMovil() ? movil : menu.querySelector(`[data-sec="${m}"]`) || movil).focus(); } });
 
 /* Celular: Menú abre la lista; cada sección se abre adentro del mismo panel. */
-movil.addEventListener('click', () => (abierta ? cerrar() : abrir('menu')));
-panelIn.addEventListener('click', (e) => {
-  const s = e.target.closest('[data-sec]'); if (s) { abierta = s.dataset.sec; pintar(); return; }
-  if (e.target.closest('[data-volver]')) { abierta = 'menu'; pintar(); }
+movil.addEventListener('click', () => (abierta ? cerrar() : abrir('menu', movil)));
+vistas.addEventListener('click', (e) => {
+  const s = e.target.closest('[data-sec]');
+  if (s && esMovil()) { irA(movilSec(SECCIONES.find((x) => x.id === s.dataset.sec)), 1); return; }
+  if (e.target.closest('[data-volver]')) irA(movilMenu(), -1);
 });
-matchMedia('(max-width: 860px)').addEventListener('change', cerrar);
+MQ.addEventListener('change', cerrar);
 
 /* Propuesta B: la foto cambia con el ítem que se señala. */
-panelIn.addEventListener('pointerover', (e) => {
+vistas.addEventListener('pointerover', (e) => {
   const li = e.target.closest('.pf-b__lista > li[data-i]'); if (!li) return;
-  const i = li.dataset.i, caja = panelIn.querySelector('.pf-b__foto'); if (!caja) return;
-  panelIn.querySelectorAll('.pf-b__lista > li').forEach((x) => x.classList.toggle('pf-sel', x === li));
-  caja.querySelectorAll('img').forEach((im) => im.classList.toggle('pf-ve', im.dataset.i === i));
+  const i = li.dataset.i, foto = vistas.querySelector('.pf-b__foto'); if (!foto) return;
+  vistas.querySelectorAll('.pf-b__lista > li').forEach((x) => x.classList.toggle('pf-sel', x === li));
+  foto.querySelectorAll('img').forEach((im) => im.classList.toggle('pf-ve', im.dataset.i === i));
   const s = SECCIONES.find((x) => x.id === abierta), it = (s.notas || s.items)[i];
-  caja.querySelector('.pf-b__pie').innerHTML = s.notas ? `<b>Novedades</b><span>${it.fe}</span>` : `<b>${esc(it.n)}</b><span>${esc(it.d)}</span>`;
+  foto.querySelector('.pf-b__pie').innerHTML = s.notas ? `<b>Novedades</b><span>${it.fe}</span>` : `<b>${esc(it.n)}</b><span>${esc(it.d)}</span>`;
+});
+
+/* ---------- Buscador: el de la barra, con resultados dentro del dock ---------- */
+// El componente de alcance (../buscador/alcance.js) abre y cierra el campo, atiende "/" y Esc y arma los
+// resultados. Acá solo se muda su panel adentro del dock y se sigue lo que hace:
+// abrir el campo cierra la sección abierta; cuando hay resultados, el dock crece desde el campo.
+addEventListener('DOMContentLoaded', () => {
+  const res = document.getElementById('pf-alc-panel'); if (!res) return;
+  slot.appendChild(res);
+  new MutationObserver(() => {
+    if (!res.hidden) abrir('busca', busca);
+    else if (abierta === 'busca') cerrar();
+  }).observe(res, { attributes: true, attributeFilter: ['hidden'] });
+  new MutationObserver(() => {
+    if (nav.classList.contains('pf-buscando') && abierta && abierta !== 'busca') cerrar();
+  }).observe(nav, { attributes: true, attributeFilter: ['class'] });
 });
 
 /* ---------- Barra sólida al bajar ---------- */
-const solida = () => dock.classList.toggle('pf-dock--solida', scrollY > innerHeight * .6);
+const solida = () => dock.classList.toggle('pf-barra--solida', scrollY > innerHeight * .6);
 addEventListener('scroll', solida, { passive: true }); solida();
 
 /* ---------- Selector de propuesta ---------- */
@@ -478,7 +625,7 @@ function marcar() {
 prop.forEach((b) => b.addEventListener('click', () => {
   V = b.dataset.v; marcar();
   const u = new URL(location); u.searchParams.set('v', V); history.replaceState(null, '', u);
-  if (abierta && !esMovil()) pintar();
+  if (abierta && abierta !== 'busca' && !esMovil()) pintarEscritorio();
 }));
 document.fonts.ready.then(marcar); marcar();
 
