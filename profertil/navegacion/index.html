@@ -147,10 +147,19 @@ img { display: block; max-width: 100%; }
 /* Pastilla Menú (en la barra real es un rótulo; acá es el botón). Área de toque de 44 px sin agrandarla. */
 .pf-dock__movil { position: relative; border: 1px solid var(--foto-borde); background: var(--foto-fondo); cursor: pointer; transition: background 200ms ease, color 200ms ease, border-color 200ms ease, opacity 220ms ease; }
 .pf-dock__movil::after { content: ""; position: absolute; inset: -6px -4px; }
-.pf-dock__movil svg { display: none; width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
-.pf-dock__movil[aria-expanded="true"] { background: var(--azul); border-color: var(--azul); color: var(--tiza); }
-.pf-dock__movil[aria-expanded="true"] i { display: none; }
-.pf-dock__movil[aria-expanded="true"] svg { display: block; }
+/* Círculos y cruz son un mismo ícono que cambia con --pf-x (0 = Menú, 1 = Cerrar), con el tiempo y la curva de la hoja.
+   Al ser una transición, abrir y cerrar rápido retoma desde donde está; el arrastre de la hoja lo mueve a mano.
+   Los cuatro círculos giran un cuarto de vuelta y se juntan al centro; la cruz llega girando desde el otro lado. */
+@property --pf-x { syntax: "<number>"; inherits: true; initial-value: 0; }
+.pf-dock__movil { --pf-x: 0; --pf-giro: 1; transition: background 200ms ease, color 200ms ease, border-color 200ms ease, opacity 220ms ease, --pf-x var(--dock-t) var(--ease); }
+.pf-dock__movil[aria-expanded="true"] { --pf-x: 1; background: var(--azul); border-color: var(--azul); color: var(--tiza); }
+.pf-dock__movil i { transform: rotate(calc(var(--pf-x) * var(--pf-giro) * 45deg)); opacity: calc(1 - var(--pf-x)); }
+.pf-dock__movil i b { transform: translate(calc(var(--pf-dx) * var(--pf-x) * var(--pf-giro) * 5px), calc(var(--pf-dy) * var(--pf-x) * var(--pf-giro) * 5px)) scale(calc(1 - var(--pf-x) * var(--pf-giro) * .5)); }
+.pf-dock__movil i b:nth-child(1) { --pf-dx: 1; --pf-dy: 1; }
+.pf-dock__movil i b:nth-child(2) { --pf-dx: -1; --pf-dy: 1; }
+.pf-dock__movil i b:nth-child(3) { --pf-dx: 1; --pf-dy: -1; }
+.pf-dock__movil i b:nth-child(4) { --pf-dx: -1; --pf-dy: -1; }
+.pf-dock__movil svg { position: absolute; left: 15.5px; top: calc(50% - 7px); width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; opacity: var(--pf-x); transform: rotate(calc((var(--pf-x) - 1) * var(--pf-giro) * 45deg)) scale(calc(1 - (1 - var(--pf-x)) * var(--pf-giro) * .4)); pointer-events: none; }
 .pf-dock__movil:active { background: color-mix(in srgb, var(--azul) 86%, #000); }
 @media (max-width: 860px) {
   .pf-dock .pf-barra__menu { display: none; }
@@ -307,6 +316,8 @@ img { display: block; max-width: 100%; }
   .pf-dock__panel, .pf-dock__caja, .pf-dock-scrim, .pf-dock .pf-barra__menu > .pf-dock__capa { transition: none !important; }
   .pf-dock__vista, .pf-dock__vista > *, .pf-dock .pf-alc__panel { animation: none; }
   .pf-tarjeta__foto img, .pf-b__foto img { transition: opacity 200ms ease; transform: none !important; }
+  /* Pastilla: sin giro ni desplazamiento, solo el fundido corto entre los dos íconos. */
+  .pf-dock__movil { --pf-giro: 0; transition: background 200ms ease, color 200ms ease, border-color 200ms ease, opacity 220ms ease, --pf-x 200ms ease; }
 }
 
 /* ---------- Selector de propuesta (fuera del sitio: solo para comparar) ---------- */
@@ -516,6 +527,7 @@ function tiroPintar(dy) {
   const d = dy > 0 ? dy * .2 : dy;
   caja.style.transform = panel.style.transform = `translateY(${d}px)`;
   scrim.style.opacity = String(Math.max(0, 1 + d / tiro.h));
+  movil.style.setProperty('--pf-x', Math.min(1, Math.max(0, 1 + d / tiro.h)).toFixed(3));   // el ícono sigue la hoja
 }
 dock.addEventListener('touchstart', (e) => {
   if (!esMovil() || !abierta || abierta === 'busca' || cerrando || e.touches.length > 1) { tiro = null; return; }
@@ -530,7 +542,7 @@ dock.addEventListener('touchmove', (e) => {
     const alFinal = panel.scrollTop + panel.clientHeight >= panel.scrollHeight - 1;
     if (Math.abs(dy) <= Math.abs(dx) || dy > 0 || !alFinal) { tiro = null; return; }
     tiro.activo = true; tiro.y = t.clientY;
-    caja.style.transition = panel.style.transition = scrim.style.transition = 'none';
+    caja.style.transition = panel.style.transition = scrim.style.transition = movil.style.transition = 'none';
   }
   e.preventDefault();
   const ahora = performance.now(), y = t.clientY - tiro.y;
@@ -549,11 +561,11 @@ function tiroSoltar(e) {
   const base = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--t-barra')) || 520;
   const resto = cierra ? (h + dy) / h : Math.min(1, Math.abs(dy) / h + .3);
   const ms = Math.round(Math.max(180, base * resto));
-  caja.style.transition = panel.style.transition = scrim.style.transition = '';
-  caja.style.transitionDuration = panel.style.transitionDuration = scrim.style.transitionDuration = ms + 'ms';
-  caja.style.transform = ''; scrim.style.opacity = '';
+  caja.style.transition = panel.style.transition = scrim.style.transition = movil.style.transition = '';
+  caja.style.transitionDuration = panel.style.transitionDuration = scrim.style.transitionDuration = movil.style.transitionDuration = ms + 'ms';
+  caja.style.transform = ''; scrim.style.opacity = ''; movil.style.removeProperty('--pf-x');
   if (cierra) cerrar(); else panel.style.transform = 'none';
-  setTimeout(() => { caja.style.transitionDuration = panel.style.transitionDuration = scrim.style.transitionDuration = ''; }, ms + 40);
+  setTimeout(() => { caja.style.transitionDuration = panel.style.transitionDuration = scrim.style.transitionDuration = movil.style.transitionDuration = ''; }, ms + 40);
 }
 dock.addEventListener('touchend', tiroSoltar);
 dock.addEventListener('touchcancel', tiroSoltar);
