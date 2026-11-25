@@ -530,7 +530,7 @@
   /* Pestañas de sección fuera de la fila de herramientas, en prueba con tres variantes (?pestanas=a|b|c; 0 = el selector de la fila).
      a: índice dentro de la tarjeta de la cabecera. b: solapas que salen de la hoja. c: el título de la lista es la pestaña. */
   var pest = $("pf-pestanas");
-  var VARIANTE = (location.search.match(/[?&]pestanas=([0abc])/) || [])[1] || "a";
+  var VARIANTE = (location.search.match(/[?&]pestanas=([0abc])/) || [])[1] || "b";
   if (pest) {
     document.documentElement.setAttribute("data-pestanas", VARIANTE);
     if (VARIANTE === "a") document.querySelector(".pf-bh").appendChild(pest);

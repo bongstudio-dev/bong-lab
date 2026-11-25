@@ -290,8 +290,8 @@ html[data-pestanas="a"] .pf-seccion, html[data-pestanas="b"] .pf-seccion, html[d
 html[data-pestanas="a"] .pf-pestanas, html[data-pestanas="b"] .pf-pestanas, html[data-pestanas="c"] .pf-pestanas {
   position: relative; isolation: isolate; display: flex; max-width: 100%; overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain; }
 .pf-pestanas::-webkit-scrollbar { display: none; }
-.pf-pestanas button { position: relative; flex: none; display: inline-flex; align-items: baseline; gap: 6px; border: 0; background: none; cursor: pointer; white-space: nowrap; transition: color 240ms ease; }
-.pf-pestanas__n { font: 500 var(--texto-mini)/1 var(--f-body); font-variant-numeric: tabular-nums; }
+.pf-pestanas button { position: relative; flex: none; display: inline-flex; align-items: center; border: 0; background: none; cursor: pointer; white-space: nowrap; transition: color 240ms ease; }
+.pf-pestanas__n { margin-left: 6px; font: 500 var(--texto-mini)/1 var(--f-body); font-variant-numeric: tabular-nums; }
 
 /* a · Índice en la cabecera: las secciones cierran la tarjeta del título, como su índice, con una línea azul que viaja. */
 html[data-pestanas="a"] .pf-pestanas { align-self: stretch; gap: 28px; margin-top: 6px; padding-top: 18px; border-top: 1px solid var(--line); }
@@ -306,6 +306,11 @@ html[data-pestanas="b"] .pf-pestanas button { align-items: center; padding: 0 18
 html[data-pestanas="b"] .pf-pestanas button:not([aria-pressed="true"]) { background: var(--foto-fondo); }
 html[data-pestanas="b"] .pf-pestanas button[aria-pressed="true"] { color: var(--azul); }
 html[data-pestanas="b"] .pf-pestanas__ind { top: 0; bottom: -1px; border-radius: 18px 18px 0 0; background: var(--pf-papel, #fff); }
+/* Empalme cóncavo a cada lado de la solapa elegida: la solapa se abre hacia la hoja en vez de apoyarse en ángulo recto. */
+html[data-pestanas="b"] .pf-pestanas { overflow: visible; }
+html[data-pestanas="b"] .pf-pestanas__ind::before, html[data-pestanas="b"] .pf-pestanas__ind::after { content: ""; position: absolute; bottom: 1px; width: 14px; height: 14px; }
+html[data-pestanas="b"] .pf-pestanas__ind::before { left: -14px; background: radial-gradient(circle at 0 0, transparent 14px, var(--pf-papel, #fff) 14.5px); }
+html[data-pestanas="b"] .pf-pestanas__ind::after { right: -14px; background: radial-gradient(circle at 100% 0, transparent 14px, var(--pf-papel, #fff) 14.5px); }
 html[data-pestanas="b"] .pf-campo-seguir { display: none; } /* la pista de scroll quedaba entre las solapas: las solapas ya invitan a bajar */
 @media (hover: hover) and (pointer: fine) { html[data-pestanas="b"] .pf-pestanas button:not([aria-pressed="true"]):hover { background: var(--foto-borde); } }
 @media (min-width: 720px) {
@@ -326,6 +331,14 @@ html[data-pestanas="c"] .pf-pestanas__n { font-size: var(--texto-chico); }
 @media (max-width: 640px) {
   html[data-pestanas="a"] .pf-pestanas { gap: 16px; }
   html[data-pestanas="a"] .pf-pestanas button { font-size: 18px; }
-  html[data-pestanas="b"] .pf-pestanas { gap: 3px; }
-  html[data-pestanas="b"] .pf-pestanas button { padding: 0 13px; font-size: 16px; }
+}
+@media (max-width: 719px) {
+  /* Solapas en el celular: el nombre entero en dos líneas, las tres a lo ancho. Arrancan pasando la curva de la esquina de la hoja
+     (26 de radio + 14 del empalme = 40 desde el borde). */
+  html[data-pestanas="b"] .pf-pestanas { gap: 3px; height: 60px; margin-top: calc(-8px - 60px); padding-inline: 24px; overflow: visible; }
+  html[data-pestanas="b"] .pf-pestanas button { flex: 1 1 0; min-width: 0; padding: 0 10px; font-size: 15px; line-height: 1.1; text-align: left; white-space: normal; text-wrap: balance; border-radius: 16px 16px 0 0; }
+  html[data-pestanas="b"] .pf-pestanas__ind { border-radius: 16px 16px 0 0; }
+  html[data-pestanas="b"] .pf-pestanas__n { margin-left: 4px; }
+  html[data-pestanas="b"] .pf-seccion__largo { display: inline; }
+  html[data-pestanas="b"] .pf-seccion__corto { display: none; }
 }
