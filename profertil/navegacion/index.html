@@ -64,12 +64,12 @@
    cuelga ni un menú a pantalla completa.
 
    La caja del dock abarca toda la barra, de borde a borde, como la franja azul de la barra sólida: así el panel
-   tiene el ancho de la grilla de la página y el logo, el menú y la lupa no se mueven al abrir. Pero nace de lo que
-   se tocó: la caja aparece recortada a la cápsula del menú (o a la pastilla Menú, o al campo del buscador) y se
-   abre desde ahí hasta ocupar la barra entera. Al cerrar vuelve a esa cápsula.
+   tiene el ancho de la grilla de la página y el logo, el menú y la lupa no se mueven al abrir. Aparece como la
+   franja azul de la barra: baja deslizándose desde arriba, con la sección ya puesta encima, y al cerrar vuelve a
+   subir. Logo, menú y lupa quedan quietos arriba mientras la hoja pasa por debajo.
 
    El buscador es el de la barra con el componente de alcance (../buscador/): sus resultados se muestran dentro
-   del mismo dock. Abrir la lupa cierra la sección que estuviera abierta y la caja crece desde el campo.
+   del mismo dock. Abrir la lupa cierra la sección que estuviera abierta y la hoja baja con los resultados.
 
    Dos propuestas para el escritorio (?v=a o ?v=b):
    a  Tarjetas. Cada subsección es una foto con su nombre; debajo, sus páginas.
@@ -105,9 +105,13 @@ img { display: block; max-width: 100%; }
 /* La franja azul de la barra sólida queda del alto de la barra aunque el dock crezca. Sin sombra. */
 .pf-dock::before { bottom: auto; height: calc(var(--barra-h) + env(safe-area-inset-top, 0px)); }
 .pf-dock.pf-barra--solida::before { box-shadow: none; }
-/* La caja: tiza, de borde a borde. El JS la recorta a la pieza que se tocó y la abre hasta la barra entera. */
-.pf-dock__caja { position: absolute; inset: 0; z-index: -1; pointer-events: none; background: var(--tiza); opacity: 0;
-  transition: clip-path var(--dock-t) var(--ease), opacity 160ms ease; }
+/* La caja: tiza, de borde a borde, con las esquinas de abajo redondeadas. Cerrada espera arriba, fuera de la
+   pantalla, del alto que va a tener; al abrir baja junto con el panel (el JS mueve los dos a la par). */
+.pf-dock__caja { position: absolute; inset: 0; z-index: -1; pointer-events: none; background: var(--tiza); border-radius: 0 0 var(--dock-r) var(--dock-r);
+  transform: translateY(-100%); transition: transform var(--dock-t) var(--ease); }
+.pf-dock.pf-abierto .pf-dock__caja { transform: none; }
+/* La fila de la barra queda encima de la hoja mientras pasa. */
+.pf-dock .pf-barra__in { position: relative; z-index: 1; }
 .pf-dock__logo { display: block; width: 74px; aspect-ratio: 1458 / 1021; background: currentColor;
   -webkit-mask: url(../sala-de-prensa/logos/Profertil_Logo_Monocromatico_Blanco.svg) center / contain no-repeat; mask: url(../sala-de-prensa/logos/Profertil_Logo_Monocromatico_Blanco.svg) center / contain no-repeat; }
 @media (max-width: 640px) { .pf-dock__logo { width: 62px; } }
@@ -143,7 +147,7 @@ img { display: block; max-width: 100%; }
 }
 
 /* El panel crece desde la barra: el alto lo pone el JS (el del contenido que se muestra). Va en la grilla de la página. */
-.pf-dock__panel { height: 0; overflow: hidden; transition: height var(--dock-t) var(--ease), clip-path var(--dock-t) var(--ease); }
+.pf-dock__panel { height: 0; overflow: hidden; transition: height var(--dock-t) var(--ease), transform var(--dock-t) var(--ease); }
 .pf-dock__panel-in { width: min(100% - 32px, 1320px); margin-inline: auto; padding: 8px 0 28px; }
 .pf-dock__vista { animation: pf-dock-entra var(--dock-t) var(--ease) both; }
 .pf-dock__vista > * { animation: pf-dock-sube var(--dock-t) var(--ease) backwards; }
@@ -291,7 +295,7 @@ img { display: block; max-width: 100%; }
   .pf-dock .pf-alc__item { padding-block: 11px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .pf-dock__panel, .pf-dock__caja, .pf-dock-scrim { transition: none; }
+  .pf-dock__panel, .pf-dock__caja, .pf-dock-scrim { transition: none !important; }
   .pf-dock__vista, .pf-dock__vista > *, .pf-dock .pf-alc__panel { animation: none; }
   .pf-tarjeta__foto img, .pf-b__foto img { transition: opacity 200ms ease; transform: none !important; }
 }
@@ -408,7 +412,6 @@ const esMovil = () => MQ.matches;
 const quieto = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 let V = new URLSearchParams(location.search).get('v') === 'b' ? 'b' : 'a';
 let abierta = null;   // id de la sección, 'menu' (celular) o 'busca'
-let origen = null;    // la pieza de la que nace la caja: cápsula, pastilla Menú o campo del buscador
 
 /* ---------- Piezas ---------- */
 const sec = (s) => `<div class="pf-sec"><h2>${esc(s.nombre)}</h2><p>${esc(s.bajada)}</p><a class="pf-ir" href="#">Ver todo${IR}</a></div>`;
@@ -454,7 +457,9 @@ function movilSec(s) {
 
 /* ---------- Alto del panel: sigue al contenido ---------- */
 function tope() { return innerHeight - nav.getBoundingClientRect().bottom - (esMovil() ? 64 : 48); }
+let cerrando = 0;      // mientras la hoja sube, el panel conserva su alto
 function medir() {
+  if (cerrando) return;
   if (!abierta) { panel.style.height = '0px'; return; }
   const h = panelIn.offsetHeight, t = tope();
   panel.style.height = Math.min(h, t) + 'px';
@@ -463,31 +468,34 @@ function medir() {
 new ResizeObserver(medir).observe(panelIn);
 addEventListener('resize', medir);
 
-/* ---------- La caja: nace de la pieza tocada y se abre hasta la barra entera ---------- */
-function recorte(el, ref = dock) {
-  const h = ref.getBoundingClientRect(), r = el.getBoundingClientRect();
-  return `inset(${r.top - h.top}px ${h.right - r.right}px calc(100% - ${r.bottom - h.top}px) ${r.left - h.left}px round ${r.height / 2}px)`;
+/* ---------- La hoja: baja desde arriba con la sección encima y vuelve a subir ---------- */
+// La caja se corre su propio alto (CSS); el panel, el mismo alto en píxeles, así el contenido viaja sobre la hoja.
+function hojaBajar() {
+  const seguia = cerrando;   // si estaba subiendo, sigue desde donde está
+  clearTimeout(cerrando); cerrando = 0;
+  if (!seguia) {
+    panel.style.transition = 'none';
+    medir();                                   // el alto final, de una
+    panel.style.transform = `translateY(${-dock.offsetHeight}px)`;
+    panel.offsetWidth;
+    panel.style.transition = '';
+  } else medir();
+  dock.classList.add('pf-abierto');
+  panel.style.transform = 'none';
 }
-const entero = () => `inset(0px 0px 0px 0px round 0px 0px ${getComputedStyle(document.documentElement).getPropertyValue('--dock-r').trim()} ${getComputedStyle(document.documentElement).getPropertyValue('--dock-r').trim()})`;
-// El panel se recorta igual que la caja: lo que tiene adentro no asoma fuera de ella mientras crece.
-function cajaAbrir(el) {
-  caja.style.transition = panel.style.transition = 'none';
-  caja.style.clipPath = recorte(el);
-  panel.style.clipPath = recorte(el, panel);
-  caja.style.opacity = '0';
-  caja.offsetWidth;
-  caja.style.transition = panel.style.transition = '';
-  caja.style.opacity = '1';
-  caja.style.clipPath = panel.style.clipPath = entero();
-}
-function cajaCerrar(el) {
-  const t = getComputedStyle(document.documentElement).getPropertyValue('--dock-t').trim();
-  // Vuelve a la pieza y recién al final se funde: deja ver otra vez el vidrio de la cápsula.
-  caja.style.transition = `clip-path ${t} var(--ease), opacity 180ms ease calc(${t} - 220ms)`;
-  const ok = el && el.offsetParent;
-  caja.style.clipPath = ok ? recorte(el) : 'inset(0px 0px 100% 0px)';
-  panel.style.clipPath = ok ? recorte(el, panel) : 'inset(0px 0px 100% 0px)';
-  caja.style.opacity = '0';
+function hojaSubir() {
+  panel.style.transform = `translateY(${-dock.offsetHeight}px)`;
+  dock.classList.remove('pf-abierto');
+  const t = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--t-barra')) || 520;
+  cerrando = setTimeout(() => {
+    cerrando = 0;
+    panel.style.transition = 'none';
+    panel.style.transform = 'none';
+    medir();
+    vistas.innerHTML = '';
+    panel.offsetWidth;
+    panel.style.transition = '';
+  }, quieto() ? 0 : t);
 }
 
 /* ---------- Abrir, cambiar y cerrar ---------- */
@@ -507,9 +515,6 @@ function abrir(id, el) {
   abierta = id;
   modo();
   if (!venia) {
-    origen = el;
-    cajaAbrir(el);
-    dock.classList.add('pf-abierto');
     document.documentElement.classList.add('pf-dock-abierto');
     if (esMovil()) document.documentElement.classList.add('pf-dock-bloqueo');
   }
@@ -517,22 +522,17 @@ function abrir(id, el) {
   if (id === 'busca') { /* el contenido lo pone el buscador */ }
   else if (esMovil()) { movil.setAttribute('aria-expanded', 'true'); movil.querySelector('span').textContent = 'Cerrar'; vistas.innerHTML = '<div class="pf-m"></div>'; irA(movilMenu(), 0); }
   else pintarEscritorio();
-  medir();
+  if (!venia) hojaBajar(); else medir();
 }
 function cerrar() {
   if (!abierta) return;
   const eraBusca = abierta === 'busca';
   abierta = null;
-  cajaCerrar(eraBusca ? $('#pf-goSearch') : origen);
-  dock.classList.remove('pf-abierto');
+  hojaSubir();
   document.documentElement.classList.remove('pf-dock-abierto', 'pf-dock-bloqueo');
   menu.querySelectorAll('button').forEach((b) => b.setAttribute('aria-expanded', 'false'));
   movil.setAttribute('aria-expanded', 'false'); movil.querySelector('span').textContent = 'Menú';
-  medir();
   if (eraBusca && nav.classList.contains('pf-buscando')) $('#pf-qClose').click();
-  // El contenido se borra cuando termina de cerrar, para que no desaparezca mientras baja el alto.
-  const t = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--t-barra')) || 520;
-  clearTimeout(cerrar.t); cerrar.t = setTimeout(() => { if (!abierta) vistas.innerHTML = ''; }, t);
 }
 
 /* Celular: cada nivel es una pantalla; entrar empuja hacia la izquierda, volver hacia la derecha. */
