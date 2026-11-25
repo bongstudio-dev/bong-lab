@@ -239,13 +239,13 @@ img { display: block; max-width: 100%; }
 /* Los niveles: cada uno es una pantalla. Entrar a una sección empuja la lista hacia la izquierda y la sección
    llega desde la derecha; volver hace lo contrario. Mientras dura el paso, la que sale queda encima sin ocupar alto. */
 .pf-m { position: relative; }
-.pf-m-pant { padding-top: 8px; }
+.pf-m-pant { padding-top: 0; }
 .pf-m-pant.pf-sale { position: absolute; left: 0; right: 0; pointer-events: none; }
 
 /* Nivel 1: las secciones. Filas grandes, con su foto y una línea de qué hay adentro. */
 .pf-m-secs { list-style: none; margin: 0; padding: 0; }
 .pf-m-secs li + li { border-top: 1px solid var(--line); }
-.pf-m-secs button { display: grid; grid-template-columns: 56px minmax(0, 1fr) 20px; align-items: center; column-gap: 14px; width: 100%; min-height: 80px; padding: 12px 0; border: 0; background: none; text-align: left; cursor: pointer;
+.pf-m-secs button { display: grid; grid-template-columns: 56px minmax(0, 1fr) 20px; align-items: center; column-gap: 14px; width: 100%; min-height: 68px; padding: 6px 0; border: 0; background: none; text-align: left; cursor: pointer;
   -webkit-user-select: none; user-select: none; transition: opacity 120ms ease; }
 .pf-m-secs button:active { opacity: .6; }
 .pf-m-secs img { width: 56px; height: 56px; border-radius: 14px; object-fit: cover; }
@@ -254,12 +254,11 @@ img { display: block; max-width: 100%; }
 .pf-m-secs button > svg { width: 20px; height: 20px; color: var(--ink-3); }
 
 /* Utilidad: botones de 48 px en dos columnas, no pastillas apretadas. */
-.pf-m-util { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--line); }
+.pf-m-util { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; padding-top: 16px; border-top: 1px solid var(--line); }
 .pf-m-util a { display: flex; align-items: center; justify-content: space-between; gap: 8px; height: 48px; padding: 0 14px 0 16px; border-radius: var(--radio-control); background: var(--bg); color: var(--ink); font-size: var(--texto-chico); -webkit-user-select: none; user-select: none; transition: background 120ms ease; }
 .pf-m-util a:last-child:nth-child(odd) { grid-column: 1 / -1; }
 .pf-m-util a svg { color: var(--ink-3); }
 .pf-m-util a:active { background: color-mix(in srgb, var(--bg) 86%, var(--ink)); }
-.pf-m-firma { margin: 16px 0 0; color: var(--ink-3); font-size: var(--texto-mini); }
 
 /* Nivel 2: la sección. Volver, título con su bajada, subsecciones con foto, páginas sueltas y el paso a la sección. */
 .pf-m-volver { position: relative; display: inline-flex; align-items: center; gap: 4px; height: 36px; margin: 2px 0 0 -2px; padding: 0 14px 0 8px; border: 0; border-radius: 999px; background: var(--chip-fondo); color: var(--chip-texto); font: 500 var(--texto-chico)/1 var(--f-body); cursor: pointer; -webkit-user-select: none; user-select: none; transition: background 120ms ease; }
@@ -444,7 +443,7 @@ function vistaB(s) {
 function movilMenu() {
   const filas = SECCIONES.map((s) => `<li><button type="button" data-sec="${s.id}"><img src="${s.foto || s.notas[0].f}" alt=""><span><b>${esc(s.nombre)}</b><small>${esc(s.bajada)}</small></span>${DER}</button></li>`).join('');
   const util = UTIL.map(([t, ext]) => `<a href="#">${esc(t)}${ext ? EXT : IR}</a>`).join('');
-  return `<ul class="pf-m-secs">${filas}</ul><nav class="pf-m-util" aria-label="Más">${util}</nav><p class="pf-m-firma">Profertil · Bahía Blanca, Argentina</p>`;
+  return `<ul class="pf-m-secs">${filas}</ul><nav class="pf-m-util" aria-label="Más">${util}</nav>`;
 }
 /* Celular, nivel 2: una sección. */
 function movilSec(s) {
