@@ -92,7 +92,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 .pf-pest.pf-fija { position: fixed; top: calc(var(--pf-barra-h, 76px) - 1px); }
 /* Escritorio: los selectores de vista van en la misma fila fija, a la derecha de las pestañas y con su mismo alto (el JS los
    mueve acá; en el celular quedan en la línea del contador, porque al lado de las pestañas no entran). */
-.pf-pest { display: flex; align-items: stretch; justify-content: space-between; gap: 12px; }
+.pf-pest { display: flex; align-items: stretch; justify-content: flex-end; gap: 12px; }   /* los selectores de vista, a la derecha (como en Inversores) */
 .pf-pest .pf-herramientas { align-items: stretch; }
 /* Escritorio: pestañas y vista juntas a la derecha (la vista contra el borde) y el contador en la misma línea, a la izquierda:
    la fila del resultado sube hasta quedar centrada con la de pestañas. */
@@ -133,11 +133,6 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
    El hueco .pf-pest-lugar no arma caja (display: contents), así el sticky tiene todo el alto de la lista para recorrer. */
 @media (max-width: 640px) {
   .pf-pest-lugar.pf-vuelve-libre { display: contents; }
-}
-@media (max-width: 640px) {
-  /* Pestañas y selector en la misma fila: la cápsula de pestañas mide lo suyo (no cambia de ancho entre pestañas) y el
-     selector va a la derecha, siempre con tres opciones. */
-  .pf-pest { gap: 8px; }
 }
 .pf-panel { overflow-x: clip; }
 .pf-panel[hidden] { display: none; }
