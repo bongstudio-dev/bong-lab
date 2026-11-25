@@ -62,6 +62,17 @@ const script = armar(JS, {
   )}
 </header>
 
+{SECCIONES.length > 0 && (
+  <nav class="pf-pestanas" id="pf-pestanas" aria-label="Secciones">
+    <span class="pf-selector__ind pf-pestanas__ind" aria-hidden="true"></span>
+    {SECCIONES.map((s, i) => (
+      <button type="button" data-seccion={s.id} aria-pressed={i === 0 ? "true" : "false"}>
+        <span class="pf-seccion__largo">{s.nombre}</span><span class="pf-seccion__corto" aria-hidden="true">{s.corto || s.nombre}</span><span class="pf-pestanas__n">{(s as { docs?: unknown[] }).docs?.length}</span>
+      </button>
+    ))}
+  </nav>
+)}
+
 <div class="pf-hoja" id="pf-hoja">
 
 <main class="pf-col" id="pf-lista" tabindex="-1">

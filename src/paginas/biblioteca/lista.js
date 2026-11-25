@@ -527,10 +527,33 @@
   /* Cambiar de sección: otra lista en el mismo lugar. Se conservan la vista y la búsqueda; los filtros no (cada sección tiene los
      suyos). Si se estaba dentro de la lista, se vuelve a su principio. */
   var selSeccion = document.querySelector(".pf-selector.pf-seccion");
+  /* Pestañas de sección fuera de la fila de herramientas, en prueba con tres variantes (?pestanas=a|b|c; 0 = el selector de la fila).
+     a: índice dentro de la tarjeta de la cabecera. b: solapas que salen de la hoja. c: el título de la lista es la pestaña. */
+  var pest = $("pf-pestanas");
+  var VARIANTE = (location.search.match(/[?&]pestanas=([0abc])/) || [])[1] || "a";
+  if (pest) {
+    document.documentElement.setAttribute("data-pestanas", VARIANTE);
+    if (VARIANTE === "a") document.querySelector(".pf-bh").appendChild(pest);
+    else if (VARIANTE === "b" || VARIANTE === "c") $("pf-lista").insertBefore(pest, $("pf-lista").firstChild);
+  }
   function marcarSeccion(animar) {
-    if (!selSeccion) return;
-    selSeccion.querySelectorAll("[data-seccion]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.seccion === seccion.id)); });
-    moverInd(selSeccion, animar);
+    [selSeccion, pest].forEach(function (cont) {
+      if (!cont) return;
+      cont.querySelectorAll("[data-seccion]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.seccion === seccion.id)); });
+      moverInd(cont, animar);
+    });
+    // En el celular las pestañas se deslizan de costado: la elegida queda a la vista.
+    var b = pest && pest.querySelector('[aria-pressed="true"]');
+    if (b && pest.scrollWidth > pest.clientWidth) pest.scrollTo({ left: b.offsetLeft - 16, behavior: animar ? "smooth" : "auto" });
+  }
+  if (pest) {
+    pest.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-seccion]"); if (!b) return;
+      if (irSeccion(b.dataset.seccion, true)) aplicar();
+    });
+    window.addEventListener("resize", function () { moverInd(pest, false); });
+    if (document.fonts) document.fonts.ready.then(function () { moverInd(pest, false); });
+    requestAnimationFrame(function () { marcarSeccion(false); });
   }
   function irSeccion(id, animar) {
     var s = SECCIONES.filter(function (x) { return x.id === id; })[0];
