@@ -120,11 +120,8 @@ img { display: block; max-width: 100%; }
 
 /* Menú: la cápsula de vidrio de la barra. Abierto, la cápsula se vuelve parte de la caja tiza. */
 .pf-dock .pf-barra__menu { transition: opacity 220ms ease, background var(--dock-t) var(--ease), border-color var(--dock-t) var(--ease); }
-.pf-dock .pf-barra__menu > button { transition: background 200ms ease, color 200ms ease; }
-@media (hover: hover) and (pointer: fine) {
-  .pf-dock .pf-barra__menu > button:hover { background: var(--foto-boton); color: var(--tiza); }
-  .pf-dock.pf-abierto .pf-barra__menu > button:hover { background: var(--line); color: var(--ink); }
-}
+/* Sin fondo al pasar, como en la barra del sitio: la respuesta al señalar es la pastilla que llega. */
+.pf-dock .pf-barra__menu > button { transition: color 200ms ease; }
 .pf-dock.pf-abierto .pf-barra__menu { background: transparent; border-color: transparent; }
 .pf-dock.pf-abierto .pf-barra__menu > button { color: var(--ink-2); }
 /* La sección abierta se marca con una pastilla azul que viaja de un ítem a otro (como el indicador del Selector).
@@ -136,7 +133,7 @@ img { display: block; max-width: 100%; }
   transition: clip-path var(--t-vista) var(--curva-vista), opacity 200ms ease; }
 .pf-dock .pf-barra__menu > .pf-dock__capa.pf-quieto { transition: opacity 200ms ease; }
 .pf-dock__capa > span { padding: 7px 14px; color: var(--tiza); font: 400 var(--texto-chico)/1.5 var(--f-body); white-space: nowrap; }
-.pf-dock__capa > span.pf-sel, .pf-dock .pf-barra__menu > button[aria-expanded="true"] { font-weight: 500; }
+/* El ítem elegido no cambia de grosor: con 500 se ensanchaba y corría a los vecinos un píxel al cambiar de sección. */
 
 /* Lupa y campo sobre la caja tiza: el gris del fondo de página en lugar del vidrio. */
 .pf-dock.pf-abierto .pf-barra__busca, .pf-dock.pf-abierto .pf-barra__cerrar { background: var(--bg); border-color: transparent; }
@@ -574,7 +571,6 @@ menu.innerHTML = SECCIONES.map((s) => `<button type="button" data-sec="${s.id}" 
 const menuCapa = $('#menuCapa');
 function moverCapa() {
   const bs = [...menu.querySelectorAll('button')], k = bs.findIndex((b) => b.getAttribute('aria-expanded') === 'true');
-  [...menuCapa.children].forEach((x, i) => x.classList.toggle('pf-sel', i === k));
   if (k < 0) { menuCapa.style.opacity = '0'; return; }
   const b = bs[k], venia = menuCapa.style.opacity === '1';
   if (!venia) menuCapa.classList.add('pf-quieto');
