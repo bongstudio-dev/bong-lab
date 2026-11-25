@@ -304,14 +304,19 @@ html[data-pestanas="a"] .pf-pestanas__ind { top: auto; bottom: 0; height: 3px; b
    alto, texto, relleno a los lados, radio de la solapa, radio del empalme, separación, deslizamiento del indicador (duración y curva)
    y el cambio de fondo de las solapas (duración del fundido, demora de la que se deja y de la que se elige). */
 html[data-pestanas="b"] {
-  --sol-alto: 48px; --sol-texto: var(--texto-mini); --sol-relleno: 8px; --sol-radio: 13px; --sol-empalme: 11px; --sol-sep: 2px;
+  --sol-alto: 46px; --sol-texto: var(--texto-cuerpo); --sol-relleno: 8px; --sol-radio: 13px; --sol-empalme: 11px; --sol-sep: 2px;
   --sol-dur: var(--t-vista); --sol-curva: var(--curva-vista);
   --sol-fundido: 180ms; --sol-demora: 300ms; --sol-demora-nueva: 260ms;
 }
 @media (min-width: 720px) {
   html[data-pestanas="b"] { --sol-alto: 48px; --sol-texto: var(--texto-destacado); --sol-relleno: 21px; --sol-radio: 18px; --sol-empalme: 11px; --sol-sep: 5px; }
 }
-html[data-pestanas="b"] .pf-pestanas { gap: var(--sol-sep); height: var(--sol-alto); margin-top: calc(-24px - var(--sol-alto)); overflow: visible; }
+html[data-pestanas="b"] .pf-pestanas { gap: var(--sol-sep); height: var(--sol-alto); margin-top: calc(-24px - var(--sol-alto)); overflow: visible;
+  padding-inline: max(0px, var(--radio-tarjeta) + var(--sol-empalme) - (100cqw - 100%) / 2); }
+/* La primera solapa arranca pasando la curva de la esquina de la hoja (radio de la hoja + radio del empalme desde su borde), en
+   cualquier ancho: la hoja es el contenedor (100cqw es su ancho) y la lista va centrada en ella, así que (100cqw - 100%) / 2 es lo que
+   ya hay entre el borde de la hoja y la lista. Donde la lista está lejos del borde no suma nada. */
+html[data-pestanas="b"] .pf-hoja { container-type: inline-size; }
 html[data-pestanas="b"] .pf-pestanas button { align-items: center; padding: 0 var(--sol-relleno); border-radius: var(--sol-radio) var(--sol-radio) 0 0;
   color: var(--foto-texto); font: 600 var(--sol-texto)/1 var(--f-display); letter-spacing: -.01em; }
 /* El fondo de cada solapa acompaña al indicador para que ninguna quede vacía mientras viaja: la que se deja sigue de papel (con sus
@@ -357,9 +362,8 @@ html[data-pestanas="c"] .pf-pestanas__ind { display: none; }
   html[data-pestanas="a"] .pf-pestanas button { font-size: 18px; }
 }
 @media (max-width: 719px) {
-  /* Solapas en el celular: el nombre entero en dos líneas, las tres a lo ancho. Arrancan pasando la curva de la esquina de la hoja:
-     radio de la hoja + radio del empalme desde su borde (la lista ya está a 16 del borde de la hoja). */
-  html[data-pestanas="b"] .pf-pestanas { margin-top: calc(-8px - var(--sol-alto)); padding-inline: calc(var(--radio-tarjeta) + var(--sol-empalme) - 16px); }
+  /* Solapas en el celular: el nombre entero (en dos líneas si no entra), las tres a lo ancho. */
+  html[data-pestanas="b"] .pf-pestanas { margin-top: calc(-8px - var(--sol-alto)); }
   html[data-pestanas="b"] .pf-pestanas button { flex: 1 1 0; min-width: 0; justify-content: center; line-height: 1.1; text-align: center; white-space: normal; text-wrap: balance; }
   html[data-pestanas="b"] .pf-seccion__largo { display: inline; }
   html[data-pestanas="b"] .pf-seccion__corto { display: none; }
