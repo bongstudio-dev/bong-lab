@@ -1,0 +1,68 @@
+---
+import Marco from "./Marco.astro";
+import { catalogo, ficha, sitio, vistas, resumenIndice, type Vista } from "../../lib/productos";
+
+interface Props { vista?: Vista; raiz: "../" | "../../" }
+const { vista, raiz } = Astro.props;
+const todos = await catalogo();
+const productos = vista ? todos.filter(p => vista.productos.includes(p.id)) : todos;
+const titulo = !vista ? "Catálogo de productos" : vista.tipo === "cultivo" ? "Productos para " + vista.nombre.toLocaleLowerCase("es") : vista.nombre;
+const descripcion = "Fertilizantes para el agro y productos industriales de Profertil. Consultá sus características, recomendaciones de uso y hojas de seguridad.";
+---
+<Marco {titulo} {descripcion} {raiz}>
+  <header class="pr-lista-cab"><div class="pr-ancho">
+    {vista && <a class="pr-volver" href={sitio("productos/")}>← Catálogo de productos</a>}
+    <h1>{titulo}</h1>
+    {!vista && <p>Fertilizantes para el agro y productos industriales de Profertil.</p>}
+  </div></header>
+  <div class="pr-ancho pr-listado">
+    <nav aria-label="Vistas del catálogo" class="pr-vistas">
+      {["linea", "cultivo"].map(tipo => <details id={"por-" + tipo}>
+        <summary>{tipo === "linea" ? "Por línea" : "Por cultivo"}</summary>
+        <div>{vistas.filter(v => v.tipo === tipo).map(v =>
+          <a href={sitio(v.ruta + "/")} aria-current={v.ruta === vista?.ruta ? "page" : undefined}>{v.nombre}</a>)}</div>
+      </details>)}
+      {!vista && <a class="pr-salto" href="#industrial">Ver industriales ↓</a>}
+    </nav>
+    <div id="pr-busqueda" hidden><p aria-live="polite"></p><a href={sitio("productos/")}>Ver todos los productos</a></div>
+    {["Agro", "Industrial"].map(categoria => {
+      const grupo = productos.filter(p => p.data.categoria === categoria);
+      return grupo.length > 0 && <section class="pr-grupo" id={categoria.toLowerCase()}>
+        <h2>{categoria}</h2>
+        <ul>{grupo.map(p => <li data-buscar={p.data.nombre + " " + resumenIndice(p)}>
+          <a href={ficha(p.id)}>
+            {(p.data.imagen || p.data.logo) && <img src={sitio((p.data.imagen || p.data.logo)!)} alt="" loading="lazy" width="84" height="72" />}
+            <span><strong>{p.data.nombre}</strong>{(p.data.familia || p.data.archivada) && <small>{p.data.archivada ? "Ficha de archivo" : p.data.familia}</small>}</span>
+            <span class="pr-flecha" aria-hidden="true">→</span>
+          </a>
+        </li>)}</ul>
+      </section>;
+    })}
+  </div>
+</Marco>
+<script>
+  // Enter en la búsqueda con alcance lleva al índice con #q=, igual que en Biblioteca.
+  function filtrar() {
+    if (location.hash === "#por-cultivo") {
+      document.querySelector<HTMLDetailsElement>("#por-cultivo")!.open = true;
+    }
+    const params = new URLSearchParams(location.hash.slice(1));
+    const termino = params.get("q")?.trim() || "";
+    const plano = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    let total = 0;
+    document.querySelectorAll<HTMLElement>(".pr-grupo").forEach(grupo => {
+      let visibles = 0;
+      grupo.querySelectorAll<HTMLElement>("[data-buscar]").forEach(fila => {
+        fila.hidden = !plano(fila.dataset.buscar || "").includes(plano(termino));
+        if (!fila.hidden) visibles++;
+      });
+      grupo.hidden = visibles === 0;
+      total += visibles;
+    });
+    const estado = document.querySelector<HTMLElement>("#pr-busqueda")!;
+    estado.hidden = !termino;
+    estado.querySelector("p")!.textContent = total + (total === 1 ? " producto" : " productos") + " para “" + termino + "”";
+  }
+  filtrar();
+  addEventListener("hashchange", filtrar);
+</script>

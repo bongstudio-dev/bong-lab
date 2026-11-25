@@ -1,0 +1,9 @@
+---
+import { sitio } from "../../lib/productos";
+interface Props { items: { titulo: string; ruta: string; visor: string | null }[] }
+const { items } = Astro.props;
+---
+{!!items.length && <ul class="pr-recursos">{items.map(d => <li>
+  <div>{d.visor ? <a href={d.visor}>{d.titulo}</a> : <span>{d.titulo}</span>}</div>
+  <a class="pf-boton" href={sitio(d.ruta)} download aria-label={"Descargar " + d.titulo}>Descargar PDF <span aria-hidden="true">↓</span></a>
+</li>)}</ul>}

@@ -18,9 +18,13 @@
      deuda). Se cambia con el selector de la fila de herramientas, como las vistas: sin cambiar de página. Cada sección trae sus
      documentos, sus grupos de filtros, cómo se nombran sus documentos y su orden. */
   var SECCIONES = PAG.secciones || [], seccion = null;
+  /* Una sección puede ser de tarjetas (s.tarjetas, Proveedores): accesos en lugar de documentos (el formulario, los PDF, los
+     portales). No tiene filtros ni vistas; el buscador filtra las tarjetas. TARJ son las de la sección elegida, null si es una lista. */
+  var TARJ = null, tarjLista = [];
   function usarSeccion(s) {
     seccion = s;
-    DOCS = s.docs; GRUPOS = s.grupos;
+    DOCS = s.docs || []; GRUPOS = s.grupos || []; TARJ = s.tarjetas || null;
+    document.documentElement.classList.toggle("pf-con-tarjetas", !!TARJ);
     NOMBRE_TODO = s.todo; UNO = s.uno; VARIOS = s.varios;
     PAG.orden = s.orden; PAG.desc = s.desc;
   }
@@ -91,6 +95,7 @@
   }
   function filtrar() {
     lista = DOCS.filter(function (d) { return pasa(d); });
+    if (TARJ) { var qt = plano(estado.q.trim()); tarjLista = TARJ.filter(function (x) { return !qt || plano([x.t, x.b || "", x.ir || ""].join(" ")).indexOf(qt) !== -1; }); }
     // Orden propio de la página (PAG.orden = "o"): el que trae cada documento en `o`, sin selector. Situación financiera va
     // del más reciente al más viejo (PAG.desc) y el Legajo impositivo como el legajo (el completo, nacionales y provincias).
     if (PAG.orden === "o") lista.sort(function (a, b) { return (a.o < b.o ? -1 : a.o > b.o ? 1 : 0) * (PAG.desc ? -1 : 1); });
@@ -169,6 +174,45 @@
       '<a class="pf-doc__d" ' + bajar + ' aria-label="Descargar PDF: ' + esc(d.t) + '">' + BAJAR + "</a>";
     return li;
   }
+  /* Tarjetas (secciones de accesos): el arte de Formas de las miniaturas arriba, la etiqueta, el título, la bajada y lo que hace al
+     final. Toda la tarjeta es el enlace; la de un PDF lleva al visor y suma la descarga. "pronto" no es enlace: queda apagada. */
+  var IR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12h10M13 8l4 4-4 4"/></svg>';
+  var AFUERA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 16 16 8M9 8h7v7"/></svg>';
+  var TIPOS = {
+    form: { nombre: "Alta", forma: "industria", f: fam("amarillo") },
+    doc: { nombre: "Documento", forma: "escudo", f: fam("azul") },
+    portal: { nombre: "Portal", forma: "capas", f: fam("verde") },
+    pronto: { nombre: "Próximamente", forma: "sol", f: fam("naranja", true) }
+  };
+  function tarjeta(x, i, q) {
+    var li = document.createElement("li"), tipo = TIPOS[x.tipo] || TIPOS.portal, pronto = x.tipo === "pronto";
+    li.className = "pf-acc pf-acc--" + x.tipo + (entradaSeccion ? " pf-entra-sec" : "");
+    if (entradaSeccion) li.style.setProperty("--i", i);
+    var href = x.tipo === "doc" ? BASE + encodeURIComponent(x.id) + "/" : x.href;
+    var fuera = x.tipo === "form" || x.tipo === "portal";
+    var dentro = '<span class="pf-acc__arte">' + arte({ c: "proveedores", k: x.k != null ? x.k : i + 3 }).replace("<svg ", '<svg preserveAspectRatio="xMidYMid slice" ') + "</span>" +
+      '<span class="pf-acc__txt">' + '<span class="pf-etiqueta" style="' + vars(tipo) + '">' + badge(tipo) + '<span class="pf-etiqueta__rotulo">' + tipo.nombre + "</span></span>" +
+      '<span class="pf-acc__t">' + resaltar(x.t, q) + "</span>" + (x.b ? '<span class="pf-acc__b">' + resaltar(x.b, q) + "</span>" : "") + "</span>" +
+      (pronto ? '<span class="pf-acc__pie"></span>' : '<span class="pf-acc__ir">' + esc(x.ir || "Acceder") + (fuera ? AFUERA : IR) + "</span>");
+    li.innerHTML = pronto ? '<div class="pf-acc__a" aria-disabled="true">' + dentro + "</div>"
+      : '<a class="pf-acc__a" href="' + esc(href) + '"' + (fuera ? ' target="_blank" rel="noopener"' : "") + ">" + dentro + "</a>" +
+        (x.tipo === "doc" && x.l ? '<a class="pf-doc__d pf-acc__d" href="' + esc(BASE + "pdf/" + encodeURIComponent(x.l)) + '" download aria-label="Descargar PDF: ' + esc(x.t) + '">' + BAJAR + "</a>" : "");
+    return li;
+  }
+  function pintarTarjetas() {
+    var ul = $("pf-tarjetas"); if (!ul) return;
+    var q = plano(estado.q.trim()), f = document.createDocumentFragment();
+    ul.innerHTML = "";
+    if (TARJ) tarjLista.forEach(function (x, i) { f.appendChild(tarjeta(x, i, q)); });
+    ul.appendChild(f);
+  }
+  function pintarIntro() {
+    var el = $("pf-sec-intro"); if (!el) return;
+    var s = seccion || {}, h = s.intro ? "<p>" + esc(s.intro) + "</p>" : "";
+    if (s.accion) h += '<a class="pf-boton' + (s.accion.verde ? " pf-boton--verde" : "") + '" href="' + esc(s.accion.href) + '"' + (s.accion.descarga ? " download" : "") + ">" + (s.accion.descarga ? BAJAR : "") + esc(s.accion.texto) + "</a>";
+    el.innerHTML = h; el.hidden = !h;
+  }
+  function cuantos() { return TARJ ? tarjLista.length : lista.length; }
   function pintarTanda() {
     var hasta = Math.min(pintadas + TANDA, lista.length), f = document.createDocumentFragment();
     for (var i = pintadas; i < hasta; i++) f.appendChild(fila(lista[i], i));
@@ -185,7 +229,8 @@
     docs.dataset.vista = vista;
     docs.innerHTML = ""; pintadas = 0;
     while (pintadas < Math.min(objetivo, lista.length)) pintarTanda();
-    $("pf-empty").hidden = lista.length > 0;
+    pintarTarjetas();
+    $("pf-empty").hidden = cuantos() > 0;
     $("pf-filters").classList.toggle("pf-vacio", !lista.length);
     docs.style.minHeight = "";
     entradaSeccion = false;
@@ -414,10 +459,11 @@
   function resumen() {
     var q = estado.q.trim();
     var nf = nFiltros();
-    var t = "<b>" + lista.length + "</b> " + (lista.length === 1 ? UNO : VARIOS);
-    if (!q && !nf) t = NOMBRE_TODO + " · <b>" + lista.length + "</b>";
+    var n = cuantos();
+    var t = "<b>" + n + "</b> " + (n === 1 ? UNO : VARIOS);
+    if (!q && !nf) t = NOMBRE_TODO + " · <b>" + n + "</b>";
     $("pf-resultText").innerHTML = t;
-    $("pf-qCount").textContent = lista.length;
+    $("pf-qCount").textContent = n;
     // En el celular el botón del dock dice cuántos filtros hay; abierto, muestra el resultado y cierra el panel.
     var nsub = esMobile.matches ? nf : 0;
     $("pf-fCount").hidden = nsub === 0; $("pf-fCount").textContent = nsub;
@@ -542,6 +588,7 @@
     estado.sel = {}; GRUPOS.forEach(function (g) { estado.sel[g.id] = {}; });
     abierto = null;
     armarFiltros();
+    pintarIntro();
     marcarSeccion(animar);
     entradaSeccion = !!animar;
     return true;
@@ -866,10 +913,14 @@
   var qPedida = (pedido.match(/(?:^|&)q=([^&]*)/) || [])[1];
   if (SECCIONES.length && !conSeccion && qPedida) {
     var qp = ""; try { qp = plano(decodeURIComponent(qPedida).trim()); } catch (e) {}
-    var con = SECCIONES.filter(function (s) { return s.docs.some(function (d) { return plano([d.t, POR[d.c].nombre, d.y].join(" ")).indexOf(qp) !== -1; }); })[0];
+    var con = SECCIONES.filter(function (s) {
+      return (s.docs || []).some(function (d) { return plano([d.t, POR[d.c].nombre, d.y].join(" ")).indexOf(qp) !== -1; }) ||
+        (s.tarjetas || []).some(function (x) { return plano([x.t, x.b || ""].join(" ")).indexOf(qp) !== -1; });
+    })[0];
     if (con) irSeccion(con.id, false);
   }
   marcarSeccion(false);
+  pintarIntro();
   pedido.split("&").forEach(function (par) {
     var i = par.indexOf("="); if (i < 1) return;
     var k = par.slice(0, i), v = par.slice(i + 1);

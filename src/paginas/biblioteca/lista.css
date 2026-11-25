@@ -281,3 +281,57 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
 /* Secciones (Inversores): solapas que salen del borde de la hoja (la pieza "solapas" de base.css). Una sección sin filtros
    (Gobierno societario) no muestra el dock ni el ancla. */
 .pf-sin-filtros .pf-filters, .pf-sin-filtros .pf-ancla { display: none; }
+
+/* Intro de la sección: un párrafo (y a veces un botón) entre las solapas y la lista. */
+.pf-sec-intro { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 24px; margin: 4px 0 18px; }
+.pf-sec-intro[hidden] { display: none; }
+.pf-sec-intro p { margin: 0; max-width: 62ch; color: var(--ink-2); font-size: var(--texto-cuerpo); line-height: 1.5; text-wrap: pretty; }
+
+/* Secciones de tarjetas (Proveedores): accesos en lugar de documentos. Sin vistas, sin filtros, sin lista. La tarjeta es la del
+   catálogo de Productos: el arte de Formas arriba, la etiqueta, el título, la bajada y lo que hace al pie. */
+.pf-con-tarjetas .pf-docs, .pf-con-tarjetas .pf-vista, .pf-con-tarjetas .pf-filters, .pf-con-tarjetas .pf-ancla { display: none; }
+.pf-tarjetas { list-style: none; margin: 8px 0 120px; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 20px; }
+html:not(.pf-con-tarjetas) .pf-tarjetas { display: none; }
+.pf-acc { position: relative; min-width: 0; }
+.pf-acc.pf-entra-sec { animation: pf-entra-sec var(--sec-entra-dur, 520ms) var(--ease) calc(var(--i, 0) * var(--sec-entra-paso, 40ms)) backwards; }
+.pf-acc__a { display: flex; flex-direction: column; height: 100%; border-radius: var(--radio-tarjeta); background: var(--card); color: inherit; text-decoration: none; transition: translate 320ms var(--ease); }
+.pf-acc__arte { display: block; aspect-ratio: 16 / 9; margin: 8px 8px 0; border-radius: var(--radio-media); overflow: hidden; line-height: 0; }
+.pf-acc__arte svg { width: 100%; height: 100%; }
+.pf-acc__arte svg { transition: scale 520ms var(--ease); }
+.pf-acc__txt { display: grid; gap: 10px; align-content: start; justify-items: start; padding: 18px 22px 0; flex: 1; }
+.pf-acc__t { color: var(--azul); font: 600 clamp(21px, 1.8vw, 24px)/1.1 var(--f-display); letter-spacing: -.02em; text-wrap: balance; }
+.pf-acc__b { color: var(--ink-2); font-size: var(--texto-chico); line-height: 1.5; }
+.pf-acc__ir { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; margin: 18px 22px 22px; color: var(--azul); font: 500 var(--texto-chico)/1 var(--f-body); }
+.pf-acc__ir svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: translate 320ms var(--ease); }
+/* El alta es lo principal: su acción va en el botón verde del sistema. */
+.pf-acc--form .pf-acc__ir { height: 40px; padding: 0 16px; border-radius: 999px; background: var(--verde); color: var(--tiza); }
+/* La descarga del PDF, arriba a la derecha sobre el arte, como en las miniaturas. */
+.pf-acc__d { position: absolute; top: 18px; right: 18px; z-index: 2; width: 34px; height: 34px; background: var(--color-blanco); border-color: transparent; }
+/* Próximamente: no es enlace; queda apagada. */
+.pf-acc--pronto .pf-acc__a { background: transparent; outline: 1px solid var(--line); outline-offset: -1px; }
+.pf-acc--pronto .pf-acc__arte { opacity: .35; filter: grayscale(1); }
+.pf-acc--pronto .pf-acc__t { color: var(--ink-2); }
+.pf-acc__pie { display: block; height: 22px; }   /* la apagada no tiene acción: solo el aire del pie */
+@media (hover: hover) and (pointer: fine) {
+  a.pf-acc__a:hover { translate: 0 -5px; }
+  a.pf-acc__a:hover .pf-acc__arte svg { scale: 1.04; }
+  a.pf-acc__a:hover .pf-acc__ir svg { translate: 3px 0; }
+  .pf-acc__a:has(+ .pf-acc__d:hover) { translate: 0 -5px; }
+  .pf-acc__d:hover { background: var(--azul); border-color: var(--azul); color: var(--tiza); }
+  .pf-acc:has(a.pf-acc__a:hover) .pf-acc__d, .pf-acc__d:hover { translate: 0 -5px; }
+}
+.pf-acc__d { transition: translate 320ms var(--ease), background-color 200ms ease, color 200ms ease; }
+a.pf-acc__a:focus-visible { outline: 2px solid var(--azul); outline-offset: 3px; }
+/* Celular: la tarjeta en fila, el arte chico a la izquierda. */
+@media (max-width: 640px) {
+  .pf-tarjetas { gap: 12px; margin-bottom: 96px; }
+  .pf-acc__a { display: grid; grid-template-columns: 88px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 14px; padding: 8px; }
+  .pf-acc__arte { grid-row: 1 / span 2; aspect-ratio: 1; margin: 0; align-self: start; }
+  .pf-acc__txt { padding: 4px 4px 0 0; gap: 7px; }
+  .pf-acc__t { font-size: 19px; }
+  .pf-acc__ir { grid-column: 2; margin: 12px 0 6px; }
+  .pf-acc--form .pf-acc__ir { height: 36px; padding: 0 14px; }
+  .pf-acc__d { top: auto; bottom: 12px; right: 12px; width: 32px; height: 32px; background: var(--tiza); }
+}
+/* Seis tarjetas no se cuentan: la fila del resultado aparece solo con una búsqueda (para mostrar su chip). */
+.pf-con-tarjetas .pf-result-row:has(.pf-activos:empty) { display: none; }

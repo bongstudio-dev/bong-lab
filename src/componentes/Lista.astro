@@ -73,6 +73,7 @@ const script = armar(JS, {
       ))}
     </nav>
   )}
+  {SECCIONES.length > 0 && <div class="pf-sec-intro" id="pf-sec-intro" hidden></div>}
   <div class="pf-result-row">
     <div class="pf-result-main">
       <p class="pf-result-text" id="pf-resultText" aria-live="polite"></p>
@@ -93,6 +94,7 @@ const script = armar(JS, {
     </div>
   </div>
   <ul class="pf-docs" id="pf-docs" data-vista="lista"></ul>
+  {SECCIONES.some((s) => (s as { tarjetas?: unknown }).tarjetas) && <ul class="pf-tarjetas" id="pf-tarjetas"></ul>}
   <div class="pf-empty" id="pf-empty" hidden>
     <svg viewBox="0 0 555 662" aria-hidden="true"><use href="#pf-simbolo"/></svg>
     <p id="pf-emptyText"></p>
