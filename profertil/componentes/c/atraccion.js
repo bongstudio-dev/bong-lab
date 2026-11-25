@@ -4,14 +4,14 @@
 (function () {
   var COLORES = [["marca", "Marca"], ["tiza", "Tiza"], ["celeste", "Celeste"], ["verde-claro", "Verde claro"], ["amarillo", "Amarillo"], ["naranja", "Naranja"], ["azul", "Azul"]];
 
-  /* Corre en la página. O = { n, d, modo, cursor, atr, fuerza, campo, roce, fondo, color }.
+  /* Corre en la página. O = { n, d, modo, cursor, atr, fuerza, campo, roce, deriva, fondo, color }.
      Unidades por cuadro de 60 fps: las fuerzas son px/cuadro², el roce es lo que se pierde de velocidad por cuadro. */
   function ATRAER(O) {
     var raiz = document.querySelector(".pf-atr"), lienzo = raiz.querySelector("canvas"), ctx = lienzo.getContext("2d");
     var quieto = matchMedia("(prefers-reduced-motion: reduce)").matches, css = getComputedStyle(raiz);
     var MARCA = ["azul", "celeste", "verde", "verde-claro", "amarillo", "naranja", "terra", "tiza"];
     var S = 3, PASO = 1000 / 60;
-    var W = 0, H = 0, dpr = 1, r = 0, n = 0, X, Y, PX, PY, C, tintas = [];
+    var W = 0, H = 0, dpr = 1, r = 0, n = 0, X, Y, PX, PY, C, FA, FB, tintas = [], reloj = 0;
     var cab, sig, cols = 0, filas = 0;
     var pun = { x: 0, y: 0, activo: false };
     var corriendo = false, visible = false, calma = 0, antes = 0, resto = 0;
@@ -32,7 +32,9 @@
     function armar() {
       r = O.d / 2;
       n = Math.max(1, Math.min(O.n, Math.floor(.5 * W * H / (Math.PI * r * r))));
-      X = new Float32Array(n); Y = new Float32Array(n); PX = new Float32Array(n); PY = new Float32Array(n); C = new Uint8Array(n);
+      X = new Float32Array(n); Y = new Float32Array(n); PX = new Float32Array(n); PY = new Float32Array(n); C = new Uint8Array(n); FA = new Float32Array(n * 2); FB = new Float32Array(n * 2);
+      // Cada bolita deriva con su propio ritmo y fase, para que floten sin moverse todas juntas.
+      for (var q = 0; q < n * 2; q++) { FA[q] = .004 + Math.random() * .008; FB[q] = Math.random() * 6.2832; }
       for (var i = 0; i < n; i++) {
         X[i] = r + Math.random() * Math.max(0, W - 2 * r);
         Y[i] = r + Math.random() * Math.max(0, (O.modo === "gravedad" ? .6 : 1) * H - 2 * r);
@@ -57,6 +59,8 @@
     function mover(h) {
       var amort = Math.pow(1 - O.roce, h), h2 = h * h;
       var cx = W / 2, cy = H / 2, k = O.atr * 5e-5, g = O.atr * .012, tope = 1.6;
+      var dv = O.deriva * .0015;
+      reloj += h;
       var R = O.campo, fc = O.fuerza * .04 * (O.cursor === "atrae" ? 1 : -1);
       for (var i = 0; i < n; i++) {
         var vx = (X[i] - PX[i]) * amort, vy = (Y[i] - PY[i]) * amort, ax, ay;
@@ -67,6 +71,7 @@
           ax = (cx - X[i]) * k; ay = (cy - Y[i]) * k;
           var m = Math.sqrt(ax * ax + ay * ay); if (m > tope) { ax *= tope / m; ay *= tope / m; }
         }
+        if (dv) { ax += dv * Math.sin(reloj * FA[2 * i] + FB[2 * i]); ay += dv * Math.sin(reloj * FA[2 * i + 1] + FB[2 * i + 1]); }
         if (pun.activo) {
           // El cursor empuja (o tira) dentro de su campo, más fuerte cuanto más cerca.
           var dx = pun.x - X[i], dy = pun.y - Y[i], d = Math.sqrt(dx * dx + dy * dy);
@@ -132,7 +137,7 @@
       while (resto >= PASO && hechos < 3) { paso(); resto -= PASO; hechos++; }
       if (hechos === 3) resto = 0;
       dibujar();
-      calma = !pun.activo && movida() < .04 ? calma + hechos : 0;
+      calma = !pun.activo && !O.deriva && movida() < .04 ? calma + hechos : 0;
       if (calma > 60 || !visible) { corriendo = false; return; }
       requestAnimationFrame(cuadro);
     }
@@ -172,29 +177,30 @@
   }
 
   function opciones(s) {
-    return { n: +s.cantidad, d: +s.diametro, modo: s.modo, cursor: s.cursor, atr: +s.atraccion, fuerza: +s.fuerza, campo: +s.campo, roce: +s.roce / 100, fondo: s.fondo, color: s.color };
+    return { n: +s.cantidad, d: +s.diametro, modo: s.modo, cursor: s.cursor, atr: +s.atraccion, fuerza: +s.fuerza, campo: +s.campo, roce: +s.roce / 100, deriva: +s.deriva, fondo: s.fondo, color: s.color };
   }
 
   Libreria.sumar({
     id: "atraccion", nombre: "Atracción", grupo: "Física", alto: "auto",
-    bajada: "Bolitas del mismo tamaño que se juntan en un punto y se apartan al paso del cursor. Para un bloque de marca o el fondo de una sección.",
+    bajada: "Bolitas del mismo tamaño que flotan sin peso y siguen al cursor. Para un bloque de marca o el fondo de una sección.",
     nota: "Pasá el cursor por el escenario. En el celular, tocá y arrastrá.",
     tamano: "ancha",
     variantes: [
-      ["centro", "Centro", "Las bolitas se juntan en el centro y el cursor abre un hueco al pasar; al irse, se vuelven a cerrar.", { modo: "centro", cursor: "aparta" }],
-      ["iman", "Imán", "La atracción al centro es suave y el cursor las tira hacia él: lo siguen como un enjambre.", { modo: "centro", cursor: "atrae", atraccion: 12, fuerza: 40 }],
-      ["gravedad", "Gravedad", "Caen y se apilan en el piso; el cursor las levanta y las desparrama.", { modo: "gravedad", cursor: "aparta", fuerza: 70 }]
+      ["flotan", "Flotan", "Flotan sueltas, sin peso, con un tirón suave hacia el centro; el cursor las atrae y lo siguen al moverse.", {}],
+      ["centro", "Centro", "Se juntan apretadas en el centro y el cursor abre un hueco al pasar; al irse, se vuelven a cerrar.", { modo: "centro", cursor: "aparta", atraccion: 40, fuerza: 50, campo: 180, roce: 5, deriva: 0 }],
+      ["gravedad", "Gravedad", "Caen y se apilan en el piso; el cursor las levanta y las desparrama.", { modo: "gravedad", cursor: "aparta", atraccion: 40, fuerza: 70, campo: 180, roce: 5, deriva: 0 }]
     ],
     controles: [
       { id: "modo", tipo: "seg", etiqueta: "Atraídas hacia", def: "centro", opciones: [["centro", "El centro"], ["gravedad", "El piso"]], desc: "El centro: un punto las junta con más fuerza cuanto más lejos están. El piso: caen como con gravedad." },
-      { id: "cursor", tipo: "seg", etiqueta: "El cursor", def: "aparta", opciones: [["aparta", "Aparta"], ["atrae", "Atrae"]], desc: "Qué hace el cursor con las bolitas que entran en su campo." },
+      { id: "cursor", tipo: "seg", etiqueta: "El cursor", def: "atrae", opciones: [["aparta", "Aparta"], ["atrae", "Atrae"]], desc: "Qué hace el cursor con las bolitas que entran en su campo." },
       "---",
       { id: "cantidad", tipo: "rango", etiqueta: "Cantidad", min: 10, max: 400, paso: 1, def: 90, desc: "Cuántas bolitas. Tiene tope: nunca cubren más de la mitad del escenario." },
       { id: "diametro", tipo: "rango", etiqueta: "Diámetro", unidad: "px", min: 12, max: 140, paso: 1, def: 56, desc: "Todas iguales. Al cambiarlo la escena se rearma." },
-      { id: "atraccion", tipo: "rango", etiqueta: "Atracción", min: 0, max: 100, paso: 1, def: 40, desc: "Fuerza del punto (o de la gravedad). En 0 quedan sueltas." },
-      { id: "fuerza", tipo: "rango", etiqueta: "Fuerza del cursor", min: 0, max: 100, paso: 1, def: 50, desc: "Cuánto empuja o tira el cursor en el centro de su campo; se apaga hacia el borde." },
-      { id: "campo", tipo: "rango", etiqueta: "Radio del campo", unidad: "px", min: 40, max: 480, paso: 5, def: 180, desc: "Hasta dónde llega el cursor." },
-      { id: "roce", tipo: "rango", etiqueta: "Roce", unidad: "%", min: 1, max: 20, paso: .5, def: 5, desc: "Velocidad que pierden por cuadro. Bajo: flotan y tardan en frenar. Alto: espesas." },
+      { id: "atraccion", tipo: "rango", etiqueta: "Atracción", min: 0, max: 100, paso: 1, def: 2, desc: "Fuerza del punto (o de la gravedad). En 0 quedan sueltas." },
+      { id: "fuerza", tipo: "rango", etiqueta: "Fuerza del cursor", min: 0, max: 100, paso: 1, def: 30, desc: "Cuánto empuja o tira el cursor en el centro de su campo; se apaga hacia el borde." },
+      { id: "campo", tipo: "rango", etiqueta: "Radio del campo", unidad: "px", min: 40, max: 480, paso: 5, def: 260, desc: "Hasta dónde llega el cursor." },
+      { id: "roce", tipo: "rango", etiqueta: "Roce", unidad: "%", min: 1, max: 20, paso: .5, def: 2, desc: "Velocidad que pierden por cuadro. Bajo: flotan y tardan en frenar. Alto: espesas." },
+      { id: "deriva", tipo: "rango", etiqueta: "Deriva", min: 0, max: 100, paso: 1, def: 50, desc: "Cuánto flotan solas, cada una con su ritmo. En 0 se quedan quietas cuando nada las mueve." },
       "---",
       { id: "fondo", tipo: "seg", etiqueta: "Fondo", def: "azul", opciones: [["azul", "Azul"], ["verde", "Verde"], ["terra", "Terra"], ["amarillo", "Amarillo"], ["claro", "Claro"]], desc: "Fondos de color del Master, o el fondo claro de la web." },
       { id: "color", tipo: "select", etiqueta: "Bolitas", def: "marca", opciones: COLORES, desc: "Marca reparte parejo los colores de marca menos el del fondo." },
@@ -204,7 +210,7 @@
     claves: [
       "Todas las bolitas tienen el mismo diámetro: los choques se resuelven en una grilla de celdas de una bolita, liviano aun con cientos.",
       "La cantidad tiene tope según el área (la mitad cubierta como máximo), así en el celular no se llena ni se traba.",
-      "La animación corre solo con el bloque en pantalla, y se apaga sola con la escena quieta y sin cursor; vuelve con el primer movimiento.",
+      "La animación corre solo con el bloque en pantalla. Sin deriva, se apaga sola con la escena quieta y sin cursor, y vuelve con el primer movimiento.",
       "Al cambiar el ancho, las bolitas se reubican en proporción: no se rearma ni salta.",
       "En el celular el bloque deja scrollear la página en vertical: el dedo empuja al tocar y al arrastrar de costado.",
       "Fondos solo del Master (azul, verde, terra, amarillo) o el claro de la web. Sin sombras ni brillos en las bolitas."
