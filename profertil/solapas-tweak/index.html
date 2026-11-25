@@ -181,12 +181,12 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
 
     <div class="acciones">
       <button class="btn prim" id="probar" type="button">Pasar a la solapa siguiente</button>
-      <button class="btn" id="medir" type="button">Medir huecos</button>
+      <button class="btn" id="medir" type="button">Medir cambio</button>
       <button class="btn" id="reset" type="button">Volver a lo publicado</button>
       <button class="btn" id="copiarCss" type="button">Copiar CSS</button>
       <button class="btn" id="copiarLink" type="button">Copiar link</button>
     </div>
-    <p class="medida" id="medida">Medir huecos recorre el cambio de solapa cuadro por cuadro (60 por segundo) y cuenta los cuadros en que alguna solapa queda sin fondo.</p>
+    <p class="medida" id="medida">Medir cambio recorre el cambio de solapa cuadro por cuadro (60 por segundo) y cuenta los cuadros en que alguna solapa queda sin fondo y los cuadros con el texto sobre el fondo equivocado (claro sobre papel o azul sobre vidrio).</p>
     <p class="aviso" id="aviso" aria-live="polite"></p>
 
     <div class="grupo">
@@ -228,9 +228,9 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
   ];
   var MOV = [
     { k: "dur", nombre: "Deslizamiento del indicador", min: 0, max: 1400, paso: 10, u: "ms", ayuda: "Lo que tarda el papel en viajar de una solapa a otra." },
-    { k: "fundido", nombre: "Duración del fundido", min: 0, max: 800, paso: 10, u: "ms", ayuda: "Cambio de fondo de cada solapa, entre papel y vidrio." },
-    { k: "demora", nombre: "Demora de la que se deja", min: 0, max: 1200, paso: 10, u: "ms", ayuda: "Cuánto sigue de papel (con sus empalmes) antes de fundir a vidrio." },
-    { k: "demoraNueva", nombre: "Demora de la que se elige", min: 0, max: 1200, paso: 10, u: "ms", ayuda: "Cuánto sigue de vidrio antes de pasar a papel. Conviene que termine cuando llega el indicador." }
+    { k: "fundido", nombre: "Duración del fundido", min: 0, max: 800, paso: 10, u: "ms", ayuda: "Cambio de fondo y de color de texto de cada solapa, entre papel (texto azul) y vidrio (texto claro)." },
+    { k: "demora", nombre: "Demora de la que se deja", min: 0, max: 1200, paso: 10, u: "ms", ayuda: "Cuánto sigue de papel, con sus empalmes y el texto azul, antes de fundir a vidrio." },
+    { k: "demoraNueva", nombre: "Demora de la que se elige", min: 0, max: 1200, paso: 10, u: "ms", ayuda: "Cuánto sigue de vidrio, con el texto claro, antes de pasar a papel. Conviene que el cruce coincida con la llegada del papel del indicador, para que el texto no quede claro sobre papel." }
   ];
   var VARS = { alto: "--sol-alto", texto: "--sol-texto", relleno: "--sol-relleno", radio: "--sol-radio", empalme: "--sol-empalme", sep: "--sol-sep",
     dur: "--sol-dur", curva: "--sol-curva", fundido: "--sol-fundido", demora: "--sol-demora", demoraNueva: "--sol-demora-nueva" };
@@ -399,21 +399,27 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
   }
   $("loop").addEventListener("change", ciclo);
 
-  /* --- Medir huecos ---------------------------------------------------------------
+  /* --- Medir el cambio -------------------------------------------------------------
      Congela las transiciones del cambio de solapa y las recorre de a un cuadro
      (1/60 s). Hay hueco cuando una solapa tiene menos fondo que el vidrio y el
-     indicador no la tapa entera. */
-  function alfa(c) { var m = (c.match(/rgba?\(([^)]+)\)/) || [])[1]; if (!m) return 0; var p = m.split(",").map(Number); return p.length > 3 ? p[3] : 1; }
+     indicador no la tapa entera. El texto está mal cuando es claro (luminancia
+     > 0.75) sobre lo que ya es casi todo papel (fondo propio o indicador debajo
+     del texto > 75%), o azul (< 0.3) sobre lo que es casi todo vidrio (< 25%).
+     El cruce a mitad de camino no cuenta: ahí los dos van parejos. */
+  function rgba(c) { var m = (c.match(/rgba?\(([^)]+)\)/) || [])[1]; if (!m) return [0, 0, 0, 0]; var p = m.split(",").map(Number); return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1]; }
+  function alfa(c) { return rgba(c)[3]; }
+  function luz(c) { var p = rgba(c); return (0.2126 * p[0] + 0.7152 * p[1] + 0.0722 * p[2]) / 255; }
   $("medir").addEventListener("click", function () {
     var n = nav(), d = doc(); if (!n) return;
     var bs = botones(), ind = n.querySelector(".pf-pestanas__ind"), w = d.defaultView;
     var vidrio = alfa(w.getComputedStyle(bs.filter(function (b) { return b.getAttribute("aria-pressed") !== "true"; })[0]).backgroundColor);
+    var desde = bs.findIndex(function (b) { return b.getAttribute("aria-pressed") === "true"; }), hasta = (desde + 1) % bs.length;
     pasar();
     bs.forEach(function (b) { w.getComputedStyle(b).backgroundColor; }); w.getComputedStyle(ind).transform;
     var an = d.getAnimations().filter(function (a) { return a.effect && n.contains(a.effect.target); });
     an.forEach(function (a) { a.pause(); });
     var fin = 0; an.forEach(function (a) { var t = a.effect.getComputedTiming(); fin = Math.max(fin, t.endTime); });
-    var cuadros = 0, malos = 0;
+    var cuadros = 0, malos = 0, texto = 0;
     for (var t = 0; t <= fin + 1; t += 1000 / 60) {
       cuadros++;
       an.forEach(function (a) { a.currentTime = t; });
@@ -423,10 +429,19 @@ pre { margin: 0; padding: 14px 16px; border-radius: 14px; background: var(--ink)
         if (alfa(w.getComputedStyle(b).backgroundColor) < vidrio - 0.001 && cub < 0.999) hueco = true;
       });
       if (hueco) malos++;
+      var mal = false;
+      [desde, hasta].forEach(function (i) {
+        var b = bs[i], tx = b.querySelector(".pf-pestanas__t").getBoundingClientRect(), cs = w.getComputedStyle(b);
+        var cub = Math.max(0, Math.min(tx.right, ri.right) - Math.max(tx.left, ri.left)) / tx.width;
+        var papel = Math.max((alfa(cs.backgroundColor) - vidrio) / (1 - vidrio), cub), l = luz(cs.color);
+        if ((l > 0.75 && papel > 0.75) || (l < 0.3 && papel < 0.25)) mal = true;
+      });
+      if (mal) texto++;
     }
     an.forEach(function (a) { a.finish(); });
-    $("medida").className = "medida" + (malos ? " mal" : "");
-    $("medida").innerHTML = "<b>" + malos + " cuadros con hueco</b> de " + cuadros + " (" + Math.round(fin) + " ms de cambio" + (k() > 1 ? ", en cámara lenta" : "") + ").";
+    $("medida").className = "medida" + (malos || texto ? " mal" : "");
+    $("medida").innerHTML = "<b>" + malos + " cuadros con hueco y " + texto + " con el texto sobre el fondo equivocado</b> de " + cuadros +
+      " (" + Math.round(fin) + " ms de cambio" + (k() > 1 ? ", en cámara lenta" : "") + ").";
   });
 
   /* --- Carga y vistas ----------------------------------------------------------------- */

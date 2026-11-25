@@ -306,7 +306,7 @@ html[data-pestanas="a"] .pf-pestanas__ind { top: auto; bottom: 0; height: 3px; b
 html[data-pestanas="b"] {
   --sol-alto: 46px; --sol-texto: var(--texto-cuerpo); --sol-relleno: 8px; --sol-radio: 13px; --sol-empalme: 11px; --sol-sep: 2px;
   --sol-dur: var(--t-vista); --sol-curva: var(--curva-vista);
-  --sol-fundido: 180ms; --sol-demora: 300ms; --sol-demora-nueva: 260ms;
+  --sol-fundido: 180ms; --sol-demora: 300ms; --sol-demora-nueva: 160ms;
 }
 @media (min-width: 720px) {
   html[data-pestanas="b"] { --sol-alto: 48px; --sol-texto: var(--texto-destacado); --sol-relleno: 21px; --sol-radio: 18px; --sol-empalme: 11px; --sol-sep: 5px; }
@@ -321,11 +321,13 @@ html[data-pestanas="b"] .pf-pestanas button { align-items: center; padding: 0 va
   color: var(--foto-texto); font: 600 var(--sol-texto)/1 var(--f-display); letter-spacing: -.01em; }
 /* El fondo de cada solapa acompaña al indicador para que ninguna quede vacía mientras viaja: la que se deja sigue de papel (con sus
    empalmes) hasta que el indicador ya se fue y recién ahí funde a vidrio; la que se elige sigue de vidrio hasta que el indicador llega y
-   recién ahí pasa a papel. Como se funde entre dos fondos con cuerpo, en ningún cuadro la solapa queda transparente. */
+   recién ahí pasa a papel. Como se funde entre dos fondos con cuerpo, en ningún cuadro la solapa queda transparente.
+   El texto cambia junto con su fondo, con la misma demora y duración: azul mientras la solapa es de papel, claro mientras es de vidrio.
+   Así nunca queda texto claro sobre papel ni azul sobre vidrio, que llaman la atención por contraste mientras viaja el indicador. */
 html[data-pestanas="b"] .pf-pestanas button:not([aria-pressed="true"]) { background-color: var(--foto-fondo);
-  transition: color 240ms ease, background-color var(--sol-fundido) ease var(--sol-demora); }
+  transition: color var(--sol-fundido) ease var(--sol-demora), background-color var(--sol-fundido) ease var(--sol-demora); }
 html[data-pestanas="b"] .pf-pestanas button[aria-pressed="true"] { color: var(--azul); background-color: var(--pf-papel, #fff);
-  transition: color 240ms ease, background-color var(--sol-fundido) ease var(--sol-demora-nueva); }
+  transition: color var(--sol-fundido) ease var(--sol-demora-nueva), background-color var(--sol-fundido) ease var(--sol-demora-nueva); }
 html[data-pestanas="b"] .pf-pestanas__ind { top: 0; bottom: -1px; border-radius: var(--sol-radio) var(--sol-radio) 0 0; background: var(--pf-papel, #fff);
   transition: transform var(--sol-dur) var(--sol-curva), width var(--sol-dur) var(--sol-curva); }
 html[data-pestanas="b"] .pf-pestanas__ind.pf-quieto { transition: none; }
@@ -345,7 +347,7 @@ html[data-pestanas="b"] .pf-pestanas button[aria-pressed="true"]::before, html[d
   transition: opacity var(--sol-fundido) ease var(--sol-demora-nueva); }
 html[data-pestanas="b"] .pf-campo-seguir { display: none; } /* la pista de scroll quedaba entre las solapas: las solapas ya invitan a bajar */
 @media (hover: hover) and (pointer: fine) {
-  html[data-pestanas="b"] .pf-pestanas button:not([aria-pressed="true"]):hover { background-color: var(--foto-borde); transition: color 240ms ease, background-color 160ms ease; } }
+  html[data-pestanas="b"] .pf-pestanas button:not([aria-pressed="true"]):hover { background-color: var(--foto-borde); transition: color var(--sol-fundido) ease var(--sol-demora), background-color 160ms ease; } }
 @media (prefers-reduced-motion: reduce) {
   html[data-pestanas="b"] { --sol-dur: 0ms; --sol-fundido: 0ms; --sol-demora: 0ms; --sol-demora-nueva: 0ms; } }
 
