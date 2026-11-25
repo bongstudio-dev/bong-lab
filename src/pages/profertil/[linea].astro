@@ -1,0 +1,10 @@
+---
+import Catalogo from "../../paginas/productos/Catalogo.astro";
+import { vistas } from "../../lib/productos";
+
+// Los cuatro listados de Proterra ya tienen enlaces de campaña con estos slugs.
+export function getStaticPaths() {
+  return vistas.filter(v => v.tipo === "linea").map(vista => ({ params: { linea: vista.ruta }, props: { vista } }));
+}
+---
+<Catalogo vista={Astro.props.vista} raiz="../" />

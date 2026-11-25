@@ -1,0 +1,79 @@
+---
+// Catálogo de productos: cabecera con foto de campo, solapas Agro e Industrial, tarjetas grandes y los filtros del dock (cultivo,
+// nutriente, forma y línea), con la misma lógica que la Biblioteca. Las vistas por cultivo y por línea (direcciones de campaña) son
+// este mismo catálogo con el filtro ya puesto. El comportamiento está en catalogo.js.
+import Marco from "./Marco.astro";
+import Tarjeta from "./Tarjeta.astro";
+import Dock from "../../componentes/Dock.astro";
+import { catalogo, nutrientes, forma, ORDEN_NUTRIENTES, FOTO_CATALOGO, type Vista } from "../../lib/productos";
+import JS from "./catalogo.js?raw";
+
+interface Props { vista?: Vista; raiz: "../" | "../../" }
+const { vista, raiz } = Astro.props;
+const todos = await catalogo();
+const agro = todos.filter(p => p.data.categoria === "Agro");
+const industrial = todos.filter(p => p.data.categoria === "Industrial");
+
+// Grupos de filtros con sus opciones y cuántos productos de Agro tiene cada una.
+function contar(valores: string[][], orden?: string[]) {
+  const n = new Map<string, number>();
+  valores.flat().filter(Boolean).forEach(v => n.set(v, (n.get(v) || 0) + 1));
+  const lista = [...n.entries()];
+  return orden ? lista.sort((a, b) => orden.indexOf(a[0]) - orden.indexOf(b[0])) : lista.sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "es"));
+}
+const GRUPOS = [
+  { id: "cultivo", nombre: "Cultivo", opciones: contar(agro.map(p => p.data.cultivos)) },
+  { id: "nutriente", nombre: "Nutriente", opciones: contar(agro.map(nutrientes), ORDEN_NUTRIENTES) },
+  { id: "forma", nombre: "Forma", opciones: contar(agro.map(p => [forma(p)])) },
+  { id: "linea", nombre: "Línea", opciones: contar(agro.map(p => [p.data.familia])) },
+];
+const inicial = vista ? { [vista.tipo === "cultivo" ? "cultivo" : "linea"]: [vista.nombre] } : {};
+const titulo = !vista ? "Productos" : vista.tipo === "cultivo" ? "Productos para " + vista.nombre.toLocaleLowerCase("es") : vista.nombre;
+const descripcion = "Fertilizantes para el agro y productos industriales de Profertil. Consultá sus características, recomendaciones de uso y hojas de seguridad.";
+const CHEVRON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg>';
+---
+<Marco {titulo} {descripcion} {raiz} foto={FOTO_CATALOGO} saltar="Ir a los productos" lista>
+  <Fragment slot="cab">
+    <h1>Productos</h1>
+    <p>Fertilizantes para cada etapa del cultivo y productos para la industria. Encontrá el indicado por cultivo, nutriente o línea y consultá su ficha técnica y su hoja de seguridad.</p>
+  </Fragment>
+
+  <nav class="pf-solapas" id="pf-solapas" role="tablist" aria-label="Categorías de productos">
+    <span class="pf-solapas__ind" aria-hidden="true"></span>
+    <button type="button" role="tab" data-solapa="agro" aria-pressed="true" aria-selected="true"><span class="pf-solapas__t">Agro</span></button>
+    <button type="button" role="tab" data-solapa="industrial" aria-pressed="false" aria-selected="false" tabindex="-1"><span class="pf-solapas__t">Industrial</span></button>
+  </nav>
+  <div class="pf-result-row">
+    <div class="pf-result-main">
+      <p class="pf-result-text" id="pf-resultText" aria-live="polite"></p>
+      <div class="pf-activos" id="pf-activos"></div>
+    </div>
+  </div>
+  <ul class="pr-grilla" id="pr-grilla">
+    {agro.map(p => <Tarjeta producto={p} />)}
+    {industrial.map(p => <Tarjeta producto={p} />)}
+  </ul>
+  <div class="pf-empty" id="pf-empty" hidden>
+    <svg viewBox="0 0 555 662" aria-hidden="true"><use href="#pf-simbolo"/></svg>
+    <p id="pf-emptyText"></p>
+    <button class="pf-boton pf-boton--verde" id="pf-emptyReset" type="button">Ver todos los productos</button>
+  </div>
+
+  <Fragment slot="fin">
+    <Dock toggle="Filtros">
+      <div class="pf-f-grupos" id="pf-fGrupos">
+        {GRUPOS.map(g => <div class="pf-f-gr" data-grupo={g.id}>
+          <button class="pf-f-gr__cab" type="button" aria-expanded="false">
+            <span class="pf-f-label">{g.nombre}</span><span class="pf-f-n" hidden>0</span>
+            <span class="pf-f-gr__res"></span><Fragment set:html={CHEVRON} />
+          </button>
+          <div class="pf-f-gr__activos"></div>
+          <div class="pf-f-gr__cuerpo"><div><div class="pf-f-row">
+            {g.opciones.map(([v, n]) => <button class="pf-pastilla" type="button" aria-pressed="false" data-v={v} style={g.id === "cultivo" ? "--pc: var(--verde)" : undefined}>{v}<span class="pf-pastilla__n">{n}</span></button>)}
+          </div></div></div>
+        </div>)}
+      </div>
+    </Dock>
+    <script is:inline set:html={"\nwindow.PR_GRUPOS = " + JSON.stringify(GRUPOS.map(g => ({ id: g.id, nombre: g.nombre }))) + ";\nwindow.PR_INICIAL = " + JSON.stringify(inicial) + ";\n" + JS}></script>
+  </Fragment>
+</Marco>

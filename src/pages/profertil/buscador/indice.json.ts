@@ -5,6 +5,7 @@
 // paginas.json. Para sumar un tipo nuevo: una función que devuelva sus ítems y una entrada en GRUPOS.
 import { leerJson } from "../../../lib/sistema.mjs";
 import { BIB, MSDS, FINANCIERA, GOBIERNO, DEUDA, LEGAJO, PROVEEDORES } from "../../../lib/datos.mjs";
+import { catalogo, resumenIndice } from "../../../lib/productos";
 
 const RESUMEN_MAX = 140;
 const orden = (f) => (a, b) => { const x = f(a), y = f(b); return x < y ? -1 : x > y ? 1 : 0; };
@@ -65,8 +66,12 @@ const notas = () => [...leerJson("profertil/novedades/fuente/notas.json")].sort(
 const paginas = () => leerJson("profertil/buscador/fuente/paginas.json").items;
 
 // id, nombre del grupo, singular, plural, artículo del plural, lista con la búsqueda aplicada (vacío: el panel muestra todos), ítems
-const GRUPOS = [
+const productos = async () => (await catalogo()).map(p => [p.data.nombre, "productos/" + p.id + "/", resumenIndice(p)]);
+
+type Grupo = [string, string, string, string, string, string, () => string[][] | Promise<string[][]>];
+const GRUPOS: Grupo[] = [
   ["documentos", "Biblioteca", "documento", "documentos", "los", "biblioteca/#q=", documentos],
+  ["productos", "Productos", "producto", "productos", "los", "productos/#q=", productos],
   ["hojas", "Hojas de seguridad", "hoja", "hojas", "las", "hojas-de-seguridad/#q=", hojas],
   ["inversores", "Inversores", "documento", "documentos", "los", "inversores/#q=", inversores],
   ["legajo", "Legajo impositivo", "documento", "documentos", "los", "legajo-impositivo/#q=", legajo],
@@ -76,7 +81,7 @@ const GRUPOS = [
   ["paginas", "Páginas", "página", "páginas", "las", "", paginas],
 ];
 
-export function GET() {
-  const grupos = GRUPOS.map(([id, nombre, uno, varios, art, lista, items]) => ({ id, nombre, uno, varios, art, lista, items: items() }));
+export async function GET() {
+  const grupos = await Promise.all(GRUPOS.map(async ([id, nombre, uno, varios, art, lista, items]) => ({ id, nombre, uno, varios, art, lista, items: await items() })));
   return new Response(JSON.stringify({ v: 1, grupos }), { headers: { "Content-Type": "application/json; charset=utf-8" } });
 }

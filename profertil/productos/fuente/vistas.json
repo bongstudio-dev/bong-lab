@@ -1,0 +1,267 @@
+[
+  {
+    "nombre": "Arroz",
+    "ruta": "productos/arroz",
+    "productos": [
+      "enetotalplus-2",
+      "fosfato-diamonico",
+      "fosfato-monoamonico",
+      "proterra-ar-12-17-0-s-5-zn-1-25",
+      "proterra-ar-7-40-0s-5",
+      "proterra-ds-42-0-0-s-3-6",
+      "proterra-s-9-42-0-s-18",
+      "proterra-zn-map",
+      "proterra-zn-spt",
+      "sulfato-calcio",
+      "sulfurgran",
+      "superfosfato-simple",
+      "superfosfato-triple",
+      "urea",
+      "zincodur"
+    ],
+    "tipo": "cultivo"
+  },
+  {
+    "nombre": "Maíz",
+    "ruta": "productos/maiz",
+    "productos": [
+      "enetotalplus-2",
+      "fosfato-diamonico",
+      "fosfato-monoamonico",
+      "proterra-ar-12-17-0-s-5-zn-1-25",
+      "proterra-ar-7-40-0s-5",
+      "proterra-ds-28-0-0-s-5-2",
+      "proterra-ds-30-0-0-s-2-6",
+      "proterra-ds-42-0-0-s-3-6",
+      "proterra-s-9-42-0-s-18",
+      "proterra-zn-map",
+      "proterra-zn-spt",
+      "sulfato-amonio",
+      "sulfato-calcio",
+      "sulfurgran",
+      "superfosfato-simple",
+      "superfosfato-triple",
+      "uan-32",
+      "urea",
+      "zincodur"
+    ],
+    "tipo": "cultivo"
+  },
+  {
+    "nombre": "Sorgo",
+    "ruta": "productos/productos-para-sorgo",
+    "productos": [
+      "enetotalplus-2",
+      "fosfato-diamonico",
+      "fosfato-monoamonico",
+      "proterra-ar-12-17-0-s-5-zn-1-25",
+      "proterra-ds-28-0-0-s-5-2",
+      "proterra-ds-30-0-0-s-2-6",
+      "proterra-ds-42-0-0-s-3-6",
+      "proterra-s-9-42-0-s-18",
+      "proterra-zn-map",
+      "proterra-zn-spt",
+      "sulfato-amonio",
+      "sulfato-calcio",
+      "sulfurgran",
+      "superfosfato-simple",
+      "superfosfato-triple",
+      "uan-32",
+      "urea",
+      "zincodur"
+    ],
+    "tipo": "cultivo"
+  },
+  {
+    "nombre": "Trigo",
+    "ruta": "productos/trigo",
+    "productos": [
+      "enetotalplus-2",
+      "fosfato-diamonico",
+      "fosfato-monoamonico",
+      "proterra-ar-12-17-0-s-5-zn-1-25",
+      "proterra-ar-7-40-0s-5",
+      "proterra-ds-28-0-0-s-5-2",
+      "proterra-ds-30-0-0-s-2-6",
+      "proterra-ds-42-0-0-s-3-6",
+      "proterra-s-9-42-0-s-18",
+      "proterra-zn-map",
+      "proterra-zn-spt",
+      "sulfato-amonio",
+      "sulfato-calcio",
+      "sulfurgran",
+      "superfosfato-simple",
+      "superfosfato-triple",
+      "uan-32",
+      "urea",
+      "zincodur"
+    ],
+    "tipo": "cultivo"
+  },
+  {
+    "nombre": "Soja",
+    "ruta": "productos/productos-para-soja",
+    "productos": [
+      "fosfato-diamonico",
+      "fosfato-monoamonico",
+      "proterra-ar-0-30-0-s-7-2",
+      "proterra-ar-7-40-0s-5",
+      "proterra-s-0-30-0-s-21",
+      "proterra-s-0-37-0-s-18",
+      "proterra-s-9-42-0-s-18",
+      "proterra-zn-map",
+      "proterra-zn-spt",
+      "sulfato-calcio",
+      "sulfato-potasio-magnesio",
+      "sulfurgran",
+      "superfosfato-simple",
+      "superfosfato-triple",
+      "zincodur"
+    ],
+    "tipo": "cultivo"
+  },
+  {
+    "nombre": "Caña de Azúcar",
+    "ruta": "productos/cana-de-azucar",
+    "productos": [
+      "enetotalplus-2",
+      "fosfato-diamonico",
+      "fosfato-monoamonico",
+      "proterra-ar-12-17-0-s-5-zn-1-25",
+      "proterra-ar-7-40-0s-5",
+      "proterra-ds-42-0-0-s-3-6",
+      "proterra-s-9-42-0-s-18",
+      "proterra-zn-map",
+      "proterra-zn-spt",
+      "sulfato-calcio",
+      "sulfurgran",
+      "superfosfato-simple",
+      "superfosfato-triple",
+      "urea",
+      "zincodur"
+    ],
+    "tipo": "cultivo"
+  },
+  {
+    "nombre": "Pasturas Consociadas",
+    "ruta": "productos/pasturas-consociadas",
+    "productos": [
+      "cloruro-de-potasio",
+      "sulfato-potasio-magnesio",
+      "uan-32"
+    ],
+    "tipo": "cultivo"
+  },
+  {
+    "nombre": "Cebada",
+    "ruta": "productos/cebada",
+    "productos": [
+      "enetotalplus-2",
+      "fosfato-diamonico",
+      "fosfato-monoamonico",
+      "proterra-ar-12-17-0-s-5-zn-1-25",
+      "proterra-ar-7-40-0s-5",
+      "proterra-ds-28-0-0-s-5-2",
+      "proterra-ds-30-0-0-s-2-6",
+      "proterra-ds-42-0-0-s-3-6",
+      "proterra-s-9-42-0-s-18",
+      "proterra-zn-map",
+      "proterra-zn-spt",
+      "sulfato-amonio",
+      "sulfato-calcio",
+      "sulfurgran",
+      "superfosfato-simple",
+      "superfosfato-triple",
+      "uan-32",
+      "urea",
+      "zincodur"
+    ],
+    "tipo": "cultivo"
+  },
+  {
+    "nombre": "Duraznero",
+    "ruta": "productos/duraznero",
+    "productos": [
+      "cloruro-de-potasio",
+      "proterra-ar-15-15-15",
+      "sulfato-potasio-magnesio"
+    ],
+    "tipo": "cultivo"
+  },
+  {
+    "nombre": "Naranjo",
+    "ruta": "productos/naranjo",
+    "productos": [
+      "cloruro-de-potasio",
+      "proterra-ar-15-15-15"
+    ],
+    "tipo": "cultivo"
+  },
+  {
+    "nombre": "Tomate",
+    "ruta": "productos/tomate",
+    "productos": [
+      "cloruro-de-potasio",
+      "proterra-ar-15-15-15",
+      "sulfato-potasio-magnesio"
+    ],
+    "tipo": "cultivo"
+  },
+  {
+    "nombre": "Cebolla",
+    "ruta": "productos/cebolla",
+    "productos": [
+      "proterra-ar-15-15-15",
+      "sulfato-potasio-magnesio"
+    ],
+    "tipo": "cultivo"
+  },
+  {
+    "nombre": "Manzana",
+    "ruta": "productos/manzana",
+    "productos": [
+      "proterra-ar-15-15-15"
+    ],
+    "tipo": "cultivo"
+  },
+  {
+    "nombre": "Proterra S",
+    "ruta": "productos-proterra",
+    "productos": [
+      "proterra-s-0-30-0-s-21",
+      "proterra-s-0-37-0-s-18",
+      "proterra-s-9-42-0-s-18"
+    ],
+    "tipo": "linea"
+  },
+  {
+    "nombre": "Proterra Zn",
+    "ruta": "productos-proterra-zn",
+    "productos": [
+      "proterra-zn-map",
+      "proterra-zn-spt"
+    ],
+    "tipo": "linea"
+  },
+  {
+    "nombre": "Proterra AR",
+    "ruta": "proterra-ar",
+    "productos": [
+      "proterra-ar-0-30-0-s-7-2",
+      "proterra-ar-12-17-0-s-5-zn-1-25",
+      "proterra-ar-15-15-15",
+      "proterra-ar-7-40-0s-5",
+      "proterra-ds-42-0-0-s-3-6"
+    ],
+    "tipo": "linea"
+  },
+  {
+    "nombre": "Proterra DS",
+    "ruta": "proterra-ds-2",
+    "productos": [
+      "proterra-ds-28-0-0-s-5-2",
+      "proterra-ds-30-0-0-s-2-6"
+    ],
+    "tipo": "linea"
+  }
+]

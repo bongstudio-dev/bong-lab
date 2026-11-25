@@ -1,0 +1,2206 @@
+[
+  {
+    "nombre": "Urea Granulada Argentina",
+    "categoria": "Agro",
+    "familia": "",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/urea",
+    "archivada": false,
+    "imagen": "productos/imagenes/bolsa-ug.png",
+    "logo": "productos/imagenes/logo-urea-granulada.png",
+    "caracteristicas": [
+      {
+        "etiqueta": "Elementos",
+        "valor": "Nitrógeno (N)"
+      },
+      {
+        "etiqueta": "Presentación",
+        "valor": "Granel – sólido"
+      },
+      {
+        "etiqueta": "Composición",
+        "valor": "N 46%"
+      },
+      {
+        "etiqueta": "Grado",
+        "valor": "46 – 0 – 0"
+      },
+      {
+        "etiqueta": "Tipo de mezcla",
+        "valor": "Simple"
+      },
+      {
+        "etiqueta": "Grado equivalente",
+        "valor": "46 – 0 – 0"
+      },
+      {
+        "etiqueta": "Forma física",
+        "valor": "Granulado"
+      },
+      {
+        "etiqueta": "Granulometría (mm)",
+        "valor": "2 – 4 mm"
+      },
+      {
+        "etiqueta": "Solubilidad",
+        "valor": "Alta"
+      }
+    ],
+    "descripcion": [
+      "La Urea Granulada es el fertilizante con mayor concentración de N. Se aplica a todos los cultivos. Por su alta higroscopicidad, no es compatible en mezclas con Nitrato de Amonio y posee compatibilidad limitada en mezclas con SPT y SPS."
+    ],
+    "recomendaciones": [
+      "Aplicación en superficie o incorporada.",
+      "Dosis: A determinar con herramientas de diagnóstico como análisis de suelo y consultar a su asesor técnico.",
+      "Momento: Presiembra; siembra y refertilización del cultivo.",
+      "No apta para uso automotriz."
+    ],
+    "cultivos": [
+      "Caña de Azúcar",
+      "Trigo",
+      "Cebada",
+      "Maíz",
+      "Arroz",
+      "Sorgo"
+    ],
+    "documentos": [
+      {
+        "titulo": "Hoja de seguridad",
+        "ruta": "productos/archivos/urea-rev.-06-251024-1.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2025/11/UREA-rev.-06-251024-1.pdf",
+        "tipo": "seguridad"
+      }
+    ],
+    "enlaces": [],
+    "id": "urea",
+    "orden": 0,
+    "bajada": "Fertilizante granulado con 46 % de nitrógeno para la nutrición de cultivos.",
+    "notaFuente": "Las imágenes son ilustrativas. Profertil informa que sus productos cuentan con el correspondiente registro en SENASA."
+  },
+  {
+    "nombre": "eNeTOTAL PLUS",
+    "categoria": "Agro",
+    "familia": "",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/enetotalplus-2",
+    "archivada": false,
+    "imagen": "productos/imagenes/bolsa-etp.png",
+    "logo": "productos/imagenes/logo-enetotal-plus-positivo.png",
+    "caracteristicas": [
+      {
+        "etiqueta": "Elementos",
+        "valor": "Nitrógeno (N)"
+      },
+      {
+        "etiqueta": "Solubilidad",
+        "valor": "Alta"
+      },
+      {
+        "etiqueta": "Composición",
+        "valor": "N 46%"
+      },
+      {
+        "etiqueta": "Presentación",
+        "valor": "Granel – sólido"
+      },
+      {
+        "etiqueta": "Grado",
+        "valor": "46 – 0 – 0"
+      },
+      {
+        "etiqueta": "Grado equivalente",
+        "valor": "46 – 0 – 0"
+      },
+      {
+        "etiqueta": "Tipo de mezcla",
+        "valor": "Simple"
+      },
+      {
+        "etiqueta": "Granulometría (mm)",
+        "valor": "2 – 4 mm"
+      },
+      {
+        "etiqueta": "Forma física",
+        "valor": "Granulado"
+      }
+    ],
+    "descripcion": [
+      "Es el fertilizante nitrogenado de mayor concentración de Nitrógeno (N) estabilizado del mercado (46-0-0). Posee un inhibidor de la ureasa que contiene dos principios activos proporcionando una amplia protección contra la pérdida de Nitrógeno (N) y ofreciendo estabilidad en la formulación y en el producto final, tanto en almacenamiento como el transporte.",
+      "eNeTOTALPLUS permite aplicar la dosis justa, de manera segura, al costo más conveniente.",
+      "Innovación: El tratamiento de Urea Granulada con un inhibidor de volatilización con dos principios activos asegura el aprovechamiento total del Nitrógeno (N) aplicado.",
+      "Confiabilidad: Aumenta la ventana de aplicación, manteniendo el Nitrógeno (N) de manera segura, a la espera de una lluvia que lo incorpore.",
+      "Eficiencia: Mayor EUN (Eficiencia de Uso del Nitrógeno [N]).",
+      "Practicidad: Recomendado para lotes con alto contenido de rastrojo.",
+      "La aplicación en superficie permite:",
+      "Mayor rapidez y facilidad.",
+      "Mayor cantidad de ha/h de trabajo.",
+      "Puede ser mezclado con otras fuentes de fertilizantes sólidos.",
+      "Rendimiento: con el uso de eNeTOTAL Plus, en condiciones de alta temperatura y humedad, se observaron respuestas de 500 a más de 1500 kg/ha en maíz.",
+      "Es el fertilizante sólido con mayor concentración de N estabilizado.",
+      "Color amarillo.",
+      "Se aplica en todos los cultivos. Especialmente recomendado para gramíneas estivales (arroz, maíz, caña de azúcar, pasturas, sorgo, etc.).",
+      "No compatible en mezclas con Nitrato de Amonio y compatibilidad limitada con SPS y SPT."
+    ],
+    "recomendaciones": [
+      "Aplicación en superficie.",
+      "Dosis: A determinar con herramientas de diagnóstico como Análisis de suelo y consultar a su asesor técnico.",
+      "Momento: Siembra o en refertilización del cultivo, cuando las condiciones agroclimáticas promuevan la volatilización del amoníaco."
+    ],
+    "cultivos": [
+      "Caña de Azúcar",
+      "Trigo",
+      "Cebada",
+      "Maíz",
+      "Arroz",
+      "Sorgo"
+    ],
+    "documentos": [
+      {
+        "titulo": "Hoja de seguridad",
+        "ruta": "biblioteca/pdf/msds-ene-total-plus.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2020/08/MSDS-eNe-Total-Plus.pdf",
+        "tipo": "seguridad"
+      },
+      {
+        "titulo": "Hoja de seguridad · Limus® Care",
+        "ruta": "productos/archivos/limus-care-30789584-sds-gen-ar-es-2-0-1.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2024/09/Limus-Care_30789584_SDS_GEN_AR_es_2-0_1.pdf",
+        "tipo": "seguridad"
+      },
+      {
+        "titulo": "Folleto eNeTOTAL PLUS",
+        "ruta": "productos/archivos/folleto-digital-enetotal-plus-2023.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2024/01/folleto-digital-eNeTOTAL-PLUS-2023.pdf",
+        "tipo": "folleto"
+      },
+      {
+        "titulo": "Ficha técnica de eNeTOTAL PLUS",
+        "ruta": "productos/archivos/ficha-tecnica-etp-mod-002.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2025/09/Ficha-tecnica-ETP-mod-002.pdf",
+        "tipo": "ficha"
+      },
+      {
+        "titulo": "Boletín 38 · eNeTOTAL PLUS frente a otros fertilizantes",
+        "ruta": "biblioteca/pdf/bt-38-enetotal-1.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2025/06/BT-38-eNeTOTAL-1.pdf",
+        "tipo": "boletin"
+      },
+      {
+        "titulo": "Boletín 30 · eNeTOTAL PLUS en maíz",
+        "ruta": "biblioteca/pdf/bt-30-etp-en-maiz.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2025/06/BT-30-ETP-en-maiz.pdf",
+        "tipo": "boletin"
+      },
+      {
+        "titulo": "Boletín 41 · Factores de emisión de GEI de urea y eNeTOTAL PLUS",
+        "ruta": "biblioteca/pdf/bt-41-factores-de-emision-gei-urea-y-enetotal-plus.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2025/09/BT-41-Factores-de-emision-GEI-urea-y-eNeTOTAL-PLUS.pdf",
+        "tipo": "boletin"
+      },
+      {
+        "titulo": "Boletín 42 · eNeTOTAL PLUS en el sudeste de Buenos Aires",
+        "ruta": "biblioteca/pdf/bt-42-enetotal-plus-se-bs-as.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2025/11/BT-42-eNeTOTAL-PLUS-SE-BS-AS.pdf",
+        "tipo": "boletin"
+      }
+    ],
+    "enlaces": [
+      {
+        "titulo": "BASF – Download Center",
+        "url": "https://downloadcenter.basf.com/search",
+        "tipo": "sitio"
+      },
+      {
+        "titulo": "Análisis de suelo",
+        "url": "https://www.youtube.com/watch?v=Yuq3qEOqrhc",
+        "tipo": "video"
+      },
+      {
+        "titulo": "La transformación de la urea en el suelo",
+        "url": "https://www.youtube.com/watch?v=8KhtyKg_H9A",
+        "tipo": "video"
+      },
+      {
+        "titulo": "Tierra de historias · Podcast de Profertil",
+        "url": "https://open.spotify.com/show/38S9iqSTAFM5G5nHaS2u8r",
+        "tipo": "podcast"
+      },
+      {
+        "titulo": "Ensayos de eNeTOTAL PLUS en Fauno",
+        "url": "https://fauno.ai/ensayos/",
+        "tipo": "sitio"
+      }
+    ],
+    "id": "enetotalplus-2",
+    "orden": 1,
+    "bajada": "Urea granulada con 46 % de nitrógeno y un inhibidor de la ureasa que ayuda a reducir las pérdidas por volatilización.",
+    "notaFuente": "Las imágenes son ilustrativas. Profertil informa que sus productos cuentan con el correspondiente registro en SENASA."
+  },
+  {
+    "nombre": "UAN 32",
+    "categoria": "Agro",
+    "familia": "",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/uan-32",
+    "archivada": false,
+    "imagen": "productos/imagenes/gota.png",
+    "logo": null,
+    "caracteristicas": [
+      {
+        "etiqueta": "Elementos",
+        "valor": "Nitrógeno (N)"
+      },
+      {
+        "etiqueta": "Solubilidad",
+        "valor": "Alta"
+      },
+      {
+        "etiqueta": "Composición",
+        "valor": "N 32%"
+      },
+      {
+        "etiqueta": "Presentación",
+        "valor": "Granel – liquido"
+      },
+      {
+        "etiqueta": "Grado",
+        "valor": "32 – 0 – 0"
+      },
+      {
+        "etiqueta": "Grado equivalente",
+        "valor": "32 – 0 – 0"
+      },
+      {
+        "etiqueta": "Tipo de mezcla",
+        "valor": "Simple"
+      },
+      {
+        "etiqueta": "Forma física",
+        "valor": "Líquido"
+      }
+    ],
+    "descripcion": [
+      "El UAN es un fertilizante líquido que posee ventajas operativas en cuanto velocidad y momento de aplicación. Apto para mezclas con otros fertilizantes líquidos.",
+      "Baja eficiencia cuando se aplica pulverizado en cobertura total, en especial en siembra directa o con residuos en superficie. Actúa mejor inyectado entre líneas con la siembra. Tiene un 50% del N en forma amídica (urea), 25% del N como amonio y 25% del N como nitrato. Estos componentes están sujetos a distintos tipos de pérdidas, volatilización para la urea, fijación y absorción por las plantas para el amonio y lixiviación y desnitrificación para el nitrato.",
+      "Las formulaciones de UAN son corrosivas a los metales amarillos. En cambio, son adecuados el acero inoxidable, el acero al carbono y el aluminio, como así también plásticos y porcelanas."
+    ],
+    "recomendaciones": [
+      "El UAN 32 puede ser inyectado en el suelo debajo de la superficie o chorreado en banda. También puede mezclarse con el agua de riego. Si se piensa usar como foliar se debe tener precaución, ya que puede causar daño al follaje si se aplica directamente a algunos cultivos, por lo que una previa dilución con agua es aconsejable."
+    ],
+    "cultivos": [
+      "Trigo",
+      "Cebada",
+      "Maíz",
+      "Sorgo",
+      "Pasturas Consociadas"
+    ],
+    "documentos": [
+      {
+        "titulo": "Hoja de seguridad",
+        "ruta": "biblioteca/pdf/uan.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2020/08/UAN.pdf",
+        "tipo": "seguridad"
+      }
+    ],
+    "enlaces": [],
+    "id": "uan-32",
+    "orden": 2,
+    "bajada": "Fertilizante líquido que aporta un 32 % de nitrógeno y se puede combinar con otros fertilizantes líquidos.",
+    "notaFuente": "Las imágenes son ilustrativas. Profertil informa que sus productos cuentan con el correspondiente registro en SENASA."
+  },
+  {
+    "nombre": "Fosfato Monoamónico (MAP)",
+    "categoria": "Agro",
+    "familia": "",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/fosfato-monoamonico",
+    "archivada": false,
+    "imagen": "productos/imagenes/bolsa-fosfato-monoamonico.png",
+    "logo": null,
+    "caracteristicas": [
+      {
+        "etiqueta": "Elementos",
+        "valor": "Nitrógeno (N) y Fósforo (P)"
+      },
+      {
+        "etiqueta": "Solubilidad",
+        "valor": "Media"
+      },
+      {
+        "etiqueta": "Composición",
+        "valor": "N 11% – P23%"
+      },
+      {
+        "etiqueta": "Presentación",
+        "valor": "Granel – sólido"
+      },
+      {
+        "etiqueta": "Grado",
+        "valor": "11 – 23 – 0"
+      },
+      {
+        "etiqueta": "Grado equivalente",
+        "valor": "11 – 52 – 0"
+      },
+      {
+        "etiqueta": "Tipo de mezcla",
+        "valor": "Compuesto"
+      },
+      {
+        "etiqueta": "Granulometría (mm)",
+        "valor": "2 – 4 mm"
+      },
+      {
+        "etiqueta": "Forma física",
+        "valor": "Granulado"
+      }
+    ],
+    "descripcion": [
+      "Los Fosfatos de Amonio son producidos por la reacción del Amoníaco con el Ácido Fosfórico, o una mezcla de Ácidos Fosfórico y Sulfúrico. Junto con el Fosfato Diamónico son los fertilizantes más concentrados del mercado, con 62% y 64% de nutrientes."
+    ],
+    "recomendaciones": [
+      "Aplicación y momento: Incorporado a la siembra (al costado y por debajo de la línea de siembra).",
+      "Dosis: Según estrategia de aplicación de Nitrógeno (N) y Fósforo (P), se recomienda realizar análisis de suelo y consultar a su asesor técnico."
+    ],
+    "cultivos": [
+      "Caña de Azúcar",
+      "Trigo",
+      "Cebada",
+      "Maíz",
+      "Arroz",
+      "Sorgo",
+      "Soja"
+    ],
+    "documentos": [
+      {
+        "titulo": "Hoja de seguridad",
+        "ruta": "biblioteca/pdf/fosfato-monoamonico-map-2.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2020/08/FOSFATO-MONOAMONICO-MAP-2.pdf",
+        "tipo": "seguridad"
+      }
+    ],
+    "enlaces": [],
+    "id": "fosfato-monoamonico",
+    "orden": 3,
+    "bajada": "Fertilizante granulado que aporta nitrógeno y fósforo. Su composición es de 11 % de nitrógeno y 23 % de fósforo.",
+    "notaFuente": "Las imágenes son ilustrativas. Profertil informa que sus productos cuentan con el correspondiente registro en SENASA."
+  },
+  {
+    "nombre": "Fosfato Diamónico (DAP)",
+    "categoria": "Agro",
+    "familia": "",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/fosfato-diamonico",
+    "archivada": false,
+    "imagen": "productos/imagenes/bolsa-fosfato-diamonico.png",
+    "logo": null,
+    "caracteristicas": [
+      {
+        "etiqueta": "Elementos",
+        "valor": "Nitrógeno (N) y Fósforo (P)"
+      },
+      {
+        "etiqueta": "Solubilidad",
+        "valor": "Alta"
+      },
+      {
+        "etiqueta": "Composición",
+        "valor": "N 18% – P 20%"
+      },
+      {
+        "etiqueta": "Presentación",
+        "valor": "Granel – sólido"
+      },
+      {
+        "etiqueta": "Grado",
+        "valor": "18 – 20 – 0"
+      },
+      {
+        "etiqueta": "Grado equivalente",
+        "valor": "18 – 46 – 0"
+      },
+      {
+        "etiqueta": "Tipo de mezcla",
+        "valor": "Compuesto"
+      },
+      {
+        "etiqueta": "Granulometría (mm)",
+        "valor": "2 – 4 mm"
+      },
+      {
+        "etiqueta": "Forma física",
+        "valor": "Granulado"
+      }
+    ],
+    "descripcion": [
+      "Es un producto compuesto por Fosfatos de Amonio, principalmente Fosfato Diamónico. Puede contener hasta 2% de Nitrógeno (N) no amoniacal. Los Fosfatos de Amonio poseen excelentes propiedades físicas y son los fertilizantes más concentrados del mercado, con entre 62% y 64% de nutrientes. Posee compatibilidad limitada en mezclas con SPS y SPT."
+    ],
+    "recomendaciones": [
+      "Aplicación y momento: Incorporado a la siembra (al costado y por debajo de la línea de siembra).",
+      "Dosis: Según estrategia de aplicación de Nitrógeno (N) y Fósforo (P), se recomienda realizar análisis de suelo y consultar a su asesor técnico."
+    ],
+    "cultivos": [
+      "Caña de Azúcar",
+      "Trigo",
+      "Cebada",
+      "Maíz",
+      "Arroz",
+      "Sorgo",
+      "Soja"
+    ],
+    "documentos": [
+      {
+        "titulo": "Hoja de seguridad",
+        "ruta": "biblioteca/pdf/fosfato-diamonico-rev-231011.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2020/08/Fosfato-DiAmonico-rev-231011.pdf",
+        "tipo": "seguridad"
+      }
+    ],
+    "enlaces": [],
+    "id": "fosfato-diamonico",
+    "orden": 4,
+    "bajada": "Fuente granulada de nitrógeno y fósforo, con 18 % de nitrógeno y 20 % de fósforo.",
+    "notaFuente": "Las imágenes son ilustrativas. Profertil informa que sus productos cuentan con el correspondiente registro en SENASA."
+  },
+  {
+    "nombre": "Superfosfato Triple (SPT)",
+    "categoria": "Agro",
+    "familia": "",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/superfosfato-triple",
+    "archivada": false,
+    "imagen": "productos/imagenes/bolsa-superfosfato-triple.png",
+    "logo": null,
+    "caracteristicas": [
+      {
+        "etiqueta": "Elementos",
+        "valor": "Fósforo (P) y Calcio"
+      },
+      {
+        "etiqueta": "Solubilidad",
+        "valor": "Baja"
+      },
+      {
+        "etiqueta": "Composición",
+        "valor": "P 20% – Ca 14%"
+      },
+      {
+        "etiqueta": "Presentación",
+        "valor": "Granel – sólido"
+      },
+      {
+        "etiqueta": "Grado",
+        "valor": "0 – 20 – 0 + Ca 14%"
+      },
+      {
+        "etiqueta": "Grado equivalente",
+        "valor": "0 – 46 – 0"
+      },
+      {
+        "etiqueta": "Tipo de mezcla",
+        "valor": "Compuesto"
+      },
+      {
+        "etiqueta": "Granulometría (mm)",
+        "valor": "2 – 4 mm"
+      },
+      {
+        "etiqueta": "Forma física",
+        "valor": "Granulado"
+      }
+    ],
+    "descripcion": [
+      "Es el fertilizante fosfatado de mayor concentración disponible, con 44% a 48% de P2O5 y 40% a 45% de P2O5 soluble en agua. Posee compatibilidad limitada en mezcla con Urea Granulada."
+    ],
+    "recomendaciones": [
+      "Según estrategia de aplicación de P: Presiembra o Siembra; en superficie o incorporado (al costado y por debajo de la línea de siembra).",
+      "Dosis: Según estrategia de aplicación de Fósforo (P), se recomienda realizar análisis de suelo y consultar a su asesor técnico."
+    ],
+    "cultivos": [
+      "Caña de Azúcar",
+      "Trigo",
+      "Cebada",
+      "Maíz",
+      "Arroz",
+      "Sorgo",
+      "Soja"
+    ],
+    "documentos": [
+      {
+        "titulo": "Hoja de seguridad",
+        "ruta": "biblioteca/pdf/superfosfato-triple-rev-6-1.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2020/08/Superfosfato-Triple-Rev-6-1.pdf",
+        "tipo": "seguridad"
+      }
+    ],
+    "enlaces": [],
+    "id": "superfosfato-triple",
+    "orden": 5,
+    "bajada": "Fertilizante fosfatado granulado que también aporta calcio.",
+    "notaFuente": "Las imágenes son ilustrativas. Profertil informa que sus productos cuentan con el correspondiente registro en SENASA."
+  },
+  {
+    "nombre": "Superfosfato Simple (SPS)",
+    "categoria": "Agro",
+    "familia": "",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/superfosfato-simple",
+    "archivada": false,
+    "imagen": "productos/imagenes/bolsa-superfosfato-simple.png",
+    "logo": null,
+    "caracteristicas": [
+      {
+        "etiqueta": "Elementos",
+        "valor": "Fósforo (P), Azufre y Calcio"
+      },
+      {
+        "etiqueta": "Solubilidad",
+        "valor": "Baja"
+      },
+      {
+        "etiqueta": "Composición",
+        "valor": "P (8,5% – 9,5%) – S 12% – Ca 20%"
+      },
+      {
+        "etiqueta": "Presentación",
+        "valor": "Granel – sólido"
+      },
+      {
+        "etiqueta": "Grado",
+        "valor": "0 – (8.5-9.5) – 0 + S 12 + Ca 20"
+      },
+      {
+        "etiqueta": "Grado equivalente",
+        "valor": "0 – (21 – 23) – 0 + S 12"
+      },
+      {
+        "etiqueta": "Tipo de mezcla",
+        "valor": "Compuesto"
+      },
+      {
+        "etiqueta": "Granulometría (mm)",
+        "valor": "2 – 4 mm"
+      },
+      {
+        "etiqueta": "Forma física",
+        "valor": "Granulado"
+      }
+    ],
+    "descripcion": [
+      "El Superfosfato Simple incluye a todos los superfosfatos que contienen hasta 22% de P2O5 disponible, comúnmente obtenidos mediante la acidulación de un material fosfatado natural con Ácido Sulfúrico. Generalmente el contenido de Fósforo (P) es cercano al 20% de P2O5. Posee compatibilidad limitada en mezclas con Urea Granulada."
+    ],
+    "recomendaciones": [
+      "Según estrategia de aplicación de P: Presiembra o Siembra; en superficie o incorporado (al costado y por debajo de la línea de siembra).",
+      "Dosis: Según estrategia de aplicación de Fósforo (P), se recomienda realizar análisis de suelo y consultar a su asesor técnico."
+    ],
+    "cultivos": [
+      "Caña de Azúcar",
+      "Trigo",
+      "Cebada",
+      "Maíz",
+      "Arroz",
+      "Sorgo",
+      "Soja"
+    ],
+    "documentos": [
+      {
+        "titulo": "Hoja de seguridad",
+        "ruta": "biblioteca/pdf/superfosfato-simple.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2020/08/SUPERFOSFATO-SIMPLE.pdf",
+        "tipo": "seguridad"
+      }
+    ],
+    "enlaces": [],
+    "id": "superfosfato-simple",
+    "orden": 6,
+    "bajada": "Fertilizante granulado que reúne fósforo, azufre y calcio.",
+    "notaFuente": "Las imágenes son ilustrativas. Profertil informa que sus productos cuentan con el correspondiente registro en SENASA."
+  },
+  {
+    "nombre": "Sulfato de Amonio (SA)",
+    "categoria": "Agro",
+    "familia": "",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/sulfato-amonio",
+    "archivada": false,
+    "imagen": "productos/imagenes/bolsa-sulfato-de-amonio.png",
+    "logo": null,
+    "caracteristicas": [
+      {
+        "etiqueta": "Elementos",
+        "valor": "Nitrógeno (N) y Azufre"
+      },
+      {
+        "etiqueta": "Solubilidad",
+        "valor": "Alta"
+      },
+      {
+        "etiqueta": "Composición",
+        "valor": "N 21% – S 24%"
+      },
+      {
+        "etiqueta": "Presentación",
+        "valor": "Granel – sólido"
+      },
+      {
+        "etiqueta": "Grado",
+        "valor": "21 – 0 – 0 + S 24%"
+      },
+      {
+        "etiqueta": "Grado equivalente",
+        "valor": "21 – 0 – 0 – S 24"
+      },
+      {
+        "etiqueta": "Tipo de mezcla",
+        "valor": "Compuesto"
+      },
+      {
+        "etiqueta": "Granulometría (mm)",
+        "valor": "2 – 4 mm"
+      },
+      {
+        "etiqueta": "Forma física",
+        "valor": "Granulado"
+      }
+    ],
+    "descripcion": [
+      "El Sulfato de Amonio es la sal amoniacal del Ácido Sulfúrico. Debe contener no menos de 20,5% de Nitrógeno (N). Compatible en mezclas con Nitrato de Amonio, Urea Granulada, Sulfato de Amonio, Superfosfato Triple, Superfosfato Simple y Fosfato Diamónico."
+    ],
+    "recomendaciones": [
+      "Aplicación y momento: Siembra. Por su solubilidad se puede utilizar en fertirriego.",
+      "Dosis: A determinar con herramientas de diagnóstico como análisis de suelo y consultar a su asesor técnico."
+    ],
+    "cultivos": [
+      "Trigo",
+      "Cebada",
+      "Maíz",
+      "Sorgo"
+    ],
+    "documentos": [
+      {
+        "titulo": "Hoja de seguridad",
+        "ruta": "biblioteca/pdf/sulfato-de-amonio.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2020/08/SULFATO-DE-AMONIO.pdf",
+        "tipo": "seguridad"
+      }
+    ],
+    "enlaces": [],
+    "id": "sulfato-amonio",
+    "orden": 7,
+    "bajada": "Fuente granulada de nitrógeno y azufre, con 21 % de nitrógeno y 24 % de azufre.",
+    "notaFuente": "Las imágenes son ilustrativas. Profertil informa que sus productos cuentan con el correspondiente registro en SENASA."
+  },
+  {
+    "nombre": "Sulfato de Calcio (SCa)",
+    "categoria": "Agro",
+    "familia": "",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/sulfato-calcio",
+    "archivada": false,
+    "imagen": "productos/imagenes/bolsa-sulfato-de-calcio.png",
+    "logo": null,
+    "caracteristicas": [
+      {
+        "etiqueta": "Elementos",
+        "valor": "Azufre y Calcio"
+      },
+      {
+        "etiqueta": "Solubilidad",
+        "valor": "Baja"
+      },
+      {
+        "etiqueta": "Composición",
+        "valor": "S (15% – 18%) – Ca (19% – 21%)"
+      },
+      {
+        "etiqueta": "Presentación",
+        "valor": "Granel – sólido"
+      },
+      {
+        "etiqueta": "Grado",
+        "valor": "0 – 0 – 0 + S (15% – 18%) + Ca (19% – 21%)"
+      },
+      {
+        "etiqueta": "Grado equivalente",
+        "valor": "0 – 0 – 0 + S 18 + Ca 22"
+      },
+      {
+        "etiqueta": "Tipo de mezcla",
+        "valor": "Compuesto"
+      },
+      {
+        "etiqueta": "Forma física",
+        "valor": "Granulado"
+      }
+    ],
+    "descripcion": [
+      "El yeso o Sulfato de Ca deshidratado se encuentra en grandes depósitos en Argentina y sus componentes son de inmediata disponibilidad para las plantas. Como tal, no es capaz de neutralizar la acidez del suelo, aunque su contenido de calcio soluble permite neutralizar la acidez del subsuelo."
+    ],
+    "recomendaciones": [
+      "Aplicación y momento: Siembra o primeros estadios dependiendo la estrategia de aplicación de azufre.",
+      "Dosis: A determinar la misma con herramientas de diagnóstico (análisis de suelo); evaluar las condiciones físicas del suelo y consultar a su asesor técnico."
+    ],
+    "cultivos": [
+      "Caña de Azúcar",
+      "Trigo",
+      "Cebada",
+      "Maíz",
+      "Arroz",
+      "Sorgo",
+      "Soja"
+    ],
+    "documentos": [
+      {
+        "titulo": "Hoja de seguridad",
+        "ruta": "biblioteca/pdf/sulfato-de-calcio.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2020/08/SULFATO-DE-CALCIO.pdf",
+        "tipo": "seguridad"
+      }
+    ],
+    "enlaces": [],
+    "id": "sulfato-calcio",
+    "orden": 8,
+    "bajada": "Fuente de azufre y calcio disponible en forma granulada.",
+    "notaFuente": "Las imágenes son ilustrativas. Profertil informa que sus productos cuentan con el correspondiente registro en SENASA."
+  },
+  {
+    "nombre": "Cloruro de Potasio (KCl)",
+    "categoria": "Agro",
+    "familia": "",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/cloruro-de-potasio",
+    "archivada": false,
+    "imagen": "productos/imagenes/bolsa-cloruro-de-potasio.png",
+    "logo": null,
+    "caracteristicas": [
+      {
+        "etiqueta": "Elementos",
+        "valor": "Potasio"
+      },
+      {
+        "etiqueta": "Presentación",
+        "valor": "Bolsa"
+      },
+      {
+        "etiqueta": "Composición",
+        "valor": "Óxido de Potasio 60% + Cloro 46%"
+      },
+      {
+        "etiqueta": "Grado equivalente",
+        "valor": "0 – 0 – 60"
+      },
+      {
+        "etiqueta": "Grado",
+        "valor": "0 – 0 – 50"
+      },
+      {
+        "etiqueta": "Granulometría (mm)",
+        "valor": "1,2 – 3,3 mm"
+      },
+      {
+        "etiqueta": "Tipo de mezcla",
+        "valor": "Simple"
+      },
+      {
+        "etiqueta": "Forma física",
+        "valor": "Granulado"
+      }
+    ],
+    "descripcion": [
+      "El Cloruro de Potasio es el fertilizante con mayor porcentaje de potasio. Puede utilizarse tanto en aplicación directa como en mezclas físicas. Puede usarse en todo tipo de cultivo, en aplicación en bandas o en cobertura sin incorporar al suelo."
+    ],
+    "recomendaciones": [
+      "Tiene efecto salino relativamente alto, por lo que se debe tener precaución si se coloca cerca de la semilla o plántulas germinando."
+    ],
+    "cultivos": [
+      "Duraznero",
+      "Naranjo",
+      "Pasturas Consociadas",
+      "Tomate"
+    ],
+    "documentos": [
+      {
+        "titulo": "Hoja de seguridad",
+        "ruta": "biblioteca/pdf/cloruro-de-potasio-cik-1.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2020/08/CLORURO-DE-POTASIO-CIK-1.pdf",
+        "tipo": "seguridad"
+      }
+    ],
+    "enlaces": [],
+    "id": "cloruro-de-potasio",
+    "orden": 9,
+    "bajada": "Fertilizante potásico granulado para aplicación directa o en mezclas físicas.",
+    "notaFuente": "Las imágenes son ilustrativas. Profertil informa que sus productos cuentan con el correspondiente registro en SENASA."
+  },
+  {
+    "nombre": "Arnox 32",
+    "categoria": "Industrial",
+    "familia": "",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/arnox-32",
+    "archivada": false,
+    "imagen": "productos/imagenes/unnamed.jpg",
+    "logo": null,
+    "caracteristicas": [],
+    "descripcion": [
+      "Arnox 32 es una solución fabricada sobre la base de urea de muy alta pureza que se utiliza en motores diésel cuya función es neutralizar Gases de Efecto Invernadero (GEI) que se producen durante la combustión.",
+      "Los vehículos que cuentan con tecnología denominada Reducción Catalítica Selectiva (SCR por su sigla en inglés) cuentan con la posibilidad del tratamiento post combustión que permite convertir Óxidos de Nitrógeno (NOx) en sustancias inofensivas para el ambiente.",
+      "Esta tecnología responde a exigencias de la Norma Euro V obligatoria en algunos países que regulan los límites permitidos de las emisiones GEI.",
+      "La marca registrada de Arnox 32 de Profertil es Proaire."
+    ],
+    "recomendaciones": [
+      "Arnox 32 no es un producto tóxico.",
+      "Arnox 32 no es un producto peligroso para las personas, ni para el medioambiente.",
+      "Arnox 32 no es considerado inflamable, ni explosivo.",
+      "Arnox 32 no es un aditivo para el combustible.",
+      "Los vehículos con tecnología SCR vienen equipados con un depósito para almacenar Arnox 32 separado e independiente del combustible. No se debe agregar Arnox 32 al tanque de combustible. En caso de que, por error, se colocara Arnox 32 en el tanque de combustible es importante no arrancar el motor y solicitar ayuda.",
+      "Arnox 32 es una solución liquida lista para usar. No debe ser diluido.",
+      "Arnox 32 es regulado internacionalmente por la norma ISO 22241 y en Argentina por Resolución 110/2011 de Secretaría de Energía. Dicha norma regula la especificación técnica del producto, el almacenamiento y su manipulación.",
+      "Es vital que Arnox 32 no se contamine en ningún momento, debido a que un producto contaminado podría dañar el motor del vehículo."
+    ],
+    "cultivos": [],
+    "documentos": [
+      {
+        "titulo": "Hoja de seguridad",
+        "ruta": "biblioteca/pdf/fds-arnox32-221128rev3.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2020/08/FDS-ARNOX32-221128rev3.pdf",
+        "tipo": "seguridad"
+      },
+      {
+        "titulo": "Resolución 35/2009",
+        "ruta": "productos/archivos/2009-resolucion-35-sec-de-ambiente-y-des-sust.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2021/11/2009-Resolucion-35-SEC-DE-AMBIENTE-Y-DES-SUST.pdf",
+        "tipo": "normativa"
+      },
+      {
+        "titulo": "Resolución 110/2011",
+        "ruta": "productos/archivos/2011-resolucion-110-sec-de-energia.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2021/11/2011-Resolucion-110-SEC-DE-ENERGIA.pdf",
+        "tipo": "normativa"
+      },
+      {
+        "titulo": "Resolución 1035/2015",
+        "ruta": "productos/archivos/2015-resolucion-1035-comision-nacional-de-regulacion-del-transporte.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2021/11/2015-Resolucion-1035-COMISION-NACIONAL-DE-REGULACION-DEL-TRANSPORTE.pdf",
+        "tipo": "normativa"
+      }
+    ],
+    "enlaces": [
+      {
+        "titulo": "Solución de urea",
+        "url": "productos/solucion-de-urea/",
+        "tipo": "producto"
+      },
+      {
+        "titulo": "ProAire",
+        "url": "https://www.youtube.com/watch?v=dU80LX-L10k",
+        "tipo": "video"
+      }
+    ],
+    "id": "arnox-32",
+    "orden": 10,
+    "bajada": "Solución de urea de alta pureza para tratar los gases de escape de motores diésel con tecnología SCR.",
+    "notaFuente": "Las imágenes son ilustrativas. Profertil informa que sus productos cuentan con el correspondiente registro en SENASA."
+  },
+  {
+    "nombre": "Amoníaco",
+    "categoria": "Industrial",
+    "familia": "",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/amoniaco",
+    "archivada": false,
+    "imagen": "productos/imagenes/amoniaco-1.jpg",
+    "logo": null,
+    "caracteristicas": [],
+    "descripcion": [
+      "Como parte del proceso de elaboración de Urea Granulada, generamos, como producto intermedio, el amoníaco. Este es utilizado como refrigerante para la industria de la panificación, en la elaboración de cosméticos, en tinturas para el cabello y en la fabricación de desinfectantes y limpiadores de cocina."
+    ],
+    "recomendaciones": [],
+    "cultivos": [],
+    "documentos": [
+      {
+        "titulo": "Hoja de seguridad",
+        "ruta": "biblioteca/pdf/amoniaco-17082022-.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2020/08/AMONIACO-17082022-.pdf",
+        "tipo": "seguridad"
+      }
+    ],
+    "enlaces": [],
+    "id": "amoniaco",
+    "orden": 11,
+    "bajada": "Producto intermedio de la elaboración de urea, con aplicaciones en refrigeración y en la industria química.",
+    "notaFuente": "Las imágenes son ilustrativas. Profertil informa que sus productos cuentan con el correspondiente registro en SENASA."
+  },
+  {
+    "nombre": "Sulfurgran",
+    "categoria": "Agro",
+    "familia": "",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/sulfurgran",
+    "archivada": false,
+    "imagen": "productos/imagenes/bolsa-sulfugran.png",
+    "logo": null,
+    "caracteristicas": [
+      {
+        "etiqueta": "Elementos",
+        "valor": "Azufre"
+      },
+      {
+        "etiqueta": "Presentación",
+        "valor": "Bolsa"
+      },
+      {
+        "etiqueta": "Composición",
+        "valor": "S 90% + Bentonita 10%"
+      },
+      {
+        "etiqueta": "Grado equivalente",
+        "valor": "0 – 0 – 0 + S 90"
+      },
+      {
+        "etiqueta": "Grado",
+        "valor": "0 – 0 – 0 – 90 S"
+      },
+      {
+        "etiqueta": "Granulometría (mm)",
+        "valor": "2 – 4 mm"
+      },
+      {
+        "etiqueta": "Tipo de mezcla",
+        "valor": "Simple"
+      },
+      {
+        "etiqueta": "Forma física",
+        "valor": "Granulado"
+      }
+    ],
+    "descripcion": [
+      "El Sulfurgran es Azufre elemental micronizado al 90% con 10% de bentonita. En el suelo el S es oxidado por los Thiobacillus que transforman el Azufre elemental en Sulfato, forma en que lo toma la planta.",
+      "La gran ventaja de este producto es que el Azufre se entrega gradualmente, estando disponible para el cultivo en el momento que más lo necesita."
+    ],
+    "recomendaciones": [
+      "Aplicación y momento: Presiembra en superficie o incorporado a la siembra.",
+      "Dosis: Según estrategia de aplicación de Azufre. Es recomendado para el doble cultivo trigo/soja segunda. Se recomienda realizar análisis de suelo y consultar a su asesor técnico."
+    ],
+    "cultivos": [
+      "Caña de Azúcar",
+      "Trigo",
+      "Cebada",
+      "Maíz",
+      "Arroz",
+      "Sorgo",
+      "Soja"
+    ],
+    "documentos": [
+      {
+        "titulo": "Hoja de seguridad",
+        "ruta": "biblioteca/pdf/sulfurgran-2.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2020/08/SULFURGRAN-2.pdf",
+        "tipo": "seguridad"
+      }
+    ],
+    "enlaces": [],
+    "id": "sulfurgran",
+    "orden": 12,
+    "bajada": "Fertilizante granulado compuesto por 90 % de azufre elemental micronizado y 10 % de bentonita.",
+    "notaFuente": "Las imágenes son ilustrativas. Profertil informa que sus productos cuentan con el correspondiente registro en SENASA."
+  },
+  {
+    "nombre": "Sulfato de Potasio y Magnesio",
+    "categoria": "Agro",
+    "familia": "",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/sulfato-potasio-magnesio",
+    "archivada": false,
+    "imagen": "productos/imagenes/bolsa-sulfato-de-potasio-y-magnesio.png",
+    "logo": null,
+    "caracteristicas": [
+      {
+        "etiqueta": "Elementos",
+        "valor": "Potasio, Azufre y Magnesio"
+      },
+      {
+        "etiqueta": "Presentación",
+        "valor": "Granel – sólido"
+      },
+      {
+        "etiqueta": "Composición",
+        "valor": "Óxido de Potasio 21,5% + S 21,5% + Mg 10,5%"
+      },
+      {
+        "etiqueta": "Grado equivalente",
+        "valor": "0 – 0 – 21,5 + S 21,5 + Mg 10,5"
+      },
+      {
+        "etiqueta": "Grado",
+        "valor": "0 – 0 – 17,8 + S 21,5 + Mg 10,5"
+      },
+      {
+        "etiqueta": "Tipo de mezcla",
+        "valor": "Simple"
+      },
+      {
+        "etiqueta": "Forma física",
+        "valor": "Granulado"
+      }
+    ],
+    "descripcion": [
+      "Es un fertilizante de origen natural que aporta tres nutrientes: K, Mg y S, todos en forma inmediatamente asimilable por la planta. Es compatible con otros fertilizantes en mezclas a granel, no afecta el pH del suelo y tiene bajo índice salino."
+    ],
+    "recomendaciones": [
+      "Sugerido en suelos arenosos con bajo contenido de cationes, en particular en suelos deficiente de Mg y S."
+    ],
+    "cultivos": [
+      "Cebolla",
+      "Duraznero",
+      "Pasturas Consociadas",
+      "Soja",
+      "Tomate"
+    ],
+    "documentos": [
+      {
+        "titulo": "Hoja de seguridad",
+        "ruta": "biblioteca/pdf/k-mag-premium-1.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2020/08/K-Mag-PREMIUM-1.pdf",
+        "tipo": "seguridad"
+      }
+    ],
+    "enlaces": [],
+    "id": "sulfato-potasio-magnesio",
+    "orden": 13,
+    "bajada": "Fertilizante de origen natural que aporta potasio, magnesio y azufre.",
+    "notaFuente": "Las imágenes son ilustrativas. Profertil informa que sus productos cuentan con el correspondiente registro en SENASA."
+  },
+  {
+    "nombre": "Zincodur",
+    "categoria": "Agro",
+    "familia": "",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/zincodur",
+    "archivada": false,
+    "imagen": "productos/imagenes/bolsa-zincodur.png",
+    "logo": null,
+    "caracteristicas": [
+      {
+        "etiqueta": "Elementos",
+        "valor": "Azufre y Zinc"
+      },
+      {
+        "etiqueta": "Presentación",
+        "valor": "Bolsa"
+      },
+      {
+        "etiqueta": "Composición",
+        "valor": "S 6% + Óxido sulfato de Zinc 25%"
+      },
+      {
+        "etiqueta": "Grado equivalente",
+        "valor": "0 – 0 – 0 + S 6 + Zn 25"
+      },
+      {
+        "etiqueta": "Grado",
+        "valor": "0 – 0 – 0 + S 6 + Zn 25"
+      },
+      {
+        "etiqueta": "Granulometría (mm)",
+        "valor": "2 – 4 mm"
+      },
+      {
+        "etiqueta": "Tipo de mezcla",
+        "valor": "Simple"
+      },
+      {
+        "etiqueta": "Forma física",
+        "valor": "Granulado"
+      }
+    ],
+    "descripcion": [
+      "El Zincodur es una mezcla de proporciones variables de Óxido y Sulfato de Zinc. Se puede mezclar con otros fertilizantes granulados en mezclas físicas.",
+      "Este fertilizante no es apto para fertirriego y foliar."
+    ],
+    "recomendaciones": [
+      "Se recomienda en aplicaciones a la siembra en mezclas físicas."
+    ],
+    "cultivos": [
+      "Caña de Azúcar",
+      "Trigo",
+      "Cebada",
+      "Maíz",
+      "Arroz",
+      "Sorgo",
+      "Soja"
+    ],
+    "documentos": [
+      {
+        "titulo": "Hoja de seguridad",
+        "ruta": "biblioteca/pdf/msds-zinc-ddp-rev3-250211.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2020/08/MSDS-ZINC-DDP-rev3-250211-1.pdf",
+        "tipo": "seguridad"
+      }
+    ],
+    "enlaces": [],
+    "id": "zincodur",
+    "orden": 14,
+    "bajada": "Fuente granulada de zinc y azufre que puede incorporarse a mezclas físicas.",
+    "notaFuente": "Las imágenes son ilustrativas. Profertil informa que sus productos cuentan con el correspondiente registro en SENASA."
+  },
+  {
+    "nombre": "Proterra Zn (SPT-Zn)",
+    "categoria": "Agro",
+    "familia": "Proterra Zn",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/proterra-zn-spt",
+    "archivada": false,
+    "imagen": "productos/imagenes/bolsa-proterra-zn.png",
+    "logo": "productos/imagenes/logo-proterra-zn-1.png",
+    "caracteristicas": [
+      {
+        "etiqueta": "Elementos",
+        "valor": "Fósforo, Calcio y Zinc"
+      },
+      {
+        "etiqueta": "Solubilidad",
+        "valor": "Media"
+      },
+      {
+        "etiqueta": "Composición",
+        "valor": "P 20% – Ca 14% – Zn 0,28%"
+      },
+      {
+        "etiqueta": "Presentación",
+        "valor": "Granel – sólido"
+      },
+      {
+        "etiqueta": "Grado",
+        "valor": "0 – 20 – 0 + Ca 14% + Zn 0,28%"
+      },
+      {
+        "etiqueta": "Grado equivalente",
+        "valor": "0 – 46 – 0 + Zn 0,45"
+      },
+      {
+        "etiqueta": "Tipo de mezcla",
+        "valor": "Compuesto"
+      },
+      {
+        "etiqueta": "Granulometría (mm)",
+        "valor": "2 – 4 mm"
+      },
+      {
+        "etiqueta": "Forma física",
+        "valor": "Granulado"
+      }
+    ],
+    "descripcion": [
+      "Este producto está compuesto por Superfosfato Triple (fertilizante fosfatado de mayor concentración disponible de P), cubierto con Zn DDP (microgránulos Zn que se adhieren al fertilizante a través de un proceso físico de estática evitando su separación durante el manipuleo y transporte).",
+      "El Zinc DDP es un Zinc micronizado (Dry Disperse Powder) que aumenta la eficiencia del nutriente.",
+      "Este producto cuenta con dos tecnologías innovadoras:",
+      "DUAL ACTION: que permite la disponibilidad del Zn en dos momentos: inmediata y a lo largo del ciclo del cultivo, estando disponible durante los momentos críticos de la planta.",
+      "EVEN COAT: Su distribución tipo manta ayuda a la absorción temprana."
+    ],
+    "recomendaciones": [
+      "Según estrategia de aplicación de P y Zn:",
+      "A la siembra: Se recomienda incorporado (al costado y por debajo de la línea de siembra).",
+      "Dosis: Según estrategia de aplicación de Fósforo, se recomienda realizar análisis de suelo y consultar a su asesor técnico."
+    ],
+    "cultivos": [
+      "Caña de Azúcar",
+      "Trigo",
+      "Cebada",
+      "Soja",
+      "Maíz",
+      "Arroz",
+      "Sorgo"
+    ],
+    "documentos": [
+      {
+        "titulo": "Hoja de seguridad · Zinc DDP",
+        "ruta": "biblioteca/pdf/msds-zinc-ddp-rev3-250211.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2020/08/MSDS-ZINC-DDP-rev3-250211.pdf",
+        "tipo": "seguridad"
+      },
+      {
+        "titulo": "Hoja de seguridad · Superfosfato triple",
+        "ruta": "biblioteca/pdf/superfosfato-triple-rev-6-1.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2020/08/Superfosfato-Triple-Rev-6-1.pdf",
+        "tipo": "seguridad"
+      }
+    ],
+    "enlaces": [],
+    "id": "proterra-zn-spt",
+    "orden": 15,
+    "bajada": "Superfosfato triple recubierto con zinc micronizado para aportar fósforo, calcio y zinc.",
+    "notaFuente": "Las imágenes son ilustrativas. Profertil informa que sus productos cuentan con el correspondiente registro en SENASA."
+  },
+  {
+    "nombre": "Proterra Zn (MAP-Zn)",
+    "categoria": "Agro",
+    "familia": "Proterra Zn",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/proterra-zn-map",
+    "archivada": false,
+    "imagen": "productos/imagenes/bolsa-proterra-zn.png",
+    "logo": "productos/imagenes/logo-proterra-zn-1.png",
+    "caracteristicas": [
+      {
+        "etiqueta": "Elementos",
+        "valor": "Nitrógeno, Fósforo y Zinc"
+      },
+      {
+        "etiqueta": "Solubilidad",
+        "valor": "Media"
+      },
+      {
+        "etiqueta": "Composición",
+        "valor": "N 11% – P 23% – Zn 0,28%"
+      },
+      {
+        "etiqueta": "Presentación",
+        "valor": "Granel – sólido"
+      },
+      {
+        "etiqueta": "Grado",
+        "valor": "11 – 23 – 0 + Zn 0,28%"
+      },
+      {
+        "etiqueta": "Grado equivalente",
+        "valor": "11 – 52 – 0 + Zn 0,45"
+      },
+      {
+        "etiqueta": "Tipo de mezcla",
+        "valor": "Compuesto"
+      },
+      {
+        "etiqueta": "Granulometría (mm)",
+        "valor": "2 – 4 mm"
+      },
+      {
+        "etiqueta": "Forma física",
+        "valor": "Granulado"
+      }
+    ],
+    "descripcion": [
+      "Este producto está compuesto por Fosfato Monoamónico (MAP), uno de los fertilizantes más concentrados del mercado, con entre 62% y 64% de nutrientes (N y P), cubierto con Zn DDP (microgránulos Zn que se adhieren al fertilizante a través de un proceso físico de estática evitando su separación durante el manipuleo y transporte).",
+      "El Zinc DDP es un Zinc micronizado (Dry Disperse Powder) que aumenta la eficiencia del nutriente.",
+      "Este producto cuenta con dos tecnologías innovadoras:",
+      "DUAL ACTION: que permite la disponibilidad del Zn en dos momentos: inmediata y a lo largo del ciclo del cultivo, estando disponible durante los momentos críticos de la planta.",
+      "EVEN COAT: Su distribución tipo manta ayuda a la absorción temprana."
+    ],
+    "recomendaciones": [
+      "Aplicación y momento: Incorporado a la siembra (al costado y por debajo de la línea de siembra).",
+      "Dosis: Según estrategia de aplicación de Nitrógeno, Fósforo y Zinc, se recomienda realizar análisis de suelo y consultar a su asesor técnico."
+    ],
+    "cultivos": [
+      "Caña de Azúcar",
+      "Trigo",
+      "Cebada",
+      "Soja",
+      "Maíz",
+      "Arroz",
+      "Sorgo"
+    ],
+    "documentos": [
+      {
+        "titulo": "Hoja de seguridad · Zinc DDP",
+        "ruta": "biblioteca/pdf/msds-zinc-ddp-rev3-250211.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2020/08/MSDS-ZINC-DDP-rev3-250211.pdf",
+        "tipo": "seguridad"
+      },
+      {
+        "titulo": "Hoja de seguridad · Fosfato monoamónico",
+        "ruta": "biblioteca/pdf/fosfato-monoamonico-map-2.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2020/08/FOSFATO-MONOAMONICO-MAP-2.pdf",
+        "tipo": "seguridad"
+      }
+    ],
+    "enlaces": [],
+    "id": "proterra-zn-map",
+    "orden": 16,
+    "bajada": "Fosfato monoamónico recubierto con zinc micronizado para aportar nitrógeno, fósforo y zinc.",
+    "notaFuente": "Las imágenes son ilustrativas. Profertil informa que sus productos cuentan con el correspondiente registro en SENASA."
+  },
+  {
+    "nombre": "Proterra S 0-30-0+S 21",
+    "categoria": "Agro",
+    "familia": "Proterra S",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/proterra-s-0-30-0-s-21",
+    "archivada": false,
+    "imagen": "productos/imagenes/bolsa-proterra.png",
+    "logo": "productos/imagenes/logo-proterra-s.png",
+    "caracteristicas": [
+      {
+        "etiqueta": "Elementos",
+        "valor": "Fósforo (P) y Azufre"
+      },
+      {
+        "etiqueta": "Solubilidad",
+        "valor": "Media"
+      },
+      {
+        "etiqueta": "Composición",
+        "valor": "P 13% – S 21%"
+      },
+      {
+        "etiqueta": "Presentación",
+        "valor": "Granel – sólido"
+      },
+      {
+        "etiqueta": "Grado",
+        "valor": "0 – 13 – 0 + S 21"
+      },
+      {
+        "etiqueta": "Grado equivalente",
+        "valor": "0 – 32 – 0 – S 21"
+      },
+      {
+        "etiqueta": "Tipo de mezcla",
+        "valor": "Compuesto"
+      },
+      {
+        "etiqueta": "Granulometría (mm)",
+        "valor": "2 – 4 mm"
+      },
+      {
+        "etiqueta": "Forma física",
+        "valor": "Granulado"
+      }
+    ],
+    "descripcion": [
+      "Es una mezcla balanceada que combina las fuentes más concentradas de P y S, este último con diferentes comportamientos de liberación en el suelo (inmediata en forma de sulfato y gradual como azufre elemental micronizado).",
+      "Esta mezcla tiene un bajo costo por unidad de nutriente (P y S) aplicado por hectárea, y posee una alta eficiencia agronómica."
+    ],
+    "recomendaciones": [
+      "Aplicación y momento: Presiembra en superficie o incorporado a la siembra (al costado y por debajo de la línea de siembra).",
+      "Dosis: Según estrategia de aplicación de Fósforo (P) y Azufre, se recomienda realizar análisis de suelo y consultar a su asesor técnico."
+    ],
+    "cultivos": [
+      "Soja"
+    ],
+    "documentos": [],
+    "enlaces": [],
+    "id": "proterra-s-0-30-0-s-21",
+    "orden": 17,
+    "bajada": "Mezcla granulada de fósforo y azufre con distintas velocidades de liberación del azufre en el suelo.",
+    "notaFuente": "Las imágenes son ilustrativas. Profertil informa que sus productos cuentan con el correspondiente registro en SENASA."
+  },
+  {
+    "nombre": "Proterra S 0-37-0 S18",
+    "categoria": "Agro",
+    "familia": "Proterra S",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/proterra-s-0-37-0-s-18",
+    "archivada": false,
+    "imagen": "productos/imagenes/bolsa-proterra.png",
+    "logo": "productos/imagenes/logo-proterra-s.png",
+    "caracteristicas": [
+      {
+        "etiqueta": "Elementos",
+        "valor": "Fósforo (P) y Azufre"
+      },
+      {
+        "etiqueta": "Solubilidad",
+        "valor": "Media"
+      },
+      {
+        "etiqueta": "Composición",
+        "valor": "P 16% – S 18%"
+      },
+      {
+        "etiqueta": "Presentación",
+        "valor": "Granel – sólido"
+      },
+      {
+        "etiqueta": "Grado",
+        "valor": "0 – 16 – 0 + S 18"
+      },
+      {
+        "etiqueta": "Grado equivalente",
+        "valor": "0 – 37- 0 – S 18"
+      },
+      {
+        "etiqueta": "Tipo de mezcla",
+        "valor": "Compuesto"
+      },
+      {
+        "etiqueta": "Granulometría (mm)",
+        "valor": "2 – 4 mm"
+      },
+      {
+        "etiqueta": "Forma física",
+        "valor": "Granulado"
+      }
+    ],
+    "descripcion": [
+      "Es una mezcla balanceada que posee fuentes concentradas de P y S de liberación gradual. Esta mezcla tiene un bajo costo por unidad de nutriente (P y S) aplicado por hectárea, y posee una alta eficiencia agronómica."
+    ],
+    "recomendaciones": [
+      "Aplicación y momento: Presiembra en superficie o incorporado a la siembra (al costado y por debajo de la línea de siembra).",
+      "Dosis: Según estrategia de aplicación de Fósforo (P) y Azufre, se recomienda realizar análisis de suelo y consultar a su asesor técnico."
+    ],
+    "cultivos": [
+      "Soja"
+    ],
+    "documentos": [],
+    "enlaces": [],
+    "id": "proterra-s-0-37-0-s-18",
+    "orden": 18,
+    "bajada": "Mezcla granulada de fuentes concentradas de fósforo y azufre de liberación gradual.",
+    "notaFuente": "Las imágenes son ilustrativas. Profertil informa que sus productos cuentan con el correspondiente registro en SENASA."
+  },
+  {
+    "nombre": "Proterra S 9-42-0+S 18",
+    "categoria": "Agro",
+    "familia": "Proterra S",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/proterra-s-9-42-0-s-18",
+    "archivada": false,
+    "imagen": "productos/imagenes/bolsa-proterra.png",
+    "logo": "productos/imagenes/logo-proterra-s.png",
+    "caracteristicas": [
+      {
+        "etiqueta": "Elementos",
+        "valor": "Nitrógeno (N), Fósforo (P) y Azufre"
+      },
+      {
+        "etiqueta": "Solubilidad",
+        "valor": "Media"
+      },
+      {
+        "etiqueta": "Composición",
+        "valor": "N 9% – P 18,5% – S 18%"
+      },
+      {
+        "etiqueta": "Presentación",
+        "valor": "Granel – sólido"
+      },
+      {
+        "etiqueta": "Grado",
+        "valor": "9 – 18,5 – 0 + S 18"
+      },
+      {
+        "etiqueta": "Grado equivalente",
+        "valor": "9 – 42 – 0 – S 18"
+      },
+      {
+        "etiqueta": "Tipo de mezcla",
+        "valor": "Compuesto"
+      },
+      {
+        "etiqueta": "Granulometría (mm)",
+        "valor": "2 – 4 mm"
+      },
+      {
+        "etiqueta": "Forma física",
+        "valor": "Granulado"
+      }
+    ],
+    "descripcion": [
+      "Es una mezcla balanceada que posee fuentes concentradas de P y S de liberación gradual. A su vez, tiene el N necesario para el arranque del cultivo.",
+      "Esta mezcla tiene un bajo costo por unidad de nutriente (P y S) aplicado por hectárea, y posee una alta eficiencia agronómica."
+    ],
+    "recomendaciones": [
+      "Aplicación y momento: Incorporado a la siembra (al costado y por debajo de la línea de siembra).",
+      "Dosis: Según estrategia de aplicación de Fósforo (P) y Azufre. Se recomienda realizar análisis de suelo y consultar a su asesor técnico."
+    ],
+    "cultivos": [
+      "Caña de Azúcar",
+      "Trigo",
+      "Cebada",
+      "Soja",
+      "Maíz",
+      "Arroz",
+      "Sorgo"
+    ],
+    "documentos": [
+      {
+        "titulo": "Hoja de seguridad",
+        "ruta": "biblioteca/pdf/proterra-s-3.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2020/08/PROTERRA-S-3.pdf",
+        "tipo": "seguridad"
+      }
+    ],
+    "enlaces": [],
+    "id": "proterra-s-9-42-0-s-18",
+    "orden": 19,
+    "bajada": "Mezcla granulada con nitrógeno para el arranque del cultivo y fuentes concentradas de fósforo y azufre.",
+    "notaFuente": "Las imágenes son ilustrativas. Profertil informa que sus productos cuentan con el correspondiente registro en SENASA."
+  },
+  {
+    "nombre": "Proterra AR 0-30-0+S 7,2",
+    "categoria": "Agro",
+    "familia": "Proterra AR",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/proterra-ar-0-30-0-s-7-2",
+    "archivada": false,
+    "imagen": "productos/imagenes/bolsa-proterra-ar.png",
+    "logo": "productos/imagenes/logo-proterra-ar.png",
+    "caracteristicas": [
+      {
+        "etiqueta": "Elementos",
+        "valor": "Fósforo (P) y Azufre"
+      },
+      {
+        "etiqueta": "Presentación",
+        "valor": "Granel – sólido"
+      },
+      {
+        "etiqueta": "Composición",
+        "valor": "P 30% + S 7,2%"
+      },
+      {
+        "etiqueta": "Grado equivalente",
+        "valor": "0 – 30 – 0 + S 7,2"
+      },
+      {
+        "etiqueta": "Grado",
+        "valor": "0 – 13,2 – 0 + 7,2"
+      },
+      {
+        "etiqueta": "Granulometría (mm)",
+        "valor": "2 – 4 mm"
+      },
+      {
+        "etiqueta": "Tipo de mezcla",
+        "valor": "Física"
+      },
+      {
+        "etiqueta": "Forma física",
+        "valor": "Granulado"
+      }
+    ],
+    "descripcion": [
+      "Las Proterras AR le brindan la posibilidad de aplicar la dosis de Fósforo (P) necesaria cuando la planta más lo requiere, sin descuidar la dotación de Nitrógeno (N) necesaria para lograr el balance adecuado de nutrientes."
+    ],
+    "recomendaciones": [
+      "Se recomienda plantear la fertilización a la siembra en bandas, al costado y por debajo de la línea de siembra."
+    ],
+    "cultivos": [
+      "Soja"
+    ],
+    "documentos": [
+      {
+        "titulo": "Hoja de seguridad",
+        "ruta": "biblioteca/pdf/proterra-ps-2.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2020/08/PROTERRA-PS-2.pdf",
+        "tipo": "seguridad"
+      }
+    ],
+    "enlaces": [],
+    "id": "proterra-ar-0-30-0-s-7-2",
+    "orden": 20,
+    "bajada": "Mezcla granulada de la línea Proterra AR que aporta fósforo y azufre al cultivo de soja.",
+    "notaFuente": "Las imágenes son ilustrativas. Profertil informa que sus productos cuentan con el correspondiente registro en SENASA."
+  },
+  {
+    "nombre": "Proterra AR 7-40-0+S 5",
+    "categoria": "Agro",
+    "familia": "Proterra AR",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/proterra-ar-7-40-0s-5",
+    "archivada": false,
+    "imagen": "productos/imagenes/bolsa-proterra-ar.png",
+    "logo": "productos/imagenes/logo-proterra-ar.png",
+    "caracteristicas": [
+      {
+        "etiqueta": "Elementos",
+        "valor": "Nitrógeno (N), Fósforo (P) y Azufre"
+      },
+      {
+        "etiqueta": "Presentación",
+        "valor": "Granel – sólido"
+      },
+      {
+        "etiqueta": "Composición",
+        "valor": "N 7% – P 40% + S 5%"
+      },
+      {
+        "etiqueta": "Grado equivalente",
+        "valor": "7 – 40 – 0 + S 5"
+      },
+      {
+        "etiqueta": "Grado",
+        "valor": "7 – 17,6 – 0 + S 5"
+      },
+      {
+        "etiqueta": "Granulometría (mm)",
+        "valor": "2 – 4 mm"
+      },
+      {
+        "etiqueta": "Tipo de mezcla",
+        "valor": "Física"
+      },
+      {
+        "etiqueta": "Forma física",
+        "valor": "Granulado"
+      }
+    ],
+    "descripcion": [
+      "Las Proterras AR le brindan la posibilidad de aplicar la dosis de Fósforo (P) necesaria cuando la planta más lo requiere, sin descuidar la dotación de Nitrógeno (N) necesaria para lograr el balance adecuado de nutrientes."
+    ],
+    "recomendaciones": [
+      "Se recomienda plantear la fertilización a la siembra en bandas, al costado y por debajo de la línea de siembra."
+    ],
+    "cultivos": [
+      "Caña de Azúcar",
+      "Trigo",
+      "Cebada",
+      "Soja",
+      "Maíz",
+      "Arroz"
+    ],
+    "documentos": [
+      {
+        "titulo": "Hoja de seguridad",
+        "ruta": "productos/archivos/proterra-7-40-1.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2026/05/PROTERRA-7-40-1.pdf",
+        "tipo": "seguridad"
+      }
+    ],
+    "enlaces": [],
+    "id": "proterra-ar-7-40-0s-5",
+    "orden": 21,
+    "bajada": "Mezcla granulada de la línea Proterra AR que combina nitrógeno, fósforo y azufre.",
+    "notaFuente": "Las imágenes son ilustrativas. Profertil informa que sus productos cuentan con el correspondiente registro en SENASA."
+  },
+  {
+    "nombre": "Proterra AR 12-17-0+S 5+Zn 1,25",
+    "categoria": "Agro",
+    "familia": "Proterra AR",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/proterra-ar-12-17-0-s-5-zn-1-25",
+    "archivada": false,
+    "imagen": "productos/imagenes/bolsa-proterra-ar.png",
+    "logo": "productos/imagenes/logo-proterra-ar.png",
+    "caracteristicas": [
+      {
+        "etiqueta": "Elementos",
+        "valor": "Nitrógeno (N), Fósforo (P), Azufre y Zinc"
+      },
+      {
+        "etiqueta": "Presentación",
+        "valor": "Granel – sólido"
+      },
+      {
+        "etiqueta": "Composición",
+        "valor": "N 12% – P 17% + S 5% + Zn 1,25%"
+      },
+      {
+        "etiqueta": "Grado equivalente",
+        "valor": "12 – 17 – 0 + S 5 + Zn 1,25"
+      },
+      {
+        "etiqueta": "Grado",
+        "valor": "12 – 17 – 0 + S 5 + Zn 1,25"
+      },
+      {
+        "etiqueta": "Granulometría (mm)",
+        "valor": "2 – 4 mm"
+      },
+      {
+        "etiqueta": "Tipo de mezcla",
+        "valor": "Física"
+      },
+      {
+        "etiqueta": "Forma física",
+        "valor": "Granulado"
+      }
+    ],
+    "descripcion": [
+      "Las Proterras AR le brindan la posibilidad de aplicar la dosis de Fósforo (P) necesaria cuando la planta más lo requiere, sin descuidar la dotación de Nitrógeno (N) necesaria para lograr el balance adecuado de nutrientes."
+    ],
+    "recomendaciones": [
+      "Se recomienda plantear la fertilización a la siembra en bandas, al costado y por debajo de la línea de siembra."
+    ],
+    "cultivos": [
+      "Caña de Azúcar",
+      "Trigo",
+      "Cebada",
+      "Sorgo",
+      "Maíz",
+      "Arroz"
+    ],
+    "documentos": [],
+    "enlaces": [],
+    "id": "proterra-ar-12-17-0-s-5-zn-1-25",
+    "orden": 22,
+    "bajada": "Mezcla granulada que reúne cuatro nutrientes para el cultivo: nitrógeno, fósforo, azufre y zinc.",
+    "notaFuente": "Las imágenes son ilustrativas. Profertil informa que sus productos cuentan con el correspondiente registro en SENASA."
+  },
+  {
+    "nombre": "Proterra AR 15-15-15",
+    "categoria": "Agro",
+    "familia": "Proterra AR",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/proterra-ar-15-15-15",
+    "archivada": false,
+    "imagen": "productos/imagenes/bolsa-proterra-ar.png",
+    "logo": "productos/imagenes/logo-proterra-ar.png",
+    "caracteristicas": [
+      {
+        "etiqueta": "Elementos",
+        "valor": "Nitrógeno (N) y Fósforo (P)"
+      },
+      {
+        "etiqueta": "Presentación",
+        "valor": "Granel – sólido"
+      },
+      {
+        "etiqueta": "Composición",
+        "valor": "N 15 – P 15% + Oxido de Potasio 15%"
+      },
+      {
+        "etiqueta": "Grado equivalente",
+        "valor": "15 – 15 – 15"
+      },
+      {
+        "etiqueta": "Grado",
+        "valor": "15 – 6,6 – 0 + K2O 12,5"
+      },
+      {
+        "etiqueta": "Granulometría (mm)",
+        "valor": "2 – 4 mm"
+      },
+      {
+        "etiqueta": "Tipo de mezcla",
+        "valor": "Física"
+      },
+      {
+        "etiqueta": "Forma física",
+        "valor": "Granulado"
+      }
+    ],
+    "descripcion": [
+      "Las Proterras AR le brindan la posibilidad de aplicar la dosis de Fósforo (P) necesaria cuando la planta más lo requiere, sin descuidar la dotación de Nitrógeno (N) necesaria para lograr el balance adecuado de nutrientes."
+    ],
+    "recomendaciones": [
+      "Se recomienda plantear la fertilización a la siembra en bandas, al costado y por debajo de la línea de siembra."
+    ],
+    "cultivos": [
+      "Cebolla",
+      "Duraznero",
+      "Naranjo",
+      "Tomate",
+      "Manzana"
+    ],
+    "documentos": [
+      {
+        "titulo": "Hoja de seguridad",
+        "ruta": "biblioteca/pdf/proterra-triple-15-rev.04-250117.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2020/08/PROTERRA-TRIPLE-15-rev.04-250117.pdf",
+        "tipo": "seguridad"
+      }
+    ],
+    "enlaces": [],
+    "id": "proterra-ar-15-15-15",
+    "orden": 23,
+    "bajada": "Mezcla granulada de grado 15-15-15 para la nutrición de frutales y hortalizas."
+  },
+  {
+    "nombre": "Proterra DS 28-0-0+S 5,2",
+    "categoria": "Agro",
+    "familia": "Proterra DS",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/proterra-ds-28-0-0-s-5-2",
+    "archivada": false,
+    "imagen": "productos/imagenes/gota-300x229.png",
+    "logo": "productos/imagenes/logo-proterra-ds.png",
+    "caracteristicas": [
+      {
+        "etiqueta": "Elementos",
+        "valor": "Nitrógeno (N) y Azufre"
+      },
+      {
+        "etiqueta": "Solubilidad",
+        "valor": "Alta"
+      },
+      {
+        "etiqueta": "Composición",
+        "valor": "N 28% + S 5,2%"
+      },
+      {
+        "etiqueta": "Presentación",
+        "valor": "Líquido"
+      },
+      {
+        "etiqueta": "Grado",
+        "valor": "28 – 0 – 0 + S 5,2"
+      },
+      {
+        "etiqueta": "Grado equivalente",
+        "valor": "28 – 0 -0 + S 5,2"
+      },
+      {
+        "etiqueta": "Tipo de mezcla",
+        "valor": "Física"
+      },
+      {
+        "etiqueta": "Forma física",
+        "valor": "Líquido"
+      }
+    ],
+    "descripcion": [
+      "El Nitrógeno (N) es el principal nutriente demandado por los cultivos, por intervenir activamente en la síntesis de clorofila y, junto con el Azufre (S), en la síntesis de aminoácidos esenciales para el desarrollo del cultivo. Por ello es que su sinergismo se ha determinado en varios ensayos desarrollados en la pampa húmeda, mostrando que en dosis crecientes de Nitrógeno (N) reviste de suma importancia la inclusión de Azufre (S) en la práctica de fertilización nitrogenada."
+    ],
+    "recomendaciones": [
+      "Se recomiendan en aplicaciones en chorreado en la superficie o en bandas en el momento de la refertilización de gramíneas de invierno como trigo y cebada o en cultivos de verano como maíz."
+    ],
+    "cultivos": [
+      "Trigo",
+      "Cebada",
+      "Sorgo",
+      "Maíz"
+    ],
+    "documentos": [
+      {
+        "titulo": "Hoja de seguridad",
+        "ruta": "biblioteca/pdf/proterra-ds-1.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2020/08/PROTERRA-DS-1.pdf",
+        "tipo": "seguridad"
+      }
+    ],
+    "enlaces": [],
+    "id": "proterra-ds-28-0-0-s-5-2",
+    "orden": 24,
+    "bajada": "Fertilizante líquido con 28 % de nitrógeno y 5,2 % de azufre.",
+    "notaFuente": "Las imágenes son ilustrativas. Profertil informa que sus productos cuentan con el correspondiente registro en SENASA."
+  },
+  {
+    "nombre": "Proterra DS 30-0-0+S 2,6",
+    "categoria": "Agro",
+    "familia": "Proterra DS",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/proterra-ds-30-0-0-s-2-6",
+    "archivada": false,
+    "imagen": "productos/imagenes/gota-300x229.png",
+    "logo": "productos/imagenes/logo-proterra-ds.png",
+    "caracteristicas": [
+      {
+        "etiqueta": "Elementos",
+        "valor": "Nitrógeno (N) y Azufre"
+      },
+      {
+        "etiqueta": "Solubilidad",
+        "valor": "Alta"
+      },
+      {
+        "etiqueta": "Composición",
+        "valor": "N 30% + S 2,6%"
+      },
+      {
+        "etiqueta": "Presentación",
+        "valor": "Líquido"
+      },
+      {
+        "etiqueta": "Grado",
+        "valor": "30 – 0 – 0 + S 2,6"
+      },
+      {
+        "etiqueta": "Grado equivalente",
+        "valor": "30 – 0 – 0 + S 2,6"
+      },
+      {
+        "etiqueta": "Tipo de mezcla",
+        "valor": "Física"
+      },
+      {
+        "etiqueta": "Forma física",
+        "valor": "Líquido"
+      }
+    ],
+    "descripcion": [
+      "El Nitrógeno (N) es el principal nutriente demandado por los cultivos, por intervenir activamente en la síntesis de clorofila y, junto con el Azufre (S), en la síntesis de aminoácidos esenciales para el desarrollo del cultivo. Por ello es que su sinergismo se ha determinado en varios ensayos desarrollados en la pampa húmeda, mostrando que en dosis crecientes de Nitrógeno (N) reviste de suma importancia la inclusión de Azufre (S) en la práctica de fertilización nitrogenada."
+    ],
+    "recomendaciones": [
+      "Se recomiendan en aplicaciones en chorreado en la superficie o en bandas en el momento de la refertilización de gramíneas de invierno como trigo y cebada o en cultivos de verano como maíz."
+    ],
+    "cultivos": [
+      "Trigo",
+      "Cebada",
+      "Sorgo",
+      "Maíz"
+    ],
+    "documentos": [
+      {
+        "titulo": "Hoja de seguridad",
+        "ruta": "biblioteca/pdf/proterra-ds-1.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2020/08/PROTERRA-DS-1.pdf",
+        "tipo": "seguridad"
+      }
+    ],
+    "enlaces": [],
+    "id": "proterra-ds-30-0-0-s-2-6",
+    "orden": 25,
+    "bajada": "Fertilizante líquido con 30 % de nitrógeno y 2,6 % de azufre.",
+    "notaFuente": "Las imágenes son ilustrativas. Profertil informa que sus productos cuentan con el correspondiente registro en SENASA."
+  },
+  {
+    "nombre": "Proterra DS 42-0-0+S 3,6",
+    "categoria": "Agro",
+    "familia": "Proterra DS",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/proterra-ds-42-0-0-s-3-6",
+    "archivada": false,
+    "imagen": "productos/imagenes/bolsa-proterra-ds.png",
+    "logo": "productos/imagenes/logo-proterra-ds.png",
+    "caracteristicas": [
+      {
+        "etiqueta": "Elementos",
+        "valor": "Nitrógeno (N) y Azufre"
+      },
+      {
+        "etiqueta": "Presentación",
+        "valor": "Granel – sólido"
+      },
+      {
+        "etiqueta": "Composición",
+        "valor": "N 42% + S 3,6%"
+      },
+      {
+        "etiqueta": "Grado equivalente",
+        "valor": "42 – 0 -0 + S 3,6"
+      },
+      {
+        "etiqueta": "Grado",
+        "valor": "42 – 0 – 0 + S 3,6"
+      },
+      {
+        "etiqueta": "Granulometría (mm)",
+        "valor": "2 – 4 mm"
+      },
+      {
+        "etiqueta": "Tipo de mezcla",
+        "valor": "Física"
+      },
+      {
+        "etiqueta": "Forma física",
+        "valor": "Granulado"
+      }
+    ],
+    "descripcion": [
+      "El Nitrógeno (N) es el principal nutriente demandado por los cultivos, por intervenir activamente en la síntesis de clorofila y, junto con el Azufre (S), en la síntesis de aminoácidos esenciales para el desarrollo del cultivo. Por ello es que su sinergismo se ha determinado en varios ensayos desarrollados en la pampa húmeda, mostrando que en dosis crecientes de Nitrógeno (N) reviste de suma importancia la inclusión de Azufre (S) en la práctica de fertilización nitrogenada."
+    ],
+    "recomendaciones": [
+      "Se recomiendan en aplicaciones en superficie en el momento de la refertilziacion de gramíneas de invierno como trigo y cebada y en gramíneas estivales como maíz."
+    ],
+    "cultivos": [
+      "Caña de Azúcar",
+      "Arroz",
+      "Trigo",
+      "Cebada",
+      "Sorgo",
+      "Maíz"
+    ],
+    "documentos": [
+      {
+        "titulo": "Hoja de seguridad",
+        "ruta": "biblioteca/pdf/proterra-ns-42-4.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2020/08/PROTERRA-NS-42-4.pdf",
+        "tipo": "seguridad"
+      }
+    ],
+    "enlaces": [],
+    "id": "proterra-ds-42-0-0-s-3-6",
+    "orden": 26,
+    "bajada": "Fertilizante granulado con 42 % de nitrógeno y 3,6 % de azufre.",
+    "notaFuente": "Las imágenes son ilustrativas. Profertil informa que sus productos cuentan con el correspondiente registro en SENASA."
+  },
+  {
+    "nombre": "Urea Industrial",
+    "categoria": "Industrial",
+    "familia": "",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/urea-industrial",
+    "archivada": false,
+    "imagen": "productos/imagenes/urea-industrial.jpg",
+    "logo": null,
+    "caracteristicas": [],
+    "descripcion": [
+      "Urea Granulada utilizada como materia prima durante parte de un proceso industrial.",
+      "Packaging",
+      "Granel. Las condiciones del transporte deben ser las adecuadas para impedir que el producto adquiera humedad o incorpore contaminantes.",
+      "Seguridad y manipuleo",
+      "Para manipulación y almacenamiento, aplicar los criterios dados en la ficha MSDS del material."
+    ],
+    "recomendaciones": [],
+    "cultivos": [],
+    "documentos": [
+      {
+        "titulo": "Hoja de seguridad",
+        "ruta": "biblioteca/pdf/urea-granulada-11082022.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2020/08/UREA-Granulada-11082022.pdf",
+        "tipo": "seguridad"
+      }
+    ],
+    "enlaces": [],
+    "id": "urea-industrial",
+    "orden": 27,
+    "bajada": "Urea granulada para usar como materia prima en procesos industriales.",
+    "notaFuente": "Las imágenes son ilustrativas. Profertil informa que sus productos cuentan con el correspondiente registro en SENASA."
+  },
+  {
+    "nombre": "Urea Pecuaria",
+    "categoria": "Industrial",
+    "familia": "",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/urea-pecuaria",
+    "archivada": true,
+    "imagen": "productos/imagenes/urea-pecuaria.jpg",
+    "logo": null,
+    "caracteristicas": [
+      {
+        "etiqueta": "Elementos",
+        "valor": "Nitrógeno (N)"
+      },
+      {
+        "etiqueta": "Presentación",
+        "valor": "Granel – sólido"
+      },
+      {
+        "etiqueta": "Composición",
+        "valor": "GRADO 46 – 0 – 0"
+      },
+      {
+        "etiqueta": "Grado equivalente",
+        "valor": "46 – 0 – 0"
+      },
+      {
+        "etiqueta": "Tipo de mezcla",
+        "valor": "Simple"
+      },
+      {
+        "etiqueta": "Granulometría (mm)",
+        "valor": "2 – 4 mm"
+      },
+      {
+        "etiqueta": "Forma física",
+        "valor": "Granulado"
+      },
+      {
+        "etiqueta": "Solubilidad",
+        "valor": "Alta"
+      }
+    ],
+    "descripcion": [
+      "Aditivo nutricional para rumiantes compuesto por Nitrógeno (46%).",
+      "Umbral de toxicidad en animales: 40 a 50 gramos cada 100 kg de peso vivo por animal y por día.",
+      "Dado su carácter higroscópico, el producto se humedece en contacto con el aire."
+    ],
+    "recomendaciones": [
+      "Para cada una de las especies y categorías a las que se destina el producto (expresadas en las unidades que corresponda), tanto para aditivos como para premezclas:",
+      "Reemplazar un tercio (1/3) del total de la proteína.",
+      "Integrar el 3% de la materia seca (MS) del concentrado o un 1% del total de la MS de la ración.",
+      "O suministrar el 0,03% del peso vivo, siempre con grano de cereal molido, como mínimo a razón del 0,5% del peso vivo de grano. Un exceso en la dosis diaria puede producir toxicidad amoniacal.",
+      "Cinética del producto",
+      "El suministro de Urea Granulada como aditivo tiene la finalidad de generar proteína microbiana. La síntesis de proteína microbiana en el rumen requiere la oportuna disponibilidad de fuentes adecuadas de N y de Hidratos de Carbono para un rápido crecimiento bacteriano. La consecuencia de un asincronismo en la digestión de las fuentes de N y de energía es un aumento en la absorción del amoníaco ruminal dentro del torrente sanguíneo y conversión a Urea en el hígado. Del hígado una parte de la Urea pasa por el riñón y sale al exterior por la orina, y la otra parte de Urea vuelve al rumen a través de la saliva.",
+      "Efectos no deseados",
+      "Niveles de Urea en “leche”: Con una dieta bien balanceada en proteína (degradable y no degradable), los niveles de Urea en leche nunca deben ser mayores a 300 mg por litro de leche. (ó 30 mg/dl)",
+      "Óptima: 150 – 300 mg/litro (o 15 a 30 mg/dl) (relación óptima energía-proteína).",
+      "Déficit de proteína degradable: menor a 150 mg/litro (o menor 15 mg/dl).",
+      "Exceso de proteína degradable: mayor de 300 mg/litro (o mayor 30 mg/dl) (indica falta de energía).",
+      "Las vacas lecheras con altas concentraciones de Urea en la sangre manifiestan una reducción en los porcentajes de pariciones. Baker et al. (1995) indica que valores arriba de 19 mg UREA/dl leche de contenido de N ureico en leche son considerados críticos para la reproducción.",
+      "Un exceso en la dosis diaria puede producir toxicidad amoniacal.",
+      "Dada la variabilidad de dietas y planteos nutricionales, recomendamos ajustar el uso a las indicaciones técnicas del asesor veterinario o ingeniero agrónomo."
+    ],
+    "cultivos": [],
+    "documentos": [
+      {
+        "titulo": "Hoja de seguridad",
+        "ruta": "biblioteca/pdf/urea-granulada-11082022.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2020/08/UREA-Granulada-11082022.pdf",
+        "tipo": "seguridad"
+      }
+    ],
+    "enlaces": [],
+    "id": "urea-pecuaria",
+    "orden": 28,
+    "bajada": "Urea destinada a la nutrición de rumiantes.",
+    "notaFuente": "Las imágenes son ilustrativas. Profertil informa que sus productos cuentan con el correspondiente registro en SENASA."
+  },
+  {
+    "nombre": "Solución de urea",
+    "categoria": "Industrial",
+    "familia": "",
+    "fuente": "https://www.profertil.com.ar/index.php/productos/solucion-de-urea",
+    "archivada": false,
+    "imagen": "productos/imagenes/conoce-el-producto-01-800x478-1.png",
+    "logo": "productos/imagenes/logo-arnox.png",
+    "caracteristicas": [
+      {
+        "etiqueta": "Aplicación",
+        "valor": "Transporte de carga pesada y de pasajeros"
+      },
+      {
+        "etiqueta": "Tecnología",
+        "valor": "Reducción catalítica selectiva (SCR)"
+      },
+      {
+        "etiqueta": "Lugar de producción",
+        "valor": "Complejo de Bahía Blanca"
+      }
+    ],
+    "descripcion": [
+      "Solución de urea de alta pureza para vehículos diésel con tecnología de reducción catalítica selectiva (SCR). El sistema convierte los óxidos de nitrógeno de los gases de escape en nitrógeno y agua.",
+      "Profertil produce la solución de urea grado automotriz (Arnox 32) en su complejo de Bahía Blanca. Allí se instalaron los equipos de elaboración antes de comenzar la producción a gran escala. El micrositio de lanzamiento consigna 150.000 toneladas y señala capacidad de abastecimiento para el mercado argentino y los principales países limítrofes."
+    ],
+    "recomendaciones": [
+      "El vehículo debe contar con tecnología SCR y utilizar gasoil con bajo contenido de azufre.",
+      "El suministro de la solución se realiza en el depósito específico de Arnox 32."
+    ],
+    "cultivos": [],
+    "documentos": [
+      {
+        "titulo": "Hoja de seguridad",
+        "ruta": "biblioteca/pdf/fds-arnox32-221128rev3.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2020/08/FDS-ARNOX32-221128rev3.pdf",
+        "tipo": "seguridad"
+      },
+      {
+        "titulo": "Resolución 35/2009",
+        "ruta": "productos/archivos/2009-resolucion-35-sec-de-ambiente-y-des-sust.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2021/11/2009-Resolucion-35-SEC-DE-AMBIENTE-Y-DES-SUST.pdf",
+        "tipo": "normativa"
+      },
+      {
+        "titulo": "Resolución 110/2011",
+        "ruta": "productos/archivos/2011-resolucion-110-sec-de-energia.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2021/11/2011-Resolucion-110-SEC-DE-ENERGIA.pdf",
+        "tipo": "normativa"
+      },
+      {
+        "titulo": "Resolución 1035/2015",
+        "ruta": "productos/archivos/2015-resolucion-1035-comision-nacional-de-regulacion-del-transporte.pdf",
+        "fuente": "https://www.profertil.com.ar/wp-content/uploads/2021/11/2015-Resolucion-1035-COMISION-NACIONAL-DE-REGULACION-DEL-TRANSPORTE.pdf",
+        "tipo": "normativa"
+      }
+    ],
+    "enlaces": [
+      {
+        "titulo": "ProAire · Solución de urea",
+        "url": "https://www.youtube.com/watch?v=JlSwNuMQUJM",
+        "tipo": "video"
+      },
+      {
+        "titulo": "Arnox 32",
+        "url": "productos/arnox-32/",
+        "tipo": "producto"
+      }
+    ],
+    "galeria": [
+      {
+        "ruta": "productos/imagenes/arnox-02.png",
+        "titulo": "Tecnología SCR"
+      },
+      {
+        "ruta": "productos/imagenes/arnox-1.png",
+        "titulo": "Motor diésel"
+      },
+      {
+        "ruta": "productos/imagenes/arnox-2.png",
+        "titulo": "Solución de urea"
+      },
+      {
+        "ruta": "productos/imagenes/arnox-3.png",
+        "titulo": "Gasoil de bajo contenido de azufre"
+      },
+      {
+        "ruta": "productos/imagenes/arnox-400x150-1.png",
+        "titulo": "Arnox 32"
+      },
+      {
+        "ruta": "productos/imagenes/reduciendo-emision-400x182-1.png",
+        "titulo": "Reducción de emisiones"
+      },
+      {
+        "ruta": "productos/imagenes/arnox-05.png",
+        "titulo": "Pureza"
+      },
+      {
+        "ruta": "productos/imagenes/arnox-06.png",
+        "titulo": "Especificaciones internacionales"
+      },
+      {
+        "ruta": "productos/imagenes/arnox-04.png",
+        "titulo": "Controles de calidad"
+      },
+      {
+        "ruta": "productos/imagenes/mapa-01.png",
+        "titulo": "Producción y alcance"
+      }
+    ],
+    "id": "solucion-de-urea",
+    "orden": 29,
+    "bajada": "Solución de grado automotriz que interviene en el tratamiento de los gases de escape de vehículos diésel."
+  }
+]

@@ -1,0 +1,57 @@
+---
+// Marco de las páginas de productos (catálogo y ficha): la misma estructura que la Biblioteca y la Sala de prensa, con una foto de
+// campo en lugar del campo de Formas. La foto queda fija detrás, la cabecera es una tarjeta sobre ella y la hoja sube por encima al
+// bajar. Barra, buscador, solapas, pie y transición son los del sitio.
+import Pagina from "../../componentes/Pagina.astro";
+import Cabeza from "../../componentes/Cabeza.astro";
+import Simbolos from "../../componentes/Simbolos.astro";
+import Barra from "../../componentes/Barra.astro";
+import Pie from "../../componentes/Pie.astro";
+import { sitio } from "../../lib/productos";
+import CSS from "./productos.css?raw";
+
+interface Props {
+  titulo: string;
+  descripcion: string;
+  raiz: "../" | "../../";
+  foto: string;
+  imagen?: string | null;
+  saltar: string;
+  lista?: boolean;                 // el catálogo filtra con el buscador de la barra; la ficha muestra la vista previa
+}
+const { titulo, descripcion, raiz, foto, imagen, saltar, lista = false } = Astro.props;
+const url = new URL(Astro.url.pathname, Astro.site);
+---
+<Pagina firma={{ nombre: "PROFERTIL · PRODUCTOS", que: "Catálogo y fichas de productos de Profertil.", contexto: "Prototipo del catálogo de productos para la web de Profertil." }} transicion="biblioteca" css={CSS}>
+  <Cabeza slot="head" titulo={titulo + " · Profertil"} {descripcion} {raiz} temaColor solapas alcance={{ seccion: "productos", nombre: "Productos", previa: !lista }}>
+    <link rel="canonical" href={url} />
+    <link rel="preload" as="image" href={sitio(foto)} fetchpriority="high" />
+    <meta property="og:title" content={titulo} />
+    <meta property="og:description" content={descripcion} />
+    <meta property="og:url" content={url.href} />
+    {imagen && <meta property="og:image" content={new URL(sitio(imagen), url).href} />}
+  </Cabeza>
+  <Simbolos badge />
+  <a class="pf-saltar" href="#pf-lista">{saltar}</a>
+  <div class="pr-fondo" aria-hidden="true"><img src={sitio(foto)} alt="" fetchpriority="high" /></div>
+  <Barra actual="Productos y Servicios" actualEnlace={sitio("productos/")} busca={{ etiqueta: "Buscar productos", placeholder: "Buscá un producto, cultivo o nutriente" }} cuenta={lista} />
+  <section class="pf-campo-cab pr-cab">
+    <header class="pf-bh" id="pf-cab"><slot name="cab" /></header>
+  </section>
+  <div class="pf-hoja" id="pf-hoja">
+    <main class="pf-col" id="pf-lista" tabindex="-1"><slot /></main>
+    <Pie />
+  </div>
+  <slot name="fin" />
+  <script is:inline>
+    // Barra sólida cuando la tarjeta de la cabecera llega a ella (igual que en la Biblioteca) y el alto de la barra para el CSS.
+    (function () {
+      var t = document.getElementById("pf-top"), cab = document.getElementById("pf-cab"), r = document.documentElement;
+      function medir() { r.style.setProperty("--pf-barra-h", t.offsetHeight + "px"); }
+      function solida() { t.classList.toggle("pf-barra--solida", scrollY > 0 && cab.getBoundingClientRect().top <= t.offsetHeight); }
+      medir(); solida();
+      addEventListener("scroll", solida, { passive: true });
+      addEventListener("resize", function () { medir(); solida(); });
+    })();
+  </script>
+</Pagina>

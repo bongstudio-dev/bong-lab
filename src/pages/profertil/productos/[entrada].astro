@@ -1,0 +1,15 @@
+---
+import Ficha from "../../../paginas/productos/Ficha.astro";
+import Catalogo from "../../../paginas/productos/Catalogo.astro";
+import { catalogo, vistas } from "../../../lib/productos";
+
+export async function getStaticPaths() {
+  const fichas = (await catalogo()).map((producto) => ({ params: { entrada: producto.id }, props: { producto } }));
+  const cultivos = vistas.filter(v => v.tipo === "cultivo").map(vista => ({
+    params: { entrada: vista.ruta.split("/")[1] }, props: { vista },
+  }));
+  return [...fichas, ...cultivos];
+}
+const props = Astro.props;
+---
+{"producto" in props && props.producto ? <Ficha producto={props.producto} /> : <Catalogo vista={props.vista} raiz="../../" />}

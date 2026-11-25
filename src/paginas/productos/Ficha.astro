@@ -1,0 +1,160 @@
+---
+// Ficha de producto: cabecera con foto de campo y la tarjeta del producto (nombre, bajada, acciones y su imagen), y en la hoja
+// tres solapas: Producto (datos técnicos y descripción), Uso (recomendaciones y cultivos) y Documentos (hojas de seguridad,
+// folletos, boletines y enlaces). Una solapa sin contenido no aparece. Al final, otros productos para seguir navegando.
+import Marco from "./Marco.astro";
+import Tarjeta from "./Tarjeta.astro";
+import { sitio, vistas, catalogo, plano, foto, nutrientes, type Producto } from "../../lib/productos";
+import { MSDS, BIB } from "../../lib/datos.mjs";
+
+interface Props { producto: Producto }
+const { producto } = Astro.props;
+const p = producto.data;
+const imagen = p.imagen || p.logo;
+const esFoto = imagen?.endsWith(".jpg");
+const biblioteca = [...MSDS, ...BIB];
+const recursos = p.documentos.map(d => {
+  const doc = biblioteca.find(v => v.l && d.ruta === "biblioteca/pdf/" + v.l);
+  return { ...d, visor: doc ? sitio("biblioteca/" + doc.id + "/") : null };
+});
+const hojas = recursos.filter(d => d.tipo === "seguridad");
+const documentos = recursos.filter(d => d.tipo !== "boletin");
+const boletines = recursos.filter(d => d.tipo === "boletin");
+const medios = p.enlaces.filter(e => e.tipo === "video" || e.tipo === "podcast");
+const enlaces = p.enlaces.filter(e => e.tipo !== "video" && e.tipo !== "podcast");
+
+// Los datos que van primero, grandes; el resto en la tabla.
+const DESTACADOS = ["Grado", "Composición", "Forma física", "Solubilidad"];
+const destacados = DESTACADOS.map(e => p.caracteristicas.find(c => plano(c.etiqueta) === plano(e))).filter(Boolean) as { etiqueta: string; valor: string }[];
+const resto = p.caracteristicas.filter(c => !destacados.includes(c));
+
+const SOLAPAS = [
+  { id: "producto", nombre: "Producto", visible: p.caracteristicas.length + p.descripcion.length + p.galeria.length },
+  { id: "uso", nombre: "Uso y cultivos", visible: p.recomendaciones.length + p.cultivos.length },
+  { id: "documentos", nombre: "Documentos", visible: documentos.length + boletines.length + enlaces.length + medios.length },
+].filter(s => s.visible);
+
+// Cultivos: a su vista de campaña si la tiene; si no, al catálogo filtrado.
+const enlaceCultivo = (c: string) => {
+  const v = vistas.find(v => v.tipo === "cultivo" && plano(v.nombre) === plano(c));
+  return v ? sitio(v.ruta + "/") : sitio("productos/#cultivo=" + encodeURIComponent(c));
+};
+
+// Otros productos: primero los de la misma línea; después los de la misma categoría con más cultivos y nutrientes en común.
+const todos = (await catalogo()).filter(o => o.id !== producto.id && !o.data.archivada);
+const nut = nutrientes(producto);
+const afinidad = (o: Producto) => (p.familia && o.data.familia === p.familia ? 100 : 0) + (o.data.categoria === p.categoria ? 10 : 0)
+  + o.data.cultivos.filter(c => p.cultivos.includes(c)).length + nutrientes(o).filter(n => nut.includes(n)).length * 2;
+const otros = todos.map(o => ({ o, a: afinidad(o) })).sort((x, y) => y.a - x.a || x.o.data.orden - y.o.data.orden).slice(0, 3).map(x => x.o);
+
+const IR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12h10M13 8l4 4-4 4"/></svg>';
+const VOLVER = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 12H7M11 8l-4 4 4 4"/></svg>';
+const AFUERA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 16l8-8M10 8h6v6"/></svg>';
+const BAJAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v13M6 13l6 6 6-6"/></svg>';
+const HOJA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/></svg>';
+const PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>';
+---
+<Marco titulo={p.nombre} descripcion={p.bajada} raiz="../../" foto={foto(producto)} imagen={imagen} saltar="Ir a la ficha">
+  <Fragment slot="cab">
+    <div class="pr-ficha-cab">
+      <div class="pr-ficha-cab__txt">
+        <nav class="pr-migas" aria-label="Ruta de navegación">
+          <a href={sitio("productos/" + (p.categoria === "Industrial" ? "#industrial" : ""))}><Fragment set:html={VOLVER} />Productos {p.categoria === "Industrial" ? "industriales" : "para el agro"}</a>
+          {p.familia && <a href={sitio("productos/#linea=" + encodeURIComponent(p.familia))}>Línea {p.familia}</a>}
+        </nav>
+        <h1>{p.nombre}</h1>
+        <p>{p.bajada}</p>
+        {p.archivada && <p class="pr-archivo">Ficha de archivo</p>}
+        <div class="pf-bh__acciones">
+          {hojas.length === 1 && <a class="pf-boton pf-boton--verde" href={hojas[0].visor || sitio(hojas[0].ruta)}><Fragment set:html={HOJA} />Hoja de seguridad</a>}
+          {hojas.length > 1 && <a class="pf-boton pf-boton--verde" href="#documentos" data-solapa-ir="documentos"><Fragment set:html={HOJA} />Hojas de seguridad</a>}
+          {!p.archivada && <a class="pf-boton" href={p.fuente}>Ficha en profertil.com.ar<Fragment set:html={AFUERA} /></a>}
+        </div>
+      </div>
+      <figure class:list={["pr-ficha-cab__arte", { "pr-ficha-cab__arte--foto": esFoto }]}>
+        {imagen && <img src={sitio(imagen)} alt={p.nombre} fetchpriority="high" />}
+      </figure>
+    </div>
+  </Fragment>
+
+  {SOLAPAS.length > 1 && <nav class="pf-solapas" id="pf-solapas" role="tablist" aria-label="Secciones de la ficha">
+    <span class="pf-solapas__ind" aria-hidden="true"></span>
+    {SOLAPAS.map((s, i) => <button type="button" role="tab" id={"pr-t-" + s.id} data-solapa={s.id} aria-controls={s.id} aria-pressed={i === 0 ? "true" : "false"} aria-selected={i === 0 ? "true" : "false"} tabindex={i === 0 ? undefined : "-1"}><span class="pf-solapas__t">{s.nombre}</span></button>)}
+  </nav>}
+
+  <div class="pr-paneles">
+    {SOLAPAS.some(s => s.id === "producto") && <section class="pr-panel" id="producto" role="tabpanel" aria-labelledby="pr-t-producto">
+      {!!destacados.length && <dl class="pr-claves">{destacados.map(c => <div><dt>{c.etiqueta}</dt><dd>{c.valor}</dd></div>)}</dl>}
+      <div class="pr-dos">
+        {!!p.descripcion.length && <div class="pr-texto"><h2>Descripción</h2>{p.descripcion.map(t => <p>{t}</p>)}</div>}
+        {!!resto.length && <div><h2>Características</h2><dl class="pr-datos">{resto.map(c => <div><dt>{c.etiqueta}</dt><dd>{c.valor}</dd></div>)}</dl></div>}
+      </div>
+      {!!p.galeria.length && <div class="pr-bloque"><h2>Tecnología y producción</h2>
+        <ul class="pr-galeria">{p.galeria.map(g => <li><img src={sitio(g.ruta)} alt="" loading="lazy" /><span>{g.titulo}</span></li>)}</ul>
+      </div>}
+    </section>}
+
+    {SOLAPAS.some(s => s.id === "uso") && <section class="pr-panel" id="uso" role="tabpanel" aria-labelledby="pr-t-uso" hidden={SOLAPAS[0].id !== "uso"}>
+      <div class="pr-dos">
+        {!!p.recomendaciones.length && <div><h2>Recomendaciones de uso</h2>
+          <ol class="pr-pasos">{p.recomendaciones.map(t => {
+            const i = t.indexOf(":");
+            return <li>{i > 0 && i < 28 ? <Fragment><b>{t.slice(0, i)}</b>{t.slice(i + 1)}</Fragment> : t}</li>;
+          })}</ol>
+        </div>}
+        {!!p.cultivos.length && <div><h2>Cultivos</h2>
+          <p class="pr-nota">Tocá un cultivo para ver todos los productos recomendados para él.</p>
+          <div class="pr-cultivos">{p.cultivos.map(c => <a class="pf-pastilla" style="--pc: var(--verde)" href={enlaceCultivo(c)}>{c}</a>)}</div>
+        </div>}
+      </div>
+    </section>}
+
+    {SOLAPAS.some(s => s.id === "documentos") && <section class="pr-panel" id="documentos" role="tabpanel" aria-labelledby="pr-t-documentos" hidden={SOLAPAS[0].id !== "documentos"}>
+      <ul class="pr-docs">
+        {[...documentos, ...boletines].map(d => <li class="pr-doc">
+          <span class="pr-doc__ico"><Fragment set:html={HOJA} /></span>
+          <span class="pr-doc__t">{d.visor ? <a href={d.visor}>{d.titulo}</a> : <a href={sitio(d.ruta)}>{d.titulo}</a>}<small>{d.tipo === "seguridad" ? "Hoja de seguridad" : d.tipo === "boletin" ? "Boletín técnico" : "Documento"} · PDF</small></span>
+          <a class="pr-doc__d" href={sitio(d.ruta)} download aria-label={"Descargar " + d.titulo}><Fragment set:html={BAJAR} /></a>
+        </li>)}
+        {[...enlaces, ...medios].map(e => <li class="pr-doc">
+          <span class="pr-doc__ico"><Fragment set:html={e.tipo === "video" || e.tipo === "podcast" ? PLAY : AFUERA} /></span>
+          <span class="pr-doc__t"><a href={e.tipo === "producto" ? sitio(e.url) : e.url}>{e.titulo}</a><small>{e.tipo === "video" ? "Video" : e.tipo === "podcast" ? "Podcast" : e.tipo === "producto" ? "Producto" : "Enlace"}</small></span>
+          <span class="pr-doc__d" aria-hidden="true"><Fragment set:html={e.tipo === "producto" ? IR : AFUERA} /></span>
+        </li>)}
+      </ul>
+    </section>}
+    {p.notaFuente && <p class="pr-nota pr-nota--fin">{p.notaFuente}</p>}
+  </div>
+
+  {!!otros.length && <section class="pr-otros" aria-labelledby="pr-otros-t">
+    <div class="pr-otros__cab">
+      <h2 id="pr-otros-t">{p.familia ? "Más de la línea " + p.familia : "Otros productos"}</h2>
+      <a class="pf-boton" href={sitio("productos/" + (p.categoria === "Industrial" ? "#industrial" : ""))}>Ver todos<Fragment set:html={IR} /></a>
+    </div>
+    <ul class="pr-grilla">{otros.map(o => <Tarjeta producto={o} />)}</ul>
+  </section>}
+
+  <Fragment slot="fin"><script is:inline>
+    // Solapas de la ficha: cambian el panel en el lugar; la dirección guarda la elegida (#uso, #documentos).
+    (function () {
+      var nav = document.getElementById("pf-solapas");
+      if (!nav) return;
+      var ids = Array.prototype.map.call(nav.querySelectorAll("[data-solapa]"), function (b) { return b.dataset.solapa; });
+      function mostrar(id, animar) {
+        ids.forEach(function (x) { var s = document.getElementById(x); s.hidden = x !== id; if (x === id && animar) { s.classList.remove("pr-entra"); void s.offsetWidth; s.classList.add("pr-entra"); } });
+        sol.marcar(id, animar);
+        history.replaceState(null, "", id === ids[0] ? location.pathname : "#" + id);
+      }
+      var sol = PFSolapas.armar(nav, function (id) { mostrar(id, true); });
+      var h = location.hash.slice(1);
+      mostrar(ids.indexOf(h) >= 0 ? h : ids[0], false);
+      if (ids.indexOf(h) > 0) requestAnimationFrame(function () { scrollTo({ top: document.getElementById("pf-hoja").offsetTop - 80 }); });
+      document.querySelectorAll("[data-solapa-ir]").forEach(function (a) {
+        a.addEventListener("click", function (e) {
+          e.preventDefault(); mostrar(a.dataset.solapaIr, true);
+          scrollTo({ top: document.getElementById("pf-hoja").offsetTop - 80, behavior: "smooth" });
+        });
+      });
+    })();
+  </script></Fragment>
+</Marco>

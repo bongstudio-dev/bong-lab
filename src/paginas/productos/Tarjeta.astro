@@ -1,0 +1,29 @@
+---
+// Tarjeta de producto: la foto del producto arriba, el grado, el nombre y la bajada. Toda la tarjeta es el enlace a la ficha.
+// Los data-* son los que lee el filtro del catálogo (catalogo.js).
+import { ficha, sitio, plano, nutrientes, forma, grado, type Producto } from "../../lib/productos";
+interface Props { producto: Producto; quieta?: boolean }
+const { producto } = Astro.props;
+const p = producto.data;
+const imagen = p.imagen || p.logo;
+const esFoto = imagen?.endsWith(".jpg");
+const g = grado(producto);
+const nut = nutrientes(producto);
+---
+<li class="pr-tarjeta" data-sec={plano(p.categoria)} data-cultivo={p.cultivos.join("|")} data-nutriente={nut.join("|")}
+  data-forma={forma(producto)} data-linea={p.familia} data-buscar={plano([p.nombre, p.familia, p.bajada, ...p.cultivos, ...nut].join(" "))}>
+  <a href={ficha(producto.id)}>
+    <span class:list={["pr-tarjeta__arte", { "pr-tarjeta__arte--foto": esFoto }]}>
+      {imagen && <img src={sitio(imagen)} alt="" loading="lazy" decoding="async" />}
+    </span>
+    <span class="pr-tarjeta__txt">
+      {(g || p.familia || p.archivada) && <span class="pr-tarjeta__meta">
+        {p.familia && <span>{p.familia}</span>}
+        {g && <span class="pr-tarjeta__grado">{g}</span>}
+        {p.archivada && <span>Ficha de archivo</span>}
+      </span>}
+      <span class="pr-tarjeta__t">{p.nombre}</span>
+      <span class="pr-tarjeta__b">{p.bajada}</span>
+    </span>
+  </a>
+</li>

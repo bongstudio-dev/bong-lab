@@ -25,6 +25,8 @@ frena si el sitio pasa de 950 MB (Pages admite hasta 1 GB; hoy pesa unos 650 MB,
 
 | Página | Dirección | Sale de |
 |---|---|---|
+| Catálogo y ficha de producto | `profertil/productos/` y `profertil/productos/<producto>/` | Colección Astro `productos`, con los datos en `profertil/productos/fuente/productos.json` |
+| Vistas por línea y cultivo | Slugs de los listados de campaña | `profertil/productos/fuente/vistas.json` |
 | Novedades | `profertil/novedades/` | `pages/profertil/novedades/index.astro` |
 | Una nota | `profertil/novedades/<nota>/` (471) | `pages/profertil/novedades/[nota].astro` |
 | Biblioteca | `profertil/biblioteca/` | `pages/profertil/biblioteca/index.astro` |
