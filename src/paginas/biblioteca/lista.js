@@ -578,7 +578,18 @@
   /* Cambiar de sección: otra lista en el mismo lugar. Se conservan la vista y la búsqueda; los filtros no (cada sección tiene los
      suyos). Si se estaba dentro de la lista, se vuelve a su principio. Las secciones son solapas que salen del borde de la hoja
      (la pieza "solapas" de base.css y componentes/solapas.js). */
-  var solapas = $("pf-solapas") && PFSolapas.armar($("pf-solapas"), function (id) { if (irSeccion(id, true)) aplicar(); });
+  var solapas = $("pf-solapas") && PFSolapas.armar($("pf-solapas"), function (id) { if (irSeccion(id, true)) { aplicar(); remedirHerr(); } });
+  /* Al pasar de una sección de tarjetas (sin selector de vistas) a una lista, o al revés, la fila de herramientas cambia de ancho:
+     se vuelve a medir (la fila fija del escritorio guarda su ancho) y los indicadores se ubican sobre la opción elegida. */
+  function remedirHerr() {
+    requestAnimationFrame(function () {
+      if (!enCel) {
+        anchoAntes = -1;
+        if (atada) atar(); else { if (herrFija()) soltarHerr(); fijarHerr(); }
+      }
+      moverInds();   // después de medir la fila: con la fila a medio armar, el indicador quedaba entre dos opciones
+    });
+  }
   function marcarSeccion(animar) { if (solapas) solapas.marcar(seccion.id, animar); }
   function irSeccion(id, animar) {
     var s = SECCIONES.filter(function (x) { return x.id === id; })[0];
@@ -647,10 +658,15 @@
     var r = herrLugar.getBoundingClientRect(), y0 = r.top + window.scrollY, T = topFijo();
     recorrido = Math.max(0, y0 - T);
     herr.style.left = r.left + "px"; herr.style.width = r.width + "px";
+    var medidas = y0 + "/" + T + "/" + recorrido;
     herr.style.setProperty("--herr-desde", y0 + "px");
     herr.style.setProperty("--herr-hasta", T + "px");
     herr.style.setProperty("--herr-recorrido", recorrido + "px");
+    // Chrome no vuelve a leer las variables de una animación atada al scroll que ya arrancó: si cambiaron (otra sección con otro
+    // alto arriba de la fila), se reinicia. Sin esto la fila quedaba clavada debajo de la barra.
+    if (medidas !== medidasAntes) { medidasAntes = medidas; herr.style.animation = "none"; void herr.offsetWidth; herr.style.animation = ""; }
   }
+  var medidasAntes = "";
   function mostrarHerr(si) { if (!enCel) herr.classList.toggle("pf-escondida", !si); }
   function soltarHerr() {
     herr.classList.remove("pf-fija"); herrLugar.classList.remove("pf-activo");
@@ -931,6 +947,7 @@
   });
   if (estado.orden === "anio") { $("pf-sortAz").setAttribute("aria-pressed", "false"); $("pf-sortAnio").setAttribute("aria-pressed", "true"); moverInds(); }
   aplicar();
+  remedirHerr();
   urlLista = true;
   if (conBusca) abrirBusca(true);
 })();

@@ -289,7 +289,9 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
 
 /* Secciones de tarjetas (Proveedores): accesos en lugar de documentos. Sin vistas, sin filtros, sin lista. La tarjeta es la del
    catálogo de Productos: el arte de Formas arriba, la etiqueta, el título, la bajada y lo que hace al pie. */
-.pf-con-tarjetas .pf-docs, .pf-con-tarjetas .pf-vista, .pf-con-tarjetas .pf-filters, .pf-con-tarjetas .pf-ancla { display: none; }
+.pf-con-tarjetas .pf-docs, .pf-con-tarjetas .pf-filters, .pf-con-tarjetas .pf-ancla { display: none; }
+/* El selector de vistas no se saca del flujo: oculto con display, la fila fija se medía en 0 y quedaba rota al volver a una lista. */
+.pf-con-tarjetas .pf-vista { visibility: hidden; pointer-events: none; }
 .pf-tarjetas { list-style: none; margin: 8px 0 120px; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 20px; }
 html:not(.pf-con-tarjetas) .pf-tarjetas { display: none; }
 .pf-acc { position: relative; min-width: 0; }
