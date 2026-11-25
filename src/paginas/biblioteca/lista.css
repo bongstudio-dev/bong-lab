@@ -283,8 +283,9 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; } /* el lugar 
 .pf-sin-filtros .pf-filters, .pf-sin-filtros .pf-ancla { display: none; }
 
 /* Intro de la sección: un párrafo (y a veces un botón) entre las solapas y la lista. */
-.pf-sec-intro { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 24px; margin: 4px 0 18px; }
+.pf-sec-intro { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 24px; margin: 30px 0 18px; }   /* 30: el mismo aire que hay en Inversores entre las solapas y el selector */
 .pf-sec-intro[hidden] { display: none; }
+@media (max-width: 640px) { .pf-sec-intro { margin-top: 26px; } }   /* el aire de Inversores en el celular */
 .pf-sec-intro p { margin: 0; max-width: 62ch; color: var(--ink-2); font-size: var(--texto-cuerpo); line-height: 1.5; text-wrap: pretty; }
 
 /* Secciones de tarjetas (Proveedores): accesos en lugar de documentos. Sin vistas, sin filtros, sin lista. La tarjeta es la del
