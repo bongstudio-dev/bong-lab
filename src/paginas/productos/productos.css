@@ -46,11 +46,12 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; }
   background: color-mix(in srgb, var(--celeste) 9%, var(--card)); }
 .pr-tarjeta__arte img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; padding: 6% 8% 3%; transition: scale 520ms var(--ease); }
 .pr-tarjeta__arte--foto img { object-fit: cover; padding: 0; }
-.pr-tarjeta__txt { display: grid; gap: 8px; align-content: start; padding: 18px 22px 24px; }
-.pr-tarjeta__meta { display: flex; flex-wrap: wrap; gap: 6px; }
-.pr-tarjeta__meta > span { display: inline-flex; align-items: center; height: 24px; padding: 0 9px; border-radius: 8px; background: var(--chip-fondo); color: var(--chip-texto);
-  font: 500 12px/1 var(--f-body); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.pr-tarjeta__t { color: var(--azul); font: 600 clamp(22px, 2vw, 26px)/1.08 var(--f-display); letter-spacing: -.025em; text-wrap: balance; }
+.pr-tarjeta__txt { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; align-content: start; min-width: 0; padding: 18px 22px 24px; }
+.pr-tarjeta__meta { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
+/* Las composiciones largas (Sulfato de Calcio) parten en dos líneas dentro de la pastilla en lugar de salirse de la tarjeta. */
+.pr-tarjeta__meta > span { display: inline-flex; align-items: center; max-width: 100%; min-height: 24px; padding: 5px 9px; border-radius: 8px; background: var(--chip-fondo); color: var(--chip-texto);
+  font: 500 12px/1.2 var(--f-body); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.pr-tarjeta__t { min-width: 0; color: var(--azul); font: 600 clamp(22px, 2vw, 26px)/1.08 var(--f-display); letter-spacing: -.025em; text-wrap: balance; overflow-wrap: break-word; }
 .pr-tarjeta__b { color: var(--ink-2); font-size: var(--texto-chico); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 @media (hover: hover) and (pointer: fine) {
   .pr-tarjeta > a:hover { translate: 0 -5px; }
@@ -67,7 +68,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; }
   .pr-tarjeta__txt { gap: 6px; padding: 12px 12px 16px; }
   .pr-tarjeta__t { font-size: 18px; }
   .pr-tarjeta__b { display: none; }
-  .pr-tarjeta__meta > span { height: 22px; padding: 0 7px; font-size: 11px; }
+  .pr-tarjeta__meta > span { min-height: 22px; padding: 4px 7px; font-size: 11px; }
 }
 
 /* --- Dock de filtros y ancla (los de la Biblioteca). El ancla va a la derecha del dock: baja una pantalla o vuelve al principio

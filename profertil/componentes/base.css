@@ -495,7 +495,10 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
    cualquier ancho: la hoja es el contenedor (100cqw es su ancho) y la lista va centrada en ella, así que (100cqw - 100%) / 2 es lo que
    ya hay entre el borde de la hoja y la lista. Donde la lista está lejos del borde no suma nada. */
 .pf-hoja:has(.pf-solapas) { container-type: inline-size; }
-.pf-solapas button { position: relative; flex: none; display: inline-flex; align-items: center; padding: 0 var(--sol-relleno); border: 0;
+/* Las de vidrio son del mismo material que el menú de la barra: el fondo y el borde de "Sobre foto" y el mismo desenfoque. El borde
+   está siempre (transparente en la elegida) para que el texto no se corra un píxel al cambiar; abajo no lleva, apoya en la hoja. */
+.pf-solapas button { position: relative; flex: none; display: inline-flex; align-items: center; padding: 0 var(--sol-relleno);
+  border: 1px solid var(--foto-borde); border-bottom: 0; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
   border-radius: var(--sol-radio) var(--sol-radio) 0 0; cursor: pointer; white-space: nowrap;
   color: var(--foto-texto); font: 600 var(--sol-texto)/1 var(--f-display); letter-spacing: -.01em; }
 /* El fondo de cada solapa acompaña al indicador para que ninguna quede vacía mientras viaja: la que se deja sigue de papel (con sus
@@ -505,9 +508,9 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
    Así nunca queda texto claro sobre papel ni azul sobre vidrio, que llaman la atención por contraste mientras viaja el indicador.
    El papel es el de la hoja (--pf-papel, que fija el campo); hasta que llega, el fondo de la página, que tiene el mismo valor. */
 .pf-solapas button:not([aria-pressed="true"]) { background-color: var(--foto-fondo);
-  transition: color var(--sol-fundido) ease var(--sol-demora), background-color var(--sol-fundido) ease var(--sol-demora); }
-.pf-solapas button[aria-pressed="true"] { color: var(--azul); background-color: var(--pf-papel, var(--bg));
-  transition: color var(--sol-fundido) ease var(--sol-demora-nueva), background-color var(--sol-fundido) ease var(--sol-demora-nueva); }
+  transition: color var(--sol-fundido) ease var(--sol-demora), background-color var(--sol-fundido) ease var(--sol-demora), border-color var(--sol-fundido) ease var(--sol-demora); }
+.pf-solapas button[aria-pressed="true"] { color: var(--azul); background-color: var(--pf-papel, var(--bg)); border-color: transparent;
+  transition: color var(--sol-fundido) ease var(--sol-demora-nueva), background-color var(--sol-fundido) ease var(--sol-demora-nueva), border-color var(--sol-fundido) ease var(--sol-demora-nueva); }
 .pf-solapas__ind { position: absolute; z-index: -1; top: 0; bottom: -1px; left: 0; width: 0; pointer-events: none;
   border-radius: var(--sol-radio) var(--sol-radio) 0 0; background: var(--pf-papel, var(--bg));
   transition: transform var(--sol-dur) var(--sol-curva), width var(--sol-dur) var(--sol-curva); }
@@ -521,6 +524,9 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   background: radial-gradient(circle at 0 0, transparent var(--sol-empalme), var(--pf-papel, var(--bg)) calc(var(--sol-empalme) + .5px)); }
 .pf-solapas__ind::after, .pf-solapas button::after { right: calc(-1 * var(--sol-empalme));
   background: radial-gradient(circle at 100% 0, transparent var(--sol-empalme), var(--pf-papel, var(--bg)) calc(var(--sol-empalme) + .5px)); }
+/* El borde de 1 px de la solapa corre el origen de sus empalmes: vuelven a quedar pegados al borde de afuera. */
+.pf-solapas button::before { margin-left: -1px; }
+.pf-solapas button::after { margin-right: -1px; }
 .pf-solapas button::before, .pf-solapas button::after { opacity: 0; transition: opacity var(--sol-fundido) ease var(--sol-demora); }
 .pf-solapas button[aria-pressed="true"]::before, .pf-solapas button[aria-pressed="true"]::after { opacity: 1;
   transition: opacity var(--sol-fundido) ease var(--sol-demora-nueva); }

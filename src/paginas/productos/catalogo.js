@@ -217,6 +217,18 @@
   function dockArriba() { filtros.classList.toggle("pf-arriba", $("pf-hoja").getBoundingClientRect().top > innerHeight * .55); }
   addEventListener("scroll", dockArriba, { passive: true }); dockArriba();
 
+  /* --- Celular: el dock se compacta al bajar y vuelve al subir o al llegar al final (lo mismo que la Biblioteca; el estilo de
+     .pf-chica está en base.css). Umbral de 8 px para que el rebote de Safari no lo haga titilar. Abierto nunca se compacta. */
+  var yAntes = scrollY;
+  addEventListener("scroll", function () {
+    var y = scrollY, dy = y - yAntes;
+    if (Math.abs(dy) < 8) return;
+    yAntes = y;
+    var alFinal = y + innerHeight >= html.scrollHeight - 4;
+    if (!matchMedia("(max-width: 640px)").matches || filtros.classList.contains("pf-abierto")) { filtros.classList.remove("pf-chica"); return; }
+    filtros.classList.toggle("pf-chica", dy > 0 && y > 40 && !alFinal);
+  }, { passive: true });
+
   /* --- Ancla (la de la Biblioteca): aparece y se va junto con el dock, baja una pantalla o vuelve al principio del catálogo.
      Se mueve con resortes (tokens --ancla-*). Lo que decide si se ve se vuelve a medir en cada cuadro mientras algo cambia, y
      también cuando cambian los filtros o la solapa: si dependiera solo del scroll, al llegar con un filtro en la dirección o al
