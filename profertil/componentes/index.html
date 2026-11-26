@@ -217,6 +217,8 @@ html.con-panel { overflow: hidden; }
 input[type="range"] { width: 100%; accent-color: var(--ink); margin: 0; }
 input[type="text"], select { width: 100%; height: 32px; padding: 0 10px; border: 0; border-radius: var(--r); background: var(--suave); font-size: 12.5px; }
 .ctl > .pf-interruptor { justify-self: end; }
+.ctl__foto { display: flex; justify-content: flex-end; gap: 6px; }
+.ctl__foto .pf-pastilla { --h: 26px; --pc: var(--suave); color: var(--ink-2); }
 
 /* Guardar ajustes: solo en el navegador que activó la edición (?editar). */
 .ajustes__cab { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 12px; margin-bottom: 10px; }
@@ -437,7 +439,9 @@ html.con-pleno { overflow: hidden; }
      base        ["selector", ...]: piezas de base.css que usa (se muestran en la pestaña BASE del código)
    Reglas del código de cada componente (ver arriba de base.css): toda clase, id y @keyframes empieza
    con pf-; colores, tamaños de texto, radios y sombras salen de tokens.css (--texto-*, --radio-*, --sombra-*).
-     controles   {id, tipo: seg|rango|texto|interr|select, etiqueta, def, desc, aplica, solo}
+     controles   {id, tipo: seg|rango|texto|interr|select|imagen, etiqueta, def, desc, aplica, solo}
+                 imagen: def es la ruta de la imagen de base; Cargar JPG la reemplaza por una del disco (se achica
+                 a 1600 px y queda solo en este navegador: al guardar los ajustes no viaja).
                  solo: ["variante", ...] = el ajuste se muestra solo en esas variantes (en las otras no hace nada).
                  aplica: {var: "--x", unidad} | {attr: "data-x"} | {texto: "selector"} = en vivo;
                  sin aplica, el componente se vuelve a dibujar.
@@ -765,8 +769,27 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
         (od && od[2] ? '<p class="ctl__desc" id="d-' + k.id + '">' + esc(od[2]) + '</p>' : '') + '</div>';
     }
     if (k.tipo === "texto") return '<div class="ctl"><label class="et" for="t-' + k.id + '">' + et + '</label><input type="text" id="t-' + k.id + '" data-k="' + k.id + '" value="' + esc(v) + '"></div>';
+    if (k.tipo === "imagen") return '<div class="ctl"><span class="et">' + et + '<small id="v-' + k.id + '">' + esc(nombreFoto(k)) + '</small></span><div class="ctl__foto">' +
+      '<button type="button" class="pf-pastilla" data-foto="' + k.id + '">Cargar JPG</button>' +
+      (v !== k.def ? '<button type="button" class="pf-pastilla" data-foto-base="' + k.id + '">De base</button>' : '') +
+      '<input type="file" accept="image/jpeg,image/png,image/webp" id="f-' + k.id + '" data-kf="' + k.id + '" hidden></div></div>';
     if (k.tipo === "interr") return '<div class="ctl"><span class="et" id="e-' + k.id + '">' + et + '</span><button type="button" class="pf-interruptor" role="switch" aria-checked="' + v + '" aria-labelledby="e-' + k.id + '" data-k="' + k.id + '"></button></div>';
     return "";
+  }
+  // Control de imagen: el nombre del archivo cargado (la imagen en sí va en el estado, como data URL).
+  var FOTOS_CARGADAS = {};
+  function nombreFoto(k) { var v = estado[k.id]; return v === k.def ? "La de base" : FOTOS_CARGADAS[v] || "Cargada"; }
+  function leerFoto(k, archivo) {
+    var url = URL.createObjectURL(archivo), im = new Image();
+    im.onload = function () {
+      var e = Math.min(1, 1600 / Math.max(im.naturalWidth, im.naturalHeight)), l = document.createElement("canvas");
+      l.width = Math.round(im.naturalWidth * e); l.height = Math.round(im.naturalHeight * e);
+      l.getContext("2d").drawImage(im, 0, 0, l.width, l.height); URL.revokeObjectURL(url);
+      var d = l.toDataURL("image/jpeg", .88); FOTOS_CARGADAS[d] = archivo.name;
+      cambio(k.id, d); $("ajustes").innerHTML = ajustesHTML(); moverInds();
+    };
+    im.onerror = function () { URL.revokeObjectURL(url); alert("No se pudo leer esa imagen. Probá con un JPG."); };
+    im.src = url;
   }
   // Solo los ajustes que hacen algo en la variante elegida.
   function ajustesHTML() {
@@ -939,7 +962,7 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
   function codigo() {
     if (!actual || actual.tipo === "pagina" || !$("pre")) return;
     var p = { html: "<!-- " + actual.nombre + " · Profertil -->\n" + htmlFinal(actual, estado), css: "/* Necesita tokens.css" + (actual.base ? " y base.css" : "") + ". */\n" + actual.css(estado) };
-    if (actual.js) { var j = actual.js(estado); if (j) p.js = j; }
+    if (actual.js) { var j = actual.js(estado); if (j) p.js = j.replace(/data:image\/[a-z]+;base64,[A-Za-z0-9+\/=]+/g, "tu-foto.jpg"); }
     if (actual.base && actual.base.length) p.base = "/* De base.css: se carga una sola vez para todo el sitio. Acá, solo las piezas que usa " + actual.nombre + ". */\n\n" +
       actual.base.map(function (n) { return PIEZAS[n] || "/* @pieza " + n + " */"; }).join("\n\n");
     if (!p[tab]) tab = "html";
@@ -1033,6 +1056,8 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, falla); else falla();
       return;
     }
+    if (b.dataset.foto) { $("f-" + b.dataset.foto).click(); return; }
+    if (b.dataset.fotoBase) { cambio(b.dataset.fotoBase, ctrl(b.dataset.fotoBase).def); $("ajustes").innerHTML = ajustesHTML(); moverInds(); return; }
     var seg = b.closest("#ajustes .pf-selector"), k = b.dataset.k || (seg && seg.dataset.k); if (!k) return;
     if (seg) {
       seg.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", x === b); });
@@ -1051,6 +1076,7 @@ var GRUPOS = ["Datos", "Navegación", "Controles", "Avisos", "Listas", "Scroll",
   });
   document.addEventListener("change", function (e) {
     var el = e.target, k = el.dataset && el.dataset.k, c = k && actual && ctrl(k);
+    if (el.dataset && el.dataset.kf && el.files && el.files[0]) { leerFoto(ctrl(el.dataset.kf), el.files[0]); el.value = ""; return; }
     if (el.type === "range" && c && !c.aplica && !hayVivo()) cambio(k, parseFloat(el.value));
   });
 

@@ -1,7 +1,8 @@
 /* Fondos generativos con Formas: un solo motor WebGL para cuatro familias de fondo.
      patron   el motor del generador de patrones del kit de marca (grilla, ladrillo, matriz) con movimiento
      grilla   grilla de puntos o Formas con foco y estela al cursor
-     dither   un campo continuo convertido en Formas con un tramado ordenado (Bayer 4x4)
+     dither   un campo continuo convertido en Formas con un tramado ordenado (Bayer 4x4); el campo puede ser
+              un degradé con ruido o una foto (cfg.imagen: un paisaje que queda dibujado con Formas)
      pixeles  celdas que aparecen y arman una Forma grande, o llenan el fondo
    Las 18 Formas del sistema (window.FORMAS, de formas.js) se dibujan una vez en un atlas y el shader las lee
    por celda: no hay librerías y todo el dibujo es propio.
@@ -70,11 +71,11 @@ window.PFFondo = function PFFondo(cv, C) {
   var FS = [
     "#version 300 es",
     "precision highp float;",
-    "uniform sampler2D uAtlas, uEn;",
+    "uniform sampler2D uAtlas, uEn, uImg;",
     "uniform vec2 uRes;",
     "uniform float uDpr, uT, uCelda, uModo, uForma, uVarias, uN, uAcentoP, uHayAcento;",
     "uniform vec3 uFondo, uFigura, uAcento, uRaton;",
-    "uniform vec4 uA, uB, uD;",          // parámetros por modo
+    "uniform vec4 uA, uB, uD, uI;",      // parámetros por modo; uI: la foto del dither
     "uniform vec4 uG[" + GRUPOS_MAX + "], uG2[" + GRUPOS_MAX + "];",
     "uniform float uNG;",
     "out vec4 o;",
@@ -206,7 +207,9 @@ window.PFFondo = function PFFondo(cv, C) {
 
     // ---------- 2 · Dither con Formas ----------
     // uA: tonos (0 binario, 1 tres tonos, 2 escalonado), ángulo, densidad del ruido, peso del degradé
-    // uB: velocidad, radio del cursor (px), contraste, -
+    // uB: velocidad, radio del cursor (px), contraste, brillo
+    // uD: viento (cuánto ruido se suma a la foto), invertir, negro y blanco de la foto (niveles automáticos)
+    // uI: hay foto, ancho, alto, encuadre vertical (0 arriba, 1 abajo)
     "float bayer(vec2 c){",
     "  vec2 m = mod(c, 4.); int i = int(m.x) + int(m.y) * 4;",
     "  int b[16] = int[16](0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5);",
@@ -225,6 +228,16 @@ window.PFFondo = function PFFondo(cv, C) {
     "  float g = dot(centro / res - .5, dir) + .5;",
     "  float n = fbm(uv * uA.z * 10. + dir * uT * uB.x * .12 + vec2(0., uT * uB.x * .03));",
     "  float v = mix(n, g, uA.w);",
+    "  if (uI.x > .5){",
+    // la foto cubre el fondo (como object-fit: cover) y se lee con el mipmap del tamaño de la celda: el promedio de la celda
+    "    float esc = max(res.x / uI.y, res.y / uI.z);",
+    "    vec2 vis = res / esc / vec2(uI.y, uI.z);",
+    "    vec2 iuv = vec2(.5 - vis.x * .5, (1. - vis.y) * uI.w) + centro / res * vis;",
+    "    vec3 f = textureLod(uImg, iuv, log2(max(1., uCelda / esc))).rgb;",
+    "    v = clamp((dot(f, vec3(.2126, .7152, .0722)) - uD.z) / max(uD.w - uD.z, .01), 0., 1.);",
+    "    if (uD.y > .5) v = 1. - v;",
+    "    v += uB.w + (n - .5) * uD.x;",
+    "  }",
     "  v = (v - .5) * uB.z + .5;",
     "  if (uRaton.z > .5){ float d = length(centro - uRaton.xy) / uB.y; v += .55 * exp(-d * d); }",
     "  float th = bayer(c);",
@@ -294,9 +307,9 @@ window.PFFondo = function PFFondo(cv, C) {
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
   var lp = gl.getAttribLocation(prog, "p"); gl.enableVertexAttribArray(lp); gl.vertexAttribPointer(lp, 2, gl.FLOAT, false, 0, 0);
   var U = {};
-  ["uAtlas", "uEn", "uRes", "uDpr", "uT", "uCelda", "uModo", "uForma", "uVarias", "uN", "uAcentoP", "uHayAcento", "uFondo", "uFigura", "uAcento", "uRaton", "uA", "uB", "uD", "uG", "uG2", "uNG"]
+  ["uAtlas", "uEn", "uImg", "uRes", "uDpr", "uT", "uCelda", "uModo", "uForma", "uVarias", "uN", "uAcentoP", "uHayAcento", "uFondo", "uFigura", "uAcento", "uRaton", "uA", "uB", "uD", "uI", "uG", "uG2", "uNG"]
     .forEach(function (n) { U[n] = gl.getUniformLocation(prog, n); });
-  gl.uniform1i(U.uAtlas, 0); gl.uniform1i(U.uEn, 1);
+  gl.uniform1i(U.uAtlas, 0); gl.uniform1i(U.uEn, 1); gl.uniform1i(U.uImg, 2);
   gl.uniform3fv(U.uFondo, hex(pal[0])); gl.uniform3fv(U.uFigura, hex(pal[1])); gl.uniform3fv(U.uAcento, hex(pal[2]));
   gl.uniform1f(U.uModo, modo); gl.uniform1f(U.uN, NOMBRES.length); gl.uniform1f(U.uForma, formaFija); gl.uniform1f(U.uVarias, variasFormas ? 1 : 0);
   gl.uniform1f(U.uAcentoP, num(C.acento, 8) / 100); gl.uniform1f(U.uHayAcento, C.acento === 0 ? 0 : 1);
@@ -314,7 +327,44 @@ window.PFFondo = function PFFondo(cv, C) {
     gl.uniform4f(U.uA, { puntos: 0, formas: 1, lineas: 2 }[C.base] || 0, num(C.foco, 260), num(C.fuerzaFoco, 100) / 100, num(C.marca, 9) / 100);
   } else if (modo === 2) {
     gl.uniform4f(U.uA, { binario: 0, tres: 1, escalonado: 2 }[C.tonos] || 0, num(C.angulo, 11) * RAD, num(C.densidad, 15) / 100 * 2 + 0.05, num(C.degrade, 45) / 100);
-    gl.uniform4f(U.uB, num(C.velocidad, 40) / 100, num(C.radioCursor, 160), num(C.contraste, 120) / 100, 0);
+    gl.uniform4f(U.uB, num(C.velocidad, 40) / 100, num(C.radioCursor, 160), num(C.contraste, 120) / 100, num(C.brillo, 0) / 100);
+    gl.uniform4f(U.uD, num(C.viento, 20) / 100, C.invertir ? 1 : 0, 0, 1);
+    gl.uniform4f(U.uI, 0, 1, 1, .5);
+    if (C.imagen) cargarFoto(C.imagen);
+  }
+
+  // --- Foto del dither: se achica a 1024 px como máximo y se sube con mipmaps, para leer el promedio de cada celda.
+  // Mientras carga queda el color de fondo; si no carga, el dither sigue con el degradé y el ruido.
+  var foto = null, esperaFoto = false;
+  function cargarFoto(src) {
+    esperaFoto = true;
+    var im = new Image();
+    if (!/^data:/.test(src)) im.crossOrigin = "anonymous";
+    im.onload = function () {
+      var e = Math.min(1, 1024 / Math.max(im.naturalWidth, im.naturalHeight)), w = Math.max(1, Math.round(im.naturalWidth * e)), h = Math.max(1, Math.round(im.naturalHeight * e));
+      var l = document.createElement("canvas"); l.width = w; l.height = h; var c2 = l.getContext("2d", { willReadFrequently: true }); c2.drawImage(im, 0, 0, w, h);
+      // Niveles automáticos: el 2% más oscuro pasa a negro y el 2% más claro a blanco, así cualquier foto usa toda la trama.
+      var px = c2.getImageData(0, 0, w, h).data, hist = new Uint32Array(256), total = w * h, lo = 0, hi = 255, acum = 0;
+      for (var i = 0; i < px.length; i += 4) hist[(px[i] * .2126 + px[i + 1] * .7152 + px[i + 2] * .0722) | 0]++;
+      for (lo = 0; lo < 255 && (acum += hist[lo]) < total * .02; lo++);
+      for (acum = 0, hi = 255; hi > 0 && (acum += hist[hi]) < total * .02; hi--);
+      if (hi - lo < 10) { lo = 0; hi = 255; }
+      foto = gl.createTexture();
+      gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, foto);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, l);
+      gl.generateMipmap(gl.TEXTURE_2D);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.activeTexture(gl.TEXTURE0);
+      gl.uniform1i(U.uImg, 2);
+      gl.uniform4f(U.uI, 1, w, h, num(C.encuadre, 50) / 100);
+      gl.uniform4f(U.uD, num(C.viento, 20) / 100, C.invertir ? 1 : 0, lo / 255, hi / 255);
+      esperaFoto = false; pedir();
+    };
+    im.onerror = function () { esperaFoto = false; pedir(); };
+    im.src = src;
   }
 
   // --- Medidas
@@ -477,7 +527,7 @@ window.PFFondo = function PFFondo(cv, C) {
     gl.uniform1f(U.uT, tu);
     gl.uniform3f(U.uRaton, raton ? raton.x : -1e4, raton ? raton.y : -1e4, raton ? 1 : 0);
     gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, atlas);
-    if (atlasListo) gl.drawArrays(gl.TRIANGLES, 0, 3);
+    if (atlasListo && !esperaFoto) gl.drawArrays(gl.TRIANGLES, 0, 3);
     else { gl.clearColor.apply(gl, hex(pal[0]).concat(1)); gl.clear(gl.COLOR_BUFFER_BIT); }
     if (!reducir) pedir();
   }

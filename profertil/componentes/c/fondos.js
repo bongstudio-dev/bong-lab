@@ -10,6 +10,8 @@
   function forma(def) { return { id: "forma", tipo: "select", etiqueta: "Forma", def: def, opciones: OPC_FORMA, desc: "La Forma de las celdas." }; }
   function celda(def, min, max) { return { id: "celda", tipo: "rango", etiqueta: "Celda", unidad: "px", min: min, max: max, def: def, desc: "Lado de la celda en escritorio; en el celular es el 76%." }; }
   function acento(def) { return { id: "acento", tipo: "rango", etiqueta: "Formas en acento", unidad: "%", min: 0, max: 40, def: def, desc: "Qué parte de las Formas sale en el color de acento." }; }
+  // La foto de campo de la cabecera del catálogo (Sala de prensa): la de base del dither Paisaje.
+  var FOTO_CAMPO = "../sala-de-prensa/fotos/profertil-en-el-campo/04.webp";
   var CURSOR = { id: "cursor", tipo: "interr", etiqueta: "Reacción al cursor", def: true, desc: "El fondo responde al mouse (con el dedo, mientras se arrastra)." };
   var CLIC = { id: "clic", tipo: "interr", etiqueta: "Clic en el fondo", def: true, desc: "Un clic o un toque en el fondo dispara una reacción ahí." };
 
@@ -154,17 +156,20 @@
   // ---------- 3 · Dither con Formas
   Libreria.sumar({
     id: "fondo-dither", nombre: "Dither con Formas", grupo: "Fondos", alto: 1000, previa: 0, mini: 1100, tamano: "ancha",
-    bajada: "Un degradé y un ruido lento convertidos en Formas con un tramado ordenado: cada píxel del dither es una Forma.",
-    nota: "El valor de cada celda sale de mezclar un degradé (con su ángulo) y un ruido que se mueve. El tramado Bayer de 4 x 4 decide qué celdas se encienden; el cursor suma luz.",
+    bajada: "Un degradé con ruido, o una foto de paisaje, convertidos en Formas con un tramado ordenado: cada píxel del dither es una Forma.",
+    nota: "El valor de cada celda sale de mezclar un degradé (con su ángulo) y un ruido que se mueve, o de la luz de la foto en Paisaje. El tramado Bayer de 4 x 4 decide qué celdas se encienden; el cursor suma luz. En Paisaje, la foto se lee con el promedio de cada celda, así el dibujo queda limpio a cualquier tamaño.",
     variantes: [
       ["binario", "Binario", "Forma o nada: el dither de un bit.", { tonos: "binario", celda: 16 }],
       ["tres", "Tres tonos", "Nada, figura y acento.", { tonos: "tres", celda: 18 }],
-      ["escalonado", "Escalonado", "La Forma cambia de tamaño en cuatro pasos, como una trama de medio tono.", { tonos: "escalonado", celda: 20 }]
+      ["escalonado", "Escalonado", "La Forma cambia de tamaño en cuatro pasos, como una trama de medio tono.", { tonos: "escalonado", celda: 20 }],
+      ["paisaje", "Paisaje", "Una foto de campo dibujada con Formas. Se puede cargar otro JPG; el viento mueve la trama despacio sobre el paisaje.", { tonos: "tres", celda: 12, contraste: 160, velocidad: 25, angulo: 0, densidad: 20, invertir: true, forma: "trigo" }]
     ],
     claves: [
       "Tramado ordenado Bayer de 4 x 4 sobre la grilla: las celdas cambian de a una, sin fundidos.",
       "Ángulo: la dirección del degradé y hacia dónde viaja el ruido. Densidad: el tamaño de las manchas del ruido.",
-      "Cursor: suma luz alrededor del mouse, así se encienden más Formas."
+      "Cursor: suma luz alrededor del mouse, así se encienden más Formas.",
+      "Paisaje: la luz de la foto decide qué Formas se encienden. Lo claro (el cielo) se llena y lo oscuro queda vacío; Invertir da vuelta la lectura. El viento suma el ruido a la foto, con el Ángulo como dirección.",
+      "Paisaje: la foto cubre el fondo como object-fit: cover; Encuadre elige qué franja queda a la vista cuando sobra alto. Mientras carga, queda el color de fondo liso."
     ].concat(COMUN),
     accesibilidad: ACC,
     controles: [
@@ -172,9 +177,14 @@
       color(), forma("urea"),
       "---",
       celda(16, 8, 48),
-      { id: "angulo", tipo: "rango", etiqueta: "Ángulo", unidad: "°", min: 0, max: 360, def: 11, desc: "Dirección del degradé." },
+      { id: "imagen", tipo: "imagen", etiqueta: "Foto", def: FOTO_CAMPO, solo: ["paisaje"], desc: "El paisaje a dibujar. Por defecto, la foto de campo del catálogo; Cargar JPG prueba otra (queda en este navegador, no se guarda)." },
+      { id: "encuadre", tipo: "rango", etiqueta: "Encuadre", unidad: "%", min: 0, max: 100, def: 50, solo: ["paisaje"], desc: "Qué franja de la foto queda a la vista cuando sobra alto: 0 arriba, 100 abajo." },
+      { id: "brillo", tipo: "rango", etiqueta: "Brillo", unidad: "%", min: -50, max: 50, def: 0, solo: ["paisaje"], desc: "Más brillo, más Formas encendidas." },
+      { id: "invertir", tipo: "interr", etiqueta: "Invertir", def: false, solo: ["paisaje"], desc: "Lo oscuro de la foto se llena y lo claro queda vacío." },
+      { id: "viento", tipo: "rango", etiqueta: "Viento", unidad: "%", min: 0, max: 100, def: 22, solo: ["paisaje"], desc: "Cuánto ruido lento se suma a la foto: la trama se mueve como el campo con viento." },
+      { id: "angulo", tipo: "rango", etiqueta: "Ángulo", unidad: "°", min: 0, max: 360, def: 11, desc: "Dirección del degradé; en Paisaje, hacia dónde sopla el viento." },
       { id: "densidad", tipo: "rango", etiqueta: "Densidad", unidad: "%", min: 0, max: 100, def: 15, desc: "Tamaño de las manchas: más densidad, manchas más chicas." },
-      { id: "degrade", tipo: "rango", etiqueta: "Peso del degradé", unidad: "%", min: 0, max: 100, def: 45, desc: "0 es solo ruido; 100, solo degradé." },
+      { id: "degrade", tipo: "rango", etiqueta: "Peso del degradé", unidad: "%", min: 0, max: 100, def: 45, solo: ["binario", "tres", "escalonado"], desc: "0 es solo ruido; 100, solo degradé." },
       { id: "contraste", tipo: "rango", etiqueta: "Contraste", unidad: "%", min: 50, max: 250, def: 130, desc: "Separa más o menos las zonas llenas de las vacías." },
       { id: "velocidad", tipo: "rango", etiqueta: "Velocidad", unidad: "%", min: 0, max: 100, def: 40, desc: "Ritmo del ruido." },
       { id: "radioCursor", tipo: "rango", etiqueta: "Radio del cursor", unidad: "px", min: 40, max: 400, def: 160, desc: "Alcance de la luz del mouse." },
@@ -186,8 +196,10 @@
       "Cada píxel del tramado es una Forma del sistema."
     ]),
     js: function (s) {
-      return js(extender(base(s), { modo: "dither", tonos: s.tonos, angulo: +s.angulo, densidad: +s.densidad, degrade: +s.degrade, contraste: +s.contraste,
-        velocidad: +s.velocidad, radioCursor: +s.radioCursor, acento: s.tonos === "tres" ? 1 : 0, clic: false }));
+      var cfg = { modo: "dither", tonos: s.tonos, angulo: +s.angulo, densidad: +s.densidad, degrade: +s.degrade, contraste: +s.contraste,
+        velocidad: +s.velocidad, radioCursor: +s.radioCursor, acento: s.tonos === "tres" ? 1 : 0, clic: false };
+      if (s.variante === "paisaje") extender(cfg, { imagen: s.imagen || FOTO_CAMPO, encuadre: +s.encuadre, brillo: +s.brillo, invertir: !!s.invertir, viento: +s.viento });
+      return js(extender(base(s), cfg));
     }
   });
 
