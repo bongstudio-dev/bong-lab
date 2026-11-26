@@ -191,3 +191,13 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; }
   .pr-paneles { padding-top: 20px; }
   .pr-pasos li { padding: 14px 14px 14px 52px; }
 }
+
+/* --- Variantes de la cabecera de la ficha, para comparar (?cab=…): sin la imagen en la tarjeta, la imagen como fondo, o fondo liso. */
+.pr-v-sin-arte .pr-ficha-cab__arte, .pr-v-arte-fondo .pr-ficha-cab__arte { display: none; }
+.pr-v-sin-arte .pf-bh:has(.pr-ficha-cab), .pr-v-arte-fondo .pf-bh:has(.pr-ficha-cab) { padding: 22px 20px 26px; }
+@media (min-width: 860px) {
+  .pr-v-sin-arte .pr-ficha-cab, .pr-v-arte-fondo .pr-ficha-cab { grid-template-columns: minmax(0, 1fr); }
+  .pr-v-sin-arte .pf-bh:has(.pr-ficha-cab), .pr-v-arte-fondo .pf-bh:has(.pr-ficha-cab) { padding: 32px 36px 36px; }
+  .pr-v-sin-arte .pr-ficha-cab__txt, .pr-v-arte-fondo .pr-ficha-cab__txt { padding-block: 0; }
+}
+.pr-v-liso .pr-fondo img { display: none; }

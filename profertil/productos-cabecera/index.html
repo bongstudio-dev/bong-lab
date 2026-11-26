@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<!-- firma:bong
+
+      ##########         #########
+      ###########      #############
+      ############   #################
+      ###########   ###################
+      ##########    ###################
+      ############  ###################
+      #############  #################
+      #############   ###############
+      ############      ###########
+
+                            #####
+      ##     ######     ##########
+      ####   ######   ###########
+      #####  ######  ###########
+      #############  ##########
+      #############  ###################
+      #############  ##################
+      #############   #################
+      #############     #############
+      #############        #######
+
+      PROFERTIL · CABECERA DE PRODUCTOS
+      Variantes de la cabecera de la ficha de producto, lado a lado sobre la página real.
+
+      Hola. Si estás leyendo esto, te gusta ver cómo están hechas las cosas.
+      A nosotros también.
+
+      Diseño y desarrollo: Bong Studio
+      Estudio de branding. Córdoba, Argentina. Desde 2019.
+      Comparador de cabeceras para la ficha de producto de la web de Profertil.
+
+      CRÉDITOS
+      María Lopez / Brand Designer
+      Marcos Cousseau / Creative Director
+
+      CONTACTO
+      https://bongstudio.ar
+
+      BONG STUDIO · 2026 — Brutally Clear Branding — bongstudio.ar
+-->
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cabecera de productos</title>
+<meta name="description" content="Variantes de la cabecera de la ficha de producto de Profertil, lado a lado sobre la página real: la de hoy, sin imagen en la tarjeta, la imagen como fondo y fondo liso.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../componentes/tokens.css">
+<style>
+/* Cada variante es la ficha real en un iframe (?cab=…), dibujada a 1280 o 375 de ancho y achicada para que entren lado a lado. */
+:root { color-scheme: light; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 15px/1.5 "DM Sans", system-ui, sans-serif; }
+header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px 32px; padding: 28px 24px 20px; }
+h1 { margin: 0; font: 600 clamp(28px, 3vw, 40px)/1.05 "Familjen Grotesk", sans-serif; letter-spacing: -.03em; color: var(--azul); }
+header p { margin: 6px 0 0; max-width: 62ch; color: var(--ink-2); }
+.ctl { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+select, .seg button { height: 38px; border: 1px solid var(--line); border-radius: 12px; background: var(--tiza); color: var(--ink); font: 500 14px/1 "DM Sans", sans-serif; padding: 0 12px; cursor: pointer; }
+.seg { display: inline-flex; gap: 4px; padding: 3px; border-radius: 14px; background: var(--line); }
+.seg button { border: 0; background: transparent; height: 32px; }
+.seg button[aria-pressed="true"] { background: var(--tiza); }
+main { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr)); gap: 20px; padding: 0 24px 48px; }
+main.cel { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+figure { margin: 0; display: grid; gap: 10px; }
+figcaption b { display: block; font-weight: 500; }
+figcaption span { color: var(--ink-2); font-size: 13px; }
+.marco { position: relative; overflow: hidden; border-radius: 16px; background: var(--azul); aspect-ratio: var(--w) / var(--h); }
+.marco iframe { position: absolute; top: 0; left: 0; width: calc(var(--w) * 1px); height: calc(var(--h) * 1px); border: 0; transform-origin: 0 0; transform: scale(var(--s, .4)); }
+@media (max-width: 640px) { header, main { padding-inline: 16px; } }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Cabecera de productos</h1>
+    <p>La ficha real con cuatro cabeceras posibles. Pensado para los productos sin bolsa, donde hoy conviven la foto de fondo y la foto del producto.</p>
+  </div>
+  <div class="ctl">
+    <select id="prod" aria-label="Producto">
+      <option value="urea-pecuaria">Urea Pecuaria</option>
+      <option value="urea-industrial">Urea Industrial</option>
+      <option value="amoniaco">Amoníaco</option>
+      <option value="arnox-32">Arnox 32</option>
+      <option value="solucion-de-urea">Solución de urea</option>
+      <option value="uan-32">UAN 32</option>
+      <option value="enetotalplus-2">eNeTOTAL PLUS (con bolsa)</option>
+    </select>
+    <div class="seg" role="group" aria-label="Pantalla">
+      <button type="button" data-p="esc" aria-pressed="true">Escritorio</button>
+      <button type="button" data-p="cel" aria-pressed="false">Celular</button>
+    </div>
+  </div>
+</header>
+<main id="grilla"></main>
+<script>
+(function () {
+  var VAR = [
+    { id: "", t: "Como está hoy", d: "Foto de fondo según categoría y la imagen del producto en la tarjeta." },
+    { id: "sin-arte", t: "Sin imagen en la tarjeta", d: "Queda la foto de fondo; la tarjeta lleva solo el texto." },
+    { id: "arte-fondo", t: "La imagen del producto como fondo", d: "Una sola foto: la del producto pasa atrás y la tarjeta lleva solo el texto." },
+    { id: "liso", t: "Fondo liso", d: "Sin foto de fondo, el azul de la marca. Lugar para un fondo generativo." }
+  ];
+  var grilla = document.getElementById("grilla"), prod = document.getElementById("prod"), pant = "esc";
+  try { var q = new URLSearchParams(location.search); if (q.get("p")) prod.value = q.get("p"); } catch (e) {}
+  function pintar() {
+    var cel = pant === "cel", w = cel ? 375 : 1280, h = cel ? 760 : 800;
+    grilla.className = cel ? "cel" : "";
+    grilla.innerHTML = VAR.map(function (v) {
+      var url = "../productos/" + prod.value + "/" + (v.id ? "?cab=" + v.id : "");
+      return '<figure><div class="marco" style="--w:' + w + ';--h:' + h + '"><iframe loading="lazy" title="' + v.t + '" src="' + url + '" tabindex="-1"></iframe></div>' +
+        '<figcaption><b>' + v.t + '</b><span>' + v.d + ' <a href="' + url + '" target="_blank" rel="noopener">Abrir</a></span></figcaption></figure>';
+    }).join("");
+    escalar();
+  }
+  function escalar() {
+    grilla.querySelectorAll(".marco").forEach(function (m) {
+      var w = parseFloat(getComputedStyle(m).getPropertyValue("--w"));
+      m.style.setProperty("--s", (m.clientWidth / w).toFixed(4));
+    });
+  }
+  prod.addEventListener("change", pintar);
+  document.querySelectorAll(".seg button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      pant = b.dataset.p;
+      document.querySelectorAll(".seg button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+      pintar();
+    });
+  });
+  addEventListener("resize", escalar);
+  pintar();
+})();
+</script>
+</body>
+</html>
