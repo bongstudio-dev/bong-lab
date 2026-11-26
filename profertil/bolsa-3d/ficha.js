@@ -23,6 +23,9 @@ const FOTO = { w: 600, h: 457, giro: 31.959, alto: 0.5233, dist: 1.4057, focal: 
 const LIMITE = 30, ELASTICO = 10;
 // Vaivén en reposo: amplitud (grados), un ida y vuelta cada PERIODO segundos, arranca a los ESPERA segundos de soltar.
 const VAIVEN = 7, PERIODO = 7, ESPERA = 2.5;
+// Entrada: la bolsa llega más grande y girada, y se asienta en su lugar (escala y giro con la misma curva).
+const ENTRADA = { segundos: 1.6, escala: 1.22, giro: 45 };
+const CENTRO_Y = 0.47; // mitad del alto de la bolsa: la escala de la entrada se hace alrededor de ese punto
 
 export async function montar(figura, { glb, piel }) {
   const foto = figura.querySelector("img");
@@ -96,7 +99,16 @@ export async function montar(figura, { glb, piel }) {
   let giro = 0, objetivo = 0, arrastre = null, cuadro = 0;
   // Vaivén: amplitud actual (sube de a poco), fase y desde cuándo está quieta.
   const quieto = matchMedia("(prefers-reduced-motion: reduce)");
-  let amp = 0, fase = 0, antes = 0, quietaDesde = performance.now(), enPantalla = true;
+  let amp = 0, fase = 0, antes = 0, quietaDesde = Infinity, enPantalla = true;
+  // Entrada: 0 al empezar, 1 al terminar (sin movimiento reducido arranca terminada).
+  let entradaDesde = 0, entrada = quieto.matches ? 1 : 0;
+  function entrar(p) {
+    const e = 1 - Math.pow(1 - p, 3);
+    const k = 1 + (ENTRADA.escala - 1) * (1 - e);
+    bolsa.scale.setScalar(k);
+    bolsa.position.y = CENTRO_Y * (1 - k);
+    return THREE.MathUtils.degToRad(ENTRADA.giro) * (1 - e);
+  }
   const meciendo = () => !quieto.matches && enPantalla && !document.hidden && !arrastre;
   const lim = THREE.MathUtils.degToRad(LIMITE), ela = THREE.MathUtils.degToRad(ELASTICO);
   // Pasado el límite el giro se frena: cuanto más se pasa, menos avanza (nunca más de ELASTICO grados).
@@ -108,7 +120,12 @@ export async function montar(figura, { glb, piel }) {
     cuadro = 0;
     const dt = Math.min(0.05, antes ? (ahora - antes) / 1000 : 0);
     antes = ahora;
-    let vaiven = 0;
+    let vaiven = 0, llegada = 0;
+    if (entrada < 1) {
+      entrada = THREE.MathUtils.clamp((ahora - entradaDesde) / (ENTRADA.segundos * 1000), 0, 1);
+      llegada = entrar(entrada);
+      if (entrada < 1) pedir(); else quietaDesde = ahora;
+    }
     if (!arrastre) {
       const meta = THREE.MathUtils.clamp(objetivo, -lim, lim);
       objetivo = meta;
@@ -123,13 +140,13 @@ export async function montar(figura, { glb, piel }) {
         pedir();
       } else if (meciendo()) pedir();
     }
-    bolsa.rotation.y = arrastre ? frenar(objetivo) : giro + vaiven;
+    bolsa.rotation.y = arrastre ? frenar(objetivo) : giro + vaiven + llegada;
     renderer.render(escena, camara);
   }
   function pedir() { if (!cuadro) cuadro = requestAnimationFrame(dibujar); }
 
   lienzo.addEventListener("pointerdown", (e) => {
-    if (e.button !== 0) return;
+    if (e.button !== 0 || entrada < 1) return;
     // Lo que se había mecido pasa a ser el giro, así no salta al agarrarla.
     objetivo = giro = bolsa.rotation.y; amp = 0; fase = 0;
     arrastre = { x: e.clientX, desde: objetivo, id: e.pointerId };
@@ -160,6 +177,9 @@ export async function montar(figura, { glb, piel }) {
   renderer.compile(escena, camara);
   cancelAnimationFrame(cuadro); cuadro = 0;
   // El dibujo y el cambio de clase van en el mismo paso: el navegador los muestra juntos en el próximo cuadro.
+  // El primer cuadro ya es el comienzo de la entrada.
+  entradaDesde = performance.now();
+  if (entrada < 1) bolsa.rotation.y = entrar(0); else quietaDesde = entradaDesde;
   renderer.render(escena, camara);
   figura.classList.add("pr-ficha-cab__arte--3d");
   performance.mark("bolsa3d-lista");
