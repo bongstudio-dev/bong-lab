@@ -92,6 +92,34 @@ body { margin: 0; background: var(--bg); color: var(--ink); font: 400 15px/1.5 v
   .vt-grilla li:nth-child(3) { display: none; }
   .vt-grilla b { font-size: 16px; }
 }
+
+/* --- Hover del botón base: variantes para comparar. Todas usan colores, curva (--ease) y tiempos que ya están en el sistema. */
+.vt-hover { padding-top: 28px; border-top: 1px solid var(--line); }
+.vt-hover h2 { margin: 0; font: 600 clamp(24px, 2.4vw, 32px)/1.08 var(--f-display); letter-spacing: -.03em; color: var(--azul); }
+.vt-hover header p { margin: 6px 0 0; color: var(--ink-2); font-size: var(--texto-chico); }
+.hv-lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 14px; margin: 22px 0 0; padding: 0; list-style: none; }
+.hv-item { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 18px; align-items: center; padding: 18px; border-radius: var(--radio-tarjeta); background: var(--card); }
+.hv-item b { display: block; color: var(--azul); font: 600 18px/1.15 var(--f-display); letter-spacing: -.01em; }
+.hv-item p { margin: 4px 0 0; color: var(--ink-2); font-size: 13px; line-height: 1.45; }
+.hv-prueba { display: grid; place-items: center; min-height: 96px; border-radius: 16px; background: var(--bg); }
+.hv-lista .pf-boton { position: relative; overflow: hidden; isolation: isolate; }
+.hv-lista .pf-boton svg { transition: transform 260ms var(--ease); }
+.hv-f { display: inline-grid; overflow: hidden; }
+.hv-t, .hv-f { position: relative; z-index: 1; }
+.hv-lista .pf-boton { transition: background 220ms ease, border-color 220ms ease, color 220ms ease, transform .15s var(--ease); }
+.hv-h3::before { content: ""; position: absolute; inset: 0; z-index: 0; background: var(--azul); transform: translateY(101%); transition: transform 380ms var(--ease); }
+@media (hover: hover) and (pointer: fine) {
+  .hv-h1:hover { background: var(--color-blanco); }
+  .hv-h1:hover svg, .hv-h2:hover svg, .hv-h5:hover svg { transform: translateX(3px); }
+  .hv-h2:hover { background: var(--azul); border-color: var(--azul); color: var(--tiza); }
+  .hv-h3:hover { color: var(--tiza); border-color: var(--azul); transition-delay: 0s, 0s, 90ms, 0s; }
+  .hv-h3:hover::before { transform: none; }
+  .hv-h4:hover svg { animation: hv-vuelta 520ms var(--ease); }
+  .hv-h5:hover { border-color: var(--azul); color: var(--azul); }
+}
+@keyframes hv-vuelta { 0% { transform: none; } 45% { transform: translateX(140%); } 46% { transform: translateX(-140%); } 100% { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .hv-h4:hover svg { animation: none; } .hv-h3::before { transition: none; } }
+@media (max-width: 640px) { .hv-item { grid-template-columns: 120px minmax(0, 1fr); gap: 12px; padding: 12px; } }
 </style>
 </head>
 <body>
@@ -119,6 +147,10 @@ body { margin: 0; background: var(--bg); color: var(--ink); font: 400 15px/1.5 v
   <section class="vt-op" id="e">
     <header class="vt-op__cab"><span class="vt-letra">E</span><div><h2>Fila con flecha</h2><p>Texto azul a lo ancho, con línea arriba y la flecha a la derecha.</p><p class="vt-uso">Hoy: el final de los resultados del buscador.</p></div></header>
     <div class="vt-escena"><div class="vt-cab"><h3>Más de la línea Proterra</h3></div><ul class="vt-grilla"><li><div class="vt-arte"><img src="../productos/imagenes/bolsa-proterra.png" alt=""></div><span class="vt-meta">9-42-0 + S 18</span><b>Proterra S</b></li><li><div class="vt-arte"><img src="../productos/imagenes/bolsa-proterra-ar.png" alt=""></div><span class="vt-meta">15-15-15</span><b>Proterra AR</b></li><li><div class="vt-arte"><img src="../productos/imagenes/bolsa-proterra-zn.png" alt=""></div><span class="vt-meta">0-46-0 + Zn</span><b>Proterra Zn</b></li></ul><div class="vt-pie"><a class="vt-fila" href="#"><span>Ver los 30 productos</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12h10M13 8l4 4-4 4"/></svg></a></div></div>
+  </section>
+  <section class="vt-hover" id="hover">
+    <header><h2>Hover del botón base</h2><p>Pasá el mouse por cada uno. En el celular no hay hover: ahí queda solo el apretar.</p></header>
+    <ul class="hv-lista"><li class="hv-item"><div class="hv-prueba"><a class="pf-boton hv-h0" href="#"><span class="hv-t">Ver todos</span><span class="hv-f"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12h10M13 8l4 4-4 4"/></svg></span></a></div><div><b>Hoy</b><p>Sin hover: solo se achica un poco al apretar.</p></div></li><li class="hv-item"><div class="hv-prueba"><a class="pf-boton hv-h1" href="#"><span class="hv-t">Ver todos</span><span class="hv-f"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12h10M13 8l4 4-4 4"/></svg></span></a></div><div><b>Blanco y flecha que avanza</b><p>El hover del botón sobre color o foto: el fondo pasa a blanco y la flecha avanza 3 px.</p></div></li><li class="hv-item"><div class="hv-prueba"><a class="pf-boton hv-h2" href="#"><span class="hv-t">Ver todos</span><span class="hv-f"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12h10M13 8l4 4-4 4"/></svg></span></a></div><div><b>Se llena de azul</b><p>Fondo y borde azul, texto tiza, la flecha avanza. Es el que ya usan las descargas de Logos en Sala de prensa.</p></div></li><li class="hv-item"><div class="hv-prueba"><a class="pf-boton hv-h3" href="#"><span class="hv-t">Ver todos</span><span class="hv-f"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12h10M13 8l4 4-4 4"/></svg></span></a></div><div><b>Azul que sube</b><p>El azul entra desde abajo y el texto cambia a tiza a medida que lo cubre.</p></div></li><li class="hv-item"><div class="hv-prueba"><a class="pf-boton hv-h4" href="#"><span class="hv-t">Ver todos</span><span class="hv-f"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12h10M13 8l4 4-4 4"/></svg></span></a></div><div><b>La flecha da la vuelta</b><p>La flecha sale por la derecha y vuelve a entrar por la izquierda. El botón no cambia de color.</p></div></li><li class="hv-item"><div class="hv-prueba"><a class="pf-boton hv-h5" href="#"><span class="hv-t">Ver todos</span><span class="hv-f"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12h10M13 8l4 4-4 4"/></svg></span></a></div><div><b>Línea azul</b><p>El borde y el texto pasan a azul y la flecha avanza. El cambio más chico de los que se ven.</p></div></li></ul>
   </section>
 </main>
 <script>document.querySelectorAll('a[href="#"]').forEach(function (a) { a.addEventListener("click", function (e) { e.preventDefault(); }); });</script>
