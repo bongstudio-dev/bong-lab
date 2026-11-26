@@ -171,8 +171,15 @@ body.ver { overflow: hidden; }
     var w = fr.contentWindow, d; try { d = fr.contentDocument; } catch (e) { return; }
     if (!d || !d.querySelector(".pr-fondo") || d.documentElement.dataset.fondo) return;
     d.documentElement.dataset.fondo = v.id;
-    if (v.id === "foto") return;
     var fondo = d.querySelector(".pr-fondo");
+    // La página ya trae su fondo de Formas: se apaga y vuelve la foto de campo, así cada variante parte de lo mismo.
+    var lienzo = fondo.querySelector(".pr-fondo__lienzo");
+    if (lienzo) {
+      if (w.PF_FONDO) w.PF_FONDO.destruir();
+      lienzo.remove();
+      var foto = d.createElement("img"); foto.alt = ""; foto.src = fondo.dataset.foto; fondo.appendChild(foto);
+    }
+    if (v.id === "foto") return;
     var st = d.createElement("style");
     st.textContent = ".pr-fondo::after { display: none; } .pr-fondo img { display: none; } .pr-fondo canvas { display: block; width: 100%; height: 100%; }";
     d.head.appendChild(st);

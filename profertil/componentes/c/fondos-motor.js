@@ -239,6 +239,8 @@ window.PFFondo = function PFFondo(cv, C) {
     "    v = clamp((dot(f, vec3(.2126, .7152, .0722)) - uD.z) / max(uD.w - uD.z, .01), 0., 1.);",
     // cielo y campo: la celda es campo cuando en la foto el verde (o el amarillo del rastrojo) le gana al azul
     // (o cuando es oscura: las sombras del cultivo son grises, pero un cielo de día nunca es oscuro)
+    // con cielo y campo, el cielo va solo en fondo y figura: el acento de la combinación azul es verde y se leería como pasto
+    "    if (uZ.x > .5) acc = uFigura;",
     "    if (uZ.x > .5 && (max(f.g, (f.r + f.g) * .5) - f.b > uZ.y || dot(f, vec3(.2126, .7152, .0722)) < .22)){ fon = uFondo2; fig = uFigura2; acc = uAcento2; }",
     "    if (uD.y > .5) v = 1. - v;",
     "    v += uB.w + (n - .5) * uD.x;",
