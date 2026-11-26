@@ -4,7 +4,7 @@
 // folletos, boletines y enlaces). Una solapa sin contenido no aparece. Al final, otros productos para seguir navegando.
 import Marco from "./Marco.astro";
 import Tarjeta from "./Tarjeta.astro";
-import { sitio, vistas, catalogo, plano, foto, nutrientes, type Producto } from "../../lib/productos";
+import { sitio, vistas, catalogo, plano, foto, nutrientes, bolsa3d, type Producto } from "../../lib/productos";
 import { MSDS, BIB } from "../../lib/datos.mjs";
 
 interface Props { producto: Producto }
@@ -12,6 +12,12 @@ const { producto } = Astro.props;
 const p = producto.data;
 const imagen = p.imagen || p.logo;
 const esFoto = imagen?.endsWith(".jpg");
+// Bolsa 3D en lugar de la foto de la bolsa: todo lo pesado se pide desde el <head> para que esté listo cuando se dibuja.
+const bolsa = bolsa3d(producto);
+const THREE_CDN = "https://cdn.jsdelivr.net/npm/three@0.170.0/";
+const bolsa3dArchivos = bolsa && {
+  modulo: sitio("bolsa-3d/ficha.js"), glb: sitio("bolsa-3d/bolsa.glb"), piel: sitio("bolsa-3d/web/" + bolsa + ".webp"),
+};
 const biblioteca = [...MSDS, ...BIB];
 const recursos = p.documentos.map(d => {
   const doc = biblioteca.find(v => v.l && d.ruta === "biblioteca/pdf/" + v.l);
@@ -68,6 +74,18 @@ const HOJA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13
 const PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>';
 ---
 <Marco titulo={p.nombre} descripcion={p.bajada} raiz="../../" foto={foto(producto)} fondo="dither" imagen={imagen} saltar="Ir a la ficha">
+  {bolsa3dArchivos && <Fragment slot="precarga">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="modulepreload" href={bolsa3dArchivos.modulo} />
+    <link rel="modulepreload" href={THREE_CDN + "+esm"} />
+    <link rel="modulepreload" href={THREE_CDN + "examples/jsm/loaders/GLTFLoader.js/+esm"} />
+    <link rel="modulepreload" href={THREE_CDN + "examples/jsm/loaders/DRACOLoader.js/+esm"} />
+    <link rel="modulepreload" href={THREE_CDN + "examples/jsm/environments/RoomEnvironment.js/+esm"} />
+    <link rel="preload" as="fetch" crossorigin="anonymous" href={THREE_CDN + "examples/jsm/libs/draco/gltf/draco_wasm_wrapper.js"} />
+    <link rel="preload" as="fetch" crossorigin="anonymous" href={THREE_CDN + "examples/jsm/libs/draco/gltf/draco_decoder.wasm"} />
+    <link rel="preload" as="fetch" crossorigin="anonymous" href={bolsa3dArchivos.glb} />
+    <link rel="preload" as="fetch" crossorigin="anonymous" href={bolsa3dArchivos.piel} />
+  </Fragment>}
   <Fragment slot="cab">
     <div class="pr-ficha-cab">
       <div class="pr-ficha-cab__txt">
@@ -84,7 +102,7 @@ const PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-
           {hojas.length > 1 && <a class="pf-boton pf-boton--verde" href="#documentos" data-solapa-ir="documentos"><Fragment set:html={HOJA} />Hojas de seguridad</a>}
         </div>}
       </div>
-      <figure class:list={["pr-ficha-cab__arte", { "pr-ficha-cab__arte--foto": esFoto }]}>
+      <figure class:list={["pr-ficha-cab__arte", { "pr-ficha-cab__arte--foto": esFoto }]} data-bolsa3d={bolsa3dArchivos ? JSON.stringify(bolsa3dArchivos) : undefined}>
         {imagen && <img src={sitio(imagen)} alt={p.nombre} fetchpriority="high" />}
       </figure>
     </div>
@@ -147,7 +165,14 @@ const PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-
     <ul class="pr-grilla">{otros.map(o => <Tarjeta producto={o} />)}</ul>
   </section>}
 
-  <Fragment slot="fin"><script is:inline>
+  <Fragment slot="fin">{bolsa3dArchivos && <script type="module" is:inline>
+    // Bolsa 3D: se monta sobre la foto y la reemplaza cuando el primer cuadro está dibujado. Sin WebGL queda la foto.
+    const figura = document.querySelector("[data-bolsa3d]");
+    if (figura) {
+      const a = JSON.parse(figura.dataset.bolsa3d);
+      import(a.modulo).then(m => m.montar(figura, a)).catch(() => {});
+    }
+  </script>}<script is:inline>
     // Variantes de la cabecera para comparar (?cab=sin-arte | arte-fondo | liso). Sin parámetro, la cabecera de siempre.
     (function () {
       var v = new URLSearchParams(location.search).get("cab");

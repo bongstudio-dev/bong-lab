@@ -66,3 +66,20 @@ export function foto(p: Producto) {
   if (/durazn|naranj|manzan|tomate|cebolla/.test(c)) return FOTOS.frutales;
   return [FOTOS.verde, FOTOS.cosecha][p.data.orden % 2];
 }
+
+// Bolsa 3D de la ficha: la etiqueta de profertil/bolsa-3d que corresponde a la foto de bolsa del producto.
+// Sin etiqueta (líquidos e industriales) queda la imagen.
+const BOLSAS: Record<string, string> = {
+  "bolsa-ug": "ug", "bolsa-etp": "etp", "bolsa-fosfato-monoamonico": "map", "bolsa-fosfato-diamonico": "fda",
+  "bolsa-superfosfato-triple": "spt", "bolsa-superfosfato-simple": "sps", "bolsa-sulfato-de-amonio": "sa",
+  "bolsa-sulfato-de-calcio": "sc", "bolsa-cloruro-de-potasio": "kcl", "bolsa-sulfugran": "sulfugran",
+  "bolsa-sulfato-de-potasio-y-magnesio": "spm", "bolsa-zincodur": "zincodur", "bolsa-proterra-zn": "proterra-zn",
+  "bolsa-proterra-ar": "proterra-ar", "bolsa-proterra-ds": "proterra-ds", "bolsa-proterra": "proterra",
+};
+export function bolsa3d({ id, data }: Producto) {
+  const base = (data.imagen || "").split("/").pop()?.replace(/\.png$/, "") || "";
+  const etiqueta = BOLSAS[base];
+  if (!etiqueta) return null;
+  // Las Proterra S usan la foto de la Proterra base; su bolsa es la de la S.
+  return etiqueta === "proterra" && id.startsWith("proterra-s") ? "proterra-s" : etiqueta;
+}

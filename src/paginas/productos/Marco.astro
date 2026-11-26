@@ -36,6 +36,7 @@ const url = new URL(Astro.url.pathname, Astro.site);
 <Pagina firma={{ nombre: "PROFERTIL · PRODUCTOS", que: "Catálogo y fichas de productos de Profertil.", contexto: "Prototipo del catálogo de productos para la web de Profertil." }} transicion="biblioteca" css={CSS}>
   <Cabeza slot="head" titulo={titulo + " · Profertil"} {descripcion} {raiz} temaColor solapas alcance={{ seccion: "productos", nombre: "Productos", previa: !lista }}>
     <link rel="canonical" href={url} />
+    <slot name="precarga" />
     {cfgFondo ? <link rel="preload" as="script" href={sitio("componentes/c/fondos-motor.js")} /> : <link rel="preload" as="image" href={sitio(foto)} fetchpriority="high" />}
     <meta property="og:title" content={titulo} />
     <meta property="og:description" content={descripcion} />
