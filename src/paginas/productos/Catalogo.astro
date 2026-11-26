@@ -5,6 +5,7 @@
 import Marco from "./Marco.astro";
 import Tarjeta from "./Tarjeta.astro";
 import Dock from "../../componentes/Dock.astro";
+import Ancla from "../../componentes/Ancla.astro";
 import { catalogo, nutrientes, forma, ORDEN_NUTRIENTES, FOTO_CATALOGO, type Vista } from "../../lib/productos";
 import JS from "./catalogo.js?raw";
 
@@ -74,6 +75,7 @@ const CHEVRON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 15 6-6 
         </div>)}
       </div>
     </Dock>
+    <Ancla />
     <script is:inline set:html={"\nwindow.PR_GRUPOS = " + JSON.stringify(GRUPOS.map(g => ({ id: g.id, nombre: g.nombre }))) + ";\nwindow.PR_INICIAL = " + JSON.stringify(inicial) + ";\n" + JS}></script>
   </Fragment>
 </Marco>

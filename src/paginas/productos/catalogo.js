@@ -87,6 +87,7 @@
     marcarFiltros(n);
     html.classList.toggle("pr-sin-filtros", estado.sec !== "agro");
     escribirDireccion();
+    if (typeof despertar === "function") despertar(400);
   }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
 
@@ -168,7 +169,7 @@
     aplicar(true);
   });
   $("pf-fClear").addEventListener("click", function () { GRUPOS.forEach(function (g) { estado.sel[g.id] = []; }); aplicar(true); });
-  document.addEventListener("pointerdown", function (e) { if (filtros.classList.contains("pf-abierto") && !filtros.contains(e.target)) cerrar(); });
+  document.addEventListener("pointerdown", function (e) { if (filtros.classList.contains("pf-abierto") && !filtros.contains(e.target) && !$("pf-ancla").contains(e.target)) cerrar(); });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && filtros.classList.contains("pf-abierto")) { cerrar(); $("pf-fToggle").focus(); } });
 
   // Chips de la fila de resultados y botón del vacío.
@@ -215,6 +216,62 @@
   var cab = $("pf-cab");
   function dockArriba() { filtros.classList.toggle("pf-arriba", $("pf-hoja").getBoundingClientRect().top > innerHeight * .55); }
   addEventListener("scroll", dockArriba, { passive: true }); dockArriba();
+
+  /* --- Ancla (la de la Biblioteca): aparece y se va junto con el dock, baja una pantalla o vuelve al principio del catálogo.
+     Se mueve con resortes (tokens --ancla-*). Lo que decide si se ve se vuelve a medir en cada cuadro mientras algo cambia, y
+     también cuando cambian los filtros o la solapa: si dependiera solo del scroll, al llegar con un filtro en la dirección o al
+     pasar de Industrial a Agro sin mover la página quedaba escondida. */
+  var ancla = $("pf-ancla"), aCuerpo = ancla.firstElementChild, flecha = aCuerpo.firstElementChild;
+  var esMobile = matchMedia("(max-width: 640px)"), quieto = matchMedia("(prefers-reduced-motion: reduce)");
+  var raiz = getComputedStyle(html);
+  function tk(n) { return parseFloat(raiz.getPropertyValue("--" + n)); }
+  var GAP = tk("ancla-gap"), APRETAR = tk("ancla-apretar"), BAJAR_P = tk("ancla-bajar"), CAMBIO = tk("ancla-cambio");
+  function R(x, k, c) { return { x: x, v: 0, t: x, k: k, c: c }; }
+  var M = { s: R(0, tk("ancla-aparecer-k"), tk("ancla-aparecer-c")), q: R(1, tk("ancla-apretar-k"), tk("ancla-apretar-c")), r: R(90, tk("ancla-giro-k"), tk("ancla-giro-c")) };
+  function inicioLista() { return $("pf-hoja").offsetTop - 80; }
+  function sube() { return scrollY > inicioLista() + innerHeight * CAMBIO; }
+  function medir() {
+    var hay = estado.sec === "agro" && !filtros.classList.contains("pf-arriba") && $("pf-empty").hidden;
+    M.s.t = hay ? 1 : 0;
+    var s = sube();
+    M.r.t = s ? -90 : 90;
+    ancla.setAttribute("aria-label", s ? "Volver al principio de los productos" : "Bajar");
+    ancla.tabIndex = hay ? 0 : -1;
+    if (!esMobile.matches) html.style.setProperty("--ancla-x", (filtros.getBoundingClientRect().right + GAP).toFixed(2) + "px");
+  }
+  function paso(s, dt) { var ac = -s.k * (s.x - s.t) - s.c * s.v; s.v += ac * dt; s.x += s.v * dt; }
+  var tAntes = 0, corriendo = false, hastaT = 0;
+  function enReposo() { for (var k in M) if (Math.abs(M[k].x - M[k].t) > 0.001 || Math.abs(M[k].v) > 0.001) return false; return true; }
+  function anim(now) {
+    var dt = tAntes ? Math.min(0.05, (now - tAntes) / 1000) : 0.016; tAntes = now;
+    medir();
+    if (quieto.matches) { for (var k in M) { M[k].x = M[k].t; M[k].v = 0; } }
+    else { var n = Math.ceil(dt / 0.004); for (var j = 0; j < n; j++) for (var k2 in M) paso(M[k2], dt / n); }
+    ancla.style.transform = "scale(" + (Math.max(0, M.s.x) * M.q.x).toFixed(4) + ")";
+    flecha.style.transform = "rotate(" + M.r.x.toFixed(2) + "deg)";
+    if (now < hastaT || !enReposo()) requestAnimationFrame(anim); else { corriendo = false; tAntes = 0; }
+  }
+  function despertar(ms) {
+    hastaT = Math.max(hastaT, performance.now() + (ms || 0));
+    if (!corriendo) { corriendo = true; requestAnimationFrame(anim); }
+  }
+  addEventListener("scroll", function () { despertar(200); }, { passive: true });
+  addEventListener("resize", function () { despertar(700); });
+  filtros.addEventListener("click", function () { despertar(900); });
+  filtros.addEventListener("transitionend", function () { despertar(120); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { despertar(300); });
+  addEventListener("load", function () { despertar(600); });
+  ancla.addEventListener("pointerdown", function () { M.q.t = APRETAR; despertar(); });
+  function soltarAncla() { M.q.t = 1; despertar(); }
+  ancla.addEventListener("pointerup", soltarAncla);
+  ancla.addEventListener("pointercancel", soltarAncla);
+  ancla.addEventListener("pointerleave", soltarAncla);
+  ancla.addEventListener("click", function () {
+    cerrar();
+    var suave = quieto.matches ? "auto" : "smooth";
+    if (sube()) scrollTo({ top: inicioLista(), behavior: suave });
+    else scrollBy({ top: Math.round(innerHeight * BAJAR_P), behavior: suave });
+  });
 
   aplicar(false);
   // Llegando con un filtro o una búsqueda, la lista queda a la vista.

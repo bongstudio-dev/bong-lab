@@ -70,11 +70,10 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; }
   .pr-tarjeta__meta > span { height: 22px; padding: 0 7px; font-size: 11px; }
 }
 
-/* --- Dock de filtros (el de la Biblioteca). Sin ancla: el dock va centrado. En Industrial no hay filtros. */
-.pf-filters { right: 0; max-width: min(100% - 32px, 980px); }
+/* --- Dock de filtros y ancla (los de la Biblioteca). El ancla va a la derecha del dock: baja una pantalla o vuelve al principio
+   del catálogo, y deja ver de un vistazo dónde están los filtros. En Industrial no hay filtros: no aparecen ni el dock ni el ancla. */
 .pf-filters.pf-arriba:not(.pf-abierto), .pr-sin-filtros .pf-filters { transform: translateY(calc(100% + 40px)); opacity: 0; pointer-events: none; }
-@media (min-width: 641px) { .pf-filters.pf-abierto { min-width: min(100% - 32px, 620px); } }
-@media (max-width: 640px) { .pf-filters, .pf-filters.pf-abierto { width: calc(100% - 32px); } }
+@media (min-width: 641px) { .pf-filters.pf-abierto { min-width: min(100% - 32px - var(--a), 620px); } }
 .pf-f-main .pf-pastilla { gap: 6px; }
 .pf-f-main .pf-pastilla[aria-expanded="true"] { background: var(--line); }
 .pf-f-grupos { display: grid; grid-template-columns: minmax(0, 1fr); }
@@ -125,8 +124,13 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; }
 .pr-paneles { padding: 32px 0 72px; }
 .pr-panel.pr-entra { animation: pr-entra 420ms var(--ease) backwards; }
 .pr-paneles h2, .pr-otros h2 { margin: 0 0 18px; color: var(--azul); font: 600 clamp(24px, 2.4vw, 32px)/1.08 var(--f-display); letter-spacing: -.03em; text-wrap: balance; }
-.pr-claves { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 12px; margin: 0 0 48px; }
-.pr-claves div { display: grid; gap: 10px; align-content: space-between; min-height: 118px; padding: 18px 20px 20px; border-radius: var(--radio-media); background: var(--card); }
+/* Datos destacados: la etiqueta arriba y el valor apoyado abajo. El aire de adentro acompaña al radio (19): con menos, la etiqueta
+   queda pegada a la curva de la esquina. */
+.pr-claves { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 12px; margin: 0 0 56px; }
+.pr-claves div { display: grid; grid-template-rows: auto 1fr; gap: 16px; align-content: space-between; min-height: 136px; padding: 22px 24px 24px; border-radius: var(--radio-media); background: var(--card); }
+.pr-claves dd { align-self: end; text-wrap: balance; }
+/* Composiciones largas (las de Sulfato de Calcio o Superfosfato Simple): un cuerpo menor para que entren en dos líneas y no en cuatro. */
+.pr-claves .pr-largo dd { font-size: clamp(18px, 1.5vw, 21px); line-height: 1.2; letter-spacing: -.01em; }
 .pr-claves dt { color: var(--ink-2); font-size: var(--texto-chico); }
 .pr-claves dd { margin: 0; color: var(--azul); font: 600 clamp(22px, 2.2vw, 30px)/1.1 var(--f-display); letter-spacing: -.02em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .pr-dos { display: grid; gap: 48px; }
@@ -176,9 +180,11 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; }
   .pr-otros .pr-tarjeta:nth-child(3) { display: none; }
 }
 @media (max-width: 640px) {
-  .pr-claves { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 36px; }
-  .pr-claves div { min-height: 96px; padding: 14px 16px 16px; }
+  .pr-claves { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 40px; }
+  .pr-claves div { gap: 12px; min-height: 96px; padding: 16px 18px 18px; }
   .pr-claves dd { font-size: 20px; }
+  .pr-claves .pr-largo { grid-column: 1 / -1; min-height: 0; }
+  .pr-claves .pr-largo dd { font-size: 17px; }
   .pr-ficha-cab__arte { order: -1; aspect-ratio: 16 / 10; }
   .pf-bh:has(.pr-ficha-cab) { padding: 8px 8px 24px; }
   .pr-ficha-cab__txt { padding-inline: 12px; }

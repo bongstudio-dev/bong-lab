@@ -65,11 +65,10 @@ const PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-
         <h1>{p.nombre}</h1>
         <p>{p.bajada}</p>
         {p.archivada && <p class="pr-archivo">Ficha de archivo</p>}
-        <div class="pf-bh__acciones">
+        {!!hojas.length && <div class="pf-bh__acciones">
           {hojas.length === 1 && <a class="pf-boton pf-boton--verde" href={hojas[0].visor || sitio(hojas[0].ruta)}><Fragment set:html={HOJA} />Hoja de seguridad</a>}
           {hojas.length > 1 && <a class="pf-boton pf-boton--verde" href="#documentos" data-solapa-ir="documentos"><Fragment set:html={HOJA} />Hojas de seguridad</a>}
-          {!p.archivada && <a class="pf-boton" href={p.fuente}>Ficha en profertil.com.ar<Fragment set:html={AFUERA} /></a>}
-        </div>
+        </div>}
       </div>
       <figure class:list={["pr-ficha-cab__arte", { "pr-ficha-cab__arte--foto": esFoto }]}>
         {imagen && <img src={sitio(imagen)} alt={p.nombre} fetchpriority="high" />}
@@ -84,7 +83,7 @@ const PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-
 
   <div class="pr-paneles">
     {SOLAPAS.some(s => s.id === "producto") && <section class="pr-panel" id="producto" role="tabpanel" aria-labelledby="pr-t-producto">
-      {!!destacados.length && <dl class="pr-claves">{destacados.map(c => <div><dt>{c.etiqueta}</dt><dd>{c.valor}</dd></div>)}</dl>}
+      {!!destacados.length && <dl class="pr-claves">{destacados.map(c => <div class:list={{ "pr-largo": c.valor.length > 16 }}><dt>{c.etiqueta}</dt><dd>{c.valor}</dd></div>)}</dl>}
       <div class="pr-dos">
         {!!p.descripcion.length && <div class="pr-texto"><h2>Descripción</h2>{p.descripcion.map(t => <p>{t}</p>)}</div>}
         {!!resto.length && <div><h2>Características</h2><dl class="pr-datos">{resto.map(c => <div><dt>{c.etiqueta}</dt><dd>{c.valor}</dd></div>)}</dl></div>}
