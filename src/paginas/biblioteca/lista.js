@@ -21,9 +21,9 @@
   /* Una sección puede ser de tarjetas (s.tarjetas, Proveedores): accesos en lugar de documentos (el formulario, los PDF, los
      portales). No tiene filtros ni vistas; el buscador filtra las tarjetas. TARJ son las de la sección elegida, null si es una lista. */
   var TARJ = null, tarjLista = [];
-  // Variante de tarjeta para comparar (?tarjeta=formas|icono|pleno|compacta); sin parámetro, la de formas.
-  var VAR_TARJ = (new URLSearchParams(location.search).get("tarjeta") || "").replace(/[^a-z]/g, "");
-  if (VAR_TARJ) document.documentElement.dataset.tarjeta = VAR_TARJ;
+  // Variante de tarjeta: compacta por defecto; ?tarjeta=formas|icono|pleno muestra las otras para comparar.
+  var VAR_TARJ = (new URLSearchParams(location.search).get("tarjeta") || "compacta").replace(/[^a-z]/g, "");
+  document.documentElement.dataset.tarjeta = VAR_TARJ;
   function usarSeccion(s) {
     seccion = s;
     DOCS = s.docs || []; GRUPOS = s.grupos || []; TARJ = s.tarjetas || null;
