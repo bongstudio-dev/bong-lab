@@ -79,6 +79,13 @@
 .pf-boton { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 16px; border: 1px solid var(--line); border-radius: var(--radio-control);
   background: var(--tiza); color: var(--ink); font: 500 var(--texto-chico)/1 var(--f-body); text-decoration: none; cursor: pointer; transition: background 220ms ease, transform .15s var(--ease); text-box: trim-both cap alphabetic; }
 .pf-boton:active { background: var(--bg); transform: scale(.97); }
+/* Hover del botón base: un relleno blanco baja desde arriba; texto y flecha quedan del mismo color. Solo en el base (tiza con línea):
+   principal, verde y alerta tienen el suyo. */
+.pf-boton:not(.pf-boton--principal, .pf-boton--verde, .pf-boton--alerta) { position: relative; overflow: hidden; isolation: isolate; }
+.pf-boton:not(.pf-boton--principal, .pf-boton--verde, .pf-boton--alerta)::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--color-blanco);
+  transform: translateY(-101%); transition: transform 380ms var(--ease); }
+@media (hover: hover) and (pointer: fine) { .pf-boton:not(.pf-boton--principal, .pf-boton--verde, .pf-boton--alerta):hover::before { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .pf-boton::before { transition: none; } }
 .pf-boton--principal { background: var(--azul); border-color: var(--azul); color: var(--tiza); }
 .pf-boton--alerta { background: var(--naranja); border-color: var(--naranja); color: var(--tiza); }
 .pf-boton--principal:active { background: color-mix(in srgb, var(--azul) 86%, var(--ink)); }
