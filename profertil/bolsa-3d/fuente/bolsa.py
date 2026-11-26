@@ -21,7 +21,7 @@ W = 0.40      # ancho del frente
 D = 0.193     # ancho del fuelle desplegado
 H = 0.928     # alto del cuerpo
 SELLO = 0.012 # alto del sello de arriba
-NF, NG, NV = 44, 18, 110   # divisiones: frente, fuelle, alto
+NF, NG, NV = 60, 26, 130   # divisiones: frente, fuelle, alto
 
 # Fondo cerrado: el fuelle llega abierto hasta abajo y el film dobla hacia la
 # base en un redondeo de alto FONDO_Z; el frente se mete FONDO_B y los
@@ -48,9 +48,68 @@ def fondo(t):
     q = max(0.0, 1 - t * H / FONDO_Z)
     return 1 - math.sqrt(max(0.0, 1 - q * q))
 
-def arruga(s, t, lado):
-    """Ondulación suave del film: pocas frecuencias, nada de ruido fino."""
-    return math.sin(t * 19.0 + s * 3.1 + lado) * 0.5 + math.sin(t * 7.3 - s * 5.7 + lado * 2.0) * 0.5
+# ---------- pliegues del film ----------
+# Cada cara se deforma a lo largo de su normal (hacia afuera +). Las medidas
+# van en metros sobre la cara desplegada: x a lo ancho, z de abajo hacia arriba.
+# Todo se apaga sobre las aristas para que el contorno no se mueva.
+
+def cresta(d, w):
+    return math.exp(-(d / w) ** 2)
+
+def a_segmento(x, z, x0, z0, x1, z1):
+    """Distancia del punto al segmento y posición a lo largo (0-1)."""
+    dx, dz = x1 - x0, z1 - z0
+    k = max(0.0, min(1.0, ((x - x0) * dx + (z - z0) * dz) / (dx * dx + dz * dz)))
+    return math.hypot(x - (x0 + k * dx), z - (z0 + k * dz)), k
+
+def arruga(x, z, x0, z0, x1, z1, alto, ancho):
+    """Una arruga recta que se afina hacia las puntas."""
+    d, k = a_segmento(x, z, x0, z0, x1, z1)
+    return alto * cresta(d, ancho) * math.sin(math.pi * k) ** 0.5
+
+def ondas(x, z, fase):
+    """Ondulación del film: dos frecuencias largas, nada de ruido fino."""
+    return (0.6 * math.sin(2 * math.pi * (x / 0.23 + z / 0.37) + fase)
+            + 0.4 * math.sin(2 * math.pi * (-x / 0.17 + z / 0.29) + 1.7 * fase))
+
+def pliegues_cara(s, t, ancho, lado):
+    """Frente (lado 0) y dorso (lado 1). s va de una arista a la otra."""
+    x, z = s * ancho, t * H
+    borde = math.sin(math.pi * s) ** 0.6
+    d = 0.0026 * ondas(x, z, 0.9 + 2.3 * lado)
+    # tensiones que bajan en diagonal desde las puntas del sello
+    d += arruga(x, z, 0.02, H - 0.01, 0.11, H - 0.17, 0.0040, 0.011)
+    d += arruga(x, z, ancho - 0.02, H - 0.01, ancho - 0.12, H - 0.15, 0.0034, 0.011)
+    # alguna arruga larga y suave en el cuerpo
+    if lado == 0:
+        d += arruga(x, z, 0.06, 0.30, 0.20, 0.17, 0.0030, 0.016)
+        d += arruga(x, z, 0.28, 0.62, 0.36, 0.42, -0.0026, 0.016)
+    else:
+        d += arruga(x, z, 0.30, 0.28, 0.16, 0.12, 0.0030, 0.016)
+    # el borde de abajo ondula donde el film dobla hacia la base
+    abajo = math.exp(-z / 0.035)
+    d += 0.0040 * abajo * math.sin(2 * math.pi * x / 0.066 + 1.3 * lado)
+    d *= borde
+    # esquinas de abajo pellizcadas: un filo corto que sube desde la esquina
+    for e0, sg in ((0.0, 1), (ancho, -1)):
+        d += arruga(x, z, e0, 0.004, e0 + sg * 0.05, 0.075, 0.0038, 0.007) * min(1.0, abs(x - e0) / 0.012)
+    return d
+
+def pliegues_fuelle(s, t, lado):
+    """s = 0 en la arista del frente, 1 en la del dorso."""
+    x, z = s * D, t * H
+    borde = math.sin(math.pi * s) ** 0.6
+    d = 0.0022 * ondas(x, z, 2.1 + 1.9 * lado)
+    # arriba el fuelle se pliega hacia el sello: un filo desde cada punta del sello
+    d += arruga(x, z, 0.004, H - 0.004, 0.085, H - 0.21, 0.0050, 0.009)
+    d += arruga(x, z, D - 0.004, H - 0.004, D - 0.08, H - 0.19, 0.0040, 0.009)
+    # pliegue marcado que cruza el fuelle cerca de la base, con su valle debajo
+    zc = 0.050 + 0.016 * (s - 0.5) * (1 if lado == 0 else -1)
+    d += 0.0065 * cresta(z - zc, 0.006) - 0.0040 * cresta(z - zc + 0.014, 0.008)
+    # un segundo quiebre corto y en diagonal más abajo
+    d += arruga(x, z, 0.03, 0.012, 0.13, 0.030, 0.0045, 0.006)
+    d *= borde
+    return d
 
 def seccion(t):
     g = apertura(t)
@@ -72,7 +131,7 @@ def seccion(t):
     for i in range(NF):
         s = i / NF
         x = -a + 2 * a * s
-        y = -b - panza * math.sin(math.pi * s) ** 0.55 - 0.0016 * g * arruga(s, t, 0)
+        y = -b - panza * math.sin(math.pi * s) ** 0.55 - pliegues_cara(s, t, 2 * a, 0)
         pts.append((x, y, s * U_FRENTE))
     def pliegue(s):
         v = 1 - abs(2 * s - 1)          # 0 en los bordes, 1 en el pliegue
@@ -80,19 +139,19 @@ def seccion(t):
     # fuelle derecho: x = +a, y de -b a +b
     for i in range(NG):
         s = i / NG
-        x = a + gpanza * math.sin(math.pi * s) - hundir * pliegue(s)
+        x = a + gpanza * math.sin(math.pi * s) - hundir * pliegue(s) + pliegues_fuelle(s, t, 0)
         y = -b + 2 * b * s
         pts.append((x, y, U_FRENTE + s * (1 - U_FRENTE)))
     # dorso: y = +b, x de +a a -a
     for i in range(NF):
         s = i / NF
         x = a - 2 * a * s
-        y = b + panza * math.sin(math.pi * s) ** 0.55 + 0.0016 * g * arruga(s, t, 1.7)
+        y = b + panza * math.sin(math.pi * s) ** 0.55 + pliegues_cara(s, t, 2 * a, 1)
         pts.append((x, y, s * U_FRENTE))
     # fuelle izquierdo: x = -a, y de +b a -b
     for i in range(NG):
         s = i / NG
-        x = -a - gpanza * math.sin(math.pi * s) + hundir * pliegue(s)
+        x = -a - gpanza * math.sin(math.pi * s) + hundir * pliegue(s) - pliegues_fuelle(1 - s, t, 1)
         y = b - 2 * b * s
         pts.append((x, y, U_FRENTE + s * (1 - U_FRENTE)))
     return pts
@@ -113,8 +172,8 @@ m_sello = material("sello", (0.92, 0.93, 0.94, 1), 0.5)
 # ---------- cuerpo ----------
 bm = bmesh.new()
 uv = bm.loops.layers.uv.new("UVMap")
-# filas parejas, más algunas extra en el redondeo del fondo
-alturas = sorted(set([j / NV for j in range(NV + 1)] + [FONDO_Z / H * k / 8 for k in range(8)]))
+# filas parejas, más densas en los 12 cm de abajo (redondeo del fondo y pliegues)
+alturas = sorted(set([round(j / NV, 5) for j in range(NV + 1)] + [round(0.004 * k / H, 5) for k in range(30)]))
 filas = []
 for t in alturas:
     filas.append([(bm.verts.new((x, y, t * H)), u) for (x, y, u) in seccion(t)])
