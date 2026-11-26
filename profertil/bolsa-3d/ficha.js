@@ -158,14 +158,12 @@ export async function montar(figura, { glb, piel }) {
   figura.appendChild(lienzo);
   medir();
   renderer.compile(escena, camara);
-  renderer.render(escena, camara);
   cancelAnimationFrame(cuadro); cuadro = 0;
-  // En el cuadro en que aparece se vuelve a dibujar, así el lienzo nunca se muestra vacío.
-  requestAnimationFrame(() => {
-    renderer.render(escena, camara);
-    figura.classList.add("pr-ficha-cab__arte--3d");
-    performance.mark("bolsa3d-lista");
-  });
+  // El dibujo y el cambio de clase van en el mismo paso: el navegador los muestra juntos en el próximo cuadro.
+  renderer.render(escena, camara);
+  figura.classList.add("pr-ficha-cab__arte--3d");
+  performance.mark("bolsa3d-lista");
+  pedir();
 
   new ResizeObserver(medir).observe(figura);
   // El vaivén solo corre mientras la bolsa se ve.
