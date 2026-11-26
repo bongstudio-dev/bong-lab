@@ -105,6 +105,10 @@ const PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-
       <figure class:list={["pr-ficha-cab__arte", { "pr-ficha-cab__arte--foto": esFoto }]} data-bolsa3d={bolsa3dArchivos ? JSON.stringify(bolsa3dArchivos) : undefined}>
         {imagen && <img src={sitio(imagen)} alt={p.nombre} fetchpriority="high" />}
       </figure>
+      {bolsa3dArchivos && <script is:inline>
+        // Con la bolsa 3D en camino la foto no se muestra: la bolsa entra con su animación. Si tarda o falla, vuelve la foto.
+        document.currentScript.previousElementSibling.classList.add("pr-ficha-cab__arte--espera");
+      </script>}
     </div>
   </Fragment>
 
@@ -170,7 +174,9 @@ const PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-
     const figura = document.querySelector("[data-bolsa3d]");
     if (figura) {
       const a = JSON.parse(figura.dataset.bolsa3d);
-      import(a.modulo).then(m => m.montar(figura, a)).catch(() => {});
+      const foto = () => { if (!figura.classList.contains("pr-ficha-cab__arte--3d")) figura.classList.remove("pr-ficha-cab__arte--espera"); };
+      setTimeout(foto, 3000);
+      import(a.modulo).then(m => m.montar(figura, a)).catch(foto);
     }
   </script>}<script is:inline>
     // Variantes de la cabecera para comparar (?cab=sin-arte | arte-fondo | liso). Sin parámetro, la cabecera de siempre.
