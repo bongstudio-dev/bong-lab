@@ -333,6 +333,15 @@ html[data-tarjeta="compacta"] .pf-acc__arte > svg { display: none; }
 html[data-tarjeta="compacta"] .pf-acc__ic { display: block; position: absolute; inset: 15px; color: var(--fo); }
 html[data-tarjeta="compacta"] .pf-acc__txt { padding-top: 16px; }
 html[data-tarjeta="compacta"] .pf-acc__txt .pf-etiqueta { display: none; }   /* el ícono ya dice qué es */
+/* Celular: el ícono va al costado del texto (arriba solo dejaba la mitad derecha vacía). */
+@media (max-width: 640px) {
+  html[data-tarjeta="compacta"] .pf-acc__a { display: grid; grid-template-columns: 48px minmax(0, 1fr); column-gap: 14px; align-items: start; padding: 18px 18px 18px 16px; }
+  html[data-tarjeta="compacta"] .pf-acc__arte { grid-row: 1 / span 2; width: 48px; height: 48px; margin: 0; }
+  html[data-tarjeta="compacta"] .pf-acc__ic { inset: 11px; }
+  html[data-tarjeta="compacta"] .pf-acc__txt { grid-column: 2; padding: 0; }
+  html[data-tarjeta="compacta"] .pf-acc__ir { grid-column: 2; margin: 12px 0 0; }
+  html[data-tarjeta="compacta"] .pf-acc__pie { display: none; }
+}
 a.pf-acc__a:focus-visible { outline: 2px solid var(--azul); outline-offset: 3px; }
 /* Celular: la misma tarjeta que en escritorio, con el arte como franja baja arriba (en fila, el arte chico a la izquierda dejaba
    hueco debajo y la descarga quedaba suelta). La fila del selector de vistas no ocupa lugar: en el celular va en el flujo. */
