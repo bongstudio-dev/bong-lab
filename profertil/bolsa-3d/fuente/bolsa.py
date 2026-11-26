@@ -8,20 +8,30 @@ para que la etiqueta sea una sola imagen intercambiable:
     u 0.00-0.75  frente (el dorso repite el frente)
     u 0.75-1.00  fuelle (los dos fuelles repiten la misma franja)
     v 0-1        alto del cuerpo, de abajo hacia arriba
-Los sellos de arriba y abajo llevan su propio material, sin etiqueta.
+El sello de arriba y la tapa del fondo llevan su propio material, sin etiqueta.
 """
 import bpy, bmesh, math, sys
 
 argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 SALIDA = argv[0] if argv else "bolsa.glb"
 
-# Medidas en metros, calcadas de las fotos de producto: el frente mide unas
-# 2,4 veces su ancho de alto y el fuelle abierto, la mitad del frente.
+# Medidas en metros, calcadas de las fotos de producto (silueta y etiqueta
+# superpuestas a la foto en la misma cámara).
 W = 0.40      # ancho del frente
-D = 0.21      # ancho del fuelle desplegado
-H = 0.92      # alto del cuerpo
-SELLO = 0.012 # alto de cada sello
+D = 0.193     # ancho del fuelle desplegado
+H = 0.928     # alto del cuerpo
+SELLO = 0.012 # alto del sello de arriba
 NF, NG, NV = 44, 18, 110   # divisiones: frente, fuelle, alto
+
+# Fondo cerrado: el fuelle llega abierto hasta abajo y el film dobla hacia la
+# base en un redondeo de alto FONDO_Z; el frente se mete FONDO_B y los
+# costados FONDO_A. Una tapa plana cierra la base.
+FONDO_Z, FONDO_A, FONDO_B = 0.065, 0.026, 0.071
+# Arriba el fuelle se pliega hacia el sello desde ARRIBA_T antes del final.
+ARRIBA_T, ARRIBA_EXP = 0.38, 0.94
+# Hombro de la bolsa llena: ensancha frente (HOMBRO_A) y fuelle (HOMBRO_B)
+# alrededor de la altura HOMBRO_T.
+HOMBRO_A, HOMBRO_B, HOMBRO_T, HOMBRO_S = 0.06, 0.015, 0.49, 0.20
 
 U_FRENTE = 0.75
 
@@ -30,12 +40,13 @@ def suave(x):
     return x * x * (3 - 2 * x)
 
 def apertura(t):
-    """Cuánto se abre el fuelle a cada altura (0 cerrado, 1 abierto).
-    Como en la bolsa llena: abajo se cierra en un tramo corto, arriba el fuelle
-    se va plegando hacia adentro desde la mitad hasta el sello."""
-    abajo = suave(t / 0.09) ** 0.55
-    arriba = suave((1 - t) / 0.50) ** 0.75
-    return abajo * arriba
+    """Cuánto se abre el fuelle a cada altura (0 cerrado, 1 abierto)."""
+    return suave((1 - t) / ARRIBA_T) ** ARRIBA_EXP
+
+def fondo(t):
+    """Cuánto se mete el film hacia la base (0 arriba del redondeo, 1 en el piso)."""
+    q = max(0.0, 1 - t * H / FONDO_Z)
+    return 1 - math.sqrt(max(0.0, 1 - q * q))
 
 def arruga(s, t, lado):
     """Ondulación suave del film: pocas frecuencias, nada de ruido fino."""
@@ -43,15 +54,19 @@ def arruga(s, t, lado):
 
 def seccion(t):
     g = apertura(t)
-    # Junto a los sellos el frente y el dorso se aplastan uno contra otro.
-    almohada = suave(t / 0.035) * suave((1 - t) / 0.06)
-    a = W / 2 * (1 - 0.03 * g)                    # el frente se cierra apenas al llenarse
-    b = max(0.003, D / 2 * g) * almohada          # medio espesor de la bolsa
+    hombro = math.exp(-((t - HOMBRO_T) / HOMBRO_S) ** 2)
+    # Junto al sello de arriba el frente y el dorso se aplastan uno contra otro.
+    almohada = suave((1 - t) / 0.06)
+    a = W / 2 * (1 - 0.03 * g) * (1 + HOMBRO_A * hombro)    # el frente se cierra apenas al llenarse
+    b = max(0.003, D / 2 * g * (1 + HOMBRO_B * hombro)) * almohada  # medio espesor de la bolsa
     b = max(b, 0.0012)
     # El fuelle que no se abre queda plegado en V hacia adentro.
     hundir = math.sqrt(max(0.0, (D / 2) ** 2 - b ** 2)) * almohada
-    panza = (0.012 + 0.016 * g) * almohada        # comba del frente, mayor en la mitad baja
-    gpanza = 0.006 * g
+    f = fondo(t)
+    a -= FONDO_A * f
+    b = max(b - FONDO_B * f, 0.004)
+    panza = (0.012 + 0.016 * g) * almohada * (1 - f)   # comba del frente
+    gpanza = 0.006 * g * (1 - f)
     pts = []  # (x, y, u)
     # frente: y = -b (mira a -Y), x de -a a +a
     for i in range(NF):
@@ -98,14 +113,14 @@ m_sello = material("sello", (0.92, 0.93, 0.94, 1), 0.5)
 # ---------- cuerpo ----------
 bm = bmesh.new()
 uv = bm.loops.layers.uv.new("UVMap")
+# filas parejas, más algunas extra en el redondeo del fondo
+alturas = sorted(set([j / NV for j in range(NV + 1)] + [FONDO_Z / H * k / 8 for k in range(8)]))
 filas = []
-for j in range(NV + 1):
-    t = j / NV
-    z = t * H
-    filas.append([(bm.verts.new((x, y, z)), u) for (x, y, u) in seccion(t)])
+for t in alturas:
+    filas.append([(bm.verts.new((x, y, t * H)), u) for (x, y, u) in seccion(t)])
 N = len(filas[0])
-for j in range(NV):
-    v0, v1 = j / NV, (j + 1) / NV
+for j in range(len(alturas) - 1):
+    v0, v1 = alturas[j], alturas[j + 1]
     for i in range(N):
         k = (i + 1) % N
         a, ua = filas[j][i]
@@ -120,9 +135,15 @@ for j in range(NV):
         cara = bm.faces.new((a, b, c, d))
         for lp, (uu, vv) in zip(cara.loops, ((ua, v0), (ub, v0), (uc, v1), (ud, v1))):
             lp[uv].uv = (uu, vv)
+# tapa del fondo (el sello de abajo queda doblado debajo, no se ve)
+tapa = bm.faces.new([v for v, _ in filas[0]][::-1])
+tapa.material_index = 1
+for lp in tapa.loops:
+    lp[uv].uv = (0.5, 0.5)
 cuerpo = bpy.data.meshes.new("cuerpo")
 bm.to_mesh(cuerpo); bm.free()
 cuerpo.materials.append(m_etq)
+cuerpo.materials.append(m_sello)
 for p in cuerpo.polygons:
     p.use_smooth = True
 ob = bpy.data.objects.new("bolsa", cuerpo)
@@ -160,13 +181,11 @@ def sello(z0, z1, a):
     return me
 
 a_sello = W / 2 * 0.995
-for nombre, z0, z1 in (("sello_abajo", -SELLO, 0.0015), ("sello_arriba", H - 0.0015, H + SELLO)):
+for nombre, z0, z1 in (("sello_arriba", H - 0.0015, H + SELLO),):
     o = bpy.data.objects.new(nombre, sello(z0, z1, a_sello))
     o.parent = ob
     bpy.context.scene.collection.objects.link(o)
 
-# apoyar en el piso y centrar
-ob.location = (0, 0, SELLO)
 
 bpy.ops.object.select_all(action="SELECT")
 bpy.ops.export_scene.gltf(
