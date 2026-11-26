@@ -104,7 +104,11 @@ export async function dibujar(canvas, p, base = "./") {
   const franja = p.franja || p.color;
   ctx.fillStyle = franja;
   ctx.fillRect(0, 70, FRENTE, 170);
-  texto(ctx, p.linea || QUIMICO, FRENTE / 2, 192, p.linea ? 92 : 104, { color: p.texto && !p.franja ? p.texto : "#ffffff", alin: "center", italica: true });
+  // La línea ocupa como mucho el 86% del frente: la versión "Compuesto" baja de cuerpo.
+  const linea = p.linea || QUIMICO;
+  ctx.font = `italic 700 104px ${FUENTE}`;
+  const cuerpo = Math.min(104, 104 * FRENTE * 0.86 / ctx.measureText(linea).width);
+  texto(ctx, linea, FRENTE / 2, 155 + cuerpo * 0.36, cuerpo, { color: p.texto && !p.franja ? p.texto : "#ffffff", alin: "center", italica: true });
 
   // Nombre o logo de la marca
   let y = 430;

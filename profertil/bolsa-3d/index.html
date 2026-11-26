@@ -69,6 +69,7 @@
   body.ver-plana .plana { display: grid; }
   body.ver-plana .escena { visibility: hidden; }
   .cargando { position: fixed; inset: 0; display: grid; place-items: center; font-size: 14px; color: var(--ink); opacity: .6; pointer-events: none; transition: opacity .3s; }
+  body.captura .cabeza, body.captura .controles, body.captura .cargando { display: none; }
   .cargando.listo { opacity: 0; visibility: hidden; }
   @media (max-width: 640px) {
     .cabeza { top: 16px; left: 16px; right: 16px; }
@@ -112,10 +113,11 @@ import { PRODUCTOS, dibujar, ANCHO, ALTO } from "./etiqueta.js";
 
 // ?p=<producto> elige la bolsa; ?giro=<grados> deja la cámara quieta en ese ángulo.
 const url = new URLSearchParams(location.search);
+if (url.has("captura")) document.body.classList.add("captura");
 const quieto = matchMedia("(prefers-reduced-motion: reduce)").matches || url.has("giro");
 const caja = document.getElementById("escena");
 
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: url.has("captura") });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.NeutralToneMapping;
@@ -211,6 +213,12 @@ async function elegir(p) {
   lienzo.width = c.width; lienzo.height = c.height;
   lienzo.getContext("2d").drawImage(c, 0, 0);
   document.getElementById("cargando").classList.add("listo");
+  // En modo captura se dibuja un cuadro y se frena: así una captura sin ventana puede terminar.
+  if (url.has("captura")) {
+    renderer.setAnimationLoop(null);
+    orbita.update();
+    renderer.render(escena, camara);
+  }
 }
 for (const p of PRODUCTOS) {
   const b = document.createElement("button");
