@@ -332,6 +332,7 @@ html[data-tarjeta="compacta"] .pf-acc__arte { aspect-ratio: auto; width: 64px; h
 html[data-tarjeta="compacta"] .pf-acc__arte > svg { display: none; }
 html[data-tarjeta="compacta"] .pf-acc__ic { display: block; position: absolute; inset: 15px; color: var(--fo); }
 html[data-tarjeta="compacta"] .pf-acc__txt { padding-top: 16px; }
+html[data-tarjeta="compacta"] .pf-acc__txt .pf-etiqueta { display: none; }   /* el ícono ya dice qué es */
 a.pf-acc__a:focus-visible { outline: 2px solid var(--azul); outline-offset: 3px; }
 /* Celular: la misma tarjeta que en escritorio, con el arte como franja baja arriba (en fila, el arte chico a la izquierda dejaba
    hueco debajo y la descarga quedaba suelta). La fila del selector de vistas no ocupa lugar: en el celular va en el flujo. */
