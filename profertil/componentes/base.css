@@ -82,6 +82,9 @@
 /* Hover del botón base: el azul baja desde arriba como la barra de navegación (mismo recorrido, tiempo --t-barra y curva), el texto
    pasa a tiza y la flecha da la vuelta: sale por la derecha y entra por la izquierda. Solo en el base (tiza con línea): principal,
    verde y alerta tienen el suyo. */
+/* En reposo toma el color del fondo donde está y lo marca solo la línea: acompaña sin destacarse. El chico (sin borde, dentro de un
+   aviso) sigue en tiza. */
+.pf-boton:not(.pf-boton--principal, .pf-boton--verde, .pf-boton--alerta, .pf-boton--chico) { background: transparent; }
 .pf-boton:not(.pf-boton--principal, .pf-boton--verde, .pf-boton--alerta) { position: relative; overflow: hidden; isolation: isolate;
   transition: background 220ms ease, color 260ms ease, border-color 260ms ease, transform .15s var(--ease); }
 .pf-boton:not(.pf-boton--principal, .pf-boton--verde, .pf-boton--alerta)::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--azul);
