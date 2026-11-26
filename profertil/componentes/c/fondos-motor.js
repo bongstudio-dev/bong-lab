@@ -75,7 +75,8 @@ window.PFFondo = function PFFondo(cv, C) {
     "uniform vec2 uRes;",
     "uniform float uDpr, uT, uCelda, uModo, uForma, uVarias, uN, uAcentoP, uHayAcento;",
     "uniform vec3 uFondo, uFigura, uAcento, uRaton;",
-    "uniform vec4 uA, uB, uD, uI;",      // parámetros por modo; uI: la foto del dither
+    "uniform vec4 uA, uB, uD, uI, uZ;",  // parámetros por modo; uI: la foto del dither; uZ: cielo y campo
+    "uniform vec3 uFondo2, uFigura2, uAcento2;",  // la combinación del campo (dither de paisaje por zonas)
     "uniform vec4 uG[" + GRUPOS_MAX + "], uG2[" + GRUPOS_MAX + "];",
     "uniform float uNG;",
     "out vec4 o;",
@@ -210,6 +211,7 @@ window.PFFondo = function PFFondo(cv, C) {
     // uB: velocidad, radio del cursor (px), contraste, brillo
     // uD: viento (cuánto ruido se suma a la foto), invertir, negro y blanco de la foto (niveles automáticos)
     // uI: hay foto, ancho, alto, encuadre vertical (0 arriba, 1 abajo)
+    // uZ: cielo y campo (cada zona de la foto con su combinación de color), umbral entre cielo y campo, -, -
     "float bayer(vec2 c){",
     "  vec2 m = mod(c, 4.); int i = int(m.x) + int(m.y) * 4;",
     "  int b[16] = int[16](0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5);",
@@ -221,7 +223,7 @@ window.PFFondo = function PFFondo(cv, C) {
     "}",
     "float fbm(vec2 p){ float v = 0., a = .5; for (int k = 0; k < 4; k++){ v += a * ruido(p); p = p * 2.03 + 17.1; a *= .5; } return v; }",
     "vec3 dither(vec2 P){",
-    "  vec3 col = uFondo;",
+    "  vec3 fon = uFondo, fig = uFigura, acc = uAcento;",
     "  vec2 c = floor(P / uCelda), centro = (c + .5) * uCelda, res = uRes / uDpr;",
     "  vec2 dir = vec2(cos(uA.y), sin(uA.y));",
     "  vec2 uv = centro / max(res.x, res.y);",
@@ -235,23 +237,27 @@ window.PFFondo = function PFFondo(cv, C) {
     "    vec2 iuv = vec2(.5 - vis.x * .5, (1. - vis.y) * uI.w) + centro / res * vis;",
     "    vec3 f = textureLod(uImg, iuv, log2(max(1., uCelda / esc))).rgb;",
     "    v = clamp((dot(f, vec3(.2126, .7152, .0722)) - uD.z) / max(uD.w - uD.z, .01), 0., 1.);",
+    // cielo y campo: la celda es campo cuando en la foto el verde (o el amarillo del rastrojo) le gana al azul
+    // (o cuando es oscura: las sombras del cultivo son grises, pero un cielo de día nunca es oscuro)
+    "    if (uZ.x > .5 && (max(f.g, (f.r + f.g) * .5) - f.b > uZ.y || dot(f, vec3(.2126, .7152, .0722)) < .22)){ fon = uFondo2; fig = uFigura2; acc = uAcento2; }",
     "    if (uD.y > .5) v = 1. - v;",
     "    v += uB.w + (n - .5) * uD.x;",
     "  }",
     "  v = (v - .5) * uB.z + .5;",
     "  if (uRaton.z > .5){ float d = length(centro - uRaton.xy) / uB.y; v += .55 * exp(-d * d); }",
+    "  vec3 col = fon;",
     "  float th = bayer(c);",
     "  vec2 l = P - centro; float fid = idForma(c);",
     "  if (uA.x < .5){",
-    "    if (v > th) col = pinta(col, uFigura, forma(fid, l / (uCelda * .86), uCelda * .86));",
+    "    if (v > th) col = pinta(col, fig, forma(fid, l / (uCelda * .86), uCelda * .86));",
     "  } else if (uA.x < 1.5){",
     "    float nivel = floor(clamp(v, 0., .999) * 2. + th);",
-    "    vec3 cc = (nivel > 1.5 && uHayAcento > .5) ? uAcento : uFigura;",
+    "    vec3 cc = (nivel > 1.5 && uHayAcento > .5) ? acc : fig;",
     "    if (nivel > .5) col = pinta(col, cc, forma(fid, l / (uCelda * .86), uCelda * .86));",
     "  } else {",
     "    float nivel = floor(clamp(v, 0., .999) * 3. + th);",
     "    float t = uCelda * (nivel < .5 ? 0. : nivel < 1.5 ? .38 : nivel < 2.5 ? .62 : .88);",
-    "    col = pinta(col, uFigura, forma(fid, l / max(t, 1.), t));",
+    "    col = pinta(col, fig, forma(fid, l / max(t, 1.), t));",
     "  }",
     "  return col;",
     "}",
@@ -307,7 +313,7 @@ window.PFFondo = function PFFondo(cv, C) {
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
   var lp = gl.getAttribLocation(prog, "p"); gl.enableVertexAttribArray(lp); gl.vertexAttribPointer(lp, 2, gl.FLOAT, false, 0, 0);
   var U = {};
-  ["uAtlas", "uEn", "uImg", "uRes", "uDpr", "uT", "uCelda", "uModo", "uForma", "uVarias", "uN", "uAcentoP", "uHayAcento", "uFondo", "uFigura", "uAcento", "uRaton", "uA", "uB", "uD", "uI", "uG", "uG2", "uNG"]
+  ["uAtlas", "uEn", "uImg", "uRes", "uDpr", "uT", "uCelda", "uModo", "uForma", "uVarias", "uN", "uAcentoP", "uHayAcento", "uFondo", "uFigura", "uAcento", "uRaton", "uA", "uB", "uD", "uI", "uZ", "uFondo2", "uFigura2", "uAcento2", "uG", "uG2", "uNG"]
     .forEach(function (n) { U[n] = gl.getUniformLocation(prog, n); });
   gl.uniform1i(U.uAtlas, 0); gl.uniform1i(U.uEn, 1); gl.uniform1i(U.uImg, 2);
   gl.uniform3fv(U.uFondo, hex(pal[0])); gl.uniform3fv(U.uFigura, hex(pal[1])); gl.uniform3fv(U.uAcento, hex(pal[2]));
@@ -330,6 +336,10 @@ window.PFFondo = function PFFondo(cv, C) {
     gl.uniform4f(U.uB, num(C.velocidad, 40) / 100, num(C.radioCursor, 160), num(C.contraste, 120) / 100, num(C.brillo, 0) / 100);
     gl.uniform4f(U.uD, num(C.viento, 20) / 100, C.invertir ? 1 : 0, 0, 1);
     gl.uniform4f(U.uI, 0, 1, 1, .5);
+    // Cielo y campo: el cielo toma la combinación de Color y el campo la de colorCampo (verde por defecto).
+    var pal2 = PALETAS[C.colorCampo] || PALETAS.verde;
+    gl.uniform3fv(U.uFondo2, hex(pal2[0])); gl.uniform3fv(U.uFigura2, hex(pal2[1])); gl.uniform3fv(U.uAcento2, hex(pal2[2]));
+    gl.uniform4f(U.uZ, C.zonas ? 1 : 0, num(C.umbral, 8) / 100, 0, 0);
     if (C.imagen) cargarFoto(C.imagen);
   }
 

@@ -162,13 +162,14 @@
       ["binario", "Binario", "Forma o nada: el dither de un bit.", { tonos: "binario", celda: 16 }],
       ["tres", "Tres tonos", "Nada, figura y acento.", { tonos: "tres", celda: 18 }],
       ["escalonado", "Escalonado", "La Forma cambia de tamaño en cuatro pasos, como una trama de medio tono.", { tonos: "escalonado", celda: 20 }],
-      ["paisaje", "Paisaje", "Una foto de campo dibujada con Formas. Se puede cargar otro JPG; el viento mueve la trama despacio sobre el paisaje.", { tonos: "tres", celda: 12, contraste: 160, velocidad: 25, angulo: 0, densidad: 20, invertir: true, forma: "trigo" }]
+      ["paisaje", "Paisaje", "Una foto de campo dibujada con Formas: el cielo en azul y el campo en verde. Se puede cargar otro JPG; el viento mueve la trama despacio sobre el paisaje.", { tonos: "tres", celda: 12, contraste: 160, velocidad: 25, angulo: 0, densidad: 20, zonas: true, invertir: false, forma: "trigo" }]
     ],
     claves: [
       "Tramado ordenado Bayer de 4 x 4 sobre la grilla: las celdas cambian de a una, sin fundidos.",
       "Ángulo: la dirección del degradé y hacia dónde viaja el ruido. Densidad: el tamaño de las manchas del ruido.",
       "Cursor: suma luz alrededor del mouse, así se encienden más Formas.",
       "Paisaje: la luz de la foto decide qué Formas se encienden. Lo claro (el cielo) se llena y lo oscuro queda vacío; Invertir da vuelta la lectura. El viento suma el ruido a la foto, con el Ángulo como dirección.",
+      "Paisaje, Cielo y campo: el cielo se trama con la combinación de Color y el campo con la de Color del campo, celda por celda, sin fundido en el límite.",
       "Paisaje: la foto cubre el fondo como object-fit: cover; Encuadre elige qué franja queda a la vista cuando sobra alto. Mientras carga, queda el color de fondo liso."
     ].concat(COMUN),
     accesibilidad: ACC,
@@ -178,6 +179,9 @@
       "---",
       celda(16, 8, 48),
       { id: "imagen", tipo: "imagen", etiqueta: "Foto", def: FOTO_CAMPO, solo: ["paisaje"], desc: "El paisaje a dibujar. Por defecto, la foto de campo del catálogo; Cargar JPG prueba otra (queda en este navegador, no se guarda)." },
+      { id: "zonas", tipo: "interr", etiqueta: "Cielo y campo", def: false, solo: ["paisaje"], desc: "Cada zona de la foto con su color: el cielo con la combinación de Color y el campo con la de Color del campo. Una celda es campo cuando en la foto el verde o el amarillo le ganan al azul, o cuando es oscura." },
+      { id: "colorCampo", tipo: "seg", etiqueta: "Color del campo", def: "verde", solo: ["paisaje"], opciones: [["verde", "Verde"], ["amarillo", "Amarillo"], ["terra", "Terra"], ["azul", "Azul"]], desc: "Solo con Cielo y campo: la combinación del campo." },
+      { id: "umbral", tipo: "rango", etiqueta: "Límite cielo y campo", unidad: "%", min: 0, max: 30, def: 8, solo: ["paisaje"], desc: "Solo con Cielo y campo: cuánto tiene que ganarle el verde al azul para que la celda sea campo. Más alto, más cielo." },
       { id: "encuadre", tipo: "rango", etiqueta: "Encuadre", unidad: "%", min: 0, max: 100, def: 50, solo: ["paisaje"], desc: "Qué franja de la foto queda a la vista cuando sobra alto: 0 arriba, 100 abajo." },
       { id: "brillo", tipo: "rango", etiqueta: "Brillo", unidad: "%", min: -50, max: 50, def: 0, solo: ["paisaje"], desc: "Más brillo, más Formas encendidas." },
       { id: "invertir", tipo: "interr", etiqueta: "Invertir", def: false, solo: ["paisaje"], desc: "Lo oscuro de la foto se llena y lo claro queda vacío." },
@@ -198,7 +202,7 @@
     js: function (s) {
       var cfg = { modo: "dither", tonos: s.tonos, angulo: +s.angulo, densidad: +s.densidad, degrade: +s.degrade, contraste: +s.contraste,
         velocidad: +s.velocidad, radioCursor: +s.radioCursor, acento: s.tonos === "tres" ? 1 : 0, clic: false };
-      if (s.variante === "paisaje") extender(cfg, { imagen: s.imagen || FOTO_CAMPO, encuadre: +s.encuadre, brillo: +s.brillo, invertir: !!s.invertir, viento: +s.viento });
+      if (s.variante === "paisaje") extender(cfg, { imagen: s.imagen || FOTO_CAMPO, zonas: !!s.zonas, colorCampo: s.colorCampo, umbral: +s.umbral, encuadre: +s.encuadre, brillo: +s.brillo, invertir: !!s.invertir, viento: +s.viento });
       return js(extender(base(s), cfg));
     }
   });
