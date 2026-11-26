@@ -524,6 +524,9 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   background: radial-gradient(circle at 0 0, transparent var(--sol-empalme), var(--pf-papel, var(--bg)) calc(var(--sol-empalme) + .5px)); }
 .pf-solapas__ind::after, .pf-solapas button::after { right: calc(-1 * var(--sol-empalme));
   background: radial-gradient(circle at 100% 0, transparent var(--sol-empalme), var(--pf-papel, var(--bg)) calc(var(--sol-empalme) + .5px)); }
+/* Con el desenfoque cada solapa es una capa propia y la de vidrio de al lado tapaba el empalme de la elegida (la curva se veía
+   recta). La elegida va por encima: su empalme de papel apoya sobre la esquina de la vecina, como la hoja. */
+.pf-solapas button[aria-pressed="true"] { z-index: 1; }
 /* El borde de 1 px de la solapa corre el origen de sus empalmes: vuelven a quedar pegados al borde de afuera. */
 .pf-solapas button::before { margin-left: -1px; }
 .pf-solapas button::after { margin-right: -1px; }
