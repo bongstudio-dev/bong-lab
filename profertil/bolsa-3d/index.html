@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="es">
+<head>
+<!-- firma:bong
+
+      ##########         #########
+      ###########      #############
+      ############   #################
+      ###########   ###################
+      ##########    ###################
+      ############  ###################
+      #############  #################
+      #############   ###############
+      ############      ###########
+
+                            #####
+      ##     ######     ##########
+      ####   ######   ###########
+      #####  ######  ###########
+      #############  ##########
+      #############  ###################
+      #############  ##################
+      #############   #################
+      #############     #############
+      #############        #######
+
+      PROFERTIL · BOLSA 3D
+      Prueba: una sola bolsa base con la etiqueta de cada producto como textura.
+
+      Hola. Si estás leyendo esto, te gusta ver cómo están hechas las cosas.
+      A nosotros también.
+
+      Diseño y desarrollo: Bong Studio
+      Estudio de branding. Córdoba, Argentina. Desde 2019.
+      Prueba de la bolsa en 3D para el catálogo de productos de la web de Profertil.
+
+      CRÉDITOS
+      María Lopez / Brand Designer
+      Marcos Cousseau / Creative Director
+
+      CONTACTO
+      https://bongstudio.ar
+
+      BONG STUDIO · 2026 — Brutally Clear Branding — bongstudio.ar
+-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profertil · Bolsa 3D</title>
+<link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../componentes/tokens.css">
+<link rel="stylesheet" href="../componentes/base.css">
+<style>
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--f-body); overflow: hidden; }
+  .escena { position: fixed; inset: 0; }
+  .escena canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+  .escena canvas:active { cursor: grabbing; }
+  .cabeza { position: fixed; top: 24px; left: 24px; right: 24px; pointer-events: none; }
+  .cabeza h1 { margin: 0; font: 600 32px/1.1 "Familjen Grotesk", sans-serif; color: var(--azul); }
+  .cabeza p { margin: 8px 0 0; max-width: 46ch; font-size: 15px; line-height: 1.45; color: var(--ink-2, var(--ink)); }
+  .controles { position: fixed; left: 16px; right: 16px; bottom: 16px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .productos { display: flex; gap: 6px; max-width: 100%; overflow-x: auto; scrollbar-width: none; padding: 2px; }
+  .productos::-webkit-scrollbar { display: none; }
+  .plana { position: fixed; inset: 0; display: none; place-items: center; padding: 120px 24px 140px; box-sizing: border-box; }
+  .plana canvas { max-width: 100%; max-height: 100%; background: #fff; }
+  body.ver-plana .plana { display: grid; }
+  body.ver-plana .escena { visibility: hidden; }
+  .cargando { position: fixed; inset: 0; display: grid; place-items: center; font-size: 14px; color: var(--ink); opacity: .6; pointer-events: none; transition: opacity .3s; }
+  .cargando.listo { opacity: 0; visibility: hidden; }
+  @media (max-width: 640px) {
+    .cabeza { top: 16px; left: 16px; right: 16px; }
+    .cabeza h1 { font-size: 26px; }
+    .cabeza p { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="escena" id="escena"></div>
+<div class="plana" id="plana"></div>
+<div class="cargando" id="cargando">Cargando la bolsa</div>
+
+<header class="cabeza">
+  <h1>Bolsa 3D</h1>
+  <p>Una sola bolsa base para todo el catálogo. La etiqueta de cada producto se arma con los logos vectoriales, así se ve nítida en cualquier pantalla.</p>
+</header>
+
+<div class="controles">
+  <div class="productos" id="productos"></div>
+  <div class="pf-selector" id="vista">
+    <span class="pf-selector__ind"></span>
+    <button type="button" aria-pressed="true" data-v="bolsa">Bolsa</button>
+    <button type="button" aria-pressed="false" data-v="plana">Etiqueta plana</button>
+  </div>
+</div>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { PRODUCTOS, dibujar, ANCHO, ALTO } from "./etiqueta.js";
+
+// ?p=<producto> elige la bolsa; ?giro=<grados> deja la cámara quieta en ese ángulo.
+const url = new URLSearchParams(location.search);
+const quieto = matchMedia("(prefers-reduced-motion: reduce)").matches || url.has("giro");
+const caja = document.getElementById("escena");
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.NeutralToneMapping;
+renderer.toneMappingExposure = 1.0;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+caja.appendChild(renderer.domElement);
+
+const escena = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+escena.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+escena.environmentIntensity = 0.55;
+
+// Luz principal arriba a la izquierda, un poco de frente: dibuja la comba del frente y el pliegue del fuelle.
+const clave = new THREE.DirectionalLight(0xffffff, 2.1);
+clave.position.set(-1.1, 3.2, 1.5);
+clave.castShadow = true;
+clave.shadow.mapSize.set(2048, 2048);
+clave.shadow.radius = 8;
+clave.shadow.bias = -0.0004;
+Object.assign(clave.shadow.camera, { left: -0.8, right: 0.8, top: 0.8, bottom: -0.8, near: 0.5, far: 6 });
+escena.add(clave);
+// Recorte frío desde atrás a la derecha: separa el borde de la bolsa del fondo.
+const recorte = new THREE.DirectionalLight(0xe8f0ff, 0.9);
+recorte.position.set(2.2, 1.4, -1.8);
+escena.add(recorte);
+
+// Piso que solo recibe la sombra de apoyo
+const piso = new THREE.Mesh(new THREE.PlaneGeometry(4, 4), new THREE.ShadowMaterial({ opacity: 0.16 }));
+piso.rotation.x = -Math.PI / 2;
+piso.receiveShadow = true;
+escena.add(piso);
+
+const camara = new THREE.PerspectiveCamera(28, 1, 0.05, 20);
+camara.position.set(0, 0.62, 2.55);
+const orbita = new OrbitControls(camara, renderer.domElement);
+orbita.target.set(0, 0.43, 0);
+orbita.enableDamping = true;
+orbita.enablePan = false;
+orbita.minDistance = 1.4;
+orbita.maxDistance = 4;
+orbita.minPolarAngle = 0.9;
+orbita.maxPolarAngle = 1.62;
+orbita.autoRotate = !quieto;
+orbita.autoRotateSpeed = 0.9;
+if (url.has("giro")) {
+  const g = THREE.MathUtils.degToRad(+url.get("giro"));
+  const d = camara.position.clone().sub(orbita.target);
+  d.applyAxisAngle(new THREE.Vector3(0, 1, 0), g);
+  camara.position.copy(orbita.target).add(d);
+}
+
+// La textura nace con el tamaño final de la etiqueta: WebGL no la puede agrandar después.
+const base = Object.assign(document.createElement("canvas"), { width: ANCHO, height: ALTO });
+const fondo = base.getContext("2d");
+fondo.fillStyle = "#f6f6f4";
+fondo.fillRect(0, 0, ANCHO, ALTO);
+const textura = new THREE.CanvasTexture(base);
+textura.colorSpace = THREE.SRGBColorSpace;
+textura.flipY = false;
+textura.anisotropy = renderer.capabilities.getMaxAnisotropy();
+
+const etiqueta = new THREE.MeshPhysicalMaterial({
+  map: textura, roughness: 0.42, clearcoat: 0.45, clearcoatRoughness: 0.28,
+});
+const sello = new THREE.MeshPhysicalMaterial({ color: 0xeceeef, roughness: 0.5, clearcoat: 0.3, clearcoatRoughness: 0.35 });
+
+const draco = new DRACOLoader().setDecoderPath("https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/libs/draco/gltf/");
+new GLTFLoader().setDRACOLoader(draco).load("bolsa.glb", (gltf) => {
+  gltf.scene.traverse((o) => {
+    if (!o.isMesh) return;
+    o.castShadow = true;
+    o.material = o.material.name === "etiqueta" ? etiqueta : sello;
+  });
+  escena.add(gltf.scene);
+  elegir(PRODUCTOS.find(p => p.id === url.get("p")) || PRODUCTOS[0]);
+});
+
+// ---------- productos ----------
+const plana = document.getElementById("plana");
+const lienzo = document.createElement("canvas");
+plana.appendChild(lienzo);
+const lista = document.getElementById("productos");
+let pedido = 0;
+async function elegir(p) {
+  const n = ++pedido;
+  for (const b of lista.children) b.setAttribute("aria-pressed", b.dataset.id === p.id);
+  const c = document.createElement("canvas");
+  await dibujar(c, p);
+  if (n !== pedido) return;
+  fondo.drawImage(c, 0, 0);
+  textura.needsUpdate = true;
+  lienzo.width = c.width; lienzo.height = c.height;
+  lienzo.getContext("2d").drawImage(c, 0, 0);
+  document.getElementById("cargando").classList.add("listo");
+}
+for (const p of PRODUCTOS) {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "pf-pastilla";
+  b.dataset.id = p.id;
+  b.textContent = p.nombre;
+  b.style.setProperty("--pc", p.franja ? "#6f7276" : p.color);
+  if (p.texto) b.style.color = p.texto;
+  b.addEventListener("click", () => elegir(p));
+  lista.appendChild(b);
+}
+
+// ---------- vista ----------
+const vista = document.getElementById("vista");
+const ind = vista.querySelector(".pf-selector__ind");
+function moverInd() {
+  const b = vista.querySelector('[aria-pressed="true"]');
+  ind.style.width = b.offsetWidth + "px";
+  ind.style.transform = `translateX(${b.offsetLeft - 3}px)`;
+}
+vista.addEventListener("click", (e) => {
+  const b = e.target.closest("button");
+  if (!b) return;
+  for (const x of vista.querySelectorAll("button")) x.setAttribute("aria-pressed", x === b);
+  document.body.classList.toggle("ver-plana", b.dataset.v === "plana");
+  moverInd();
+});
+ind.classList.add("pf-quieto");
+moverInd();
+requestAnimationFrame(() => ind.classList.remove("pf-quieto"));
+
+// ---------- tamaño y cuadro ----------
+function medir() {
+  const w = caja.clientWidth, h = caja.clientHeight;
+  renderer.setSize(w, h, false);
+  camara.aspect = w / h;
+  // En pantallas angostas la cámara se aleja para que entre la bolsa entera
+  camara.fov = w < h ? 34 : 28;
+  camara.updateProjectionMatrix();
+  moverInd();
+}
+addEventListener("resize", medir);
+medir();
+renderer.setAnimationLoop(() => {
+  orbita.update();
+  renderer.render(escena, camara);
+});
+</script>
+</body>
+</html>
