@@ -1,16 +1,18 @@
 // Etiqueta de bolsa dibujada en un canvas a partir de los logos vectoriales.
 // Una sola plantilla para todos los productos: cambian el color, el nombre y el logo.
 //
-// Lienzo de 2048 × 3072 px, pensado para el UV de bolsa.glb:
+// Lienzo de 2288 × 3840 px, pensado para el UV de bolsa.glb (fuente/bolsa.py):
 //   x 0-1536     frente (el dorso repite el frente)
-//   x 1536-2048  fuelle (los dos fuelles repiten esta franja)
-//   y 0-3072     alto del cuerpo, de arriba hacia abajo
+//   x 1536-2288  fuelle (los dos fuelles repiten esta franja)
+//   y 0-3840     alto del cuerpo, del sello de arriba a la base
+// 1 px vale lo mismo a lo ancho y a lo alto sobre la bolsa (3.8 px por mm en
+// el frente, 3.9 en el fuelle): un cuadrado del arte queda cuadrado.
 
 // Los textos van en Rotis Sans Serif, como en las bolsas impresas. No se usa la
 // fuente: fuente/textos.py deja sus contornos en textos.js (TRAZOS).
 import { TRAZOS } from "./textos.js";
 
-export const ANCHO = 2048, ALTO = 3072, FRENTE = 1536;
+export const ANCHO = 2288, ALTO = 3840, FRENTE = 1536;
 const CX = FRENTE / 2;
 // Media altura de mayúscula de la Rotis: centra un texto en vertical.
 const MEDIA = 0.345;

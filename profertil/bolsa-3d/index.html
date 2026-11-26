@@ -109,9 +109,11 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
-import { PRODUCTOS, ANCHO, ALTO } from "./etiqueta.js";
+import { PRODUCTOS, ANCHO, ALTO, FRENTE } from "./etiqueta.js";
 
 // ?p=<producto> elige la bolsa; ?giro=<grados> deja la cámara quieta en ese ángulo.
+// ?p=grilla proyecta una grilla de control: cuadrados de 128 px con un círculo
+// adentro, numerados por fila y columna, y el borde de cada tramo marcado.
 const url = new URLSearchParams(location.search);
 if (url.has("captura")) document.body.classList.add("captura");
 const quieto = matchMedia("(prefers-reduced-motion: reduce)").matches || url.has("giro");
@@ -206,12 +208,15 @@ async function elegir(p) {
   const n = ++pedido;
   for (const b of lista.children) b.setAttribute("aria-pressed", b.dataset.id === p.id);
   // El arte de cada etiqueta se exporta del sistema visual en Figma (etiquetas/<id>.webp).
-  const img = new Image();
-  img.src = `etiquetas/${p.id}.webp`;
-  await img.decode();
-  if (n !== pedido) return;
   const c = Object.assign(document.createElement("canvas"), { width: ANCHO, height: ALTO });
-  c.getContext("2d").drawImage(img, 0, 0, ANCHO, ALTO);
+  if (p.id === "grilla") grilla(c.getContext("2d"));
+  else {
+    const img = new Image();
+    img.src = `etiquetas/${p.id}.webp`;
+    await img.decode();
+    if (n !== pedido) return;
+    c.getContext("2d").drawImage(img, 0, 0, ANCHO, ALTO);
+  }
   fondo.drawImage(c, 0, 0);
   textura.needsUpdate = true;
   lienzo.width = c.width; lienzo.height = c.height;
@@ -224,6 +229,34 @@ async function elegir(p) {
     renderer.render(escena, camara);
   }
 }
+function grilla(ctx) {
+  const L = 128;
+  const tramos = [[0, FRENTE, "#0b5aa5", "F"], [FRENTE, ANCHO, "#4f8128", "G"]];
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  for (const [x0, x1, color, letra] of tramos) {
+    for (let y = 0, f = 1; y < ALTO; y += L, f++) {
+      for (let x = x0, k = 1; x < x1; x += L, k++) {
+        const par = (f + k) % 2 === 0;
+        ctx.fillStyle = par ? color : "#f6f6f4";
+        ctx.fillRect(x, y, Math.min(L, x1 - x), L);
+        ctx.strokeStyle = par ? "#f6f6f4" : color;
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(x + L / 2, y + L / 2, L / 2 - 10, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.fillStyle = par ? "#f6f6f4" : color;
+        ctx.font = "600 30px sans-serif";
+        ctx.fillText(letra + f + "." + k, x + L / 2, y + L / 2);
+      }
+    }
+    // borde de cada tramo
+    ctx.strokeStyle = "#e1251b";
+    ctx.lineWidth = 16;
+    ctx.strokeRect(x0 + 8, 8, x1 - x0 - 16, ALTO - 16);
+  }
+}
+if (url.get("p") === "grilla") PRODUCTOS.unshift({ id: "grilla", nombre: "Grilla", color: "#e1251b" });
 for (const p of PRODUCTOS) {
   const b = document.createElement("button");
   b.type = "button";

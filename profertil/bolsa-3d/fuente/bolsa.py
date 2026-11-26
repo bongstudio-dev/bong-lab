@@ -4,11 +4,18 @@ Se corre sin interfaz:
     blender -b --factory-startup --python bolsa.py -- ../bolsa.glb
 
 Arma la malla por código (frente, fuelles, dorso y sellos), con un UV pensado
-para que la etiqueta sea una sola imagen intercambiable:
-    u 0.00-0.75  frente (el dorso repite el frente)
-    u 0.75-1.00  fuelle (los dos fuelles repiten la misma franja)
-    v 0-1        alto del cuerpo, de abajo hacia arriba
-El sello de arriba y la tapa del fondo llevan su propio material, sin etiqueta.
+para que la etiqueta sea una sola imagen intercambiable (lienzo de
+2288 x 3840 px, ver etiqueta.js):
+    u 0-1536 px     frente (el dorso repite el frente)
+    u 1536-2288 px  fuelle (los dos fuelles repiten la misma franja)
+El arte se reparte por largo de superficie, como un film impreso: a lo ancho
+según el largo de arco de cada fila y a lo alto según el largo de las
+columnas, del sello de arriba a la base (una v por fila, filas derechas). Cada tramo usa el alto entero del
+lienzo, sin relleno ni recorte, y su ancho en px sale de la proporción de la
+superficie, así un cuadrado del arte queda cuadrado sobre la bolsa.
+Con --medir imprime esa proporción y cuánto se aparta cada celda del cuadrado:
+    blender -b --factory-startup --python bolsa.py -- ../bolsa.glb --medir
+El sello de arriba lleva la primera fila del arte (el film impreso sigue\nadentro del sello); la tapa del fondo va con su propio material, sin etiqueta.
 """
 import bpy, bmesh, math, sys
 
@@ -33,7 +40,12 @@ ARRIBA_T, ARRIBA_EXP = 0.38, 0.94
 # alrededor de la altura HOMBRO_T.
 HOMBRO_A, HOMBRO_B, HOMBRO_T, HOMBRO_S = 0.06, 0.015, 0.49, 0.20
 
-U_FRENTE = 0.75
+# Lienzo de la etiqueta en px (ver etiqueta.js). Cada tramo ocupa el lienzo
+# entero de alto; el ancho de cada uno sale de la proporción de su superficie,
+# así un cuadrado del arte queda cuadrado sobre la bolsa.
+FRENTE_PX, FUELLE_PX, ALTO_PX = 1536, 752, 3840
+U_FRENTE = FRENTE_PX / (FRENTE_PX + FUELLE_PX)
+MEDIR = "--medir" in argv
 
 def suave(x):
     x = min(1.0, max(0.0, x))
@@ -178,22 +190,104 @@ filas = []
 for t in alturas:
     filas.append([(bm.verts.new((x, y, t * H)), u) for (x, y, u) in seccion(t)])
 N = len(filas[0])
-for j in range(len(alturas) - 1):
-    v0, v1 = alturas[j], alturas[j + 1]
+NR = len(alturas)
+
+# Tramos de cada fila: (primer índice, cantidad, u inicial, u final)
+TRAMOS = ((0, NF, 0.0, U_FRENTE), (NF, NG, U_FRENTE, 1.0),
+          (NF + NG, NF, 0.0, U_FRENTE), (2 * NF + NG, NG, U_FRENTE, 1.0))
+def tramo_de(i):
+    for k, (i0, n, _, _) in enumerate(TRAMOS):
+        if i0 <= i < i0 + n:
+            return k
+
+# a lo ancho: largo de arco acumulado de cada tramo, fila por fila
+s_fila = []      # s_fila[j][k][m] = 0-1 dentro del tramo k, m = 0..n
+anchos = [[] for _ in TRAMOS]
+for fila in filas:
+    por_tramo = []
+    for k, (i0, n, _, _) in enumerate(TRAMOS):
+        acum = [0.0]
+        for m in range(n):
+            p0 = fila[(i0 + m) % N][0].co
+            p1 = fila[(i0 + m + 1) % N][0].co
+            acum.append(acum[-1] + (p1 - p0).length)
+        anchos[k].append(acum[-1])
+        por_tramo.append([a / acum[-1] for a in acum])
+    s_fila.append(por_tramo)
+
+# a lo alto: largo acumulado de cada columna desde el sello de arriba
+desde_arriba = [[0.0] * N for _ in range(NR)]
+for j in range(NR - 2, -1, -1):
     for i in range(N):
-        k = (i + 1) % N
-        a, ua = filas[j][i]
-        b, ub = filas[j][k]
-        c, uc = filas[j + 1][k]
-        d, ud = filas[j + 1][i]
-        # costura: al cerrar cada tramo, la u del vértice siguiente se toma como fin de tramo
-        if ub < ua:
-            ub = uc = U_FRENTE if ua < U_FRENTE else 1.0
-        if ub == 0 and ua > 0:
-            ub = uc = U_FRENTE
+        desde_arriba[j][i] = desde_arriba[j + 1][i] + (filas[j + 1][i][0].co - filas[j][i][0].co).length
+
+def mediana(xs):
+    xs = sorted(xs)
+    return xs[len(xs) // 2]
+
+# a lo alto, una sola v por fila y tramo: el promedio del largo de cada columna
+# desde el sello, relativo al largo total de esa columna. Así las filas del
+# arte quedan derechas aunque una columna sea más larga que otra (el pliegue
+# en V del fuelle alarga la del centro) y el arte llega justo del sello a la base.
+v_fila = []
+for k, (i0, n, _, _) in enumerate(TRAMOS):
+    cols = [(i0 + m) % N for m in range(n + 1)]
+    v_fila.append([1 - sum(desde_arriba[j][i] / desde_arriba[0][i] for i in cols) / len(cols) for j in range(NR)])
+
+def uv_de(j, i, k, m):
+    """UV del vértice (fila j, columna i) visto desde el tramo k, posición m.
+    u: largo de arco dentro del tramo; v: largo desde el sello (por fila)."""
+    i0, n, u0, u1 = TRAMOS[k]
+    uu = u0 + (u1 - u0) * s_fila[j][k][m]
+    return (uu, v_fila[k][j])
+
+for j in range(NR - 1):
+    for i in range(N):
+        k = tramo_de(i)
+        m = i - TRAMOS[k][0]
+        i1 = (i + 1) % N
+        a, b = filas[j][i][0], filas[j][i1][0]
+        c, d = filas[j + 1][i1][0], filas[j + 1][i][0]
         cara = bm.faces.new((a, b, c, d))
-        for lp, (uu, vv) in zip(cara.loops, ((ua, v0), (ub, v0), (uc, v1), (ud, v1))):
-            lp[uv].uv = (uu, vv)
+        esquinas = (uv_de(j, i, k, m), uv_de(j, i1, k, m + 1),
+                    uv_de(j + 1, i1, k, m + 1), uv_de(j + 1, i, k, m))
+        for lp, q in zip(cara.loops, esquinas):
+            lp[uv].uv = q
+if MEDIR:
+    # Proporción de la superficie de cada tramo y lienzo que le corresponde.
+    LARGO = [mediana([desde_arriba[0][TRAMOS[k][0] + m] for m in range(TRAMOS[k][1])]) for k in range(4)]
+    for k, nombre in enumerate(("frente", "fuelle der", "dorso", "fuelle izq")):
+        an = mediana(anchos[k])
+        print("%s: ancho %.4f m, largo %.4f m -> %d px de ancho para %d de alto (%.2f px/mm)" % (
+            nombre, an, LARGO[k], round(ALTO_PX * an / LARGO[k]), ALTO_PX, ALTO_PX / LARGO[k] / 1000))
+    # Celda sobre la bolsa: ancho / alto de un cuadrado del lienzo, cara por cara.
+    TOT = FRENTE_PX + FUELLE_PX
+    def stats(zona):
+        for k, nombre in enumerate(("frente", "fuelle der", "dorso", "fuelle izq")):
+            i0, n, u0, u1 = TRAMOS[k]
+            rs = []
+            for j in range(NR - 1):
+                z = filas[j][0][0].co.z
+                if not zona(z):
+                    continue
+                for m in range(n):
+                    i, i1 = (i0 + m) % N, (i0 + m + 1) % N
+                    pa, pb, pd = filas[j][i][0].co, filas[j][i1][0].co, filas[j + 1][i][0].co
+                    ua, ub = uv_de(j, i, k, m), uv_de(j, i1, k, m + 1)
+                    ud = uv_de(j + 1, i, k, m)
+                    h = (pb - pa).length / max(1e-9, abs(ub[0] - ua[0]) * TOT)
+                    v = (pd - pa).length / max(1e-9, abs(ud[1] - ua[1]) * ALTO_PX)
+                    rs.append((h / v, (pb - pa).length * (pd - pa).length))
+            rs.sort()
+            tot = sum(w for _, w in rs); acc = 0; q = {}
+            for r, w in rs:
+                acc += w
+                for p in (0.05, 0.5, 0.95):
+                    if p not in q and acc >= p * tot:
+                        q[p] = r
+            print("  %-10s celda ancho/alto  p5 %.3f  mediana %.3f  p95 %.3f" % (nombre, q[0.05], q[0.5], q[0.95]))
+    print("toda la superficie:"); stats(lambda z: True)
+    print("cuerpo (sin los 8 cm de abajo ni los 8 de arriba):"); stats(lambda z: 0.08 < z < H - 0.08)
 # tapa del fondo (el sello de abajo queda doblado debajo, no se ve)
 tapa = bm.faces.new([v for v, _ in filas[0]][::-1])
 tapa.material_index = 1
@@ -229,12 +323,14 @@ def sello(z0, z1, a):
             for lado in (0, 1):
                 q = (vs[j][i][lado], vs[j][i + 1][lado], vs[j + 1][i + 1][lado], vs[j + 1][i][lado])
                 f = bm.faces.new(q if lado else q[::-1])
+                # el film impreso sigue dentro del sello: toma la primera fila del arte
                 for lp in f.loops:
-                    lp[uvl].uv = (0.5, 0.5)
+                    s = (lp.vert.co.x + a) / (2 * a)
+                    lp[uvl].uv = ((s if lado == 0 else 1 - s) * U_FRENTE, 1 - 0.5 / ALTO_PX)  # v de Blender: 1 es arriba
     bm.normal_update()
     me = bpy.data.meshes.new("sello")
     bm.to_mesh(me); bm.free()
-    me.materials.append(m_sello)
+    me.materials.append(m_etq)
     for p in me.polygons:
         p.use_smooth = True
     return me
