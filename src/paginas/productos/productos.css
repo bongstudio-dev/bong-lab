@@ -178,6 +178,9 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; }
 .pr-otros { padding-top: 56px; border-top: 1px solid var(--line); }
 .pr-otros__cab { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
 .pr-otros__cab h2 { margin: 0; }
+/* En el celular el título largo se partía y mandaba el botón abajo: ahí va la versión corta, con el botón al lado. */
+.pr-otros__corto { display: none; }
+@media (max-width: 640px) { .pr-otros__largo { display: none; } .pr-otros__corto { display: inline; } .pr-otros__cab { flex-wrap: nowrap; } .pr-otros__cab .pf-boton { flex: none; } }
 .pr-otros .pr-grilla { margin-bottom: 96px; }
 @media (max-width: 640px) {
   .pr-otros .pr-grilla { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -188,6 +191,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; }
   .pr-claves div { gap: 12px; min-height: 96px; padding: 16px 18px 18px; }
   .pr-claves dd { font-size: 20px; }
   .pr-claves .pr-largo { grid-column: 1 / -1; min-height: 0; }
+  .pr-claves .pr-solo { grid-column: 1 / -1; }
   .pr-claves .pr-largo dd { font-size: 17px; }
   .pr-ficha-cab__arte { order: -1; aspect-ratio: 16 / 10; }
   .pf-bh:has(.pr-ficha-cab) { padding: 8px 8px 24px; }

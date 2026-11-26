@@ -21,6 +21,9 @@
   /* Una sección puede ser de tarjetas (s.tarjetas, Proveedores): accesos en lugar de documentos (el formulario, los PDF, los
      portales). No tiene filtros ni vistas; el buscador filtra las tarjetas. TARJ son las de la sección elegida, null si es una lista. */
   var TARJ = null, tarjLista = [];
+  // Variante de tarjeta para comparar (?tarjeta=formas|icono|pleno|compacta); sin parámetro, la de formas.
+  var VAR_TARJ = (new URLSearchParams(location.search).get("tarjeta") || "").replace(/[^a-z]/g, "");
+  if (VAR_TARJ) document.documentElement.dataset.tarjeta = VAR_TARJ;
   function usarSeccion(s) {
     seccion = s;
     DOCS = s.docs || []; GRUPOS = s.grupos || []; TARJ = s.tarjetas || null;
@@ -179,7 +182,7 @@
   var IR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12h10M13 8l4 4-4 4"/></svg>';
   var AFUERA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 16 16 8M9 8h7v7"/></svg>';
   var TIPOS = {
-    form: { nombre: "Alta", forma: "industria", f: fam("amarillo") },
+    form: { nombre: "Formulario", forma: "industria", f: fam("amarillo") },
     doc: { nombre: "Documento", forma: "escudo", f: fam("azul") },
     portal: { nombre: "Portal", forma: "capas", f: fam("verde") },
     pronto: { nombre: "Próximamente", forma: "sol", f: fam("naranja", true) }
@@ -187,16 +190,19 @@
   function tarjeta(x, i, q) {
     var li = document.createElement("li"), tipo = TIPOS[x.tipo] || TIPOS.portal, pronto = x.tipo === "pronto";
     li.className = "pf-acc pf-acc--" + x.tipo + (entradaSeccion ? " pf-entra-sec" : "");
+    li.style.cssText = vars(tipo);   // los colores de la etiqueta, para las variantes que tiñen el ícono
     if (entradaSeccion) li.style.setProperty("--i", i);
     var href = x.tipo === "doc" ? BASE + encodeURIComponent(x.id) + "/" : x.href;
     var fuera = x.tipo === "form" || x.tipo === "portal";
-    var dentro = '<span class="pf-acc__arte">' + arte({ c: "proveedores", k: x.k != null ? x.k : i + 3 }).replace("<svg ", '<svg preserveAspectRatio="xMidYMid slice" ') + "</span>" +
+    // Una sola acción por tarjeta: toda la tarjeta es el enlace (el PDF se descarga desde la página del documento). Si la tarjeta
+    // trae ícono (x.ic), va sobre el arte; las variantes de tarjeta (html[data-tarjeta]) deciden cómo se ve.
+    var dentro = '<span class="pf-acc__arte">' + arte({ c: "proveedores", k: x.k != null ? x.k : i + 3 }).replace("<svg ", '<svg preserveAspectRatio="xMidYMid slice" ') +
+      (x.ic ? '<span class="pf-acc__ic">' + x.ic.replace("<svg ", '<svg aria-hidden="true" ') + "</span>" : "") + "</span>" +
       '<span class="pf-acc__txt">' + '<span class="pf-etiqueta" style="' + vars(tipo) + '">' + badge(tipo) + '<span class="pf-etiqueta__rotulo">' + tipo.nombre + "</span></span>" +
       '<span class="pf-acc__t">' + resaltar(x.t, q) + "</span>" + (x.b ? '<span class="pf-acc__b">' + resaltar(x.b, q) + "</span>" : "") + "</span>" +
       (pronto ? '<span class="pf-acc__pie"></span>' : '<span class="pf-acc__ir">' + esc(x.ir || "Acceder") + (fuera ? AFUERA : IR) + "</span>");
     li.innerHTML = pronto ? '<div class="pf-acc__a" aria-disabled="true">' + dentro + "</div>"
-      : '<a class="pf-acc__a" href="' + esc(href) + '"' + (fuera ? ' target="_blank" rel="noopener"' : "") + ">" + dentro + "</a>" +
-        (x.tipo === "doc" && x.l ? '<a class="pf-doc__d pf-acc__d" href="' + esc(BASE + "pdf/" + encodeURIComponent(x.l)) + '" download aria-label="Descargar PDF: ' + esc(x.t) + '">' + BAJAR + "</a>" : "");
+      : '<a class="pf-acc__a" href="' + esc(href) + '"' + (fuera ? ' target="_blank" rel="noopener"' : "") + ">" + dentro + "</a>";
     return li;
   }
   function pintarTarjetas() {
@@ -209,7 +215,7 @@
   function pintarIntro() {
     var el = $("pf-sec-intro"); if (!el) return;
     var s = seccion || {}, h = s.intro ? "<p>" + esc(s.intro) + "</p>" : "";
-    if (s.accion) h += '<a class="pf-boton' + (s.accion.verde ? " pf-boton--verde" : "") + '" href="' + esc(s.accion.href) + '"' + (s.accion.descarga ? " download" : "") + ">" + (s.accion.descarga ? BAJAR : "") + esc(s.accion.texto) + "</a>";
+    if (s.accion) h += '<a class="pf-boton' + (s.accion.verde ? " pf-boton--verde" : "") + (s.accion.descarga ? " pf-boton--descarga" : "") + '" href="' + esc(s.accion.href) + '"' + (s.accion.descarga ? " download" : "") + ">" + (s.accion.descarga ? BAJAR : "") + esc(s.accion.texto) + "</a>";
     el.innerHTML = h; el.hidden = !h;
   }
   function cuantos() { return TARJ ? tarjLista.length : lista.length; }

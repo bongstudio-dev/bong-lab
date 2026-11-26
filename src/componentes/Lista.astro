@@ -53,7 +53,7 @@ const script = armar(JS, {
   {p.acciones && p.acciones.length > 0 && (
     <div class="pf-bh__acciones">
       {p.acciones.map((a) => (
-        <a class={"pf-boton" + (a.verde ? " pf-boton--verde" : "")} href={a.href} download={a.descarga ? "" : undefined}
+        <a class={"pf-boton" + (a.verde ? " pf-boton--verde" : "") + (a.descarga ? " pf-boton--descarga" : "")} href={a.href} download={a.descarga ? "" : undefined}
           target={a.fuera ? "_blank" : undefined} rel={a.fuera ? "noopener" : undefined}>
           {a.icono && a.icono !== "ir" && <Fragment set:html={ICONOS[a.icono]} />}{a.texto}{a.icono === "ir" && <Fragment set:html={ICONOS.ir} />}
         </a>

@@ -28,7 +28,16 @@ const unico = totalDocs === 1 && !hojas.length ? (documentos[0] || boletines[0] 
 
 // Los datos que van primero, grandes; el resto en la tabla.
 const DESTACADOS = ["Grado", "Composición", "Forma física", "Solubilidad"];
+// En el celular las claves van de a dos y las largas ocupan la fila. Una corta que quedaría sola en su fila (la última de una tanda
+// impar de cortas) también la ocupa entera, para que no quede huérfana.
+const largo = (c) => c.valor.length > 16;
 const destacados = DESTACADOS.map(e => p.caracteristicas.find(c => plano(c.etiqueta) === plano(e))).filter(Boolean) as { etiqueta: string; valor: string }[];
+const solo = (i) => {
+  if (largo(destacados[i])) return false;
+  let antes = 0; for (let j = i - 1; j >= 0 && !largo(destacados[j]); j--) antes++;
+  const fin = i + 1 >= destacados.length || largo(destacados[i + 1]);
+  return fin && antes % 2 === 0;
+};
 const resto = p.caracteristicas.filter(c => !destacados.includes(c));
 
 const SOLAPAS = [
@@ -88,7 +97,7 @@ const PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-
 
   <div class="pr-paneles">
     {SOLAPAS.some(s => s.id === "producto") && <section class="pr-panel" id="producto" role="tabpanel" aria-labelledby="pr-t-producto">
-      {!!destacados.length && <dl class="pr-claves">{destacados.map(c => <div class:list={{ "pr-largo": c.valor.length > 16 }}><dt>{c.etiqueta}</dt><dd>{c.valor}</dd></div>)}</dl>}
+      {!!destacados.length && <dl class="pr-claves">{destacados.map((c, i) => <div class:list={{ "pr-largo": largo(c), "pr-solo": solo(i) }}><dt>{c.etiqueta}</dt><dd>{c.valor}</dd></div>)}</dl>}
       <div class="pr-dos">
         {!!p.descripcion.length && <div class="pr-texto"><h2>Descripción</h2>{p.descripcion.map(t => <p>{t}</p>)}</div>}
         {!!resto.length && <div><h2>Características</h2><dl class="pr-datos">{resto.map(c => <div><dt>{c.etiqueta}</dt><dd>{c.valor}</dd></div>)}</dl></div>}
@@ -132,7 +141,7 @@ const PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-
 
   {!!otros.length && <section class="pr-otros" aria-labelledby="pr-otros-t">
     <div class="pr-otros__cab">
-      <h2 id="pr-otros-t">{p.familia ? "Más de la línea " + p.familia : "Otros productos"}</h2>
+      <h2 id="pr-otros-t">{p.familia ? <Fragment><span class="pr-otros__largo">{"Más de la línea " + p.familia}</span><span class="pr-otros__corto">Más de esta línea</span></Fragment> : "Otros productos"}</h2>
       <a class="pf-boton" href={sitio("productos/" + (p.categoria === "Industrial" ? "#industrial" : ""))}>Ver todos<Fragment set:html={IR} /></a>
     </div>
     <ul class="pr-grilla">{otros.map(o => <Tarjeta producto={o} />)}</ul>

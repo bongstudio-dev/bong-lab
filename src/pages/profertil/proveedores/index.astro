@@ -5,6 +5,11 @@
 // El Legajo es una lista de documentos con sus filtros, como su página. Los PDF abren en la página del documento de la Biblioteca.
 import Lista from "../../../componentes/Lista.astro";
 import { PROVEEDORES, LEGAJO, LEGAJO_GRUPOS, LEGAJO_ZIP } from "../../../lib/datos.mjs";
+// Íconos de la librería Profertil (Hugeicons) que dicen qué hace cada tarjeta; las variantes de tarjeta con ícono los usan.
+const IC = Object.fromEntries(Object.entries(import.meta.glob("../../../lib/iconos-proveedores/*.svg", { query: "?raw", import: "default", eager: true }))
+  .map(([k, v]) => [k.split("/").pop().replace(".svg", ""), String(v).trim()]));
+const IC_DOC = { "proveedores-codigo-de-conducta-etica": "conducta", "proveedores-condiciones-generales-de-compras": "compras",
+  "proveedores-lineamientos-de-seguridad-de-la-informacion": "seguridad" };
 const FORM = "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=mSN4cDytpky4qa8rr7xXBH0y8EVhYWtJv-JN5bM1CXhUMlhFTTJINVRTOTNPSTkyU0VDSTQ1N09TSC4u";
 // Bajada de cada PDF (el título ya dice qué es).
 const BAJADAS = {
@@ -16,17 +21,17 @@ const SECCIONES = [
   { id: "quiero-ser-proveedor", nombre: "Quiero ser proveedor", uno: "acceso", varios: "accesos", todo: "Quiero ser proveedor", orden: "o",
     intro: "Si tu empresa es de Argentina o del exterior, acá encontrás lo necesario para registrarte y formar parte de nuestra base de proveedores.",
     tarjetas: [
-      { tipo: "form", t: "Planilla de información de proveedores", b: "Completá el formulario con los datos de tu empresa para iniciar el alta.", href: FORM, ir: "Completar el formulario", k: 2 },
-      ...PROVEEDORES.map((d, i) => ({ tipo: "doc", id: d.id, l: d.l, t: d.t, b: BAJADAS[d.id], ir: "Ver documento", k: i + 4 })),
-      { tipo: "portal", t: "Checkpagos", b: "Consultá el estado de tus facturas y pagos.", href: "https://checkpagos.com/", ir: "Acceder a Checkpagos", k: 8 },
-      { tipo: "portal", t: "Certronic", b: "Presentá y renová la documentación de tu personal y tu empresa.", href: "https://certronic.io/portal/pages/login.php", ir: "Acceder a Certronic", k: 9 },
+      { tipo: "form", t: "Planilla de información de proveedores", b: "Completá el formulario con los datos de tu empresa para iniciar el alta.", href: FORM, ir: "Completar el formulario", k: 2, ic: IC.formulario },
+      ...PROVEEDORES.map((d, i) => ({ tipo: "doc", id: d.id, l: d.l, t: d.t, b: BAJADAS[d.id], ir: "Ver documento", k: i + 4, ic: IC[IC_DOC[d.id]] })),
+      { tipo: "portal", t: "Checkpagos", b: "Consultá el estado de tus facturas y pagos.", href: "https://checkpagos.com/", ir: "Acceder a Checkpagos", k: 8, ic: IC.pagos },
+      { tipo: "portal", t: "Certronic", b: "Presentá y renová la documentación de tu personal y tu empresa.", href: "https://certronic.io/portal/pages/login.php", ir: "Acceder a Certronic", k: 9, ic: IC.certronic },
     ] },
   { id: "licitaciones-ariba", nombre: "Licitaciones Ariba", uno: "acceso", varios: "accesos", todo: "Licitaciones Ariba", orden: "o",
     intro: "Ariba es la plataforma que usa Profertil para gestionar las licitaciones con sus proveedores.",
     tarjetas: [
-      { tipo: "portal", t: "Ariba Network", b: "La plataforma de licitaciones y sourcing de Profertil.", href: "https://service.ariba.com/Sourcing.aw/109578013/aw", ir: "Acceder a Ariba", k: 11 },
-      { tipo: "pronto", t: "Manuales de uso", b: "Documentación de apoyo para operar en la plataforma.", k: 12 },
-      { tipo: "pronto", t: "Videos tutoriales", b: "Capacitaciones paso a paso.", k: 13 },
+      { tipo: "portal", t: "Ariba Network", b: "La plataforma de licitaciones y sourcing de Profertil.", href: "https://service.ariba.com/Sourcing.aw/109578013/aw", ir: "Acceder a Ariba", k: 11, ic: IC.ariba },
+      { tipo: "pronto", t: "Manuales de uso", b: "Documentación de apoyo para operar en la plataforma.", k: 12, ic: IC.manuales },
+      { tipo: "pronto", t: "Videos tutoriales", b: "Capacitaciones paso a paso.", k: 13, ic: IC.videos },
     ] },
   { id: "legajo-impositivo", nombre: "Legajo impositivo", docs: LEGAJO, grupos: LEGAJO_GRUPOS.map((g) => ({ ...g, sin: false })),
     todo: "Todo el legajo", uno: "documento", varios: "documentos", orden: "o",

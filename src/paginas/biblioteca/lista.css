@@ -306,10 +306,6 @@ html:not(.pf-con-tarjetas) .pf-tarjetas { display: none; }
 .pf-acc__b { color: var(--ink-2); font-size: var(--texto-chico); line-height: 1.5; }
 .pf-acc__ir { display: inline-flex; align-items: center; gap: 6px; align-self: flex-start; margin: 18px 22px 22px; color: var(--azul); font: 500 var(--texto-chico)/1 var(--f-body); }
 .pf-acc__ir svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: translate 320ms var(--ease); }
-/* El alta es lo principal: su acción va en el botón verde del sistema. */
-.pf-acc--form .pf-acc__ir { height: 40px; padding: 0 16px; border-radius: 999px; background: var(--verde); color: var(--tiza); }
-/* La descarga del PDF, arriba a la derecha sobre el arte, como en las miniaturas. */
-.pf-acc__d { position: absolute; top: 18px; right: 18px; z-index: 2; width: 34px; height: 34px; background: var(--color-blanco); border-color: transparent; }
 /* Próximamente: no es enlace; queda apagada. */
 .pf-acc--pronto .pf-acc__a { background: transparent; outline: 1px solid var(--line); outline-offset: -1px; }
 .pf-acc--pronto .pf-acc__arte { opacity: .35; filter: grayscale(1); }
@@ -319,11 +315,23 @@ html:not(.pf-con-tarjetas) .pf-tarjetas { display: none; }
   a.pf-acc__a:hover { translate: 0 -5px; }
   a.pf-acc__a:hover .pf-acc__arte svg { scale: 1.04; }
   a.pf-acc__a:hover .pf-acc__ir svg { translate: 3px 0; }
-  .pf-acc__a:has(+ .pf-acc__d:hover) { translate: 0 -5px; }
-  .pf-acc__d:hover { background: var(--azul); border-color: var(--azul); color: var(--tiza); }
-  .pf-acc:has(a.pf-acc__a:hover) .pf-acc__d, .pf-acc__d:hover { translate: 0 -5px; }
 }
-.pf-acc__d { transition: translate 320ms var(--ease), background-color 200ms ease, color 200ms ease; }
+/* Ícono de lo que hace la tarjeta (librería Profertil). En la variante de formas no se muestra. Las demás son opciones a comparar:
+   icono = el ícono en un círculo tiza sobre el arte; pleno = arte reemplazado por un plano azul con el ícono grande en tiza;
+   compacta = sin arte, el ícono en un cuadro con los colores de su etiqueta y la tarjeta más baja. */
+.pf-acc__arte { position: relative; }
+.pf-acc__ic { display: none; }
+.pf-acc__ic svg { width: 100%; height: 100%; }
+html[data-tarjeta="icono"] .pf-acc__ic { display: grid; place-items: center; position: absolute; left: 50%; top: 50%; width: 76px; height: 76px; translate: -50% -50%;
+  padding: 20px; border-radius: 50%; background: var(--tiza); color: var(--azul); }
+html[data-tarjeta="pleno"] .pf-acc__arte { background: var(--azul); }
+html[data-tarjeta="pleno"] .pf-acc--pronto .pf-acc__arte { background: var(--ink-2); }
+html[data-tarjeta="pleno"] .pf-acc__arte > svg { display: none; }
+html[data-tarjeta="pleno"] .pf-acc__ic { display: block; position: absolute; left: 22px; bottom: 20px; width: 56px; height: 56px; color: var(--tiza); }
+html[data-tarjeta="compacta"] .pf-acc__arte { aspect-ratio: auto; width: 64px; height: 64px; margin: 18px 22px 0; background: var(--eb); }
+html[data-tarjeta="compacta"] .pf-acc__arte > svg { display: none; }
+html[data-tarjeta="compacta"] .pf-acc__ic { display: block; position: absolute; inset: 15px; color: var(--fo); }
+html[data-tarjeta="compacta"] .pf-acc__txt { padding-top: 16px; }
 a.pf-acc__a:focus-visible { outline: 2px solid var(--azul); outline-offset: 3px; }
 /* Celular: la misma tarjeta que en escritorio, con el arte como franja baja arriba (en fila, el arte chico a la izquierda dejaba
    hueco debajo y la descarga quedaba suelta). La fila del selector de vistas no ocupa lugar: en el celular va en el flujo. */
@@ -334,8 +342,6 @@ a.pf-acc__a:focus-visible { outline: 2px solid var(--azul); outline-offset: 3px;
   .pf-acc__txt { padding: 16px 18px 0; gap: 8px; }
   .pf-acc__t { font-size: 20px; }
   .pf-acc__ir { margin: 14px 18px 18px; }
-  .pf-acc--form .pf-acc__ir { height: 40px; }
-  .pf-acc__d { top: 16px; right: 16px; width: 32px; height: 32px; }
   .pf-acc__pie { height: 18px; }
 }
 /* Seis tarjetas no se cuentan: la fila del resultado aparece solo con una búsqueda (para mostrar su chip). */

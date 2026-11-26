@@ -271,7 +271,7 @@
     return '<li class="pf-logo"><div class="pf-logo__ver' + (x.color === "Blanco" ? " pf-sobre-azul" : "") + '"><img src="' + esc(ver) + '" alt="Logo de Profertil, ' + esc(x.nombre.toLowerCase()) + ", " + esc(x.color.toLowerCase()) + '" loading="lazy"></div>' +
       '<div class="pf-logo__t"><h3>' + esc(x.nombre) + "</h3><span>" + esc(x.color) + "</span></div>" +
       '<div class="pf-logo__d">' + orden.map(function (e) {
-        return '<a class="pf-boton" href="' + esc(x.a[e]) + '" download aria-label="Descargar ' + esc(x.nombre + " " + x.color) + " en " + e.toUpperCase() + '">' + BAJAR + e.toUpperCase() + "</a>";
+        return '<a class="pf-boton pf-boton--descarga" href="' + esc(x.a[e]) + '" download aria-label="Descargar ' + esc(x.nombre + " " + x.color) + " en " + e.toUpperCase() + '">' + BAJAR + e.toUpperCase() + "</a>";
       }).join("") + "</div></li>";
   }
   function pintar() {
