@@ -16,12 +16,32 @@
 window.PFSolapas = (function () {
   function armar(nav, alElegir) {
     var ind = nav.querySelector(".pf-solapas__ind"), tabs = nav.getAttribute("role") === "tablist";
-    function botones() { return Array.prototype.slice.call(nav.querySelectorAll("[data-solapa]")); }
-    function elegida() { return nav.querySelector('[data-solapa][aria-pressed="true"]'); }
+    function botones() { return Array.prototype.slice.call(nav.querySelectorAll(":scope > [data-solapa]")); }
+    function elegida() { return nav.querySelector(':scope > [data-solapa][aria-pressed="true"]'); }
+    /* La tinta: una copia de las solapas con el texto azul, dentro del papel y recortada por él. Se mueve al revés que el papel con la
+       misma transición, así queda quieta sobre las solapas de verdad: el texto es azul justo donde hay papel y claro donde hay vidrio,
+       al píxel, también a mitad de una letra mientras el papel viaja. Es solo dibujo: inerte y fuera del árbol de accesibilidad. */
+    var ventana = document.createElement("span"), tinta = document.createElement("span");
+    ventana.className = "pf-solapas__ventana"; tinta.className = "pf-solapas__tinta";
+    ventana.setAttribute("aria-hidden", "true"); tinta.inert = true;
+    botones().forEach(function (b) {
+      var c = document.createElement("span");
+      c.className = "pf-solapas__copia"; c.innerHTML = b.innerHTML;
+      tinta.appendChild(c);
+    });
+    ventana.appendChild(tinta); ind.appendChild(ventana);
     function ubicar(animar) {
       var b = elegida();
       if (!b || !b.offsetWidth) return;
       if (!animar) ind.classList.add("pf-quieto");
+      // Cada copia va exactamente encima de su solapa (medidas con decimales, desde el borde interno del nav, que es el origen del papel).
+      var rn = nav.getBoundingClientRect(), x0 = rn.left + nav.clientLeft;
+      tinta.style.width = nav.clientWidth + "px"; tinta.style.height = nav.clientHeight + "px";
+      botones().forEach(function (o, i) {
+        var r = o.getBoundingClientRect(), c = tinta.children[i];
+        c.style.left = (r.left - x0) + "px"; c.style.width = r.width + "px";
+      });
+      tinta.style.transform = "translateX(" + (-b.offsetLeft) + "px)";
       ind.style.width = b.offsetWidth + "px";
       ind.style.transform = "translateX(" + b.offsetLeft + "px)";
       if (!animar) { void ind.offsetWidth; ind.classList.remove("pf-quieto"); }

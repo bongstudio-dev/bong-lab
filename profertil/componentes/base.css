@@ -495,8 +495,8 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
    cualquier ancho: la hoja es el contenedor (100cqw es su ancho) y la lista va centrada en ella, así que (100cqw - 100%) / 2 es lo que
    ya hay entre el borde de la hoja y la lista. Donde la lista está lejos del borde no suma nada. */
 .pf-hoja:has(.pf-solapas) { container-type: inline-size; }
-/* Tres capas, de abajo hacia arriba: el vidrio de cada solapa, el papel que viaja (el indicador) y el texto. Así el papel se desplaza
-   sólido por encima del vidrio, sin que el desenfoque lo borronee, y el texto queda siempre arriba.
+/* Tres capas, de abajo hacia arriba: el vidrio de cada solapa, el texto claro y el papel que viaja (el indicador) con el texto azul
+   adentro. Así el papel se desplaza sólido por encima del vidrio, sin que el desenfoque lo borronee.
    El vidrio es el mismo material que el menú de la barra: el fondo y el borde de "Sobre foto" y el mismo desenfoque. Va en el ::before
    de cada solapa (la solapa no forma capa propia, así el ::before queda debajo del indicador); abajo no lleva borde, apoya en la hoja. */
 .pf-solapas button { position: relative; flex: none; display: inline-flex; align-items: center; padding: 0 var(--sol-relleno); border: 0;
@@ -505,15 +505,18 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
 .pf-solapas button::before { content: ""; position: absolute; inset: 0; z-index: -2; pointer-events: none; border-radius: inherit;
   border: 1px solid var(--foto-borde); border-bottom: 0; background: var(--foto-fondo);
   backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); transition: background-color 160ms ease; }
-/* El texto cambia de color cuando el papel lo alcanza: la que se deja sigue azul hasta que el papel se fue, la que se elige sigue clara
-   hasta que el papel llega. Nunca queda texto claro sobre papel ni azul sobre vidrio. */
-.pf-solapas button:not([aria-pressed="true"]) { transition: color var(--sol-fundido) ease var(--sol-demora); }
-.pf-solapas button[aria-pressed="true"] { color: var(--azul); transition: color var(--sol-fundido) ease var(--sol-demora-nueva); }
-/* El papel es el de la hoja (--pf-papel, que fija el campo); hasta que llega, el fondo de la página, que tiene el mismo valor. */
-.pf-solapas__ind { position: absolute; z-index: -1; top: 0; bottom: -1px; left: 0; width: 0; pointer-events: none;
+/* El papel es el de la hoja (--pf-papel, que fija el campo); hasta que llega, el fondo de la página, que tiene el mismo valor.
+   Va por encima del texto claro de las solapas y lleva adentro la tinta (el mismo texto en azul, ver solapas.js): el color cambia
+   en el borde del papel, al píxel, sin fundidos ni demoras. */
+.pf-solapas__ind { position: absolute; z-index: 1; top: 0; bottom: -1px; left: 0; width: 0; pointer-events: none;
   border-radius: var(--sol-radio) var(--sol-radio) 0 0; background: var(--pf-papel, var(--bg));
   transition: transform var(--sol-dur) var(--sol-curva), width var(--sol-dur) var(--sol-curva); }
-.pf-solapas__ind.pf-quieto { transition: none; }
+.pf-solapas__ind.pf-quieto, .pf-solapas__ind.pf-quieto .pf-solapas__tinta { transition: none; }
+.pf-solapas__ventana { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; }
+.pf-solapas__tinta { position: absolute; top: 0; left: 0; color: var(--azul);
+  transition: transform var(--sol-dur) var(--sol-curva); }
+.pf-solapas__copia { position: absolute; top: 0; bottom: 0; display: inline-flex; align-items: center; padding: 0 var(--sol-relleno);
+  font: 600 var(--sol-texto)/1 var(--f-display); letter-spacing: -.01em; white-space: nowrap; }
 /* Empalme cóncavo a cada lado del papel: la solapa se abre hacia la hoja en vez de apoyarse en ángulo recto. Viaja con el indicador y
    apoya sobre la esquina del vidrio de la vecina, como la hoja. */
 .pf-solapas__ind::before, .pf-solapas__ind::after {
@@ -522,8 +525,6 @@ button, [role="button"] { -webkit-user-select: none; user-select: none; }
   background: radial-gradient(circle at 0 0, transparent var(--sol-empalme), var(--pf-papel, var(--bg)) calc(var(--sol-empalme) + .5px)); }
 .pf-solapas__ind::after { right: calc(-1 * var(--sol-empalme));
   background: radial-gradient(circle at 100% 0, transparent var(--sol-empalme), var(--pf-papel, var(--bg)) calc(var(--sol-empalme) + .5px)); }
-/* Al cargar (o al llegar con otra sección en la dirección) la solapa ya está elegida: el texto toma su color desde el primer cuadro. */
-.pf-solapas.pf-quieto button { transition: none; }
 html:has(.pf-solapas) .pf-campo-seguir { display: none; } /* la pista de scroll quedaba entre las solapas: las solapas ya invitan a bajar */
 @media (hover: hover) and (pointer: fine) {
   .pf-solapas button:not([aria-pressed="true"]):hover::before { background-color: var(--foto-borde); } }
@@ -531,4 +532,5 @@ html:has(.pf-solapas) .pf-campo-seguir { display: none; } /* la pista de scroll 
 @media (max-width: 719px) {
   .pf-solapas { margin-top: calc(-8px - var(--sol-alto)); }
   .pf-solapas button { flex: 1 1 0; min-width: 0; justify-content: center; line-height: 1.1; text-align: center; white-space: normal; text-wrap: balance; }
+  .pf-solapas__copia { justify-content: center; line-height: 1.1; text-align: center; white-space: normal; text-wrap: balance; }
 }
