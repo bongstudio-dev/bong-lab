@@ -72,10 +72,10 @@ function textosDe(p) {
   const nombre = p.logo ? [] : (p.lineas || [p.nombre.toUpperCase()]);
   const lateral = p.logo ? [] : [(p.lineas || [p.nombre]).join(" ").toUpperCase()];
   return [
-    ["65", p.linea || QUIMICO],
+    ["75", p.linea || QUIMICO],
     ...nombre.map(l => ["75", l]),
     ...(p.sub ? [["65", p.sub]] : []),
-    ...(p.pie || []).map(l => ["65", l]),
+    ...(p.pie || []).map(l => ["75", l]),
     ...lateral.map(l => ["75", l]),
   ];
 }
@@ -131,8 +131,8 @@ export async function dibujar(canvas, p, base = "./") {
   ctx.fillRect(0, 70, FRENTE, 170);
   // La línea ocupa como mucho el 92% del frente: la versión "Compuesto" baja de cuerpo.
   const linea = p.linea || QUIMICO;
-  const cuerpo = Math.min(104, 104 * FRENTE * 0.92 / medir(linea, 104));
-  texto(ctx, linea, CX, 155 + cuerpo * MEDIA, cuerpo, { color: p.texto && !p.franja ? p.texto : "#ffffff", alin: "center", inclinar: true });
+  const cuerpo = Math.min(104, 104 * FRENTE * 0.92 / medir(linea, 104, "75"));
+  texto(ctx, linea, CX, 155 + cuerpo * MEDIA, cuerpo, { color: p.texto && !p.franja ? p.texto : "#ffffff", alin: "center", inclinar: true, peso: "75" });
 
   // Nombre o logo de la marca, centrado en el frente
   let y = 430;
@@ -181,8 +181,8 @@ export async function dibujar(canvas, p, base = "./") {
 
   if (p.pie) {
     const col = p.pieColor || "#ffffff";
-    if (p.pie.length === 1) texto(ctx, p.pie[0], CX, 2800, 150, { color: col, alin: "center" });
-    else p.pie.forEach((l, i) => texto(ctx, l, CX, 2700 + i * 112, 104, { color: col, alin: "center" }));
+    if (p.pie.length === 1) texto(ctx, p.pie[0], CX, 2800, 150, { color: col, alin: "center", peso: "75" });
+    else p.pie.forEach((l, i) => texto(ctx, l, CX, 2700 + i * 112, 104, { color: col, alin: "center", peso: "75" }));
   }
   ctx.restore();
 
