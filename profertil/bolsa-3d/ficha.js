@@ -2,7 +2,8 @@
 // Se dibuja encima de la foto de la bolsa con la misma cámara que la foto (ángulo, lente y encuadre),
 // así que cuando el primer cuadro está listo la foto se cambia por la bolsa sin que nada se mueva.
 // Mientras tanto se ve la foto. Se puede girar arrastrando unos grados a cada lado; al soltar vuelve
-// adentro del límite si se pasó. Solo se dibuja cuando algo cambia.
+// adentro del límite si se pasó. Quieta, se mece despacio unos grados (solo mientras se ve en pantalla y
+// sin movimiento reducido). Fuera de eso, solo se dibuja cuando algo cambia.
 //
 // Uso: import { montar } from ".../bolsa-3d/ficha.js"; montar(figura, { glb, piel });
 //   figura: el <figure> que contiene la <img> de la bolsa.
@@ -20,6 +21,8 @@ export const DRACO = "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/li
 const FOTO = { w: 600, h: 457, giro: 31.959, alto: 0.5233, dist: 1.4057, focal: 554.0951, baja: 2.3331, ox: -7.3875, oy: -1.2485 };
 // Cuánto se puede girar a cada lado (grados) y cuánto se estira al pasarse.
 const LIMITE = 30, ELASTICO = 10;
+// Vaivén en reposo: amplitud (grados), un ida y vuelta cada PERIODO segundos, arranca a los ESPERA segundos de soltar.
+const VAIVEN = 7, PERIODO = 7, ESPERA = 2.5;
 
 export async function montar(figura, { glb, piel }) {
   const foto = figura.querySelector("img");
@@ -81,7 +84,7 @@ export async function montar(figura, { glb, piel }) {
     const cs = getComputedStyle(foto);
     const pl = parseFloat(cs.paddingLeft), pr = parseFloat(cs.paddingRight), pt = parseFloat(cs.paddingTop), pb = parseFloat(cs.paddingBottom);
     const cw = foto.clientWidth - pl - pr, ch = foto.clientHeight - pt - pb;
-    const s = Math.min(cw / FOTO.w, ch / FOTO.h);
+    const s = (cs.objectFit === "cover" ? Math.max : Math.min)(cw / FOTO.w, ch / FOTO.h);
     const rw = FOTO.w * s, rh = FOTO.h * s;
     const rx = foto.offsetLeft + pl + (cw - rw) / 2, ry = foto.offsetTop + pt + (ch - rh) / 2;
     renderer.setSize(W, H, false);
@@ -91,27 +94,44 @@ export async function montar(figura, { glb, piel }) {
 
   // ---------- giro ----------
   let giro = 0, objetivo = 0, arrastre = null, cuadro = 0;
+  // Vaivén: amplitud actual (sube de a poco), fase y desde cuándo está quieta.
+  const quieto = matchMedia("(prefers-reduced-motion: reduce)");
+  let amp = 0, fase = 0, antes = 0, quietaDesde = performance.now(), enPantalla = true;
+  const meciendo = () => !quieto.matches && enPantalla && !document.hidden && !arrastre;
   const lim = THREE.MathUtils.degToRad(LIMITE), ela = THREE.MathUtils.degToRad(ELASTICO);
   // Pasado el límite el giro se frena: cuanto más se pasa, menos avanza (nunca más de ELASTICO grados).
   const frenar = (a) => {
     const fuera = Math.abs(a) - lim;
     return fuera <= 0 ? a : Math.sign(a) * (lim + ela * (1 - Math.exp(-fuera / ela)));
   };
-  function dibujar() {
+  function dibujar(ahora) {
     cuadro = 0;
+    const dt = Math.min(0.05, antes ? (ahora - antes) / 1000 : 0);
+    antes = ahora;
+    let vaiven = 0;
     if (!arrastre) {
       const meta = THREE.MathUtils.clamp(objetivo, -lim, lim);
       objetivo = meta;
       giro += (meta - giro) * 0.18;
       if (Math.abs(meta - giro) > 1e-4) pedir(); else giro = meta;
+      if (meciendo() && ahora - quietaDesde > ESPERA * 1000) {
+        amp = Math.min(1, amp + dt / 1.5);
+        fase += dt * 2 * Math.PI / PERIODO;
+        // El vaivén va de ida y vuelta alrededor de donde quedó, sin pasarse del límite.
+        vaiven = amp * THREE.MathUtils.degToRad(VAIVEN) * Math.sin(fase);
+        vaiven = THREE.MathUtils.clamp(giro + vaiven, -lim, lim) - giro;
+        pedir();
+      } else if (meciendo()) pedir();
     }
-    bolsa.rotation.y = arrastre ? frenar(objetivo) : giro;
+    bolsa.rotation.y = arrastre ? frenar(objetivo) : giro + vaiven;
     renderer.render(escena, camara);
   }
   function pedir() { if (!cuadro) cuadro = requestAnimationFrame(dibujar); }
 
   lienzo.addEventListener("pointerdown", (e) => {
     if (e.button !== 0) return;
+    // Lo que se había mecido pasa a ser el giro, así no salta al agarrarla.
+    objetivo = giro = bolsa.rotation.y; amp = 0; fase = 0;
     arrastre = { x: e.clientX, desde: objetivo, id: e.pointerId };
     lienzo.setPointerCapture(e.pointerId);
     lienzo.classList.add("pr-bolsa3d--mano");
@@ -127,6 +147,7 @@ export async function montar(figura, { glb, piel }) {
     if (!arrastre || e.pointerId !== arrastre.id) return;
     objetivo = giro = frenar(objetivo);
     arrastre = null;
+    quietaDesde = performance.now();
     lienzo.classList.remove("pr-bolsa3d--mano");
     pedir();
   };
@@ -147,6 +168,10 @@ export async function montar(figura, { glb, piel }) {
   });
 
   new ResizeObserver(medir).observe(figura);
+  // El vaivén solo corre mientras la bolsa se ve.
+  new IntersectionObserver(([e]) => { enPantalla = e.isIntersecting; antes = 0; pedir(); }).observe(figura);
+  document.addEventListener("visibilitychange", () => { antes = 0; pedir(); });
+  quieto.addEventListener?.("change", pedir);
   // Al irse de la página se libera la GPU (si la página queda guardada para volver atrás, se conserva).
   addEventListener("pagehide", (e) => {
     if (e.persisted) return;

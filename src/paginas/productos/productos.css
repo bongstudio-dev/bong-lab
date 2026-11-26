@@ -200,6 +200,9 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; }
   .pr-claves .pr-solo { grid-column: 1 / -1; }
   .pr-claves .pr-largo dd { font-size: 17px; }
   .pr-ficha-cab__arte { order: -1; aspect-ratio: 16 / 10; }
+  /* Con la bolsa 3D la ventana es cuadrada y la foto llena el alto: la bolsa se ve más grande (los costados vacíos de la foto quedan afuera). */
+  .pr-ficha-cab__arte[data-bolsa3d] { aspect-ratio: 1 / 1; }
+  .pr-ficha-cab__arte[data-bolsa3d] img { object-fit: cover; padding: 4% 0 2%; }
   .pf-bh:has(.pr-ficha-cab) { padding: 8px 8px 24px; }
   .pr-ficha-cab__txt { padding-inline: 12px; }
   .pr-paneles { padding-top: 20px; }
