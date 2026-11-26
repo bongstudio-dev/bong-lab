@@ -6,12 +6,18 @@
 //   x 1536-2048  fuelle (los dos fuelles repiten esta franja)
 //   y 0-3072     alto del cuerpo, de arriba hacia abajo
 
+// Los textos van en Rotis Sans Serif, como en las bolsas impresas. No se usa la
+// fuente: fuente/textos.py deja sus contornos en textos.js (TRAZOS).
+import { TRAZOS } from "./textos.js";
+
 export const ANCHO = 2048, ALTO = 3072, FRENTE = 1536;
+const CX = FRENTE / 2;
+// Media altura de mayúscula de la Rotis: centra un texto en vertical.
+const MEDIA = 0.345;
 
 const GRIS_FRANJA = "#8f9194";
 const TEXTO = "#5f6164";
 const FILM = "#f6f6f4";
-const FUENTE = '"Roboto Condensed", "Arial Narrow", sans-serif';
 
 const QUIMICO = "Fertilizante Químico Granulado";
 const COMPUESTO = "Fertilizante Químico Compuesto Granulado";
@@ -50,18 +56,6 @@ function cargar(src) {
   return cache.get(src);
 }
 
-let fuentesListas = null;
-function fuentes(base) {
-  if (!fuentesListas) {
-    const caras = [
-      new FontFace("Roboto Condensed", `url(${base}fuentes/roboto-condensed-700-normal.woff2)`, { weight: "700", style: "normal" }),
-      new FontFace("Roboto Condensed", `url(${base}fuentes/roboto-condensed-700-italic.woff2)`, { weight: "700", style: "italic" }),
-    ];
-    fuentesListas = Promise.all(caras.map(f => f.load().then(c => document.fonts.add(c))));
-  }
-  return fuentesListas;
-}
-
 // Dibuja una imagen centrada en (cx, cy) con el ancho dado y rotación en grados.
 function poner(ctx, im, cx, cy, ancho, rot = 0) {
   const alto = ancho * (im.naturalHeight || im.height) / (im.naturalWidth || im.width);
@@ -73,16 +67,47 @@ function poner(ctx, im, cx, cy, ancho, rot = 0) {
   return alto;
 }
 
-function texto(ctx, s, x, y, px, { color = TEXTO, alin = "left", italica = false } = {}) {
-  ctx.font = `${italica ? "italic " : ""}700 ${px}px ${FUENTE}`;
+// Textos de cada etiqueta, con su peso: 65 es Bold, 75 es Extra Bold.
+function textosDe(p) {
+  const nombre = p.logo ? [] : (p.lineas || [p.nombre.toUpperCase()]);
+  const lateral = p.logo ? [] : [(p.lineas || [p.nombre]).join(" ").toUpperCase()];
+  return [
+    ["65", p.linea || QUIMICO],
+    ...nombre.map(l => ["75", l]),
+    ...(p.sub ? [["65", p.sub]] : []),
+    ...(p.pie || []).map(l => ["65", l]),
+    ...lateral.map(l => ["75", l]),
+  ];
+}
+export const FRASES = [...new Map(PRODUCTOS.flatMap(textosDe).map(f => [f.join("|"), f])).values()];
+
+const trazos = new Map();
+function trazo(s, peso) {
+  const t = TRAZOS[`${peso}|${s}`];
+  if (!t) throw new Error(`Falta el texto "${s}" (${peso}): correr fuente/textos.py`);
+  if (!trazos.has(t)) trazos.set(t, new Path2D(t[1]));
+  return { ancho: t[0] / 1000, forma: trazos.get(t) };
+}
+
+// Ancho en px de un texto a un cuerpo dado.
+function medir(s, px, peso = "65") {
+  return trazo(s, peso).ancho * px;
+}
+
+function texto(ctx, s, x, y, px, { color = TEXTO, alin = "left", peso = "65", inclinar = false } = {}) {
+  const t = trazo(s, peso);
+  const w = t.ancho * px;
+  ctx.save();
+  ctx.translate(alin === "center" ? x - w / 2 : alin === "right" ? x - w : x, y);
+  // La línea de producto va oblicua, como en la bolsa.
+  if (inclinar) ctx.transform(1, 0, -0.2, 1, 0.07 * px, 0);
+  ctx.scale(px / 1000, px / 1000);
   ctx.fillStyle = color;
-  ctx.textAlign = alin;
-  ctx.textBaseline = "alphabetic";
-  ctx.fillText(s, x, y);
+  ctx.fill(t.forma);
+  ctx.restore();
 }
 
 export async function dibujar(canvas, p, base = "./") {
-  await fuentes(base);
   const logos = { profertil: cargar(base + "logos/profertil-slogan.svg"), simbolo: cargar(base + "logos/profertil.svg") };
   if (p.logo) logos.marca = cargar(`${base}logos/${p.logo}.svg`);
   if (p.lateral) logos.lateral = cargar(`${base}logos/${p.lateral}.svg`);
@@ -104,58 +129,60 @@ export async function dibujar(canvas, p, base = "./") {
   const franja = p.franja || p.color;
   ctx.fillStyle = franja;
   ctx.fillRect(0, 70, FRENTE, 170);
-  // La línea ocupa como mucho el 86% del frente: la versión "Compuesto" baja de cuerpo.
+  // La línea ocupa como mucho el 92% del frente: la versión "Compuesto" baja de cuerpo.
   const linea = p.linea || QUIMICO;
-  ctx.font = `italic 700 104px ${FUENTE}`;
-  const cuerpo = Math.min(104, 104 * FRENTE * 0.86 / ctx.measureText(linea).width);
-  texto(ctx, linea, FRENTE / 2, 155 + cuerpo * 0.36, cuerpo, { color: p.texto && !p.franja ? p.texto : "#ffffff", alin: "center", italica: true });
+  const cuerpo = Math.min(104, 104 * FRENTE * 0.92 / medir(linea, 104));
+  texto(ctx, linea, CX, 155 + cuerpo * MEDIA, cuerpo, { color: p.texto && !p.franja ? p.texto : "#ffffff", alin: "center", inclinar: true });
 
-  // Nombre o logo de la marca
+  // Nombre o logo de la marca, centrado en el frente
   let y = 430;
   if (im.marca) {
     const h = p.ancho * im.marca.naturalHeight / im.marca.naturalWidth;
     const cy = 300 + h / 2 + 60;
-    poner(ctx, im.marca, FRENTE / 2 + 20, cy, p.ancho);
+    poner(ctx, im.marca, CX, cy, p.ancho);
     y = cy + h / 2 + 120;
   } else {
     const lineas = p.lineas || [p.nombre.toUpperCase()];
-    const px = lineas.some(l => l.length > 14) ? 170 : 196;
-    lineas.forEach((l, i) => texto(ctx, l, 236, 520 + i * px * 1.02, px));
-    y = 520 + (lineas.length - 1) * px * 1.02 + 150;
+    // Cuerpo fijo mientras entre en el 84% del frente; los nombres largos bajan.
+    const ancho = Math.max(...lineas.map(l => medir(l, 1, "75")));
+    const px = Math.min(196, FRENTE * 0.84 / ancho);
+    lineas.forEach((l, i) => texto(ctx, l, CX, 520 + i * px * 1.04, px, { alin: "center", peso: "75" }));
+    y = 520 + (lineas.length - 1) * px * 1.04 + 150;
   }
   if (p.sub) {
-    texto(ctx, p.sub, FRENTE / 2 + 20, y, 96, { alin: "center", color: "#8a8c8f" });
+    texto(ctx, p.sub, CX, y, 96, { alin: "center", color: "#8a8c8f" });
     y += 90;
   }
 
   // Logo Profertil con lema
   const logoY = Math.max(y + 80, 920);
-  poner(ctx, im.profertil, FRENTE / 2 + 40, logoY + 270, 740);
+  poner(ctx, im.profertil, CX, logoY + 270, 740);
 
-  // Estela gris sobre el arco (Urea y Proterra)
-  const cx = 950, cy = 2700, r = 740;
+  // Círculo de color, centrado en el frente, que sale por el pie de la bolsa
+  const cy = 2720, r = 720;
+  // Estela gris que acompaña al círculo por arriba (Urea y Proterra): una media luna
+  // más gruesa en el centro, que se apaga hacia los costados.
   if (p.estela) {
-    const g = ctx.createLinearGradient(260, 0, 1536, 0);
+    const g = ctx.createLinearGradient(CX - r - 120, 0, CX + r + 120, 0);
     g.addColorStop(0, "rgba(190,192,195,0)");
-    g.addColorStop(0.55, "rgba(190,192,195,.55)");
-    g.addColorStop(1, "rgba(175,177,180,.9)");
+    g.addColorStop(0.3, "rgba(186,188,191,.6)");
+    g.addColorStop(0.7, "rgba(178,180,183,.85)");
+    g.addColorStop(1, "rgba(190,192,195,.2)");
     ctx.fillStyle = g;
     ctx.beginPath();
-    ctx.arc(cx + 70, cy - 90, r + 120, 0, Math.PI * 2);
-    ctx.arc(cx, cy, r + 4, 0, Math.PI * 2, true);
+    ctx.arc(CX, cy - 120, r + 90, 0, Math.PI * 2);
+    ctx.arc(CX, cy, r + 4, 0, Math.PI * 2, true);
     ctx.fill("evenodd");
   }
-
-  // Arco de color
   ctx.fillStyle = p.color;
   ctx.beginPath();
-  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.arc(CX, cy, r, 0, Math.PI * 2);
   ctx.fill();
 
   if (p.pie) {
     const col = p.pieColor || "#ffffff";
-    if (p.pie.length === 1) texto(ctx, p.pie[0], 1240, 2860, 150, { color: col, alin: "center" });
-    else p.pie.forEach((l, i) => texto(ctx, l, 860, 2700 + i * 108, 100, { color: col, alin: "center" }));
+    if (p.pie.length === 1) texto(ctx, p.pie[0], CX, 2800, 150, { color: col, alin: "center" });
+    else p.pie.forEach((l, i) => texto(ctx, l, CX, 2700 + i * 112, 104, { color: col, alin: "center" }));
   }
   ctx.restore();
 
@@ -175,8 +202,8 @@ export async function dibujar(canvas, p, base = "./") {
     ctx.translate(fx + 20, 1100);
     ctx.rotate(Math.PI / 2);
     const nombre = (p.lineas || [p.nombre]).join(" ").toUpperCase();
-    const px = Math.min(118, 1000 / (nombre.length * 0.47));
-    texto(ctx, nombre, 0, px * 0.36, px);
+    const px = Math.min(118, 1000 / medir(nombre, 1, "75"));
+    texto(ctx, nombre, 0, px * MEDIA, px, { peso: "75" });
     ctx.restore();
   }
   return canvas;
