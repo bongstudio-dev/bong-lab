@@ -47,7 +47,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fondos de productos</title>
-<meta name="description" content="Fondos generativos con el Sistema de Formas detrás de la cabecera de Productos de Profertil, lado a lado con la foto de campo: patrón, grilla interactiva, dither y píxeles.">
+<meta name="description" content="Fondos generativos con el Sistema de Formas detrás de la cabecera de Productos de Profertil, lado a lado con la foto de campo: grilla interactiva, dither y píxeles.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
@@ -120,7 +120,6 @@ body.ver { overflow: hidden; }
     </div>
     <div class="seg" role="group" aria-label="Familia" id="fam">
       <button type="button" data-v="" aria-pressed="true">Todas</button>
-      <button type="button" data-v="Patrón" aria-pressed="false">Patrón</button>
       <button type="button" data-v="Grilla" aria-pressed="false">Grilla</button>
       <button type="button" data-v="Dither" aria-pressed="false">Dither</button>
       <button type="button" data-v="Píxeles" aria-pressed="false">Píxeles</button>
@@ -134,16 +133,10 @@ body.ver { overflow: hidden; }
   var VAR = [
     { id: "foto", f: "Hoy", t: "Foto de campo", d: "La foto fija detrás de la tarjeta, como está publicada." },
     { id: "campo", f: "Hoy", t: "Campo de Formas", d: "El campo de la Biblioteca, la Sala de prensa y la Nota: grupos que crecen y se deshacen." },
-    { id: "patron-onda", f: "Patrón", t: "Ladrillo con onda", d: "El ladrillo del generador de patrones. Las Formas respiran en una onda.", cfg: { modo: "patron", disposicion: "ladrillo", mov: "onda", celda: 30, ritmoX: 120, ritmoY: 110, solapamiento: 30, direccion: 1, direccionImpar: 3, velocidad: 40, angulo: 30, intensidad: 55, forma: "urea", acento: 8 } },
-    { id: "patron-grupos", f: "Patrón", t: "Grilla con grupos", d: "La grilla del generador con el comportamiento del campo: las Formas aparecen en grupos.", cfg: { modo: "patron", disposicion: "grilla", mov: "grupos", celda: 30, ritmoX: 110, ritmoY: 110, solapamiento: 30, grupos: 7, forma: "varias", acento: 8 } },
-    { id: "patron-giro", f: "Patrón", t: "Grilla con giro", d: "Cada Forma gira de a 90 grados en una ola, como la Dirección del generador.", cfg: { modo: "patron", disposicion: "grilla", mov: "giro", celda: 34, ritmoX: 120, ritmoY: 120, solapamiento: 30, velocidad: 40, angulo: 30, intensidad: 55, forma: "hoja", acento: 8 } },
-    { id: "patron-deriva", f: "Patrón", t: "Matriz a la deriva", d: "La matriz del generador (bloques con Formas grandes) se desliza despacio.", cfg: { modo: "patron", disposicion: "matriz", mov: "deriva", celda: 30, ritmoX: 110, ritmoY: 110, solapamiento: 30, velocidad: 40, angulo: 30, semilla: 37, forma: "circulos", acento: 8 } },
-    { id: "grilla-puntos", f: "Grilla", t: "Puntos con estela", d: "Puntos en grilla. El cursor los ilumina y deja una estela de Formas que se apagan.", cfg: { modo: "grilla", base: "puntos", celda: 28, marca: 8, actividad: 24, estela: 56, foco: 260, fuerzaFoco: 30, forma: "urea", acento: 1 } },
     { id: "grilla-formas", f: "Grilla", t: "Formas chicas con foco", d: "La grilla es de Formas chicas que crecen con el foco y la estela.", cfg: { modo: "grilla", base: "formas", celda: 30, marca: 10, actividad: 24, estela: 56, foco: 300, fuerzaFoco: 60, forma: "trigo", acento: 1 } },
-    { id: "dither-binario", f: "Dither", t: "Dither binario", d: "Degradé y ruido con tramado Bayer: cada píxel es una Forma o nada.", cfg: { modo: "dither", tonos: "binario", celda: 16, angulo: 11, densidad: 15, degrade: 45, contraste: 130, velocidad: 40, radioCursor: 160, forma: "urea", acento: 0, clic: false } },
+    { id: "dither-tres", f: "Dither", t: "Dither de tres tonos", d: "La Forma de urea dibuja una trama de tres tonos. Al pasar el cursor, más Formas toman el color de acento.", cfg: { modo: "dither", tonos: "tres", celda: 18, angulo: 11, densidad: 15, degrade: 45, contraste: 130, velocidad: 40, radioCursor: 160, forma: "urea", acento: 1, cursor: true, clic: false } },
     { id: "dither-escalonado", f: "Dither", t: "Dither escalonado", d: "La Forma cambia de tamaño en cuatro pasos, como una trama de medio tono.", cfg: { modo: "dither", tonos: "escalonado", celda: 20, angulo: 11, densidad: 15, degrade: 45, contraste: 130, velocidad: 40, radioCursor: 160, forma: "urea", acento: 0, clic: false } },
-    { id: "pixeles-forma", f: "Píxeles", t: "Píxeles que arman una Forma", d: "Las celdas aparecen desde un punto y arman una Forma grande; se desarman y vuelve a empezar.", cfg: { modo: "pixeles", objetivo: "forma", origen: "punto", celda: 20, tamano: 110, posX: 55, posY: 80, entrada: 22, quieto: 40, salida: 12, forma: "urea", acento: 10, cursor: false } },
-    { id: "pixeles-llenar", f: "Píxeles", t: "Píxeles que llenan", d: "Las celdas llenan el fondo al azar, se quedan y se van.", cfg: { modo: "pixeles", objetivo: "llenar", origen: "azar", celda: 26, entrada: 22, quieto: 40, salida: 12, forma: "varias", acento: 10, cursor: false } }
+    { id: "pixeles-forma", f: "Píxeles", t: "Píxeles que arman una Forma", d: "Las celdas aparecen desde un punto y arman una Forma grande; se desarman y vuelve a empezar.", cfg: { modo: "pixeles", objetivo: "forma", origen: "punto", celda: 20, tamano: 110, posX: 55, posY: 80, entrada: 22, quieto: 40, salida: 12, forma: "urea", acento: 10, cursor: false } }
   ];
   var CAMPO_COLOR = { azul: "azul", verde: "verde", amarillo: "amarillo", terra: "naranja" };
   var IGNORAR = "a, button, input, select, textarea, label, summary, [role=button], .pf-bh, .pf-hoja, #pf-top";
