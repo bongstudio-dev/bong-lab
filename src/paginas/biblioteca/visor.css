@@ -107,9 +107,9 @@ body.pf-foco .pf-v-doc { grid-column: 1; grid-row: 1; margin-top: 0; padding-bot
 
 /* --- Más documentos: filas, las mismas de la lista. */
 .pf-v-sigue { margin-top: 128px; }
-.pf-v-sigue__cab { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 20px; margin-bottom: 20px; }
+.pf-v-sigue__cab { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 20px; margin-bottom: 20px; }
 .pf-v-sigue__cab h2 { margin: 0; font: 600 var(--texto-subtitulo)/1.1 var(--f-display); letter-spacing: -0.02em; color: var(--azul); }
-.pf-v-sigue__cab a { display: inline-flex; align-items: center; gap: 6px; color: var(--azul); font-size: var(--texto-chico); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, var(--celeste) 60%, transparent); }
+/* "Ver todo" al cierre de una sección: el botón base (pf-boton), como en la ficha de producto. */
 
 
 /* --- Pantallas medianas y celular: una columna; el índice se va y los datos pasan arriba del documento. */

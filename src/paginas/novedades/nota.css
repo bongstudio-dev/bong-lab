@@ -111,7 +111,8 @@ body.pf-foco .pf-n-texto { padding-bottom: 160px; }
 
 /* --- Relacionadas: tres tarjetas y nada más. */
 .pf-n-sigue { margin-top: 128px; }
-.pf-n-rel__cab { margin-bottom: 24px; }
+.pf-n-rel__cab { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; margin-bottom: 24px; }
+/* "Ver todas las notas": el botón base (pf-boton), el mismo cierre que la ficha de producto y el visor de la Biblioteca. */
 .pf-n-rel__cab h2 { margin: 0; font: 600 var(--texto-subtitulo)/1.1 var(--f-display); letter-spacing: -0.02em; color: var(--azul); }
 .pf-n-rel__fila { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
 

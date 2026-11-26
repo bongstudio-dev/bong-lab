@@ -173,7 +173,8 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; }
 
 /* --- Ficha: otros productos para seguir navegando. */
 .pr-otros { padding-top: 56px; border-top: 1px solid var(--line); }
-.pr-otros__cab { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
+.pr-otros__cab { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+.pr-otros__cab h2 { margin: 0; }
 .pr-otros .pr-grilla { margin-bottom: 96px; }
 @media (max-width: 640px) {
   .pr-otros .pr-grilla { grid-template-columns: repeat(2, minmax(0, 1fr)); }

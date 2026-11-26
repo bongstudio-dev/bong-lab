@@ -69,7 +69,13 @@
 
 /* @pieza boton
    UI/Botón: alto 40, radio 13, tiza con línea. Principal en azul; alerta en naranja (lo que borra o no tiene vuelta).
-   Chico (32) para acciones dentro de un aviso. */
+   Chico (32) para acciones dentro de un aviso.
+   "Ver todo", según dónde está:
+   - Al cierre de una sección (Otros productos, Más de la Biblioteca, Notas relacionadas): el botón base con flecha.
+   - En el menú de navegación, donde es la acción principal del panel: principal, en azul.
+   - Cuando un filtro no deja resultados: verde.
+   - Al final de los resultados del buscador: la fila con flecha del buscador.
+   Un link subrayado solo va dentro de un texto, nunca como la acción de un bloque. */
 .pf-boton { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 16px; border: 1px solid var(--line); border-radius: var(--radio-control);
   background: var(--tiza); color: var(--ink); font: 500 var(--texto-chico)/1 var(--f-body); text-decoration: none; cursor: pointer; transition: background 220ms ease, transform .15s var(--ease); text-box: trim-both cap alphabetic; }
 .pf-boton:active { background: var(--bg); transform: scale(.97); }
@@ -78,7 +84,7 @@
 .pf-boton--principal:active { background: color-mix(in srgb, var(--azul) 86%, var(--ink)); }
 .pf-boton--alerta:active { background: color-mix(in srgb, var(--naranja) 86%, var(--ink)); }
 .pf-boton--chico { height: 32px; padding: 0 14px; border: 0; }
-/* Verde: la acción que lleva afuera (Ver la nota original, Ver todas las notas). */
+/* Verde: la acción que lleva afuera (Ver la nota original) y la salida de una lista vacía (Ver todas las notas). */
 .pf-boton--verde { background: var(--verde); border-color: var(--verde); color: var(--color-blanco); }
 @media (hover: hover) and (pointer: fine) { .pf-boton--verde:hover { background: color-mix(in srgb, var(--verde) 86%, var(--ink)); } }
 .pf-boton--verde:active { background: color-mix(in srgb, var(--verde) 86%, var(--ink)); }
