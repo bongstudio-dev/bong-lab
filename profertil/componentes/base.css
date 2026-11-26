@@ -79,13 +79,20 @@
 .pf-boton { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 16px; border: 1px solid var(--line); border-radius: var(--radio-control);
   background: var(--tiza); color: var(--ink); font: 500 var(--texto-chico)/1 var(--f-body); text-decoration: none; cursor: pointer; transition: background 220ms ease, transform .15s var(--ease); text-box: trim-both cap alphabetic; }
 .pf-boton:active { background: var(--bg); transform: scale(.97); }
-/* Hover del botón base: un relleno blanco baja desde arriba; texto y flecha quedan del mismo color. Solo en el base (tiza con línea):
-   principal, verde y alerta tienen el suyo. */
-.pf-boton:not(.pf-boton--principal, .pf-boton--verde, .pf-boton--alerta) { position: relative; overflow: hidden; isolation: isolate; }
-.pf-boton:not(.pf-boton--principal, .pf-boton--verde, .pf-boton--alerta)::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--color-blanco);
-  transform: translateY(-101%); transition: transform 380ms var(--ease); }
-@media (hover: hover) and (pointer: fine) { .pf-boton:not(.pf-boton--principal, .pf-boton--verde, .pf-boton--alerta):hover::before { transform: none; } }
-@media (prefers-reduced-motion: reduce) { .pf-boton::before { transition: none; } }
+/* Hover del botón base: el azul baja desde arriba como la barra de navegación (mismo recorrido, tiempo --t-barra y curva), el texto
+   pasa a tiza y la flecha da la vuelta: sale por la derecha y entra por la izquierda. Solo en el base (tiza con línea): principal,
+   verde y alerta tienen el suyo. */
+.pf-boton:not(.pf-boton--principal, .pf-boton--verde, .pf-boton--alerta) { position: relative; overflow: hidden; isolation: isolate;
+  transition: background 220ms ease, color 260ms ease, border-color 260ms ease, transform .15s var(--ease); }
+.pf-boton:not(.pf-boton--principal, .pf-boton--verde, .pf-boton--alerta)::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--azul);
+  transform: translateY(-100%); transition: transform var(--t-barra) var(--ease); }
+@media (hover: hover) and (pointer: fine) {
+  .pf-boton:not(.pf-boton--principal, .pf-boton--verde, .pf-boton--alerta):hover { color: var(--tiza); border-color: var(--azul); transition-delay: 0s, 80ms, 80ms, 0s; }
+  .pf-boton:not(.pf-boton--principal, .pf-boton--verde, .pf-boton--alerta):hover::before { transform: none; }
+  .pf-boton:not(.pf-boton--principal, .pf-boton--verde, .pf-boton--alerta):hover svg { animation: pf-flecha-vuelta 520ms var(--ease); }
+}
+@keyframes pf-flecha-vuelta { 0% { transform: none; } 45% { transform: translateX(22px); opacity: 0; } 46% { transform: translateX(-22px); opacity: 0; } 100% { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .pf-boton::before { transition: none; } .pf-boton svg { animation: none !important; } }
 .pf-boton--principal { background: var(--azul); border-color: var(--azul); color: var(--tiza); }
 .pf-boton--alerta { background: var(--naranja); border-color: var(--naranja); color: var(--tiza); }
 .pf-boton--principal:active { background: color-mix(in srgb, var(--azul) 86%, var(--ink)); }
