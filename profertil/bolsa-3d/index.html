@@ -85,7 +85,7 @@
 
 <header class="cabeza">
   <h1>Bolsa 3D</h1>
-  <p>Una sola bolsa base para todo el catálogo. La etiqueta de cada producto se arma con los logos vectoriales, así se ve nítida en cualquier pantalla.</p>
+  <p>Una sola bolsa base para todo el catálogo. La etiqueta de cada producto sale del sistema visual de la marca y se aplica como textura, igual en el frente y en el fuelle.</p>
 </header>
 
 <div class="controles">
@@ -109,7 +109,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
-import { PRODUCTOS, dibujar, ANCHO, ALTO } from "./etiqueta.js";
+import { PRODUCTOS, ANCHO, ALTO } from "./etiqueta.js";
 
 // ?p=<producto> elige la bolsa; ?giro=<grados> deja la cámara quieta en ese ángulo.
 const url = new URLSearchParams(location.search);
@@ -205,9 +205,13 @@ let pedido = 0;
 async function elegir(p) {
   const n = ++pedido;
   for (const b of lista.children) b.setAttribute("aria-pressed", b.dataset.id === p.id);
-  const c = document.createElement("canvas");
-  await dibujar(c, p);
+  // El arte de cada etiqueta se exporta del sistema visual en Figma (etiquetas/<id>.webp).
+  const img = new Image();
+  img.src = `etiquetas/${p.id}.webp`;
+  await img.decode();
   if (n !== pedido) return;
+  const c = Object.assign(document.createElement("canvas"), { width: ANCHO, height: ALTO });
+  c.getContext("2d").drawImage(img, 0, 0, ANCHO, ALTO);
   fondo.drawImage(c, 0, 0);
   textura.needsUpdate = true;
   lienzo.width = c.width; lienzo.height = c.height;
