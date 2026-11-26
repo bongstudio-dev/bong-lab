@@ -26,7 +26,7 @@ const COMPUESTO = "Fertilizante Químico Compuesto Granulado";
 export const PRODUCTOS = [
   { id: "ug", nombre: "Urea Granulada Argentina", color: "#0b5aa5", logo: "urea", ancho: 1180, sub: "Grado: 46-0-0", estela: true, pie: ["Industria", "Argentina"] },
   { id: "etp", nombre: "eNeTOTAL PLUS", color: "#f2e500", texto: "#3d4a2a", logo: "enetotal", ancho: 760, sub: "Grado: 46-0-0", pie: ["Industria", "Argentina"], pieColor: "#3d4a2a" },
-  { id: "proterra", nombre: "Proterra", color: "#4f8128", linea: COMPUESTO, logo: "proterra", ancho: 1160, sub: "Mezcla Física", estela: true, pie: ["Industria", "Argentina"] },
+  { id: "proterra", nombre: "Proterra", color: "#4f8128", linea: COMPUESTO, logo: "proterra", ancho: 1160, sub: "Mezcla Física", estela: true, pie: ["Industria", "Argentina"], lateral: "proterra" },
   { id: "proterra-ar", nombre: "Proterra AR", color: "#4f8128", linea: COMPUESTO, logo: "proterra-ar", ancho: 1180, sub: "Mezcla Física", estela: true, pie: ["Industria", "Argentina"], lateral: "proterra" },
   { id: "proterra-ds", nombre: "Proterra DS", color: "#4f8128", linea: COMPUESTO, logo: "proterra-ds", ancho: 1180, sub: "Mezcla Física", estela: true, pie: ["Industria", "Argentina"], lateral: "proterra" },
   { id: "proterra-zn", nombre: "Proterra Zn", color: "#4f8128", linea: COMPUESTO, logo: "proterra-zn", ancho: 1200, sub: "Mezcla Física", estela: true, pie: ["Industria", "Argentina"], lateral: "proterra" },
