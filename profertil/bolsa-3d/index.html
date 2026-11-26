@@ -152,9 +152,9 @@ piso.receiveShadow = true;
 escena.add(piso);
 
 const camara = new THREE.PerspectiveCamera(28, 1, 0.05, 20);
-camara.position.set(0, 0.62, 2.55);
+camara.position.set(0, 0.68, 2.75);
 const orbita = new OrbitControls(camara, renderer.domElement);
-orbita.target.set(0, 0.43, 0);
+orbita.target.set(0, 0.47, 0);
 orbita.enableDamping = true;
 orbita.enablePan = false;
 orbita.minDistance = 1.4;

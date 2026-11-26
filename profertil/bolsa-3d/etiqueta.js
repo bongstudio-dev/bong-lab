@@ -187,19 +187,20 @@ export async function dibujar(canvas, p, base = "./") {
   ctx.restore();
 
   // ---------- fuelle ----------
+  // Arriba el fuelle se pliega hacia adentro: el contenido va de la mitad para abajo.
   const fx = FRENTE + (ANCHO - FRENTE) / 2;
-  poner(ctx, im.simbolo, fx, 560, 470, 90);
+  poner(ctx, im.simbolo, fx, 900, 420, 90);
 
   const marcaLateral = im.lateral || (p.logo === "urea" ? im.marca : null);
   if (marcaLateral) {
-    poner(ctx, marcaLateral, fx, 1520, 1050, 90);
+    poner(ctx, marcaLateral, fx, 1800, 1050, 90);
   } else if (p.logo === "enetotal") {
-    poner(ctx, im.marca, fx, 1500, 640, 90);
+    poner(ctx, im.marca, fx, 1780, 640, 90);
   } else {
     ctx.fillStyle = p.color;
-    ctx.fillRect(FRENTE + 96, 1060, 30, 1080);
+    ctx.fillRect(FRENTE + 96, 1300, 30, 1080);
     ctx.save();
-    ctx.translate(fx + 20, 1100);
+    ctx.translate(fx + 20, 1340);
     ctx.rotate(Math.PI / 2);
     const nombre = (p.lineas || [p.nombre]).join(" ").toUpperCase();
     const px = Math.min(118, 1000 / medir(nombre, 1, "75"));

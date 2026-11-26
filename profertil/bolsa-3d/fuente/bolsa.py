@@ -15,54 +15,69 @@ import bpy, bmesh, math, sys
 argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 SALIDA = argv[0] if argv else "bolsa.glb"
 
-# Medidas en metros (bolsa de 50 kg aprox.)
+# Medidas en metros, calcadas de las fotos de producto: el frente mide unas
+# 2,4 veces su ancho de alto y el fuelle abierto, la mitad del frente.
 W = 0.40      # ancho del frente
-D = 0.12      # ancho del fuelle
-H = 0.80      # alto del cuerpo
-SELLO = 0.028 # alto de cada sello
-NF, NG, NV = 40, 14, 90   # divisiones: frente, fuelle, alto
+D = 0.21      # ancho del fuelle desplegado
+H = 0.92      # alto del cuerpo
+SELLO = 0.012 # alto de cada sello
+NF, NG, NV = 44, 18, 110   # divisiones: frente, fuelle, alto
 
 U_FRENTE = 0.75
 
-def lleno(t):
-    """0 en los sellos, 1 en el cuerpo; arriba se afina más que abajo (el grano se asienta)."""
-    tt = t ** 1.12
-    return max(0.0, 1 - abs(2 * tt - 1) ** 4.5) ** 0.45
+def suave(x):
+    x = min(1.0, max(0.0, x))
+    return x * x * (3 - 2 * x)
+
+def apertura(t):
+    """Cuánto se abre el fuelle a cada altura (0 cerrado, 1 abierto).
+    Como en la bolsa llena: abajo se cierra en un tramo corto, arriba el fuelle
+    se va plegando hacia adentro desde la mitad hasta el sello."""
+    abajo = suave(t / 0.09) ** 0.55
+    arriba = suave((1 - t) / 0.50) ** 0.75
+    return abajo * arriba
 
 def arruga(s, t, lado):
     """Ondulación suave del film: pocas frecuencias, nada de ruido fino."""
-    a = math.sin(t * 19.0 + s * 3.1 + lado) * 0.5 + math.sin(t * 7.3 - s * 5.7 + lado * 2.0) * 0.5
-    return a
+    return math.sin(t * 19.0 + s * 3.1 + lado) * 0.5 + math.sin(t * 7.3 - s * 5.7 + lado * 2.0) * 0.5
 
 def seccion(t):
-    f = lleno(t)
-    a = W / 2 * (1 - 0.035 * f)            # el frente se cierra un poco al llenarse
-    b = max(0.0025, D / 2 * f)             # el fuelle se abre
-    panza = 0.020 * f                      # comba del frente
-    gpanza = 0.005 * f                     # comba del fuelle
+    g = apertura(t)
+    # Junto a los sellos el frente y el dorso se aplastan uno contra otro.
+    almohada = suave(t / 0.035) * suave((1 - t) / 0.06)
+    a = W / 2 * (1 - 0.03 * g)                    # el frente se cierra apenas al llenarse
+    b = max(0.003, D / 2 * g) * almohada          # medio espesor de la bolsa
+    b = max(b, 0.0012)
+    # El fuelle que no se abre queda plegado en V hacia adentro.
+    hundir = math.sqrt(max(0.0, (D / 2) ** 2 - b ** 2)) * almohada
+    panza = (0.012 + 0.016 * g) * almohada        # comba del frente, mayor en la mitad baja
+    gpanza = 0.006 * g
     pts = []  # (x, y, u)
     # frente: y = -b (mira a -Y), x de -a a +a
     for i in range(NF):
         s = i / NF
         x = -a + 2 * a * s
-        y = -b - panza * math.sin(math.pi * s) ** 0.6 - 0.0016 * f * arruga(s, t, 0)
+        y = -b - panza * math.sin(math.pi * s) ** 0.55 - 0.0016 * g * arruga(s, t, 0)
         pts.append((x, y, s * U_FRENTE))
+    def pliegue(s):
+        v = 1 - abs(2 * s - 1)          # 0 en los bordes, 1 en el pliegue
+        return v ** 1.15
     # fuelle derecho: x = +a, y de -b a +b
     for i in range(NG):
         s = i / NG
-        x = a + gpanza * math.sin(math.pi * s)
+        x = a + gpanza * math.sin(math.pi * s) - hundir * pliegue(s)
         y = -b + 2 * b * s
         pts.append((x, y, U_FRENTE + s * (1 - U_FRENTE)))
     # dorso: y = +b, x de +a a -a
     for i in range(NF):
         s = i / NF
         x = a - 2 * a * s
-        y = b + panza * math.sin(math.pi * s) ** 0.6 + 0.0016 * f * arruga(s, t, 1.7)
+        y = b + panza * math.sin(math.pi * s) ** 0.55 + 0.0016 * g * arruga(s, t, 1.7)
         pts.append((x, y, s * U_FRENTE))
     # fuelle izquierdo: x = -a, y de +b a -b
     for i in range(NG):
         s = i / NG
-        x = -a - gpanza * math.sin(math.pi * s)
+        x = -a - gpanza * math.sin(math.pi * s) + hundir * pliegue(s)
         y = b - 2 * b * s
         pts.append((x, y, U_FRENTE + s * (1 - U_FRENTE)))
     return pts
@@ -144,7 +159,7 @@ def sello(z0, z1, a):
         p.use_smooth = True
     return me
 
-a_sello = W / 2
+a_sello = W / 2 * 0.995
 for nombre, z0, z1 in (("sello_abajo", -SELLO, 0.0015), ("sello_arriba", H - 0.0015, H + SELLO)):
     o = bpy.data.objects.new(nombre, sello(z0, z1, a_sello))
     o.parent = ob
