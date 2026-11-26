@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<!-- firma:bong
+
+      ##########         #########
+      ###########      #############
+      ############   #################
+      ###########   ###################
+      ##########    ###################
+      ############  ###################
+      #############  #################
+      #############   ###############
+      ############      ###########
+
+                            #####
+      ##     ######     ##########
+      ####   ######   ###########
+      #####  ######  ###########
+      #############  ##########
+      #############  ###################
+      #############  ##################
+      #############   #################
+      #############     #############
+      #############        #######
+
+      PROFERTIL · FONDOS DE PRODUCTOS
+      Fondos generativos con el Sistema de Formas, lado a lado detrás de la cabecera real de Productos.
+
+      Hola. Si estás leyendo esto, te gusta ver cómo están hechas las cosas.
+      A nosotros también.
+
+      Diseño y desarrollo: Bong Studio
+      Estudio de branding. Córdoba, Argentina. Desde 2019.
+      Comparador de fondos para el catálogo y la ficha de producto de la web de Profertil.
+      Cada fondo es un shader propio que dibuja las Formas del sistema; sin librerías.
+
+      CRÉDITOS
+      María Lopez / Brand Designer
+      Marcos Cousseau / Creative Director
+
+      CONTACTO
+      https://bongstudio.ar
+
+      BONG STUDIO · 2026 — Brutally Clear Branding — bongstudio.ar
+-->
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fondos de productos</title>
+<meta name="description" content="Fondos generativos con el Sistema de Formas detrás de la cabecera de Productos de Profertil, lado a lado con la foto de campo: patrón, grilla interactiva, dither y píxeles.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../componentes/tokens.css">
+<style>
+/* Cada fondo se monta sobre la página real en un iframe (catálogo o ficha), dibujada a 1280 o 375 de ancho y achicada
+   para que entren lado a lado. La foto de campo de la página se reemplaza por el canvas del fondo; nada del sitio cambia. */
+:root { color-scheme: light; }
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 15px/1.5 "DM Sans", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+header { display: grid; gap: 18px; padding: 28px 24px 20px; }
+h1 { margin: 0; font: 600 clamp(28px, 3vw, 40px)/1.05 "Familjen Grotesk", sans-serif; letter-spacing: -.03em; color: var(--azul); }
+header p { margin: 6px 0 0; max-width: 70ch; color: var(--ink-2); }
+.ctl { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
+select { height: 38px; border: 0; border-radius: 12px; background: var(--tiza); color: var(--ink); font: 500 14px/1 "DM Sans", sans-serif; padding: 0 12px; cursor: pointer; }
+.seg { display: inline-flex; flex-wrap: wrap; gap: 2px; padding: 3px; border-radius: 14px; background: var(--line); }
+.seg button { border: 0; border-radius: 11px; background: transparent; height: 32px; padding: 0 12px; color: var(--ink); font: 500 14px/1 "DM Sans", sans-serif; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--tiza); }
+.seg button:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid var(--azul); outline-offset: 2px; }
+.muestra { width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-right: 6px; vertical-align: -1px; }
+main { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 460px), 1fr)); gap: 28px 20px; padding: 4px 24px 56px; }
+main.cel { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+figure { margin: 0; display: grid; gap: 10px; align-content: start; }
+figcaption { display: grid; gap: 2px; }
+figcaption .linea { font-size: 12px; letter-spacing: .02em; color: var(--ink-3); }
+figcaption b { font-weight: 500; }
+figcaption span { color: var(--ink-2); font-size: 13px; }
+figcaption a { color: var(--azul); font-weight: 500; }
+.marco { position: relative; overflow: hidden; border-radius: 16px; background: var(--azul); aspect-ratio: var(--w) / var(--h); }
+.marco iframe { position: absolute; top: 0; left: 0; width: calc(var(--w) * 1px); height: calc(var(--h) * 1px); border: 0; transform-origin: 0 0; transform: scale(var(--s, .4)); }
+/* Vista de un solo fondo a pantalla completa */
+body.ver { overflow: hidden; }
+.ver header, .ver main { display: none; }
+.solo { position: fixed; inset: 0; border: 0; width: 100%; height: 100%; }
+.solo-barra { position: fixed; left: 12px; bottom: 12px; z-index: 2; display: flex; align-items: center; gap: 6px; max-width: calc(100% - 24px); padding: 4px; border-radius: 999px; background: var(--tiza); }
+.solo-barra a, .solo-barra button { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border: 0; border-radius: 999px; background: transparent; color: var(--ink); font: 500 14px/1 "DM Sans", sans-serif; text-decoration: none; cursor: pointer; white-space: nowrap; }
+.solo-barra button { width: 36px; padding: 0; justify-content: center; background: var(--line); }
+.solo-barra .nombre { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 6px; font-size: 13px; color: var(--ink-2); }
+.solo-barra svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+@media (max-width: 640px) { header, main { padding-inline: 16px; } }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Fondos de productos</h1>
+    <p>La cabecera real del catálogo y de la ficha con fondos generativos hechos con el Sistema de Formas, al lado de la foto de campo de hoy y del campo de Formas de la Biblioteca. Todos se mueven y responden al mouse; con movimiento reducido quedan quietos. "Ver solo" abre uno a pantalla completa.</p>
+  </div>
+  <div class="ctl">
+    <div class="seg" role="group" aria-label="Página" id="pag">
+      <button type="button" data-v="ficha" aria-pressed="true">Ficha</button>
+      <button type="button" data-v="catalogo" aria-pressed="false">Catálogo</button>
+    </div>
+    <select id="prod" aria-label="Producto">
+      <option value="urea-pecuaria">Urea Pecuaria</option>
+      <option value="urea">Urea Granulada Argentina</option>
+      <option value="uan-32">UAN 32</option>
+      <option value="amoniaco">Amoníaco</option>
+      <option value="enetotalplus-2">eNeTOTAL PLUS</option>
+    </select>
+    <div class="seg" role="group" aria-label="Pantalla" id="pant">
+      <button type="button" data-v="esc" aria-pressed="true">Escritorio</button>
+      <button type="button" data-v="cel" aria-pressed="false">Celular</button>
+    </div>
+    <div class="seg" role="group" aria-label="Color del fondo" id="color">
+      <button type="button" data-v="azul" aria-pressed="true"><span class="muestra" style="background:#003DA5"></span>Azul</button>
+      <button type="button" data-v="verde" aria-pressed="false"><span class="muestra" style="background:#2D8035"></span>Verde</button>
+      <button type="button" data-v="amarillo" aria-pressed="false"><span class="muestra" style="background:#EABA2C"></span>Amarillo</button>
+      <button type="button" data-v="terra" aria-pressed="false"><span class="muestra" style="background:#8A4818"></span>Terra</button>
+    </div>
+    <div class="seg" role="group" aria-label="Familia" id="fam">
+      <button type="button" data-v="" aria-pressed="true">Todas</button>
+      <button type="button" data-v="Patrón" aria-pressed="false">Patrón</button>
+      <button type="button" data-v="Grilla" aria-pressed="false">Grilla</button>
+      <button type="button" data-v="Dither" aria-pressed="false">Dither</button>
+      <button type="button" data-v="Píxeles" aria-pressed="false">Píxeles</button>
+    </div>
+  </div>
+</header>
+<main id="grilla"></main>
+<script>
+(function () {
+  // Fondos a comparar. cfg va al motor (PFFondo); "foto" deja la página como está y "campo" monta el campo de la Biblioteca.
+  var VAR = [
+    { id: "foto", f: "Hoy", t: "Foto de campo", d: "La foto fija detrás de la tarjeta, como está publicada." },
+    { id: "campo", f: "Hoy", t: "Campo de Formas", d: "El campo de la Biblioteca, la Sala de prensa y la Nota: grupos que crecen y se deshacen." },
+    { id: "patron-onda", f: "Patrón", t: "Ladrillo con onda", d: "El ladrillo del generador de patrones. Las Formas respiran en una onda.", cfg: { modo: "patron", disposicion: "ladrillo", mov: "onda", celda: 30, ritmoX: 120, ritmoY: 110, solapamiento: 30, direccion: 1, direccionImpar: 3, velocidad: 40, angulo: 30, intensidad: 55, forma: "urea", acento: 8 } },
+    { id: "patron-grupos", f: "Patrón", t: "Grilla con grupos", d: "La grilla del generador con el comportamiento del campo: las Formas aparecen en grupos.", cfg: { modo: "patron", disposicion: "grilla", mov: "grupos", celda: 30, ritmoX: 110, ritmoY: 110, solapamiento: 30, grupos: 7, forma: "varias", acento: 8 } },
+    { id: "patron-giro", f: "Patrón", t: "Grilla con giro", d: "Cada Forma gira de a 90 grados en una ola, como la Dirección del generador.", cfg: { modo: "patron", disposicion: "grilla", mov: "giro", celda: 34, ritmoX: 120, ritmoY: 120, solapamiento: 30, velocidad: 40, angulo: 30, intensidad: 55, forma: "hoja", acento: 8 } },
+    { id: "patron-deriva", f: "Patrón", t: "Matriz a la deriva", d: "La matriz del generador (bloques con Formas grandes) se desliza despacio.", cfg: { modo: "patron", disposicion: "matriz", mov: "deriva", celda: 30, ritmoX: 110, ritmoY: 110, solapamiento: 30, velocidad: 40, angulo: 30, semilla: 37, forma: "circulos", acento: 8 } },
+    { id: "grilla-puntos", f: "Grilla", t: "Puntos con estela", d: "Puntos en grilla. El cursor los ilumina y deja una estela de Formas que se apagan.", cfg: { modo: "grilla", base: "puntos", celda: 28, marca: 8, actividad: 24, estela: 56, foco: 260, fuerzaFoco: 30, forma: "urea", acento: 1 } },
+    { id: "grilla-formas", f: "Grilla", t: "Formas chicas con foco", d: "La grilla es de Formas chicas que crecen con el foco y la estela.", cfg: { modo: "grilla", base: "formas", celda: 30, marca: 10, actividad: 24, estela: 56, foco: 300, fuerzaFoco: 60, forma: "trigo", acento: 1 } },
+    { id: "dither-binario", f: "Dither", t: "Dither binario", d: "Degradé y ruido con tramado Bayer: cada píxel es una Forma o nada.", cfg: { modo: "dither", tonos: "binario", celda: 16, angulo: 11, densidad: 15, degrade: 45, contraste: 130, velocidad: 40, radioCursor: 160, forma: "urea", acento: 0, clic: false } },
+    { id: "dither-escalonado", f: "Dither", t: "Dither escalonado", d: "La Forma cambia de tamaño en cuatro pasos, como una trama de medio tono.", cfg: { modo: "dither", tonos: "escalonado", celda: 20, angulo: 11, densidad: 15, degrade: 45, contraste: 130, velocidad: 40, radioCursor: 160, forma: "urea", acento: 0, clic: false } },
+    { id: "pixeles-forma", f: "Píxeles", t: "Píxeles que arman una Forma", d: "Las celdas aparecen desde un punto y arman una Forma grande; se desarman y vuelve a empezar.", cfg: { modo: "pixeles", objetivo: "forma", origen: "punto", celda: 20, tamano: 110, posX: 55, posY: 80, entrada: 22, quieto: 40, salida: 12, forma: "urea", acento: 10, cursor: false } },
+    { id: "pixeles-llenar", f: "Píxeles", t: "Píxeles que llenan", d: "Las celdas llenan el fondo al azar, se quedan y se van.", cfg: { modo: "pixeles", objetivo: "llenar", origen: "azar", celda: 26, entrada: 22, quieto: 40, salida: 12, forma: "varias", acento: 10, cursor: false } }
+  ];
+  var CAMPO_COLOR = { azul: "azul", verde: "verde", amarillo: "amarillo", terra: "naranja" };
+  var IGNORAR = "a, button, input, select, textarea, label, summary, [role=button], .pf-bh, .pf-hoja, #pf-top";
+  var base = location.href.split(/[?#]/)[0];
+  var URL_FORMAS = new URL("../componentes/formas.js", base).href, URL_MOTOR = new URL("../componentes/c/fondos-motor.js", base).href;
+  var Q = new URLSearchParams(location.search);
+  var est = { pag: Q.get("pag") || "ficha", prod: Q.get("prod") || "urea-pecuaria", pant: Q.get("pant") || "esc", color: Q.get("color") || "azul", fam: "" };
+  var grilla = document.getElementById("grilla");
+
+  function urlPagina() { return "../productos/" + (est.pag === "ficha" ? est.prod + "/" : ""); }
+
+  // --- Montaje dentro de la página (mismo origen)
+  function cargarScript(d, src) {
+    return new Promise(function (ok, mal) { var s = d.createElement("script"); s.src = src; s.onload = ok; s.onerror = mal; d.head.appendChild(s); });
+  }
+  var campoFuente = null;
+  // El campo de Formas vive en línea en las páginas del sitio: se toma de la Biblioteca para no copiarlo.
+  function traerCampo() {
+    if (campoFuente) return campoFuente;
+    campoFuente = fetch(new URL("../biblioteca/", base).href).then(function (r) { return r.text(); }).then(function (t) {
+      var doc = new DOMParser().parseFromString(t, "text/html"), js = "", css = "";
+      doc.querySelectorAll("script").forEach(function (s) { if (/window\.PF_CAMPO \|\|/.test(s.textContent)) js = s.textContent; });
+      doc.querySelectorAll("style").forEach(function (s) { if (/#pf-campo/.test(s.textContent)) css += s.textContent; });
+      return { js: js, css: css };
+    });
+    return campoFuente;
+  }
+  function montar(fr, v) {
+    var w = fr.contentWindow, d; try { d = fr.contentDocument; } catch (e) { return; }
+    if (!d || !d.querySelector(".pr-fondo") || d.documentElement.dataset.fondo) return;
+    d.documentElement.dataset.fondo = v.id;
+    if (v.id === "foto") return;
+    var fondo = d.querySelector(".pr-fondo");
+    var st = d.createElement("style");
+    st.textContent = ".pr-fondo::after { display: none; } .pr-fondo img { display: none; } .pr-fondo canvas { display: block; width: 100%; height: 100%; }";
+    d.head.appendChild(st);
+    cargarScript(d, URL_FORMAS).then(function () {
+      if (v.id === "campo") {
+        return traerCampo().then(function (c) {
+          if (!c.js) return;
+          var s2 = d.createElement("style"); s2.textContent = c.css; d.head.appendChild(s2);
+          fondo.remove();
+          var formas = {}; Object.keys(w.FORMAS).forEach(function (k) { if (k !== "logo") formas[k] = w.FORMAS[k]; });
+          w.PF_CAMPO = { formas: formas, color: CAMPO_COLOR[est.color], forma: "urea", tema: ["urea", "trigo", "hoja", "plantas"], cab: "pf-cab", main: "pf-hoja", columna: "pf-lista" };
+          var viejo = d.querySelector(".pr-cab");
+          var sc = d.createElement("script"); sc.textContent = c.js; d.body.appendChild(sc);
+          if (viejo && !viejo.children.length) viejo.remove();
+        });
+      }
+      return cargarScript(d, URL_MOTOR).then(function () {
+        fondo.style.background = "none";
+        var cv = d.createElement("canvas"); cv.setAttribute("aria-hidden", "true"); fondo.appendChild(cv);
+        var cfg = {}; Object.keys(v.cfg).forEach(function (k) { cfg[k] = v.cfg[k]; });
+        cfg.color = est.color; cfg.tapa = "pf-hoja"; cfg.ignorar = IGNORAR;
+        w.PFFondo(cv, cfg);
+      });
+    }).catch(function (e) { console.error(e); });
+  }
+
+  // --- Grilla de comparación
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (e) { var fr = e.target.querySelector("iframe"); try { fr.contentWindow.PF_PAUSA = !e.isIntersecting; } catch (x) {} });
+  }, { rootMargin: "200px 0px" });
+  function enlaceSolo(v) {
+    var p = new URLSearchParams({ ver: v.id, pag: est.pag, prod: est.prod, color: est.color });
+    return "?" + p.toString();
+  }
+  function pintar() {
+    var cel = est.pant === "cel", w = cel ? 375 : 1280, h = cel ? 760 : 800;
+    grilla.className = cel ? "cel" : "";
+    io.disconnect();
+    var lista = VAR.filter(function (v) { return !est.fam || v.f === est.fam || v.f === "Hoy"; });
+    grilla.innerHTML = lista.map(function (v) {
+      return '<figure data-id="' + v.id + '"><div class="marco" style="--w:' + w + ';--h:' + h + '"><iframe loading="lazy" title="' + v.t + '" src="' + urlPagina() + '"></iframe></div>' +
+        '<figcaption><span class="linea">' + v.f + '</span><b>' + v.t + '</b><span>' + v.d + ' <a href="' + enlaceSolo(v) + '">Ver solo</a></span></figcaption></figure>';
+    }).join("");
+    grilla.querySelectorAll("figure").forEach(function (f) {
+      var v = VAR.filter(function (x) { return x.id === f.dataset.id; })[0], fr = f.querySelector("iframe");
+      fr.addEventListener("load", function () { montar(fr, v); });
+      io.observe(f);
+    });
+    escalar();
+    var q = new URLSearchParams({ pag: est.pag, prod: est.prod, pant: est.pant, color: est.color });
+    history.replaceState(null, "", "?" + q.toString());
+  }
+  function escalar() {
+    grilla.querySelectorAll(".marco").forEach(function (m) {
+      var w = parseFloat(m.style.getPropertyValue("--w"));
+      m.style.setProperty("--s", (m.clientWidth / w).toFixed(4));
+    });
+  }
+  function seg(id, clave, alCambiar) {
+    var g = document.getElementById(id);
+    g.querySelectorAll("button").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b.dataset.v === est[clave]));
+      b.addEventListener("click", function () {
+        est[clave] = b.dataset.v;
+        g.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+        alCambiar();
+      });
+    });
+  }
+
+  // --- Un solo fondo a pantalla completa (?ver=)
+  var ver = Q.get("ver"), vi = VAR.map(function (v) { return v.id; }).indexOf(ver);
+  if (vi >= 0) {
+    document.body.classList.add("ver");
+    var v = VAR[vi], fr = document.createElement("iframe");
+    fr.className = "solo"; fr.title = v.t; fr.src = urlPagina();
+    fr.addEventListener("load", function () { montar(fr, v); });
+    document.body.appendChild(fr);
+    var IZQ = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 12H7M11 8l-4 4 4 4"/></svg>', DER = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12h10M13 8l4 4-4 4"/></svg>';
+    var barra = document.createElement("nav");
+    barra.className = "solo-barra"; barra.setAttribute("aria-label", "Fondos");
+    var volver = new URLSearchParams({ pag: est.pag, prod: est.prod, color: est.color });
+    barra.innerHTML = '<a href="?' + volver + '">' + IZQ + 'Todos</a><span class="nombre">' + v.t + '</span>' +
+      '<button type="button" data-d="-1" aria-label="Fondo anterior">' + IZQ + '</button><button type="button" data-d="1" aria-label="Fondo siguiente">' + DER + '</button>';
+    barra.querySelectorAll("button").forEach(function (b) {
+      b.addEventListener("click", function () { location.search = enlaceSolo(VAR[(vi + +b.dataset.d + VAR.length) % VAR.length]).slice(1); });
+    });
+    document.body.appendChild(barra);
+    return;
+  }
+
+  document.getElementById("prod").value = est.prod;
+  document.getElementById("prod").addEventListener("change", function (e) { est.prod = e.target.value; pintar(); });
+  function verProd() { document.getElementById("prod").hidden = est.pag !== "ficha"; }
+  seg("pag", "pag", function () { verProd(); pintar(); });
+  seg("pant", "pant", pintar);
+  seg("color", "color", pintar);
+  seg("fam", "fam", pintar);
+  verProd();
+  addEventListener("resize", escalar);
+  pintar();
+})();
+</script>
+</body>
+</html>
