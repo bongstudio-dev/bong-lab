@@ -2252,6 +2252,54 @@
     ],
     "id": "solucion-de-urea",
     "orden": 29,
-    "bajada": "Solución de grado automotriz que interviene en el tratamiento de los gases de escape de vehículos diésel."
+    "bajada": "Solución de grado automotriz que interviene en el tratamiento de los gases de escape de vehículos diésel.",
+    "tecnologia": {
+      "intro": "La norma Euro 5 pide tres condiciones para que un vehículo diésel reduzca sus emisiones.",
+      "requisitos": [
+        {
+          "t": "Motor diésel con tecnología SCR",
+          "b": "Reducción catalítica selectiva en el sistema de escape.",
+          "ic": "motor",
+          "color": "azul"
+        },
+        {
+          "t": "Solución de urea de alta pureza",
+          "b": "Arnox 32, de grado automotriz.",
+          "ic": "urea",
+          "color": "verde"
+        },
+        {
+          "t": "Gasoil de bajo contenido de azufre",
+          "b": "El combustible que el sistema necesita para funcionar bien.",
+          "ic": "gasoil",
+          "color": "amarillo"
+        }
+      ],
+      "resultado": {
+        "t": "Convierte los óxidos de nitrógeno en nitrógeno y agua, sustancias inocuas para el ambiente.",
+        "ic": "emisiones"
+      },
+      "calidad": [
+        {
+          "t": "Gran pureza",
+          "ic": "pureza"
+        },
+        {
+          "t": "Especificaciones técnicas internacionales",
+          "ic": "normas"
+        },
+        {
+          "t": "Estrictos controles de calidad",
+          "ic": "controles"
+        }
+      ],
+      "produccion": {
+        "cifra": "150.000",
+        "unidad": "t",
+        "t": "Producción y alcance",
+        "b": "Se produce en el complejo de Bahía Blanca, con capacidad para abastecer todo el mercado nacional y los principales países limítrofes.",
+        "ic": "produccion"
+      }
+    }
   }
 ]

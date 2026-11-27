@@ -27,6 +27,14 @@ const productos = defineCollection({
     cultivos: z.array(z.string()),
     documentos: z.array(z.object({ titulo: z.string(), ruta: z.string(), fuente: z.url(), tipo: z.string() })),
     galeria: z.array(z.object({ titulo: z.string(), ruta: z.string() })).default([]),
+    // Tecnología y producción armada con el sistema (íconos de src/lib/iconos-arnox): reemplaza a la galería de imágenes del sitio actual.
+    tecnologia: z.object({
+      intro: z.string(),
+      requisitos: z.array(z.object({ t: z.string(), b: z.string(), ic: z.string(), color: z.enum(["azul", "verde", "amarillo", "naranja"]) })),
+      resultado: z.object({ t: z.string(), ic: z.string() }),
+      calidad: z.array(z.object({ t: z.string(), ic: z.string() })),
+      produccion: z.object({ cifra: z.string(), unidad: z.string(), t: z.string(), b: z.string(), ic: z.string() }),
+    }).optional(),
     enlaces: z.array(z.object({ titulo: z.string(), url: z.union([z.url(), z.string().regex(/^productos\/[a-z0-9-]+\/$/)]), tipo: z.string() })),
   }),
 });

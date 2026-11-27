@@ -10,6 +10,7 @@ import { MSDS, BIB } from "../../lib/datos.mjs";
 interface Props { producto: Producto }
 const { producto } = Astro.props;
 const p = producto.data;
+const tec = p.tecnologia;
 const imagen = p.imagen || p.logo;
 const esFoto = imagen?.endsWith(".jpg");
 // Bolsa 3D en lugar de la foto de la bolsa: todo lo pesado se pide desde el <head> para que esté listo cuando se dibuja.
@@ -47,7 +48,7 @@ const solo = (i) => {
 const resto = p.caracteristicas.filter(c => !destacados.includes(c));
 
 const SOLAPAS = [
-  { id: "producto", nombre: "Producto", visible: p.caracteristicas.length + p.descripcion.length + p.galeria.length },
+  { id: "producto", nombre: "Producto", visible: p.caracteristicas.length + p.descripcion.length + p.galeria.length + (tec ? 1 : 0) },
   { id: "uso", nombre: "Uso y cultivos", visible: p.recomendaciones.length + p.cultivos.length },
   // Un solo documento va en el botón de la cabecera; la solapa aparece desde dos.
   { id: "documentos", nombre: "Documentos", visible: totalDocs > 1 },
@@ -66,6 +67,11 @@ const afinidad = (o: Producto) => (p.familia && o.data.familia === p.familia ? 1
   + o.data.cultivos.filter(c => p.cultivos.includes(c)).length + nutrientes(o).filter(n => nut.includes(n)).length * 2;
 const otros = todos.map(o => ({ o, a: afinidad(o) })).sort((x, y) => y.a - x.a || x.o.data.orden - y.o.data.orden).slice(0, 3).map(x => x.o);
 
+// Tecnología y producción con el sistema: íconos de la librería Profertil (Hugeicons) y los colores de las familias de etiquetas.
+const IC = Object.fromEntries(Object.entries(import.meta.glob("../../lib/iconos-arnox/*.svg", { query: "?raw", import: "default", eager: true }))
+  .map(([k, v]) => [k.split("/").pop().replace(".svg", ""), String(v).trim().replace("<svg ", '<svg aria-hidden="true" ')]));
+const COLOR = { azul: "--eb: var(--azul); --fo: var(--celeste)", verde: "--eb: var(--verde); --fo: var(--verde-claro)",
+  amarillo: "--eb: var(--amarillo); --fo: var(--naranja)", naranja: "--eb: var(--naranja); --fo: var(--terra)" };
 const IR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12h10M13 8l4 4-4 4"/></svg>';
 const VOLVER = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 12H7M11 8l-4 4 4 4"/></svg>';
 const AFUERA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 16l8-8M10 8h6v6"/></svg>';
@@ -129,7 +135,29 @@ const PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-
           : <ul>{b.lista.map(i => typeof i === "string" ? <li>{i}</li> : <li><strong>{i.termino}:</strong> {i.texto}</li>)}</ul>)}</div>}
         {!!resto.length && <div><h2>Características</h2><dl class="pr-datos">{resto.map(c => <div><dt>{c.etiqueta}</dt><dd>{c.valor}</dd></div>)}</dl></div>}
       </div>
-      {!!p.galeria.length && <div class="pr-bloque"><h2>Tecnología y producción</h2>
+      {tec && <div class="pr-bloque pr-tec"><h2>Tecnología y producción</h2>
+        <p class="pr-tec__intro">{tec.intro}</p>
+        <ol class="pr-tec__req">{tec.requisitos.map((r, i) => <li style={COLOR[r.color]}>
+          <span class="pr-tec__ic"><Fragment set:html={IC[r.ic]} /></span>
+          <span class="pr-tec__n" aria-hidden="true">{i + 1}</span>
+          <span class="pr-tec__t">{r.t}</span><span class="pr-tec__b">{r.b}</span>
+        </li>)}</ol>
+        <div class="pr-tec__res">
+          <span class="pr-tec__ic"><Fragment set:html={IC[tec.resultado.ic]} /></span>
+          <p class="pr-tec__formula" aria-label="Óxidos de nitrógeno a nitrógeno y agua">NO<sub>x</sub><Fragment set:html={IR} />N<sub>2</sub> + H<sub>2</sub>O</p>
+          <p class="pr-tec__res-t">{tec.resultado.t}</p>
+        </div>
+        <div class="pr-tec__pie">
+          <ul class="pr-tec__cal">{tec.calidad.map(c => <li><span class="pr-tec__ic"><Fragment set:html={IC[c.ic]} /></span>{c.t}</li>)}</ul>
+          <div class="pr-tec__prod">
+            <span class="pr-tec__ic"><Fragment set:html={IC[tec.produccion.ic]} /></span>
+            <span class="pr-tec__t">{tec.produccion.t}</span>
+            <p class="pr-tec__cifra">{tec.produccion.cifra}<small>{tec.produccion.unidad}</small></p>
+            <p class="pr-tec__b">{tec.produccion.b}</p>
+          </div>
+        </div>
+      </div>}
+      {!tec && !!p.galeria.length && <div class="pr-bloque"><h2>Tecnología y producción</h2>
         <ul class="pr-galeria">{p.galeria.map(g => <li><img src={sitio(g.ruta)} alt="" loading="lazy" /><span>{g.titulo}</span></li>)}</ul>
       </div>}
     </section>}

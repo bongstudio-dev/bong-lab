@@ -232,3 +232,42 @@ html { scrollbar-gutter: stable; scroll-padding-block: 96px 96px; }
   .pr-v-sin-arte .pr-ficha-cab__txt, .pr-v-arte-fondo .pr-ficha-cab__txt { padding-block: 0; }
 }
 .pr-v-liso .pr-fondo img { display: none; }
+
+/* --- Tecnología y producción (Solución de urea): el relato de la norma armado con el sistema. Tres condiciones numeradas, cada una
+   con su ícono en un cuadro con los colores de una familia de etiquetas (como las tarjetas compactas de Proveedores); qué hace el
+   producto en un plano azul; calidad y la cifra de producción al pie. */
+.pr-tec__intro { margin: -4px 0 20px; max-width: 640px; color: var(--ink-2); font-size: var(--texto-destacado); line-height: 1.5; }
+.pr-tec__ic { display: grid; place-items: center; flex: none; width: 56px; height: 56px; padding: 14px; border-radius: 16px; background: var(--eb, var(--chip-fondo)); color: var(--fo, var(--azul)); }
+.pr-tec__ic svg { width: 100%; height: 100%; }
+.pr-tec__req { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 12px; padding: 0; margin: 0; list-style: none; }
+.pr-tec__req li { position: relative; display: grid; align-content: start; gap: 8px; padding: 22px 24px 24px; border-radius: var(--radio-media); background: var(--card); }
+.pr-tec__req .pr-tec__ic { margin-bottom: 14px; }
+.pr-tec__n { position: absolute; top: 18px; right: 24px; color: var(--eb); font: 600 clamp(40px, 4vw, 56px)/1 var(--f-display); letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+.pr-tec__t { color: var(--azul); font: 600 var(--texto-subtitulo, 22px)/1.15 var(--f-display); letter-spacing: -.02em; text-wrap: balance; }
+.pr-tec__b { margin: 0; color: var(--ink-2); font-size: var(--texto-chico); line-height: 1.5; }
+.pr-tec__res { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 8px 22px; margin-top: 12px; padding: 26px 28px; border-radius: var(--radio-media); background: var(--azul); color: var(--tiza); }
+.pr-tec__res .pr-tec__ic { grid-row: 1 / span 2; --eb: var(--celeste); --fo: var(--tiza); }
+.pr-tec__formula { margin: 0; font: 600 clamp(24px, 2.6vw, 34px)/1.1 var(--f-display); letter-spacing: -.02em; }
+.pr-tec__formula sub { font-size: .55em; vertical-align: -.1em; }
+.pr-tec__formula svg { display: inline-block; width: 1.1em; height: 1.1em; margin: 0 .15em; vertical-align: -.2em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.pr-tec__res-t { margin: 0; max-width: 620px; font-size: var(--texto-destacado); line-height: 1.45; opacity: .9; }
+.pr-tec__pie { display: grid; gap: 12px; margin-top: 12px; }
+@media (min-width: 860px) { .pr-tec__pie { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.pr-tec__cal { display: grid; gap: 0; padding: 6px 24px; margin: 0; list-style: none; border-radius: var(--radio-media); background: var(--card); }
+.pr-tec__cal li { display: flex; align-items: center; gap: 16px; padding: 14px 0; color: var(--ink); font: 600 var(--texto-destacado)/1.25 var(--f-display); letter-spacing: -.01em; }
+.pr-tec__cal li + li { border-top: 1px solid var(--line); }
+.pr-tec__cal .pr-tec__ic { width: 44px; height: 44px; padding: 11px; border-radius: 12px; }
+.pr-tec__prod { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; align-content: start; gap: 6px 16px; padding: 22px 24px 24px; border-radius: var(--radio-media); background: var(--card); --eb: var(--verde); --fo: var(--verde-claro); }
+.pr-tec__prod .pr-tec__ic { width: 44px; height: 44px; padding: 11px; border-radius: 12px; }
+.pr-tec__cifra { grid-column: 1 / -1; margin: 14px 0 0; color: var(--azul); font: 600 clamp(48px, 5.5vw, 72px)/1 var(--f-display); letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+.pr-tec__cifra small { margin-left: .2em; font-size: .5em; letter-spacing: 0; }
+.pr-tec__prod .pr-tec__b { grid-column: 1 / -1; }
+@media (max-width: 640px) {
+  /* Celular: como las tarjetas compactas de Proveedores, el ícono al costado del texto. */
+  .pr-tec__req li { grid-template-columns: 48px minmax(0, 1fr); column-gap: 14px; row-gap: 4px; padding: 18px 52px 18px 16px; }
+  .pr-tec__req .pr-tec__ic { grid-row: 1 / span 2; width: 48px; height: 48px; padding: 12px; border-radius: 14px; margin: 0; }
+  .pr-tec__req .pr-tec__t { font-size: 19px; }
+  .pr-tec__n { top: 16px; right: 18px; font-size: 32px; }
+  .pr-tec__res { grid-template-columns: 1fr; padding: 22px; }
+  .pr-tec__res .pr-tec__ic { grid-row: auto; margin-bottom: 8px; }
+}
