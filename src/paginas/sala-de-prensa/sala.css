@@ -265,9 +265,7 @@ html { scrollbar-gutter: stable; scroll-padding-block: 150px 96px; }
 .pf-logo__t h3 { margin: 0; font: 500 1.12rem/1.2 var(--f-display); color: var(--azul); letter-spacing: -0.01em; }
 .pf-logo__t span { font-size: var(--texto-chico); color: var(--ink-2); }
 .pf-logo__d { display: flex; gap: 6px; padding-inline: 8px; }
-.pf-logo__d .pf-boton { flex: 1; height: 34px; padding: 0 10px; background: var(--tiza); }
-@media (hover: hover) and (pointer: fine) { .pf-logo__d .pf-boton:hover { background: var(--azul); border-color: var(--azul); color: var(--tiza); } }
-.pf-logo__d .pf-boton::before { display: none; } /* las descargas de logos tienen su propio hover, en azul */
+.pf-logo__d .pf-boton { flex: 1; height: 34px; padding: 0 10px; background: var(--tiza); } /* hover del botón base: el azul baja desde arriba */
 .pf-logos-pie { margin: 22px 0 0; color: var(--ink-2); font-size: var(--texto-chico); }
 .pf-logos-pie a { color: var(--azul); }
 
