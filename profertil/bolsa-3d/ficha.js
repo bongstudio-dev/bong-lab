@@ -3,7 +3,9 @@
 // así que cuando el primer cuadro está listo la foto se cambia por la bolsa sin que nada se mueva.
 // Mientras tanto se ve la foto. Se puede girar arrastrando unos grados a cada lado; al soltar vuelve
 // adentro del límite si se pasó. Quieta, se mece despacio unos grados (solo mientras se ve en pantalla y
-// sin movimiento reducido). Fuera de eso, solo se dibuja cuando algo cambia.
+// sin movimiento reducido). Al bajar por la página gira hacia el frente, siguiendo el scroll con un poco de
+// inercia (en el iPhone el scroll llega a saltos mientras cambia la barra del navegador y así no se notan).
+// Fuera de eso, solo se dibuja cuando algo cambia.
 //
 // Uso: import { montar } from ".../bolsa-3d/ficha.js"; montar(figura, { glb, piel });
 //   figura: el <figure> que contiene la <img> de la bolsa.
@@ -26,6 +28,10 @@ const VAIVEN = 7, PERIODO = 7, ESPERA = 2.5;
 // Entrada: la bolsa llega más grande y girada, y se asienta en su lugar (escala y giro con la misma curva).
 const ENTRADA = { segundos: 1.6, escala: 1.22, giro: 45 };
 const CENTRO_Y = 0.47; // mitad del alto de la bolsa: la escala de la entrada se hace alrededor de ese punto
+// Scroll: la bolsa gira GIRO grados (negativo = hacia el frente, de cara a la cámara) en los primeros RECORRIDO px,
+// o antes si la figura sale de pantalla antes (termina cuando bajó el 60 % de la figura). Lo sigue con un retardo de
+// INERCIA segundos.
+const SCROLL = { recorrido: 400, giro: -25, inercia: 0.14 };
 
 export async function montar(figura, { glb, piel }) {
   const foto = figura.querySelector("img");
@@ -90,6 +96,8 @@ export async function montar(figura, { glb, piel }) {
     const s = (cs.objectFit === "cover" ? Math.max : Math.min)(cw / FOTO.w, ch / FOTO.h);
     const rw = FOTO.w * s, rh = FOTO.h * s;
     const rx = foto.offsetLeft + pl + (cw - rw) / 2, ry = foto.offsetTop + pt + (ch - rh) / 2;
+    const caja = figura.getBoundingClientRect();
+    recorrido = THREE.MathUtils.clamp(caja.top + scrollY + 0.6 * H, 120, SCROLL.recorrido);
     renderer.setSize(W, H, false);
     camara.setViewOffset(rw, rh, -rx - FOTO.ox * s, -ry - FOTO.oy * s, W, H);
     pedir();
@@ -102,6 +110,10 @@ export async function montar(figura, { glb, piel }) {
   let amp = 0, fase = 0, antes = 0, quietaDesde = Infinity, enPantalla = true;
   // Entrada: 0 al empezar, 1 al terminar (sin movimiento reducido arranca terminada).
   let entradaDesde = 0, entrada = quieto.matches ? 1 : 0;
+  // Giro por scroll: lo que pide la posición de la página y lo que lleva la bolsa (lo sigue con inercia).
+  let desp = 0, recorrido = SCROLL.recorrido;
+  const metaScroll = () => quieto.matches ? 0
+    : THREE.MathUtils.degToRad(SCROLL.giro) * THREE.MathUtils.clamp(scrollY / recorrido, 0, 1);
   function entrar(p) {
     const e = 1 - Math.pow(1 - p, 3);
     const k = 1 + (ENTRADA.escala - 1) * (1 - e);
@@ -121,6 +133,11 @@ export async function montar(figura, { glb, piel }) {
     const dt = Math.min(0.05, antes ? (ahora - antes) / 1000 : 0);
     antes = ahora;
     let vaiven = 0, llegada = 0;
+    // Primer cuadro (dt 0): toma la posición de la página sin animar, por si se entra con la página ya bajada.
+    const ms = metaScroll();
+    desp = dt ? desp + (ms - desp) * (1 - Math.exp(-dt / SCROLL.inercia)) : ms;
+    const girando = Math.abs(ms - desp) > 1e-4;
+    if (girando) pedir(); else desp = ms;
     if (entrada < 1) {
       entrada = THREE.MathUtils.clamp((ahora - entradaDesde) / (ENTRADA.segundos * 1000), 0, 1);
       llegada = entrar(entrada);
@@ -131,8 +148,11 @@ export async function montar(figura, { glb, piel }) {
       objetivo = meta;
       giro += (meta - giro) * 0.18;
       if (Math.abs(meta - giro) > 1e-4) pedir(); else giro = meta;
-      if (meciendo() && ahora - quietaDesde > ESPERA * 1000) {
-        amp = Math.min(1, amp + dt / 1.5);
+      // Mientras gira por el scroll el vaivén se apaga de a poco y vuelve a esperar.
+      if (girando) quietaDesde = ahora;
+      const mecer = meciendo() && ahora - quietaDesde > ESPERA * 1000;
+      amp = THREE.MathUtils.clamp(amp + (mecer ? dt / 1.5 : -dt / 0.4), 0, 1);
+      if (amp > 0) {
         fase += dt * 2 * Math.PI / PERIODO;
         // El vaivén va de ida y vuelta alrededor de donde quedó, sin pasarse del límite.
         vaiven = amp * THREE.MathUtils.degToRad(VAIVEN) * Math.sin(fase);
@@ -140,7 +160,7 @@ export async function montar(figura, { glb, piel }) {
         pedir();
       } else if (meciendo()) pedir();
     }
-    bolsa.rotation.y = arrastre ? frenar(objetivo) : giro + vaiven + llegada;
+    bolsa.rotation.y = (arrastre ? frenar(objetivo) : giro + vaiven + llegada) + desp;
     renderer.render(escena, camara);
   }
   function pedir() { if (!cuadro) cuadro = requestAnimationFrame(dibujar); }
@@ -148,7 +168,7 @@ export async function montar(figura, { glb, piel }) {
   lienzo.addEventListener("pointerdown", (e) => {
     if (e.button !== 0 || entrada < 1) return;
     // Lo que se había mecido pasa a ser el giro, así no salta al agarrarla.
-    objetivo = giro = bolsa.rotation.y; amp = 0; fase = 0;
+    objetivo = giro = bolsa.rotation.y - desp; amp = 0; fase = 0;
     arrastre = { x: e.clientX, desde: objetivo, id: e.pointerId };
     lienzo.setPointerCapture(e.pointerId);
     lienzo.classList.add("pr-bolsa3d--mano");
@@ -179,13 +199,16 @@ export async function montar(figura, { glb, piel }) {
   // El dibujo y el cambio de clase van en el mismo paso: el navegador los muestra juntos en el próximo cuadro.
   // El primer cuadro ya es el comienzo de la entrada.
   entradaDesde = performance.now();
-  if (entrada < 1) bolsa.rotation.y = entrar(0); else quietaDesde = entradaDesde;
+  desp = metaScroll();
+  bolsa.rotation.y = (entrada < 1 ? entrar(0) : 0) + desp;
+  if (entrada >= 1) quietaDesde = entradaDesde;
   renderer.render(escena, camara);
   figura.classList.add("pr-ficha-cab__arte--3d");
   performance.mark("bolsa3d-lista");
   pedir();
 
   new ResizeObserver(medir).observe(figura);
+  addEventListener("scroll", pedir, { passive: true });
   // El vaivén solo corre mientras la bolsa se ve.
   new IntersectionObserver(([e]) => { enPantalla = e.isIntersecting; antes = 0; pedir(); }).observe(figura);
   document.addEventListener("visibilitychange", () => { antes = 0; pedir(); });
