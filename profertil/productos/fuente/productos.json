@@ -125,19 +125,40 @@
     "descripcion": [
       "Es el fertilizante nitrogenado de mayor concentración de Nitrógeno (N) estabilizado del mercado (46-0-0). Posee un inhibidor de la ureasa que contiene dos principios activos proporcionando una amplia protección contra la pérdida de Nitrógeno (N) y ofreciendo estabilidad en la formulación y en el producto final, tanto en almacenamiento como el transporte.",
       "eNeTOTALPLUS permite aplicar la dosis justa, de manera segura, al costo más conveniente.",
-      "Innovación: El tratamiento de Urea Granulada con un inhibidor de volatilización con dos principios activos asegura el aprovechamiento total del Nitrógeno (N) aplicado.",
-      "Confiabilidad: Aumenta la ventana de aplicación, manteniendo el Nitrógeno (N) de manera segura, a la espera de una lluvia que lo incorpore.",
-      "Eficiencia: Mayor EUN (Eficiencia de Uso del Nitrógeno [N]).",
-      "Practicidad: Recomendado para lotes con alto contenido de rastrojo.",
-      "La aplicación en superficie permite:",
-      "Mayor rapidez y facilidad.",
-      "Mayor cantidad de ha/h de trabajo.",
-      "Puede ser mezclado con otras fuentes de fertilizantes sólidos.",
-      "Rendimiento: con el uso de eNeTOTAL Plus, en condiciones de alta temperatura y humedad, se observaron respuestas de 500 a más de 1500 kg/ha en maíz.",
-      "Es el fertilizante sólido con mayor concentración de N estabilizado.",
-      "Color amarillo.",
-      "Se aplica en todos los cultivos. Especialmente recomendado para gramíneas estivales (arroz, maíz, caña de azúcar, pasturas, sorgo, etc.).",
-      "No compatible en mezclas con Nitrato de Amonio y compatibilidad limitada con SPS y SPT."
+      {
+        "termino": "Innovación",
+        "texto": "El tratamiento de Urea Granulada con un inhibidor de volatilización con dos principios activos asegura el aprovechamiento total del Nitrógeno (N) aplicado."
+      },
+      {
+        "termino": "Confiabilidad",
+        "texto": "Aumenta la ventana de aplicación, manteniendo el Nitrógeno (N) de manera segura, a la espera de una lluvia que lo incorpore."
+      },
+      {
+        "termino": "Eficiencia",
+        "texto": "Mayor EUN (Eficiencia de Uso del Nitrógeno [N])."
+      },
+      {
+        "termino": "Practicidad",
+        "texto": "Recomendado para lotes con alto contenido de rastrojo."
+      },
+      {
+        "subtitulo": "La aplicación en superficie permite:"
+      },
+      {
+        "lista": [
+          "Mayor rapidez y facilidad.",
+          "Mayor cantidad de ha/h de trabajo.",
+          "Puede ser mezclado con otras fuentes de fertilizantes sólidos.",
+          {
+            "termino": "Rendimiento",
+            "texto": "con el uso de eNeTOTAL Plus, en condiciones de alta temperatura y humedad, se observaron respuestas de 500 a más de 1500 kg/ha en maíz."
+          },
+          "Es el fertilizante sólido con mayor concentración de N estabilizado.",
+          "Color amarillo.",
+          "Se aplica en todos los cultivos. Especialmente recomendado para gramíneas estivales (arroz, maíz, caña de azúcar, pasturas, sorgo, etc.).",
+          "No compatible en mezclas con Nitrato de Amonio y compatibilidad limitada con SPS y SPT."
+        ]
+      }
     ],
     "recomendaciones": [
       "Aplicación en superficie.",
@@ -1178,9 +1199,22 @@
     "descripcion": [
       "Este producto está compuesto por Superfosfato Triple (fertilizante fosfatado de mayor concentración disponible de P), cubierto con Zn DDP (microgránulos Zn que se adhieren al fertilizante a través de un proceso físico de estática evitando su separación durante el manipuleo y transporte).",
       "El Zinc DDP es un Zinc micronizado (Dry Disperse Powder) que aumenta la eficiencia del nutriente.",
-      "Este producto cuenta con dos tecnologías innovadoras:",
-      "DUAL ACTION: que permite la disponibilidad del Zn en dos momentos: inmediata y a lo largo del ciclo del cultivo, estando disponible durante los momentos críticos de la planta.",
-      "EVEN COAT: Su distribución tipo manta ayuda a la absorción temprana."
+      {
+        "subtitulo": "Este producto cuenta con dos tecnologías innovadoras:"
+      },
+      {
+        "lista": [
+          {
+            "termino": "DUAL ACTION",
+            "texto": "que permite la disponibilidad del Zn en dos momentos: inmediata y a lo largo del ciclo del cultivo, estando disponible durante los momentos críticos de la planta."
+          },
+          {
+            "termino": "EVEN COAT",
+            "texto": "Su distribución tipo manta ayuda a la absorción temprana."
+          }
+        ],
+        "numerada": true
+      }
     ],
     "recomendaciones": [
       "Según estrategia de aplicación de P y Zn:",
@@ -1265,9 +1299,22 @@
     "descripcion": [
       "Este producto está compuesto por Fosfato Monoamónico (MAP), uno de los fertilizantes más concentrados del mercado, con entre 62% y 64% de nutrientes (N y P), cubierto con Zn DDP (microgránulos Zn que se adhieren al fertilizante a través de un proceso físico de estática evitando su separación durante el manipuleo y transporte).",
       "El Zinc DDP es un Zinc micronizado (Dry Disperse Powder) que aumenta la eficiencia del nutriente.",
-      "Este producto cuenta con dos tecnologías innovadoras:",
-      "DUAL ACTION: que permite la disponibilidad del Zn en dos momentos: inmediata y a lo largo del ciclo del cultivo, estando disponible durante los momentos críticos de la planta.",
-      "EVEN COAT: Su distribución tipo manta ayuda a la absorción temprana."
+      {
+        "subtitulo": "Este producto cuenta con dos tecnologías innovadoras:"
+      },
+      {
+        "lista": [
+          {
+            "termino": "DUAL ACTION",
+            "texto": "que permite la disponibilidad del Zn en dos momentos: inmediata y a lo largo del ciclo del cultivo, estando disponible durante los momentos críticos de la planta."
+          },
+          {
+            "termino": "EVEN COAT",
+            "texto": "Su distribución tipo manta ayuda a la absorción temprana."
+          }
+        ],
+        "numerada": true
+      }
     ],
     "recomendaciones": [
       "Aplicación y momento: Incorporado a la siembra (al costado y por debajo de la línea de siembra).",
@@ -1989,9 +2036,13 @@
     "caracteristicas": [],
     "descripcion": [
       "Urea Granulada utilizada como materia prima durante parte de un proceso industrial.",
-      "Packaging",
+      {
+        "subtitulo": "Packaging"
+      },
       "Granel. Las condiciones del transporte deben ser las adecuadas para impedir que el producto adquiera humedad o incorpore contaminantes.",
-      "Seguridad y manipuleo",
+      {
+        "subtitulo": "Seguridad y manipuleo"
+      },
       "Para manipulación y almacenamiento, aplicar los criterios dados en la ficha MSDS del material."
     ],
     "recomendaciones": [],
@@ -2054,7 +2105,10 @@
     ],
     "descripcion": [
       "Aditivo nutricional para rumiantes compuesto por Nitrógeno (46%).",
-      "Umbral de toxicidad en animales: 40 a 50 gramos cada 100 kg de peso vivo por animal y por día.",
+      {
+        "termino": "Umbral de toxicidad en animales",
+        "texto": "40 a 50 gramos cada 100 kg de peso vivo por animal y por día."
+      },
       "Dado su carácter higroscópico, el producto se humedece en contacto con el aire."
     ],
     "recomendaciones": [

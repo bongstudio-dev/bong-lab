@@ -16,7 +16,13 @@ const productos = defineCollection({
     imagen: z.string().nullable(),
     logo: z.string().nullable(),
     caracteristicas: z.array(z.object({ etiqueta: z.string(), valor: z.string() })),
-    descripcion: z.array(z.string()),
+    // Párrafos de la descripción. Además del texto corrido: subtítulo, término en negrita con su explicación, y lista (con viñetas o numerada).
+    descripcion: z.array(z.union([
+      z.string(),
+      z.object({ subtitulo: z.string() }),
+      z.object({ termino: z.string(), texto: z.string() }),
+      z.object({ lista: z.array(z.union([z.string(), z.object({ termino: z.string(), texto: z.string() })])), numerada: z.boolean().optional() }),
+    ])),
     recomendaciones: z.array(z.string()),
     cultivos: z.array(z.string()),
     documentos: z.array(z.object({ titulo: z.string(), ruta: z.string(), fuente: z.url(), tipo: z.string() })),
