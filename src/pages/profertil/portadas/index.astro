@@ -1,0 +1,85 @@
+---
+// Portadas de esfera: las tres versiones de la portada de Sostenibilidad (Editorial, Inmersiva e Índice) lado a lado,
+// en escritorio o en celular, para compararlas. Cada una se puede abrir sola.
+import { firma } from "../../../lib/firma.mjs";
+const VERSIONES = [
+  { id: "editorial", t: "Editorial", d: "Ritmo lento y mucho aire. El texto abre y las imágenes acompañan." },
+  { id: "inmersiva", t: "Inmersiva", d: "La imagen manda. Foto a sangre, texto fijo con fotos que pasan y pausas de color." },
+  { id: "indice", t: "Índice", d: "Arriba, a qué se puede ir. Accesos en la primera pantalla y bloques que se despliegan." },
+];
+const FLECHA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>';
+---
+<!DOCTYPE html>
+<Fragment set:html={firma({ nombre: "PROFERTIL · PORTADAS DE ESFERA", que: "Las tres versiones de la portada de Sostenibilidad, lado a lado.", contexto: "Prototipo de las portadas de esfera para la web de Profertil." })} />
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portadas de esfera · Profertil</title>
+<meta name="description" content="Tres versiones de la portada de la esfera Sostenibilidad, con la misma plantilla y distinto ritmo, para comparar en escritorio y en celular.">
+<meta name="color-scheme" content="only light">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../componentes/tokens.css">
+<link rel="stylesheet" href="../componentes/base.css">
+<style>
+  body { min-height: 100vh; }
+  .pf-cmp { --ancho: 1440; --alto: 900; padding: 28px clamp(16px, 2.4vw, 32px) 40px; }
+  .pf-cmp[data-vista="mobile"] { --ancho: 390; --alto: 844; }
+  .pf-cmp__cab { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 24px; }
+  .pf-cmp h1 { margin: 0; font: 500 var(--texto-titulo)/1.04 var(--f-display); letter-spacing: -.03em; color: var(--titulo); }
+  .pf-cmp__cab p { margin: 10px 0 0; max-width: 60ch; color: var(--ink-2); }
+  .pf-cmp__cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .pf-cmp__col { display: grid; gap: 12px; align-content: start; min-width: 0; }
+  .pf-cmp__col header { display: flex; justify-content: space-between; align-items: start; gap: 12px; }
+  .pf-cmp__col h2 { margin: 0; font: 500 var(--texto-subtitulo)/1.1 var(--f-display); color: var(--titulo); }
+  .pf-cmp__col header p { margin: 4px 0 0; font-size: var(--texto-chico); line-height: 1.4; color: var(--ink-2); }
+  .pf-cmp__marco { position: relative; width: 100%; aspect-ratio: var(--ancho) / var(--alto); overflow: hidden; border-radius: var(--radio-tarjeta); background: var(--card); border: 1px solid var(--line); }
+  .pf-cmp[data-vista="mobile"] .pf-cmp__marco { max-width: 390px; margin-inline: auto; }
+  .pf-cmp__marco iframe { position: absolute; left: 0; top: 0; width: calc(var(--ancho) * 1px); height: calc(var(--alto) * 1px); border: 0; transform-origin: 0 0; transform: scale(var(--k, .3)); }
+  .pf-cmp .pf-selector { width: 220px; }
+  @media (max-width: 900px) { .pf-cmp__cols { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main class="pf-cmp" id="pf-cmp" data-vista="desktop">
+  <div class="pf-cmp__cab">
+    <div>
+      <h1>Portadas de esfera</h1>
+      <p>La portada de Sostenibilidad en tres versiones. Misma plantilla y mismo orden de bloques, con distinto ritmo. Cada vista se puede recorrer con el scroll.</p>
+    </div>
+    <div class="pf-selector" role="group" aria-label="Pantalla">
+      <span class="pf-selector__ind" aria-hidden="true"></span>
+      <button type="button" data-vista="desktop" aria-pressed="true">Escritorio</button>
+      <button type="button" data-vista="mobile" aria-pressed="false">Celular</button>
+    </div>
+  </div>
+  <div class="pf-cmp__cols">
+    {VERSIONES.map((v) => (
+      <section class="pf-cmp__col" aria-labelledby={"pf-cmp-" + v.id}>
+        <header>
+          <div><h2 id={"pf-cmp-" + v.id}>{v.t}</h2><p>{v.d}</p></div>
+          <a class="pf-boton" href={v.id + "/"}>Abrir<Fragment set:html={FLECHA} /></a>
+        </header>
+        <div class="pf-cmp__marco"><iframe src={v.id + "/"} title={"Portada " + v.t} loading="lazy"></iframe></div>
+      </section>
+    ))}
+  </div>
+</main>
+<script is:inline>
+  (function () {
+    var raiz = document.getElementById("pf-cmp"), sel = raiz.querySelector(".pf-selector"), ind = sel.querySelector(".pf-selector__ind");
+    // Cada vista se dibuja a su tamaño real (1440 o 390 de ancho) y se achica para entrar en su columna.
+    function escalar() { var a = raiz.dataset.vista === "mobile" ? 390 : 1440; raiz.querySelectorAll(".pf-cmp__marco").forEach(function (m) { m.style.setProperty("--k", (m.clientWidth / a).toFixed(4)); }); }
+    function ubicar() { var b = sel.querySelector('[aria-pressed="true"]'); ind.style.width = b.offsetWidth + "px"; ind.style.transform = "translateX(" + b.offsetLeft + "px)"; }
+    sel.addEventListener("click", function (e) {
+      var b = e.target.closest("button"); if (!b) return;
+      sel.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+      raiz.dataset.vista = b.dataset.vista; ubicar(); escalar();
+    });
+    ubicar(); escalar(); addEventListener("resize", function () { ubicar(); escalar(); });
+  })();
+</script>
+</body>
+</html>

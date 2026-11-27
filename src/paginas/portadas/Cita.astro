@@ -1,0 +1,9 @@
+---
+// 04B Cita (pieza nueva): comillas, el texto y quién lo dice.
+import { CITA } from "./contenido.mjs";
+---
+<figure class="pf-po-cita">
+  <span class="pf-po-cita__marca" aria-hidden="true">“</span>
+  <blockquote><p data-anim="persiana">{CITA.t}</p></blockquote>
+  <figcaption><b>{CITA.quien}</b><span>{CITA.cargo}</span></figcaption>
+</figure>

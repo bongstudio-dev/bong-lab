@@ -1,0 +1,11 @@
+---
+// 04 Cifras clave (componente de la librería): el marcado del componente con las cifras reales y su año.
+// El CSS lo suma la versión con pieza("cifras", ...); acá van sus atributos.
+import { CIFRAS } from "./contenido.mjs";
+interface Props { attrs: string; style: string }
+const { attrs, style } = Astro.props;
+const html = `<section class="pf-cifras" data-c="cifras"${attrs} style="${style}">\n  <div class="pf-cifras__lista">\n` + CIFRAS.map((d) =>
+  `    <article class="pf-cifra">\n      <div class="pf-cifra__cab"><span class="pf-cifra__rotulo">${d[0]}</span><span class="pf-cifra__anio">${d[3]}</span></div>\n` +
+  `      <strong class="pf-cifra__n" data-anim="cifra" data-dur="1400">${d[1]}</strong>\n      <p class="pf-cifra__desc">${d[2]}</p>\n    </article>`).join("\n") + "\n  </div>\n</section>";
+---
+<Fragment set:html={html} />

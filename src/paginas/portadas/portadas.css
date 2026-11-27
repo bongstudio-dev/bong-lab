@@ -1,0 +1,178 @@
+/* Portadas de esfera: las piezas que comparten las tres versiones (Editorial, Inmersiva e Índice).
+   Tamaños de texto y radios desde tokens.css. Sin sombras, sin degradados sobre fotos (si falta contraste, filtro negro
+   parejo) y sin desenfoque de movimiento. Fondos de color: solo azul, verde, amarillo o terra. */
+.pf-po { --aire: clamp(88px, 11vw, 168px); --borde: clamp(16px, 4vw, 56px); --curva: var(--ease); }
+.pf-po[data-ritmo="lento"] { --aire: clamp(112px, 15vw, 220px); }
+.pf-po[data-ritmo="corto"] { --aire: clamp(64px, 8vw, 120px); }
+.pf-po-ancho { width: min(100% - 2 * var(--borde), 1240px); margin-inline: auto; }
+.pf-po-sec { padding-block: var(--aire) 0; }
+.pf-po-sec:last-of-type { padding-bottom: 0; }
+.pf-po-h2 { margin: 0; font: 500 var(--texto-titulo)/1.04 var(--f-display); letter-spacing: -.03em; color: var(--titulo); text-wrap: balance; }
+.pf-po-cab { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: clamp(28px, 3.4vw, 44px); }
+.pf-po-flecha { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* --- 01 Hero ---------------------------------------------------------------------------------------------------------- */
+/* A · Solo texto */
+.pf-po-hero { position: relative; }
+.pf-po-hero--texto { padding: calc(76px + clamp(96px, 16vw, 220px)) 0 0; }
+.pf-po-hero h1 { margin: 0; max-width: 11ch; font: 500 var(--texto-display)/.98 var(--f-display); letter-spacing: -.045em; color: var(--titulo); text-wrap: balance; }
+.pf-po-hero__bajada { margin: clamp(20px, 2.4vw, 32px) 0 0; max-width: 34ch; font-size: var(--texto-destacado); line-height: 1.45; color: var(--ink-2); text-wrap: pretty; }
+/* B · Foto o video a sangre (pieza nueva, Hero con foto). El texto va sobre un filtro negro parejo. */
+.pf-po-hero--foto { height: 100svh; min-height: 560px; overflow: hidden; color: var(--tiza); background: var(--ink); }
+.pf-po-hero--foto video, .pf-po-hero--foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.pf-po-hero--foto::after { content: ""; position: absolute; inset: 0; background: color-mix(in srgb, var(--color-negro) 34%, transparent); }
+.pf-po-hero--foto .pf-po-ancho { position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: clamp(40px, 7vw, 96px); }
+.pf-po-hero--foto h1 { color: var(--tiza); }
+.pf-po-hero--foto .pf-po-hero__bajada { color: var(--foto-texto); }
+/* C · Fondo de marca: el lienzo del componente Fondos queda fijo detrás y la hoja sube por encima. */
+.pf-po-hero--fondo { min-height: 78svh; display: flex; align-items: flex-end; padding: calc(76px + 48px) 0 clamp(48px, 6vw, 80px); }
+.pf-po-hero--fondo .pf-fondo__lienzo { position: fixed; inset: 0; width: 100%; height: 100lvh; z-index: 0; display: block; }
+.pf-po-hero__tarjeta { position: relative; z-index: 1; display: grid; gap: 0; max-width: 760px; padding: clamp(24px, 3.4vw, 44px); border-radius: var(--radio-tarjeta); background: var(--bg); }
+.pf-po-hoja { position: relative; z-index: 2; background: var(--bg); border-radius: var(--radio-tarjeta) var(--radio-tarjeta) 0 0; }
+.pf-po-hoja > .pf-po-sec:first-child { padding-top: clamp(56px, 7vw, 96px); }
+
+/* --- 02 Apertura -------------------------------------------------------------------------------------------------------- */
+/* A · Revelado con scroll (componente): solo el ajuste de tamaño y el aire de la portada. */
+.pf-po .pf-sr { --tam: clamp(28px, 3.6vw, 52px); background: transparent; }
+.pf-po .pf-sr__bloque { padding: 0; }
+.pf-po .pf-sr__t { max-width: 26ch; }
+/* B · Enunciado y accesos (pieza nueva, Tarjeta de acceso) */
+.pf-po-enunciado { margin: 0 0 clamp(36px, 4vw, 56px); max-width: 30ch; font: 500 clamp(26px, 3vw, 40px)/1.14 var(--f-display); letter-spacing: -.025em; color: var(--ink); text-wrap: pretty; }
+.pf-po-accesos { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.pf-po-acceso { position: relative; display: grid; grid-template-columns: 40px minmax(0, 1fr) 15px; align-items: start; column-gap: 16px; row-gap: 6px; height: 100%; padding: 22px 22px 24px; border-radius: var(--radio-tarjeta);
+  background: var(--card); color: var(--ink); text-decoration: none; transition: background 220ms ease, transform 320ms var(--ease); }
+.pf-po-acceso__forma { grid-row: 1 / span 2; width: 40px; height: 40px; fill: var(--verde); transition: fill 220ms ease; }
+.pf-po-acceso__t { margin: 0; font: 500 var(--texto-subtitulo)/1.1 var(--f-display); letter-spacing: -.015em; color: var(--titulo); }
+.pf-po-acceso__d { grid-column: 2; margin: 0; font-size: var(--texto-chico); line-height: 1.45; color: var(--ink-2); }
+.pf-po-acceso .pf-po-flecha { grid-column: 3; grid-row: 1; margin-top: 4px; color: var(--azul); transition: transform 260ms var(--ease); }
+@media (hover: hover) and (pointer: fine) {
+  .pf-po-acceso:hover { transform: translateY(-3px); }
+  .pf-po-acceso:hover .pf-po-acceso__forma { fill: var(--azul); }
+  .pf-po-acceso:hover .pf-po-flecha { transform: translateX(3px); }
+  .pf-po-acceso--externo:hover .pf-po-flecha { transform: translate(2px, -2px); }
+}
+.pf-po-acceso:active { transform: scale(.985); }
+/* C · Pregunta y respuesta en dos columnas (pieza nueva, Dos columnas) */
+.pf-po-dos { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(28px, 6vw, 96px); align-items: start; }
+.pf-po-dos h2 { max-width: 13ch; }
+.pf-po-dos p { margin: 0; font-size: clamp(18px, 1.6vw, 22px); line-height: 1.5; color: var(--ink-2); text-wrap: pretty; }
+
+/* --- 03 Bloques numerados ------------------------------------------------------------------------------------------------ */
+/* A · Alternados, texto e imagen (pieza nueva, Bloque numerado) */
+.pf-po-bloques { list-style: none; margin: 0; padding: 0; display: grid; gap: clamp(64px, 9vw, 140px); }
+.pf-po-bloque { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: clamp(28px, 6vw, 96px); }
+.pf-po-bloque:nth-child(even) .pf-po-bloque__txt { order: 2; }
+.pf-po-bloque__n { display: block; margin-bottom: 18px; font: 500 var(--texto-chico)/1 var(--f-display); color: var(--verde); font-variant-numeric: tabular-nums; }
+.pf-po-bloque h3 { margin: 0 0 16px; font: 500 clamp(26px, 2.6vw, 38px)/1.06 var(--f-display); letter-spacing: -.025em; color: var(--titulo); text-wrap: balance; }
+.pf-po-bloque p { margin: 0; max-width: 44ch; font-size: var(--texto-cuerpo); line-height: 1.6; color: var(--ink-2); text-wrap: pretty; }
+.pf-po-bloque img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--radio-tarjeta); background: var(--card); }
+/* B · Fotos a pantalla completa (componente): filtro negro parejo en lugar del degradé, sin etiqueta, y el índice de los cinco. */
+.pf-po .pf-sf__media::after { background: color-mix(in srgb, var(--color-negro) calc(var(--oscuro) * 1%), transparent); }
+.pf-po .pf-sf__txt h3 { font-size: clamp(36px, 5vw, 72px); }
+.pf-po .pf-sf__txt p { max-width: 46ch; font-size: var(--texto-destacado); line-height: 1.5; }
+.pf-po-sfi { position: absolute; z-index: 3; right: max(var(--borde), (100% - 1240px) / 2); bottom: calc(24px + env(safe-area-inset-bottom, 0px) + 10px); display: flex; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.pf-po-sfi li { display: grid; place-items: center; min-width: 40px; height: 28px; padding: 0 10px; border-radius: 999px; background: var(--foto-fondo); border: 1px solid var(--foto-borde); color: var(--foto-texto);
+  font: 500 var(--texto-mini)/1 var(--f-body); font-variant-numeric: tabular-nums; transition: background 260ms ease, color 260ms ease; }
+.pf-po-sfi li.pf-activa { background: var(--tiza); border-color: var(--tiza); color: var(--azul); }
+/* C · Lista que se despliega (componente Lista de valores, Filas): con foto al abrirse. */
+.pf-po .pf-lv { --tam: 72; }
+.pf-po .pf-lv__filas { padding: 0 0 0 clamp(40px, 5vw, 72px); }
+.pf-po .pf-lv__palabra { color: var(--titulo); }
+.pf-po .pf-lv__barra { left: 0; }
+.pf-po .pf-lv__abre > div { overflow: hidden; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 300px); gap: 32px; align-items: start; opacity: 0; transition: opacity .4s var(--curva); }
+.pf-po .pf-lv__fila.pf-activa .pf-lv__abre > div { opacity: 1; padding-top: 16px; transition-delay: .1s; }
+.pf-po .pf-lv__abre p { margin: 0; max-width: 46ch; font-size: var(--texto-cuerpo); line-height: 1.6; color: var(--ink-2); }
+.pf-po .pf-lv__abre img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--radio-media); }
+
+/* --- 04 Prueba ----------------------------------------------------------------------------------------------------------- */
+.pf-po .pf-cifras { width: 100%; max-width: none; }
+/* Cita (pieza nueva): comillas en Familjen, el texto en tinta y quién lo dice debajo. */
+.pf-po-cita { margin: 0; max-width: 980px; }
+.pf-po-cita__marca { display: block; height: .5em; margin-bottom: 8px; font: 500 clamp(64px, 7vw, 104px)/1 var(--f-display); color: var(--verde); }
+.pf-po-cita blockquote { margin: 0; }
+.pf-po-cita blockquote p { margin: 0; font: 500 clamp(24px, 2.8vw, 40px)/1.18 var(--f-display); letter-spacing: -.022em; color: var(--ink); text-wrap: pretty; }
+.pf-po-cita figcaption { display: grid; gap: 2px; margin-top: 24px; font-size: var(--texto-chico); color: var(--ink-2); }
+.pf-po-cita figcaption b { font-weight: 500; color: var(--ink); }
+.pf-po-prueba { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(48px, 6vw, 88px); }
+.pf-po-prueba .pf-po-cita { padding-top: clamp(40px, 5vw, 64px); border-top: 1px solid var(--line); }
+
+/* --- 05 Medios ----------------------------------------------------------------------------------------------------------- */
+.pf-po-foto { position: relative; height: 100svh; min-height: 520px; margin: 0; overflow: hidden; }
+.pf-po-foto img { position: absolute; inset: -6% 0; width: 100%; height: 112%; object-fit: cover; transform: translate3d(0, var(--y, 0px), 0); will-change: transform; }
+@media (prefers-reduced-motion: reduce) { .pf-po-foto img { transform: none; } }
+
+/* --- 06 Afirmación ------------------------------------------------------------------------------------------------------- */
+.pf-po-frase { margin: 0; max-width: 18ch; font: 500 clamp(40px, 6.4vw, 96px)/1 var(--f-display); letter-spacing: -.045em; color: var(--titulo); text-wrap: balance; }
+.pf-po-frase--sangria { margin-left: clamp(0px, 8vw, 120px); }
+/* B · Frase sobre fondo de marca: el lienzo del componente Fondos ocupa la sección. */
+.pf-po-color { position: relative; min-height: 86svh; display: flex; align-items: center; overflow: hidden; background: var(--verde); margin-top: var(--aire); }
+.pf-po-color .pf-fondo__lienzo { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.pf-po-color .pf-po-frase { position: relative; z-index: 1; color: var(--tiza); }
+.pf-po-foto + .pf-po-color { margin-top: 0; }
+/* C · Marquesina (animador de texto) */
+.pf-po-marq { padding-block: clamp(20px, 2.4vw, 32px); border-block: 1px solid var(--line); font: 500 clamp(44px, 7vw, 112px)/1 var(--f-display); letter-spacing: -.04em; color: var(--verde); }
+.pf-po-marq p { margin: 0; }
+
+/* --- 07 Recursos --------------------------------------------------------------------------------------------------------- */
+/* A · Grilla de notas: la Tarjeta nota de Novedades (mismas medidas), sin sombra. */
+.pf-po-notas { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.pf-po-notas .pf-card { position: relative; display: grid; text-align: left; text-decoration: none; background: var(--card); border-radius: 26px; container-type: inline-size; transition: transform 320ms var(--ease); }
+@media (hover: hover) and (pointer: fine) { .pf-po-notas .pf-card:hover { transform: translateY(-3px); } }
+.pf-po-notas .pf-card:active { transform: scale(.985); transition-duration: 120ms; }
+.pf-po-notas .pf-media { position: relative; margin: 8px 8px 0; border-radius: 19px; overflow: hidden; line-height: 0; }
+.pf-po-notas .pf-media > img { display: block; width: 100%; height: auto; object-fit: cover; background: var(--bg); }
+.pf-po-notas .pf-media .pf-etiqueta { position: absolute; top: 10px; left: 10px; max-width: calc(100% - 20px); }
+.pf-po-notas .pf-meta { padding: 12px 18px 18px; display: grid; gap: 8px; min-width: 0; }
+.pf-po-notas .pf-when { margin: 0; font-size: var(--texto-chico); color: var(--ink-3); }
+.pf-po-notas .pf-when b { font-weight: 500; color: var(--ink-2); }
+.pf-po-notas .pf-ttl { margin: 0; font: 500 var(--texto-subtitulo)/1.14 var(--f-display); letter-spacing: -.015em; color: var(--azul); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.pf-po-notas .pf-etiqueta .pf-etiqueta__rotulo { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.pf-po-pie-sec { margin-top: 28px; }
+/* B · Documentos: la fila de la Biblioteca (pieza documento de base.css). */
+.pf-po .pf-docs { margin-top: 4px; }
+
+/* --- 08 Contacto --------------------------------------------------------------------------------------------------------- */
+/* A · Frase y botón: bloque verde con el Botón sobre color. */
+.pf-po-cierre { display: grid; justify-items: start; gap: 28px; padding: clamp(40px, 6vw, 88px); border-radius: var(--radio-tarjeta); background: var(--verde); }
+.pf-po-cierre p { margin: 0; max-width: 20ch; font: 500 var(--texto-titulo)/1.04 var(--f-display); letter-spacing: -.03em; color: var(--tiza); text-wrap: balance; }
+/* B · Contactos por área: los datos del contacto de la Sala de prensa (mismas medidas), uno por área. */
+.pf-po-contactos { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.pf-po-contacto { display: grid; align-content: start; gap: 8px; padding: 22px; border-radius: var(--radio-tarjeta); background: var(--card); }
+.pf-po-contacto h3 { margin: 0; font: 500 var(--texto-subtitulo)/1.1 var(--f-display); letter-spacing: -.015em; color: var(--titulo); }
+.pf-po-contacto > p { margin: 0 0 8px; font-size: var(--texto-chico); line-height: 1.45; color: var(--ink-2); }
+.pf-po .pf-dato { display: flex; align-items: stretch; height: 44px; border-radius: var(--radio-control); background: var(--bg); min-width: 0; }
+.pf-po .pf-dato a { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; padding: 0 10px 0 14px; color: var(--ink); text-decoration: none; font: 500 var(--texto-chico)/1 var(--f-body); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pf-po .pf-dato a svg { width: 16px; height: 16px; flex: none; fill: none; stroke: var(--azul); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.pf-po .pf-copiar { width: 44px; flex: none; display: grid; place-items: center; border: 0; border-left: 1px solid var(--line); border-radius: 0 var(--radio-control) var(--radio-control) 0; background: none; color: var(--ink-2); cursor: pointer; }
+.pf-po .pf-copiar svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+@media (hover: hover) and (pointer: fine) { .pf-po .pf-dato a:hover { color: var(--azul); } .pf-po .pf-copiar:hover { color: var(--azul); } }
+/* C · Frase y Botón fijo: el botón acompaña el scroll desde el bloque 03 y se queda en su lugar al llegar (sticky, sin JS). */
+.pf-po-acompana { position: relative; }
+.pf-po-acompana__frase { margin: 0; max-width: 18ch; font: 500 var(--texto-titulo)/1.04 var(--f-display); letter-spacing: -.03em; color: var(--titulo); text-wrap: balance; }
+.pf-po-acompana__fijo { position: sticky; z-index: 30; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); display: flex; margin-top: 28px; pointer-events: none; }
+.pf-po-acompana__fijo .pf-boton-color { pointer-events: auto; background: var(--azul); color: var(--tiza); }
+@media (hover: hover) and (pointer: fine) { .pf-po-acompana__fijo .pf-boton-color:hover { background: color-mix(in srgb, var(--azul) 86%, var(--ink)); } }
+
+/* --- Mobile -------------------------------------------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .pf-po-accesos, .pf-po-contactos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pf-po-notas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pf-po-notas > :nth-child(3) { display: none; }
+}
+@media (max-width: 640px) {
+  .pf-po-hero--texto { padding-top: calc(66px + 88px); }
+  .pf-po-dos, .pf-po-bloque { grid-template-columns: 1fr; }
+  .pf-po-bloque:nth-child(even) .pf-po-bloque__txt { order: 0; }
+  .pf-po-bloque { gap: 24px; }
+  .pf-po-accesos, .pf-po-contactos, .pf-po-notas { grid-template-columns: 1fr; }
+  .pf-po-notas > :nth-child(3) { display: grid; }
+  .pf-po-acceso { padding: 18px; }
+  .pf-po-cab { flex-direction: column; align-items: start; }
+  .pf-po .pf-lv { --tam: 64; }
+  .pf-po .pf-lv__filas { padding-left: 24px; }
+  .pf-po .pf-lv__fila { grid-template-columns: 2.2em minmax(0, 1fr); column-gap: 8px; }
+  .pf-po .pf-lv__abre > div { grid-template-columns: 1fr; gap: 16px; }
+  .pf-po-sfi { gap: 4px; } .pf-po-sfi li { min-width: 34px; padding: 0 8px; }
+  .pf-po-cierre { padding: 32px 24px; }
+  .pf-po-acompana__fijo .pf-boton-color { --alto: var(--btn-m); }
+}

@@ -1,0 +1,18 @@
+---
+// 07A Grilla de notas: la Tarjeta nota de Novedades con las notas reales de sostenibilidad y comunidad, y el botón base al cierre.
+import { etiqueta } from "../../lib/piezas.mjs";
+import { NOTAS_SOS, R } from "./contenido.mjs";
+const FLECHA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+---
+<section class="pf-po-sec pf-po-ancho" aria-labelledby="pf-po-notas-t">
+  <div class="pf-po-cab"><h2 class="pf-po-h2" id="pf-po-notas-t">Novedades</h2></div>
+  <div class="pf-po-notas">
+    {NOTAS_SOS.map((n) => (
+      <a class="pf-card" href={n.href} aria-label={n.t + ". " + n.fecha}>
+        <div class="pf-media"><img src={n.img} alt="" loading="lazy" decoding="async" style={"aspect-ratio:" + n.ratio} /><Fragment set:html={etiqueta(n.tp, n.anio)} /></div>
+        <div class="pf-meta"><p class="pf-when"><b>{n.fecha}</b></p><p class="pf-ttl">{n.t}</p></div>
+      </a>
+    ))}
+  </div>
+  <p class="pf-po-pie-sec"><a class="pf-boton" href={R + "novedades/"}>Ver todas las notas<Fragment set:html={FLECHA} /></a></p>
+</section>

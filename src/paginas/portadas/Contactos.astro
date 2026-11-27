@@ -1,0 +1,20 @@
+---
+// 08B Contactos por área: los datos del contacto de la Sala de prensa (mail y teléfono con copiar), uno por área.
+import { CONTACTOS } from "./contenido.mjs";
+const MAIL = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/></svg>';
+const TEL = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 3.5h3l1.5 4-2 1.3a11 11 0 0 0 6.1 6.1l1.3-2 4 1.5v3a2 2 0 0 1-2.2 2A17 17 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2z"/></svg>';
+const COPIAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="3"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>';
+---
+<section class="pf-po-sec pf-po-ancho" aria-labelledby="pf-po-contacto-t">
+  <div class="pf-po-cab"><h2 class="pf-po-h2" id="pf-po-contacto-t">Hablemos</h2></div>
+  <ul class="pf-po-contactos">
+    {CONTACTOS.map((c) => (
+      <li class="pf-po-contacto">
+        <h3>{c.area}</h3>
+        <p>{c.d}</p>
+        <span class="pf-dato"><a href={"mailto:" + c.mail}><Fragment set:html={MAIL} />{c.mail}</a><button type="button" class="pf-copiar" data-copiar={c.mail} aria-label={"Copiar el mail de " + c.area}><Fragment set:html={COPIAR} /></button></span>
+        {c.tel && <span class="pf-dato"><a href={"tel:" + c.tel.replace(/[^\d+]/g, "")}><Fragment set:html={TEL} />{c.tel}</a><button type="button" class="pf-copiar" data-copiar={c.tel} aria-label={"Copiar el teléfono de " + c.area}><Fragment set:html={COPIAR} /></button></span>}
+      </li>
+    ))}
+  </ul>
+</section>

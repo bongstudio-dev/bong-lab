@@ -1,0 +1,21 @@
+---
+// 07B Documentos: la fila de la Biblioteca (pieza documento de base.css) con documentos reales sobre ambiente.
+import { etiqueta } from "../../lib/piezas.mjs";
+import { DOCS_SOS, R } from "./contenido.mjs";
+const BAJAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v13M6 13l6 6 6-6"/></svg>';
+const FLECHA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+---
+<section class="pf-po-sec pf-po-ancho" aria-labelledby="pf-po-docs-t">
+  <div class="pf-po-cab"><h2 class="pf-po-h2" id="pf-po-docs-t">Documentos</h2></div>
+  <ul class="pf-docs">
+    {DOCS_SOS.map((d) => (
+      <li class="pf-doc">
+        <Fragment set:html={etiqueta(d.c)} />
+        <h3 class="pf-doc__t"><a href={d.href}>{d.t}</a></h3>
+        <span class="pf-doc__y">{d.y}</span>
+        <a class="pf-doc__d" href={d.u} target="_blank" rel="noopener" aria-label={"Descargar PDF: " + d.t}><Fragment set:html={BAJAR} /></a>
+      </li>
+    ))}
+  </ul>
+  <p class="pf-po-pie-sec"><a class="pf-boton" href={R + "biblioteca/"}>Ir a la Biblioteca<Fragment set:html={FLECHA} /></a></p>
+</section>

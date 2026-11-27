@@ -1,0 +1,72 @@
+---
+// Portada de esfera, versión Editorial (Sostenibilidad): ritmo lento y mucho aire, el texto abre y las imágenes acompañan.
+// 00A barra sobre claro · 01A hero solo texto · 02A enunciado que se enciende · 03A cuatro bloques alternados ·
+// 04C cifras y cita · 05A carrusel de fotos · 06A frase grande · 07A grilla de notas · 08A frase y botón · 09 pie.
+import Marco from "../../../../paginas/portadas/Marco.astro";
+import Cifras from "../../../../paginas/portadas/Cifras.astro";
+import Cita from "../../../../paginas/portadas/Cita.astro";
+import Notas from "../../../../paginas/portadas/Notas.astro";
+import { pieza } from "../../../../lib/piezas.mjs";
+import { HERO, APERTURA, BLOQUES, FRASE, CARRUSEL, CIERRE } from "../../../../paginas/portadas/contenido.mjs";
+
+const revela = pieza("revela-scroll", { variante: "resaltado", txt: APERTURA, color: "verde", fondo: "tiza" });
+const cifras = pieza("cifras", { variante: "tiza", paleta: "verde", comb: "terciaria", num: 72 });
+const carrusel = pieza("carrusel-fotos", { pastilla: "Arrastrá" });
+const apertura = revela.html().replace(/\s*<div class="pf-sr__aire[^"]*"[^>]*>[^<]*<\/div>/g, "");
+const lista = [BLOQUES.gestion, BLOQUES.huella, BLOQUES.comunidad, BLOQUES.puertas];
+const FLECHA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+const css = [revela.css, cifras.css, carrusel.css].join("\n");
+const js = [revela.js, carrusel.js].join("\n");
+---
+<Marco version="Editorial" ritmo="lento" barra="solida" css={css} js={js}>
+  <header class="pf-po-hero pf-po-hero--texto pf-po-ancho" slot="hero">
+    <h1 data-anim="sube" data-disparo="carga">{HERO.titulo}</h1>
+    <p class="pf-po-hero__bajada" data-anim="funde" data-disparo="carga">{HERO.bajada}</p>
+  </header>
+
+  <section class="pf-po-sec pf-po-ancho" aria-label="Nuestro compromiso"><Fragment set:html={apertura} /></section>
+
+  <section class="pf-po-sec pf-po-ancho" aria-labelledby="pf-po-bloques-t">
+    <div class="pf-po-cab"><h2 class="pf-po-h2" id="pf-po-bloques-t">Cómo lo hacemos</h2></div>
+    <ol class="pf-po-bloques">
+      {lista.map((b, i) => (
+        <li class="pf-po-bloque">
+          <div class="pf-po-bloque__txt">
+            <span class="pf-po-bloque__n">{String(i + 1).padStart(2, "0")}</span>
+            <h3 data-anim="ventana">{b.t}</h3>
+            <p data-anim="funde">{b.p}</p>
+          </div>
+          <img src={b.foto} alt={b.alt} loading="lazy" decoding="async" />
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section class="pf-po-sec pf-po-ancho pf-po-prueba" aria-label="Datos y testimonio">
+    <Cifras attrs={cifras.attrs} style={cifras.style} />
+    <Cita />
+  </section>
+
+  <section class="pf-po-sec" aria-label="Fotos">
+    <section class="pf-fotos" data-c="carrusel-fotos" style={carrusel.style} aria-roledescription="carrusel" aria-label="Galería de fotos">
+      <p class="pf-oculto">Usá las flechas izquierda y derecha del teclado para recorrer las fotos.</p>
+      <div class="pf-fotos__pista" tabindex="0" role="group" aria-label="Fotos">
+        {CARRUSEL.map(([src, alt]) => <figure class="pf-foto" style="--tono:#8C8A6E"><img src={src} alt={alt} draggable="false" decoding="async" /></figure>)}
+      </div>
+      <div class="pf-fotos__cursor" aria-hidden="true"><span class="pf-fotos__pastilla">{carrusel.s.pastilla}</span></div>
+    </section>
+  </section>
+
+  <section class="pf-po-sec pf-po-ancho" aria-label="Afirmación">
+    <p class="pf-po-frase pf-po-frase--sangria" data-anim="ventana">{FRASE}</p>
+  </section>
+
+  <Notas />
+
+  <section class="pf-po-sec pf-po-ancho" aria-label="Reporte de Sostenibilidad">
+    <div class="pf-po-cierre">
+      <p data-anim="sube">{CIERRE.frase}</p>
+      <a class="pf-boton-color" href={CIERRE.href} target="_blank" rel="noopener">{CIERRE.boton}<Fragment set:html={FLECHA} /></a>
+    </div>
+  </section>
+</Marco>

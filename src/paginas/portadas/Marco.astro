@@ -1,0 +1,47 @@
+---
+// Marco de las portadas de esfera: firma, <head> común, barra, pie, transición entre páginas y los scripts de la librería
+// que use cada versión. Cada versión pone sus bloques en el slot, en el orden fijo de la plantilla.
+import Pagina from "../../componentes/Pagina.astro";
+import Cabeza from "../../componentes/Cabeza.astro";
+import Simbolos from "../../componentes/Simbolos.astro";
+import Barra from "../../componentes/Barra.astro";
+import Pie from "../../componentes/Pie.astro";
+import CSS from "./portadas.css?raw";
+import JS from "./portada.js?raw";
+import { R } from "./contenido.mjs";
+
+interface Props {
+  version: string;                      // Editorial, Inmersiva o Índice
+  ritmo: "lento" | "medio" | "corto";
+  css?: string;                         // el de los componentes de la librería que usa
+  js?: string;                          // el de los componentes de la librería que usa
+  barra: "solida" | "foto";             // 00A sobre claro (azul desde arriba) o 00B transparente sobre el hero
+  formas?: boolean;                     // formas.js, para los fondos generativos
+  hoja?: boolean;                       // con fondo fijo detrás: lo que sigue al hero va en una hoja que sube
+}
+const { version, ritmo, css = "", js = "", barra, formas = false, hoja = false } = Astro.props;
+const nombre = "Sostenibilidad · " + version;
+---
+<Pagina firma={{ nombre: "PROFERTIL · PORTADA DE ESFERA · " + version.toUpperCase(), que: "Portada de la esfera Sostenibilidad armada con la plantilla base de portadas.", contexto: "Prototipo de las portadas de esfera para la web de Profertil." }} transicion="biblioteca" css={CSS + "\n" + css}>
+<Cabeza slot="head" titulo={nombre + " · Profertil"} descripcion="Portada de la esfera Sostenibilidad de profertil.com.ar: propósito, certificaciones, cuidado ambiental, comunidad, novedades y contacto." raiz="../../" temaColor alcance={{ seccion: "", nombre: "Sostenibilidad" }}>
+  <link rel="stylesheet" href={R + "animadores-texto/animadores.css"}>
+  <script is:inline src={R + "animadores-texto/animadores.js"} defer></script>
+</Cabeza>
+
+<Simbolos badge />
+
+<a class="pf-saltar" href="#pf-contenido">Ir al contenido</a>
+
+<Barra solida={barra === "solida"} actual="Sostenibilidad" busca={{ etiqueta: "Buscar en el sitio", placeholder: "Buscá: huertas, visitas, reporte…" }} />
+
+<div class="pf-po" data-ritmo={ritmo} data-barra={barra}>
+  <slot name="hero" />
+  {hoja
+    ? <div class="pf-po-hoja" id="pf-po-hoja"><main id="pf-contenido" tabindex="-1"><slot /></main><Pie /></div>
+    : <Fragment><main id="pf-contenido" tabindex="-1"><slot /></main><Pie /></Fragment>}
+</div>
+
+{formas && <script is:inline src={R + "componentes/formas.js"}></script>}
+<script is:inline set:html={"\n" + JS}></script>
+{js && <script is:inline set:html={"\n" + js}></script>}
+</Pagina>
