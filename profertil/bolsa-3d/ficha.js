@@ -6,15 +6,20 @@
 // sin movimiento reducido). Al bajar por la página gira hacia el frente, siguiendo el scroll con un poco de
 // inercia (en el iPhone el scroll llega a saltos mientras cambia la barra del navegador y así no se notan).
 // Fuera de eso, solo se dibuja cuando algo cambia.
+// Terminación: sombra horneada en pliegues, fuelle y base, relieve del film y reflejos de un estudio de fotografía.
+// Son iguales para todos los productos (se bajan una vez por visita). Si llegan después que la malla y la piel, la bolsa
+// aparece igual con un entorno genérico y se suman cuando están.
 //
-// Uso: import { montar } from ".../bolsa-3d/ficha.js"; montar(figura, { glb, piel });
+// Uso: import { montar } from ".../bolsa-3d/ficha.js"; montar(figura, { glb, piel, sombra, relieve, estudio });
 //   figura: el <figure> que contiene la <img> de la bolsa.
-//   glb: bolsa.glb; piel: etiqueta liviana (web/<id>.webp, 1144 x 1920, proporción 2288:3840).
+//   glb: bolsa-horneada.glb (con el UV de la sombra); piel: etiqueta liviana (web/<id>.webp, 1144 x 1920, proporción 2288:3840).
+//   sombra: sombra.webp; relieve: relieve.webp; estudio: estudio.hdr (ver fuente/sombra.py, relieve.py y estudio.py).
 
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.170.0/+esm";
 import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/loaders/GLTFLoader.js/+esm";
 import { DRACOLoader } from "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/loaders/DRACOLoader.js/+esm";
 import { RoomEnvironment } from "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/environments/RoomEnvironment.js/+esm";
+import { RGBELoader } from "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/loaders/RGBELoader.js/+esm";
 
 export const DRACO = "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/libs/draco/gltf/";
 
@@ -32,8 +37,12 @@ const CENTRO_Y = 0.47; // mitad del alto de la bolsa: la escala de la entrada se
 // o antes si la figura sale de pantalla antes (termina cuando bajó el 60 % de la figura). Lo sigue con un retardo de
 // INERCIA segundos.
 const SCROLL = { recorrido: 400, giro: -25, inercia: 0.14 };
+// Terminación: cuánto marca el relieve, cuántas veces se repite sobre la etiqueta (tejas de unos 15 cm), cuánto oscurece la
+// sombra y cuánta luz da el estudio. ESPERA_TERMINACION: cuánto se espera a la terminación antes de mostrar la bolsa sin ella.
+const TERMINACION = { relieve: 0.15, repetir: [4, 6], sombra: 1.2, estudio: 1.1 };
+const ESPERA_TERMINACION = 150;
 
-export async function montar(figura, { glb, piel }) {
+export async function montar(figura, { glb, piel, sombra, relieve, estudio }) {
   const foto = figura.querySelector("img");
   if (!foto) return;
 
@@ -65,13 +74,14 @@ export async function montar(figura, { glb, piel }) {
   camara.position.set(-FOTO.dist * Math.sin(g), FOTO.alto, FOTO.dist * Math.cos(g));
   camara.lookAt(camara.position.clone().add(new THREE.Vector3(Math.sin(g) * Math.cos(b), -Math.sin(b), -Math.cos(g) * Math.cos(b))));
 
-  // Malla, piel y decodificador en paralelo.
+  // Malla, piel y decodificador en paralelo; la terminación también, pero no se la espera (ver más abajo).
+  const imagen = (url) => fetch(url).then(r => r.blob()).then(bl => createImageBitmap(bl, { colorSpaceConversion: "none" }));
+  const terminacion = sombra && relieve && estudio
+    ? Promise.all([imagen(sombra), imagen(relieve), new RGBELoader().loadAsync(estudio)]).catch(() => null)
+    : Promise.resolve(null);
   const draco = new DRACOLoader().setDecoderPath(DRACO);
   const cargador = new GLTFLoader().setDRACOLoader(draco);
-  const [gltf, mapa] = await Promise.all([
-    cargador.loadAsync(glb),
-    fetch(piel).then(r => r.blob()).then(bl => createImageBitmap(bl, { colorSpaceConversion: "none" })),
-  ]);
+  const [gltf, mapa] = await Promise.all([cargador.loadAsync(glb), imagen(piel)]);
   draco.dispose();
 
   const textura = new THREE.Texture(mapa);
@@ -79,11 +89,36 @@ export async function montar(figura, { glb, piel }) {
   textura.flipY = false;
   textura.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
   textura.needsUpdate = true;
-  const etiqueta = new THREE.MeshPhysicalMaterial({ map: textura, roughness: 0.42, clearcoat: 0.45, clearcoatRoughness: 0.28 });
-  const tapa = new THREE.MeshPhysicalMaterial({ color: 0xeceeef, roughness: 0.5, clearcoat: 0.3, clearcoatRoughness: 0.35 });
+  // Material sin barniz: con la terminación se ve como el film de la foto y le cuesta menos al teléfono.
+  const etiqueta = new THREE.MeshStandardMaterial({ map: textura, roughness: 0.36 });
+  const tapa = new THREE.MeshStandardMaterial({ color: 0xeceeef, roughness: 0.5 });
   const bolsa = gltf.scene;
   bolsa.traverse(o => { if (o.isMesh) o.material = o.material.name === "etiqueta" ? etiqueta : tapa; });
   escena.add(bolsa);
+
+  // Terminación: sombra en el segundo UV, relieve repetido sobre el de la etiqueta y el estudio como entorno.
+  let terminada = false;
+  function terminar(t) {
+    if (!t || terminada) return;
+    terminada = true;
+    const [somb, rel, hdr] = t;
+    const ao = new THREE.Texture(somb);
+    ao.flipY = false; ao.channel = 1; ao.needsUpdate = true;
+    const normal = new THREE.Texture(rel);
+    normal.flipY = false; normal.wrapS = normal.wrapT = THREE.RepeatWrapping;
+    normal.repeat.set(...TERMINACION.repetir); normal.needsUpdate = true;
+    for (const m of [etiqueta, tapa]) {
+      m.aoMap = ao; m.aoMapIntensity = TERMINACION.sombra;
+      m.normalMap = normal; m.normalScale.setScalar(TERMINACION.relieve);
+      m.needsUpdate = true;
+    }
+    hdr.mapping = THREE.EquirectangularReflectionMapping;
+    const pm = new THREE.PMREMGenerator(renderer);
+    escena.environment?.dispose();
+    escena.environment = pm.fromEquirectangular(hdr).texture;
+    escena.environmentIntensity = TERMINACION.estudio;
+    pm.dispose(); hdr.dispose();
+  }
 
   // El lienzo tapa la figura entera; la foto ocupa un rectángulo adentro (object-fit: contain con padding).
   // La cámara se corre para que ese rectángulo coincida con el encuadre de la foto.
@@ -190,6 +225,10 @@ export async function montar(figura, { glb, piel }) {
   };
   lienzo.addEventListener("pointerup", soltar);
   lienzo.addEventListener("pointercancel", soltar);
+
+  // Si la terminación está por llegar se la espera un instante; si no, la bolsa sale sin ella y se suma después.
+  terminar(await Promise.race([terminacion, new Promise(r => setTimeout(r, ESPERA_TERMINACION, null))]));
+  if (!terminada) terminacion.then(t => { terminar(t); if (terminada) pedir(); });
 
   // Primer cuadro: se sube todo a la GPU y se dibuja con el lienzo todavía oculto; recién entonces se cambia la foto.
   figura.appendChild(lienzo);

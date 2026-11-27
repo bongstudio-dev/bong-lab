@@ -52,7 +52,7 @@ const TIPOS = {
   ".mjs": "text/javascript; charset=utf-8", ".json": "application/json; charset=utf-8", ".svg": "image/svg+xml",
   ".webp": "image/webp", ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".gif": "image/gif",
   ".pdf": "application/pdf", ".mp4": "video/mp4", ".woff2": "font/woff2", ".txt": "text/plain; charset=utf-8",
-  ".md": "text/markdown; charset=utf-8", ".glb": "model/gltf-binary",
+  ".md": "text/markdown; charset=utf-8", ".glb": "model/gltf-binary", ".hdr": "image/vnd.radiance",
 };
 
 export default function estaticos() {

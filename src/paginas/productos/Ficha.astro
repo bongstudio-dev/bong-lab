@@ -17,7 +17,8 @@ const esFoto = imagen?.endsWith(".jpg");
 const bolsa = bolsa3d(producto);
 const THREE_CDN = "https://cdn.jsdelivr.net/npm/three@0.170.0/";
 const bolsa3dArchivos = bolsa && {
-  modulo: sitio("bolsa-3d/ficha.js"), glb: sitio("bolsa-3d/bolsa.glb"), piel: sitio("bolsa-3d/web/" + bolsa + ".webp"),
+  modulo: sitio("bolsa-3d/ficha.js"), glb: sitio("bolsa-3d/bolsa-horneada.glb"), piel: sitio("bolsa-3d/web/" + bolsa + ".webp"),
+  sombra: sitio("bolsa-3d/sombra.webp"), relieve: sitio("bolsa-3d/relieve.webp"), estudio: sitio("bolsa-3d/estudio.hdr"),
 };
 const biblioteca = [...MSDS, ...BIB];
 const recursos = p.documentos.map(d => {
@@ -87,10 +88,14 @@ const PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-
     <link rel="modulepreload" href={THREE_CDN + "examples/jsm/loaders/GLTFLoader.js/+esm"} />
     <link rel="modulepreload" href={THREE_CDN + "examples/jsm/loaders/DRACOLoader.js/+esm"} />
     <link rel="modulepreload" href={THREE_CDN + "examples/jsm/environments/RoomEnvironment.js/+esm"} />
+    <link rel="modulepreload" href={THREE_CDN + "examples/jsm/loaders/RGBELoader.js/+esm"} />
     <link rel="preload" as="fetch" crossorigin="anonymous" href={THREE_CDN + "examples/jsm/libs/draco/gltf/draco_wasm_wrapper.js"} />
     <link rel="preload" as="fetch" crossorigin="anonymous" href={THREE_CDN + "examples/jsm/libs/draco/gltf/draco_decoder.wasm"} />
     <link rel="preload" as="fetch" crossorigin="anonymous" href={bolsa3dArchivos.glb} />
     <link rel="preload" as="fetch" crossorigin="anonymous" href={bolsa3dArchivos.piel} />
+    <link rel="preload" as="fetch" crossorigin="anonymous" href={bolsa3dArchivos.sombra} />
+    <link rel="preload" as="fetch" crossorigin="anonymous" href={bolsa3dArchivos.relieve} />
+    <link rel="preload" as="fetch" crossorigin="anonymous" href={bolsa3dArchivos.estudio} />
   </Fragment>}
   <Fragment slot="cab">
     <div class="pr-ficha-cab">
